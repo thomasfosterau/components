@@ -1,5 +1,5 @@
 // Main components
-export { Chart, Line, Bar, Scatter, Axis } from './components/index.js';
+export { Chart, Line, Bar, Scatter, Area, Pie, Axis } from './components/index.js';
 
 // Renderers
 export { SVGRenderer, CanvasRenderer, WebGPURenderer } from './renderers/index.js';

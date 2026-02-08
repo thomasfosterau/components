@@ -1,3 +1,4 @@
-import { defineConfig } from '@sveltejs/kit';
+/** @type {import('@sveltejs/kit').Config} */
+const config = {};
 
-export default defineConfig({});
+export default config;

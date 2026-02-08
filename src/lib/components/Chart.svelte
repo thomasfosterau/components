@@ -1,51 +1,39 @@
 <script lang="ts">
-	import { onMount, setContext } from 'svelte';
-	import type { RenderTarget, Margin } from '../types/index.js';
-	import { setChartContext, createRenderer } from '../core/index.js';
-	import type { Snippet } from 'svelte';
+import { onMount } from 'svelte';
+import type { RenderTarget, Margin } from '../types/index.js';
+import { setChartContext, createRenderer } from '../core/index.js';
 
-	interface Props {
-		width?: number;
-		height?: number;
-		margin?: Margin;
-		renderTarget?: RenderTarget;
-		children?: Snippet;
-	}
+export let width: number = 600;
+export let height: number = 400;
+export let margin: Margin = { top: 20, right: 20, bottom: 40, left: 50 };
+export let renderTarget: RenderTarget = 'svg';
 
-	let {
-		width = 600,
-		height = 400,
-		margin = { top: 20, right: 20, bottom: 40, left: 50 },
-		renderTarget = 'svg',
-		children
-	}: Props = $props();
+let containerElement: HTMLDivElement;
+let canvasElement: HTMLCanvasElement | undefined;
+let svgContent = '';
 
-	let containerElement: HTMLDivElement;
-	let canvasElement: HTMLCanvasElement | undefined = $state();
-	let svgContent = $state('');
+const renderer = createRenderer(renderTarget, canvasElement);
 
-	const renderer = createRenderer(renderTarget, canvasElement);
-	
-	// Set up chart context for child components
-	setChartContext({
-		renderer,
-		width,
-		height,
-		margin,
-		renderTarget
-	});
+// Set up chart context for child components
+setChartContext({
+renderer,
+width,
+height,
+margin,
+renderTarget
+});
 
-	onMount(() => {
-		renderer.initialize(width, height);
-		
-		if (renderTarget === 'svg') {
-			svgContent = (renderer.getOutput() as string) || '';
-		}
-	});
+onMount(() => {
+renderer.initialize(width, height);
 
-	// Calculate inner dimensions (accounting for margins)
-	const innerWidth = $derived(width - margin.left - margin.right);
-	const innerHeight = $derived(height - margin.top - margin.bottom);
+if (renderTarget === 'svg') {
+svgContent = (renderer.getOutput() as string) || '';
+}
+});
+
+// Calculate inner dimensions (accounting for margins)
+$: innerWidth = width - margin.left - margin.right;
+$: innerHeight = height - margin.top - margin.bottom;
 </script>
 
 <div bind:this={containerElement} class="chart-container" style="width: {width}px; height: {height}px;">
@@ -57,9 +45,7 @@
 <canvas bind:this={canvasElement} {width} {height}></canvas>
 {/if}
 
-{#if children}
-{@render children()}
-{/if}
+<slot />
 </div>
 
 <style>
