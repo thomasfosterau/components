@@ -10,6 +10,8 @@ export let y: string;
 export let fill: string = '#4299e1';
 export let stroke: string | undefined = undefined;
 export let radius: number = 4;
+export let xScale: any = undefined;
+export let yScale: any = undefined;
 
 const chartContext = getChartContext();
 const { renderer, width, height, margin } = chartContext;
@@ -25,19 +27,25 @@ if (!data || data.length === 0) return;
 const xValues = data.map(d => d[x] as number);
 const yValues = data.map(d => d[y] as number);
 
-// Create scales
-const xScale = createScale('linear')
-.domain(getNiceDomain(xValues, 0.1))
-.range([margin.left, width - margin.right]);
+// Use provided scales or create default ones
+let finalXScale = xScale;
+if (!finalXScale) {
+finalXScale = createScale('linear');
+finalXScale.domain(getNiceDomain(xValues, 0.1));
+finalXScale.range([margin.left, width - margin.right]);
+}
 
-const yScale = createScale('linear')
-.domain(getNiceDomain(yValues, 0.1))
-.range([height - margin.bottom, margin.top]);
+let finalYScale = yScale;
+if (!finalYScale) {
+finalYScale = createScale('linear');
+finalYScale.domain(getNiceDomain(yValues, 0.1));
+finalYScale.range([height - margin.bottom, margin.top]);
+}
 
 // Draw points
 data.forEach(d => {
-const xPos = xScale(d[x] as number) as number;
-const yPos = yScale(d[y] as number) as number;
+const xPos = finalXScale(d[x] as number) as number;
+const yPos = finalYScale(d[y] as number) as number;
 
 const point = {
 x: (xPos / width) * 100,

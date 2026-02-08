@@ -23,8 +23,20 @@ drawAxis();
 function drawAxis() {
 if (!scale) return;
 
+let ticks: any[];
+
+// Use the scale's own tick generator when available (continuous scales),
+// otherwise branch by scale type to avoid passing non-numeric domains to getTicks.
+if (typeof scale.ticks === 'function') {
+ticks = scale.ticks(tickCount);
+} else if (scaleType === 'band' || scaleType === 'ordinal') {
+// For band/ordinal (categorical) scales, the domain itself is the set of tick values.
+ticks = scale.domain();
+} else {
+// Fallback: assume a numeric domain and use helper-based tick generation.
 const domain = scale.domain();
-const ticks = getTicks(domain, tickCount);
+ticks = getTicks(domain, tickCount);
+}
 
 const isXAxis = type === 'x';
 const axisY = position === 'bottom' ? height - margin.bottom : margin.top;
@@ -46,6 +58,9 @@ renderer.stroke('#000', 1);
 // Draw ticks and labels
 ticks.forEach(tick => {
 const scaledValue = scale(tick);
+
+// Guard against undefined scaledValue
+if (scaledValue == null) return;
 
 if (isXAxis) {
 const x = (scaledValue / width) * 100;

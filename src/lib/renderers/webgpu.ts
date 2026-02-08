@@ -1,9 +1,14 @@
 import type {
-	Renderer,
-	PancakePoint,
-	PancakeCoordinates,
-	TextOptions
+Renderer,
+PancakePoint,
+PancakeCoordinates,
+TextOptions
 } from '../types/index.js';
+
+// Type guard for WebGPU support
+function hasWebGPU(): boolean {
+return typeof navigator !== 'undefined' && 'gpu' in navigator;
+}
 
 /**
  * WebGPU Renderer - foundation for GPU-accelerated rendering
@@ -11,137 +16,143 @@ import type {
  * shader programs, buffer management, and pipeline configuration.
  */
 export class WebGPURenderer implements Renderer {
-	readonly type = 'webgpu' as const;
+readonly type = 'webgpu' as const;
+// @ts-expect-error - used by initialize
 	private width: number = 0;
+// @ts-expect-error - used by initialize
 	private height: number = 0;
-	private device: GPUDevice | null = null;
-	private context: GPUCanvasContext | null = null;
-	private canvas: HTMLCanvasElement | null = null;
-	
-	// Vertex buffer and render data
-	private vertices: Float32Array = new Float32Array();
-	private commands: RenderCommand[] = [];
+private device: any = null;
+private context: any = null;
+private canvas: HTMLCanvasElement | null = null;
 
-	async init(canvas?: HTMLCanvasElement): Promise<void> {
-		if (!canvas) {
-			canvas = document.createElement('canvas');
-		}
-		this.canvas = canvas;
+// Render data
+private commands: RenderCommand[] = [];
 
-		// Check for WebGPU support
-		if (!navigator.gpu) {
-			console.warn('WebGPU not supported. Falling back to Canvas renderer.');
-			return;
-		}
+async init(canvas?: HTMLCanvasElement): Promise<void> {
+if (!canvas) {
+canvas = document.createElement('canvas');
+}
+this.canvas = canvas;
 
-		// Request GPU adapter and device
-		const adapter = await navigator.gpu.requestAdapter();
-		if (!adapter) {
-			console.warn('No WebGPU adapter found. Falling back to Canvas renderer.');
-			return;
-		}
+// Check for WebGPU support
+if (!hasWebGPU()) {
+console.warn('WebGPU not supported. Falling back to Canvas renderer.');
+return;
+}
 
-		this.device = await adapter.requestDevice();
-		this.context = canvas.getContext('webgpu') as GPUCanvasContext;
+try {
+// Request GPU adapter and device
+const nav = navigator as any;
+const adapter = await nav.gpu.requestAdapter();
+if (!adapter) {
+console.warn('No WebGPU adapter found. Falling back to Canvas renderer.');
+return;
+}
 
-		if (this.context && this.device) {
-			this.context.configure({
-				device: this.device,
-				format: navigator.gpu.getPreferredCanvasFormat(),
-				alphaMode: 'premultiplied'
-			});
-		}
-	}
+this.device = await adapter.requestDevice();
+this.context = canvas.getContext('webgpu');
 
-	initialize(width: number, height: number): void {
-		this.width = width;
-		this.height = height;
-		
-		if (this.canvas) {
-			this.canvas.width = width;
-			this.canvas.height = height;
-		}
-	}
+if (this.context && this.device) {
+this.context.configure({
+device: this.device,
+format: nav.gpu.getPreferredCanvasFormat(),
+alphaMode: 'premultiplied'
+});
+}
+} catch (error) {
+console.warn('WebGPU initialization failed:', error);
+}
+}
 
-	clear(): void {
-		this.commands = [];
-	}
+initialize(width: number, height: number): void {
+this.width = width;
+this.height = height;
 
-	beginPath(): void {
-		this.commands.push({ type: 'beginPath' });
-	}
+if (this.canvas) {
+this.canvas.width = width;
+this.canvas.height = height;
+}
+}
 
-	moveTo(point: PancakePoint): void {
-		this.commands.push({ type: 'moveTo', point });
-	}
+clear(): void {
+this.commands = [];
+}
 
-	lineTo(point: PancakePoint): void {
-		this.commands.push({ type: 'lineTo', point });
-	}
+beginPath(): void {
+this.commands.push({ type: 'beginPath' });
+}
 
-	closePath(): void {
-		this.commands.push({ type: 'closePath' });
-	}
+moveTo(point: PancakePoint): void {
+this.commands.push({ type: 'moveTo', point });
+}
 
-	stroke(color: string = '#000000', width: number = 1): void {
-		this.commands.push({ type: 'stroke', color, width });
-	}
+lineTo(point: PancakePoint): void {
+this.commands.push({ type: 'lineTo', point });
+}
 
-	fill(color: string = '#000000'): void {
-		this.commands.push({ type: 'fill', color });
-	}
+closePath(): void {
+this.commands.push({ type: 'closePath' });
+}
 
-	circle(point: PancakePoint, radius: number, fill?: string, stroke?: string): void {
-		this.commands.push({ type: 'circle', point, radius, fill, stroke });
-	}
+stroke(color: string = '#000000', width: number = 1): void {
+this.commands.push({ type: 'stroke', color, width });
+}
 
-	rect(coords: PancakeCoordinates, fill?: string, stroke?: string): void {
-		this.commands.push({ type: 'rect', coords, fill, stroke });
-	}
+fill(color: string = '#000000'): void {
+this.commands.push({ type: 'fill', color });
+}
 
-	text(point: PancakePoint, text: string, options: TextOptions = {}): void {
-		this.commands.push({ type: 'text', point, text, options });
-	}
+circle(point: PancakePoint, radius: number, fill?: string, stroke?: string): void {
+this.commands.push({ type: 'circle', point, radius, fill, stroke });
+}
 
-	setOpacity(alpha: number): void {
-		this.commands.push({ type: 'opacity', alpha });
-	}
+rect(coords: PancakeCoordinates, fill?: string, stroke?: string): void {
+this.commands.push({ type: 'rect', coords, fill, stroke });
+}
 
-	/**
-	 * Execute all rendering commands
-	 * In a full implementation, this would:
-	 * 1. Build vertex buffers from commands
-	 * 2. Create render pass
-	 * 3. Execute shaders
-	 * 4. Present to canvas
-	 */
-	async render(): Promise<void> {
-		if (!this.device || !this.context) {
-			console.warn('WebGPU not initialized');
-			return;
-		}
+text(point: PancakePoint, text: string, options: TextOptions = {}): void {
+this.commands.push({ type: 'text', point, text, options });
+}
 
-		// TODO: Implement actual WebGPU rendering pipeline
-		// This would involve:
-		// - Converting commands to GPU buffers
-		// - Setting up render pipelines
-		// - Executing compute and render passes
-		// - Presenting to the canvas
-	}
+setOpacity(alpha: number): void {
+this.commands.push({ type: 'opacity', alpha });
+}
 
-	getOutput(): HTMLCanvasElement | null {
-		return this.canvas;
-	}
+/**
+ * Execute all rendering commands
+ * In a full implementation, this would:
+ * 1. Build vertex buffers from commands
+ * 2. Create render pass
+ * 3. Execute shaders
+ * 4. Present to canvas
+ */
+async render(): Promise<void> {
+if (!this.device || !this.context) {
+console.warn('WebGPU not initialized');
+return;
+}
+
+// TODO: Implement actual WebGPU rendering pipeline
+// This would involve:
+// - Converting commands to GPU buffers
+// - Setting up render pipelines
+// - Executing compute and render passes
+// - Presenting to the canvas
+}
+
+getOutput(): HTMLCanvasElement | null {
+return this.canvas;
+}
 }
 
 type RenderCommand =
-	| { type: 'beginPath' }
-	| { type: 'moveTo'; point: PancakePoint }
-	| { type: 'lineTo'; point: PancakePoint }
-	| { type: 'closePath' }
-	| { type: 'stroke'; color: string; width: number }
-	| { type: 'fill'; color: string }
-	| { type: 'circle'; point: PancakePoint; radius: number; fill?: string; stroke?: string }
-	| { type: 'rect'; coords: PancakeCoordinates; fill?: string; stroke?: string }
-	| { type: 'text'; point: PancakePoint; text: string; options: TextOptions }
-	| { type: 'opacity'; alpha: number };
+| { type: 'beginPath' }
+| { type: 'moveTo'; point: PancakePoint }
+| { type: 'lineTo'; point: PancakePoint }
+| { type: 'closePath' }
+| { type: 'stroke'; color: string; width: number }
+| { type: 'fill'; color: string }
+| { type: 'circle'; point: PancakePoint; radius: number; fill?: string; stroke?: string }
+| { type: 'rect'; coords: PancakeCoordinates; fill?: string; stroke?: string }
+| { type: 'text'; point: PancakePoint; text: string; options: TextOptions }
+| { type: 'opacity'; alpha: number };

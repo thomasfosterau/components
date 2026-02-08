@@ -127,11 +127,11 @@ bun run dev
 # Build the library
 bun run build
 
-# Run tests
-bun test
+# Run type checking
+bun run check
 
-# Lint
-bun run lint
+# Format code
+bun run format
 ```
 
 ## Versioning

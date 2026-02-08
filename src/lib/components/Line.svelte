@@ -10,6 +10,8 @@ export let y: string;
 export let stroke: string = '#4299e1';
 export let strokeWidth: number = 2;
 export let fill: string | undefined = undefined;
+export let xScale: any = undefined;
+export let yScale: any = undefined;
 
 const chartContext = getChartContext();
 const { renderer, width, height, margin } = chartContext;
@@ -25,31 +27,42 @@ if (!data || data.length === 0) return;
 const xValues = data.map(d => d[x] as number);
 const yValues = data.map(d => d[y] as number);
 
-// Create scales
-const xScale = createScale('linear')
-.domain(getNiceDomain(xValues, 0))
-.range([margin.left, width - margin.right]);
+// Use provided scales or create default ones
+let finalXScale = xScale;
+if (!finalXScale) {
+finalXScale = createScale('linear');
+finalXScale.domain(getNiceDomain(xValues, 0));
+finalXScale.range([margin.left, width - margin.right]);
+}
 
-const yScale = createScale('linear')
-.domain(getNiceDomain(yValues, 0.1))
-.range([height - margin.bottom, margin.top]);
+let finalYScale = yScale;
+if (!finalYScale) {
+finalYScale = createScale('linear');
+finalYScale.domain(getNiceDomain(yValues, 0.1));
+finalYScale.range([height - margin.bottom, margin.top]);
+}
 
 // Convert to pancake coordinates (0-100)
 const points = data.map(d => {
-const xPos = xScale(d[x] as number) as number;
-const yPos = yScale(d[y] as number) as number;
+const xPos = finalXScale(d[x] as number) as number;
+const yPos = finalYScale(d[y] as number) as number;
 return {
 x: (xPos / width) * 100,
 y: (yPos / height) * 100
 };
 });
 
+const firstPoint = points[0];
+const lastPoint = points[points.length - 1];
+if (!firstPoint || !lastPoint) return;
+
 // Draw the line
 renderer.beginPath();
-if (points[0]) renderer.moveTo(points[0]);
+renderer.moveTo(firstPoint);
 
 for (let i = 1; i < points.length; i++) {
-if (points[i]) renderer.lineTo(points[i]);
+const point = points[i];
+if (point) renderer.lineTo(point);
 }
 
 renderer.stroke(stroke, strokeWidth);
@@ -57,15 +70,16 @@ renderer.stroke(stroke, strokeWidth);
 // Optionally fill the area under the line
 if (fill) {
 renderer.beginPath();
-if (points[0]) renderer.moveTo(points[0]);
+renderer.moveTo(firstPoint);
 
 for (let i = 1; i < points.length; i++) {
-if (points[i]) renderer.lineTo(points[i]);
+const point = points[i];
+if (point) renderer.lineTo(point);
 }
 
 // Close to bottom
-renderer.lineTo({ x: points[points.length - 1].x, y: ((height - margin.bottom) / height) * 100 });
-renderer.lineTo({ x: points[0].x, y: ((height - margin.bottom) / height) * 100 });
+renderer.lineTo({ x: lastPoint.x, y: ((height - margin.bottom) / height) * 100 });
+renderer.lineTo({ x: firstPoint.x, y: ((height - margin.bottom) / height) * 100 });
 renderer.closePath();
 renderer.fill(fill);
 }
