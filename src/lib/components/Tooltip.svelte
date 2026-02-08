@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createTooltip, melt } from '@melt-ui/svelte';
+	import { createTooltip } from '@melt-ui/svelte';
 	import { clsx } from 'clsx';
 	import { fade } from 'svelte/transition';
 
@@ -25,20 +25,20 @@
 	});
 </script>
 
-<span use={melt($trigger)} class={clsx('inline-block', triggerClass)}>
+<span use:melt={$trigger} class={clsx('inline-block', triggerClass)}>
 	<slot />
 </span>
 
 {#if $open}
 	<div
-		use={melt($content)}
+		use:melt={$content}
 		transition:fade={{ duration: 100 }}
 		class={clsx(
 			'z-50 rounded-md bg-slate-900 px-3 py-1.5 text-sm text-slate-50 shadow-md',
 			contentClass
 		)}
 	>
-		<div use={melt($arrow)} />
+		<div use:melt={$arrow} />
 		{text}
 	</div>
 {/if}

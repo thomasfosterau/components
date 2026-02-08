@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createSelect, melt } from '@melt-ui/svelte';
+	import { createSelect } from '@melt-ui/svelte';
 	import { clsx } from 'clsx';
 	import { fade } from 'svelte/transition';
 
@@ -40,7 +40,7 @@
 </script>
 
 <button
-	use={melt($trigger)}
+	use:melt={$trigger}
 	class={clsx(
 		'flex h-10 w-full items-center justify-between rounded-md border border-slate-300',
 		'bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-400',
@@ -71,7 +71,7 @@
 
 {#if $open}
 	<div
-		use={melt($menu)}
+		use:melt={$menu}
 		class={clsx(
 			'z-50 max-h-[300px] overflow-y-auto rounded-md border border-slate-200',
 			'bg-white p-1 shadow-md focus:outline-none',
@@ -81,7 +81,7 @@
 	>
 		{#each items as item}
 			<div
-				use={melt($option({ value: item.value, label: item.label, disabled: item.disabled }))}
+				use:melt={$option({ value: item.value, label: item.label, disabled: item.disabled })}
 				class={clsx(
 					'relative flex w-full cursor-default select-none items-center rounded-sm',
 					'py-1.5 pl-8 pr-2 text-sm outline-none',

@@ -112,7 +112,7 @@
 			<Card>
 				<CardContent>
 					<div class="max-w-xs">
-						<label class="block text-sm font-medium mb-2">Choose a fruit</label>
+						<label for="fruit-select" class="block text-sm font-medium mb-2">Choose a fruit</label>
 						<Select items={selectItems} placeholder="Select a fruit..." />
 					</div>
 				</CardContent>
