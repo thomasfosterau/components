@@ -46,10 +46,10 @@
 
 		// Fill the area under the curve
 		renderer.beginPath();
-		renderer.moveTo(points[0]);
+		if (points[0]) renderer.moveTo(points[0]);
 		
 		for (let i = 1; i < points.length; i++) {
-			renderer.lineTo(points[i]);
+			if (points[i]) renderer.lineTo(points[i]);
 		}
 		
 		// Close to bottom
@@ -60,10 +60,10 @@
 
 		// Draw the line on top
 		renderer.beginPath();
-		renderer.moveTo(points[0]);
+		if (points[0]) renderer.moveTo(points[0]);
 		
 		for (let i = 1; i < points.length; i++) {
-			renderer.lineTo(points[i]);
+			if (points[i]) renderer.lineTo(points[i]);
 		}
 
 		renderer.stroke(stroke, strokeWidth);

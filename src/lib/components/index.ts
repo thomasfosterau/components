@@ -5,3 +5,5 @@ export { default as Scatter } from './Scatter.svelte';
 export { default as Area } from './Area.svelte';
 export { default as Pie } from './Pie.svelte';
 export { default as Axis } from './Axis.svelte';
+export { default as Grid } from './Grid.svelte';
+export { default as Legend } from './Legend.svelte';

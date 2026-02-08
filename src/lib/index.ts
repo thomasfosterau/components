@@ -1,11 +1,11 @@
 // Main components
-export { Chart, Line, Bar, Scatter, Area, Pie, Axis } from './components/index.js';
+export { Chart, Line, Bar, Scatter, Area, Pie, Axis, Grid, Legend } from './components/index.js';
 
 // Renderers
 export { SVGRenderer, CanvasRenderer, WebGPURenderer } from './renderers/index.js';
 
 // Core utilities
-export { setChartContext, getChartContext, createRenderer } from './core/index.js';
+export { setChartContext, getChartContext, createRenderer, defaultTheme, darkTheme, colorPalettes, getColorFromPalette, mergeTheme } from './core/index.js';
 export type { ChartContext } from './core/index.js';
 
 // Scales

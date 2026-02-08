@@ -46,10 +46,10 @@ y: (yPos / height) * 100
 
 // Draw the line
 renderer.beginPath();
-renderer.moveTo(points[0]);
+if (points[0]) renderer.moveTo(points[0]);
 
 for (let i = 1; i < points.length; i++) {
-renderer.lineTo(points[i]);
+if (points[i]) renderer.lineTo(points[i]);
 }
 
 renderer.stroke(stroke, strokeWidth);
@@ -57,10 +57,10 @@ renderer.stroke(stroke, strokeWidth);
 // Optionally fill the area under the line
 if (fill) {
 renderer.beginPath();
-renderer.moveTo(points[0]);
+if (points[0]) renderer.moveTo(points[0]);
 
 for (let i = 1; i < points.length; i++) {
-renderer.lineTo(points[i]);
+if (points[i]) renderer.lineTo(points[i]);
 }
 
 // Close to bottom
@@ -72,7 +72,7 @@ renderer.fill(fill);
 
 // Draw points
 points.forEach(point => {
-renderer.circle(point, 3, stroke);
+if (point) renderer.circle(point, 3, stroke);
 });
 }
 </script>
