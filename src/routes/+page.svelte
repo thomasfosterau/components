@@ -125,11 +125,11 @@
 			<Card>
 				<CardContent>
 					<p class="text-sm">
-						Hover over the{' '}
+						Hover over the
 						<Tooltip text="This is a helpful tooltip!">
 							<span class="underline decoration-dotted cursor-help">underlined text</span>
 						</Tooltip>
-						{' '}to see a tooltip.
+						to see a tooltip.
 					</p>
 				</CardContent>
 			</Card>
