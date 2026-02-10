@@ -84,6 +84,31 @@ export interface Renderer {
 	text(point: PancakePoint, text: string, options?: TextOptions): void;
 	
 	/**
+	 * Draw an ellipse (in Pancake coordinates)
+	 */
+	ellipse(center: PancakePoint, radiusX: number, radiusY: number, fill?: string, stroke?: string, strokeWidth?: number): void;
+	
+	/**
+	 * Draw a rounded rectangle (in Pancake coordinates)
+	 */
+	roundedRect(coords: PancakeCoordinates, radius: number, fill?: string, stroke?: string, strokeWidth?: number): void;
+	
+	/**
+	 * Draw a polygon (in Pancake coordinates)
+	 */
+	polygon(points: PancakePoint[], fill?: string, stroke?: string, strokeWidth?: number): void;
+	
+	/**
+	 * Draw a bezier curve (in Pancake coordinates)
+	 */
+	bezierCurve(start: PancakePoint, cp1: PancakePoint, cp2: PancakePoint, end: PancakePoint, stroke?: string, strokeWidth?: number): void;
+	
+	/**
+	 * Draw an arrow from start to end point (in Pancake coordinates)
+	 */
+	arrow(start: PancakePoint, end: PancakePoint, stroke?: string, strokeWidth?: number, arrowSize?: number): void;
+	
+	/**
 	 * Set global alpha/opacity
 	 */
 	setOpacity(alpha: number): void;

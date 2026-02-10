@@ -159,6 +159,120 @@ export class CanvasRenderer implements Renderer {
 		}
 	}
 
+ellipse(center: PancakePoint, radiusX: number, radiusY: number, fill?: string, stroke?: string, strokeWidth: number = 1): void {
+if (!this.context) return;
+const { x, y } = pancakePointToPixels(center, this.width, this.height);
+
+this.context.beginPath();
+this.context.ellipse(x, y, radiusX, radiusY, 0, 0, Math.PI * 2);
+
+if (fill) {
+this.context.fillStyle = fill;
+this.context.fill();
+}
+
+if (stroke) {
+this.context.strokeStyle = stroke;
+this.context.lineWidth = strokeWidth;
+this.context.stroke();
+}
+}
+
+roundedRect(coords: PancakeCoordinates, radius: number, fill?: string, stroke?: string, strokeWidth: number = 1): void {
+if (!this.context) return;
+const { x1, y1, x2, y2 } = pancakeCoordsToPixels(coords, this.width, this.height);
+const width = Math.abs(x2 - x1);
+const height = Math.abs(y2 - y1);
+const x = Math.min(x1, x2);
+const y = Math.min(y1, y2);
+
+this.context.beginPath();
+this.context.roundRect(x, y, width, height, radius);
+
+if (fill) {
+this.context.fillStyle = fill;
+this.context.fill();
+}
+
+if (stroke) {
+this.context.strokeStyle = stroke;
+this.context.lineWidth = strokeWidth;
+this.context.stroke();
+}
+}
+
+polygon(points: PancakePoint[], fill?: string, stroke?: string, strokeWidth: number = 1): void {
+if (!this.context || points.length === 0) return;
+
+const pixelPoints = points.map(p => pancakePointToPixels(p, this.width, this.height));
+
+this.context.beginPath();
+this.context.moveTo(pixelPoints[0].x, pixelPoints[0].y);
+
+for (let i = 1; i < pixelPoints.length; i++) {
+this.context.lineTo(pixelPoints[i].x, pixelPoints[i].y);
+}
+
+this.context.closePath();
+
+if (fill) {
+this.context.fillStyle = fill;
+this.context.fill();
+}
+
+if (stroke) {
+this.context.strokeStyle = stroke;
+this.context.lineWidth = strokeWidth;
+this.context.stroke();
+}
+}
+
+bezierCurve(start: PancakePoint, cp1: PancakePoint, cp2: PancakePoint, end: PancakePoint, stroke: string = '#000000', strokeWidth: number = 1): void {
+if (!this.context) return;
+const s = pancakePointToPixels(start, this.width, this.height);
+const c1 = pancakePointToPixels(cp1, this.width, this.height);
+const c2 = pancakePointToPixels(cp2, this.width, this.height);
+const e = pancakePointToPixels(end, this.width, this.height);
+
+this.context.beginPath();
+this.context.moveTo(s.x, s.y);
+this.context.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, e.x, e.y);
+this.context.strokeStyle = stroke;
+this.context.lineWidth = strokeWidth;
+this.context.stroke();
+}
+
+arrow(start: PancakePoint, end: PancakePoint, stroke: string = '#000000', strokeWidth: number = 1, arrowSize: number = 8): void {
+if (!this.context) return;
+const s = pancakePointToPixels(start, this.width, this.height);
+const e = pancakePointToPixels(end, this.width, this.height);
+
+// Draw the line
+this.context.beginPath();
+this.context.moveTo(s.x, s.y);
+this.context.lineTo(e.x, e.y);
+this.context.strokeStyle = stroke;
+this.context.lineWidth = strokeWidth;
+this.context.stroke();
+
+// Calculate and draw arrow head
+const angle = Math.atan2(e.y - s.y, e.x - s.x);
+const arrowAngle = Math.PI / 6; // 30 degrees
+
+const x1 = e.x - arrowSize * Math.cos(angle - arrowAngle);
+const y1 = e.y - arrowSize * Math.sin(angle - arrowAngle);
+const x2 = e.x - arrowSize * Math.cos(angle + arrowAngle);
+const y2 = e.y - arrowSize * Math.sin(angle + arrowAngle);
+
+this.context.beginPath();
+this.context.moveTo(x1, y1);
+this.context.lineTo(e.x, e.y);
+this.context.lineTo(x2, y2);
+this.context.strokeStyle = stroke;
+this.context.lineWidth = strokeWidth;
+this.context.stroke();
+}
+
 	setOpacity(alpha: number): void {
 		if (this.context) {
 			this.context.globalAlpha = Math.max(0, Math.min(1, alpha));
