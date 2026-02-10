@@ -490,7 +490,7 @@ export let position: PancakePoint;
 
 ```svelte
 <!--
-  RefereneceLine component
+  ReferenceLine component
   
   Draws a horizontal or vertical reference line across the chart.
   
