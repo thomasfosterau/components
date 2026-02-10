@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { getChartContext } from '../../core/context.js';
-	import type { PancakePoint } from '../../types/index.js';
 	
 	// Component props - for a diamond shape centered at (centerX, centerY)
 	export let centerX: number;

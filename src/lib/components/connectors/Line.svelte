@@ -12,14 +12,20 @@
 	
 	$: {
 		if (points.length >= 2) {
-			renderer.beginPath();
-			renderer.moveTo(points[0]);
-			
-			for (let i = 1; i < points.length; i++) {
-				renderer.lineTo(points[i]);
+			const firstPoint = points[0];
+			if (firstPoint) {
+				renderer.beginPath();
+				renderer.moveTo(firstPoint);
+				
+				for (let i = 1; i < points.length; i++) {
+					const point = points[i];
+					if (point) {
+						renderer.lineTo(point);
+					}
+				}
+				
+				renderer.stroke(stroke, strokeWidth);
 			}
-			
-			renderer.stroke(stroke, strokeWidth);
 		}
 	}
 </script>

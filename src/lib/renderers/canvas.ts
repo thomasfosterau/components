@@ -205,12 +205,17 @@ polygon(points: PancakePoint[], fill?: string, stroke?: string, strokeWidth: num
 if (!this.context || points.length === 0) return;
 
 const pixelPoints = points.map(p => pancakePointToPixels(p, this.width, this.height));
+const firstPoint = pixelPoints[0];
+if (!firstPoint) return;
 
 this.context.beginPath();
-this.context.moveTo(pixelPoints[0].x, pixelPoints[0].y);
+this.context.moveTo(firstPoint.x, firstPoint.y);
 
 for (let i = 1; i < pixelPoints.length; i++) {
-this.context.lineTo(pixelPoints[i].x, pixelPoints[i].y);
+const point = pixelPoints[i];
+if (point) {
+this.context.lineTo(point.x, point.y);
+}
 }
 
 this.context.closePath();

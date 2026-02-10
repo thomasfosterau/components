@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { getChartContext } from '../../core/context.js';
-	import type { PancakePoint } from '../../types/index.js';
 	
 	// Component props - Bezier curve connector
 	export let startX: number;

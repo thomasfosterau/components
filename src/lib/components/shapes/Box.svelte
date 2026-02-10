@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { getChartContext } from '../../core/context.js';
-	import type { PancakeCoordinates } from '../../types/index.js';
 	
 	// Component props
 	export let x1: number;
