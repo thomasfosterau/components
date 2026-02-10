@@ -95,14 +95,42 @@ GPU-accelerated rendering for complex visualizations:
 
 This library uses the "Pancake" coordinate system, where all positions are specified as percentages (0-100) rather than pixels. This makes the rendering truly device-independent and allows the same chart description to work across SVG, Canvas, and WebGPU renderers.
 
-## API Reference
+## Documentation
+
+📚 **Comprehensive documentation is available in the [docs](./docs) directory:**
+
+### Getting Started
+- [Getting Started Guide](./docs/getting-started.md) - Installation, setup, and your first chart
+
+### Tutorials
+- [Basic Charts](./docs/tutorials/01-basic-charts.md) - Learn all chart types
+- [Advanced Features](./docs/tutorials/02-advanced-features.md) - Scales, theming, and more
+- [Custom Components](./docs/tutorials/03-custom-components.md) - Build your own chart types
+
+### Guides
+- [Render Targets](./docs/guides/render-targets.md) - SVG vs Canvas vs WebGPU
+- [Scales and Domains](./docs/guides/scales-and-domains.md) - Understanding D3 scales
+- [Theming](./docs/guides/theming.md) - Colors, styles, and themes
+- [SSR Support](./docs/guides/ssr.md) - Server-side rendering with SvelteKit
+
+### API Reference
+- [API Overview](./docs/api/README.md) - Quick reference
+- [Components](./docs/api/components.md) - Complete component API
+- [Utilities](./docs/api/utilities.md) - Helper functions and scales
+- [Renderers](./docs/api/renderers.md) - Rendering backends
+
+## Quick API Reference
 
 ### Components
 - `Chart` - Root container component
 - `Line` - Line chart visualization
 - `Bar` - Bar chart visualization
 - `Scatter` - Scatter plot visualization
+- `Area` - Area chart visualization
+- `Pie` - Pie/Donut chart
 - `Axis` - Chart axis with ticks and labels
+- `Grid` - Standalone grid lines
+- `Legend` - Chart legend
 
 ### Utilities
 - `createScale()` - Create D3-style scales
