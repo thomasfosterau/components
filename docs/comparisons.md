@@ -447,7 +447,7 @@ Plot.plot({
 ✅ Concise syntax
 ✅ Grammar of graphics thinking
 
-### What We Different
+### What We Changed
 
 🔄 Component-based instead of functional
 🔄 Svelte framework integration
