@@ -76,7 +76,7 @@ export interface Renderer {
 	/**
 	 * Draw a rectangle (in Pancake coordinates)
 	 */
-	rect(coords: PancakeCoordinates, fill?: string, stroke?: string): void;
+	rect(coords: PancakeCoordinates, fill?: string, stroke?: string, strokeWidth?: number): void;
 	
 	/**
 	 * Draw text (in Pancake coordinates)

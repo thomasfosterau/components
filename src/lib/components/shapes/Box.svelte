@@ -21,7 +21,7 @@
 		if (rounded) {
 			renderer.roundedRect(coords, radius, fill, stroke, strokeWidth);
 		} else {
-			renderer.rect(coords, fill, stroke);
+			renderer.rect(coords, fill, stroke, strokeWidth);
 		}
 	}
 </script>

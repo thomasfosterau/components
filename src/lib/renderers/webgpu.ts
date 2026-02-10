@@ -106,8 +106,8 @@ circle(point: PancakePoint, radius: number, fill?: string, stroke?: string): voi
 this.commands.push({ type: 'circle', point, radius, fill, stroke });
 }
 
-rect(coords: PancakeCoordinates, fill?: string, stroke?: string): void {
-this.commands.push({ type: 'rect', coords, fill, stroke });
+rect(coords: PancakeCoordinates, fill?: string, stroke?: string, strokeWidth?: number): void {
+this.commands.push({ type: 'rect', coords, fill, stroke, strokeWidth });
 }
 
 text(point: PancakePoint, text: string, options: TextOptions = {}): void {
@@ -173,7 +173,7 @@ type RenderCommand =
 | { type: 'stroke'; color: string; width: number }
 | { type: 'fill'; color: string }
 | { type: 'circle'; point: PancakePoint; radius: number; fill?: string; stroke?: string }
-| { type: 'rect'; coords: PancakeCoordinates; fill?: string; stroke?: string }
+| { type: 'rect'; coords: PancakeCoordinates; fill?: string; stroke?: string; strokeWidth?: number }
 | { type: 'text'; point: PancakePoint; text: string; options: TextOptions }
 | { type: 'opacity'; alpha: number }
 | { type: 'ellipse'; center: PancakePoint; radiusX: number; radiusY: number; fill?: string; stroke?: string; strokeWidth?: number }

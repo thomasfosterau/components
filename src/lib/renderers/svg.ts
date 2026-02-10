@@ -93,7 +93,7 @@ this.elements.push(
 );
 }
 
-rect(coords: PancakeCoordinates, fill?: string, stroke?: string): void {
+rect(coords: PancakeCoordinates, fill?: string, stroke?: string, strokeWidth: number = 1): void {
 const { x1, y1, x2, y2 } = pancakeCoordsToPixels(coords, this.width, this.height);
 const width = Math.abs(x2 - x1);
 const height = Math.abs(y2 - y1);
@@ -103,7 +103,10 @@ const y = Math.min(y1, y2);
 const attrs: string[] = [];
 if (fill) attrs.push(`fill="${escapeHtml(fill)}"`);
 else attrs.push('fill="none"');
-if (stroke) attrs.push(`stroke="${escapeHtml(stroke)}"`);
+if (stroke) {
+attrs.push(`stroke="${escapeHtml(stroke)}"`);
+attrs.push(`stroke-width="${strokeWidth}"`);
+}
 attrs.push(`opacity="${this.opacity}"`);
 
 this.elements.push(
