@@ -187,8 +187,25 @@ const height = Math.abs(y2 - y1);
 const x = Math.min(x1, x2);
 const y = Math.min(y1, y2);
 
+const r = Math.max(0, Math.min(radius, width / 2, height / 2));
+
 this.context.beginPath();
-this.context.roundRect(x, y, width, height, radius);
+
+// Feature-detect roundRect and fall back to manual path if unavailable
+if (typeof (this.context as any).roundRect === 'function') {
+(this.context as any).roundRect(x, y, width, height, r);
+} else {
+// Fallback for environments without CanvasRenderingContext2D.roundRect
+this.context.moveTo(x + r, y);
+this.context.lineTo(x + width - r, y);
+this.context.arcTo(x + width, y, x + width, y + r, r);
+this.context.lineTo(x + width, y + height - r);
+this.context.arcTo(x + width, y + height, x + width - r, y + height, r);
+this.context.lineTo(x + r, y + height);
+this.context.arcTo(x, y + height, x, y + height - r, r);
+this.context.lineTo(x, y + r);
+this.context.arcTo(x, y, x + r, y, r);
+}
 
 if (fill) {
 this.context.fillStyle = fill;

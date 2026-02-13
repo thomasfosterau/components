@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { getChartContext } from '../../core/context.js';
 	
 	// Component props
@@ -13,9 +14,8 @@
 	const context = getChartContext();
 	const { renderer } = context;
 	
-	$: center = { x: centerX, y: centerY };
-	
-	$: {
+	onMount(() => {
+		const center = { x: centerX, y: centerY };
 		renderer.ellipse(center, radiusX, radiusY, fill, stroke, strokeWidth);
-	}
+	});
 </script>

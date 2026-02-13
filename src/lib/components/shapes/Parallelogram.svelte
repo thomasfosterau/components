@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { getChartContext } from '../../core/context.js';
 	
 	// Component props - for a parallelogram (input/output shape in flowcharts)
@@ -14,15 +15,15 @@
 	const context = getChartContext();
 	const { renderer } = context;
 	
-	// Calculate parallelogram points
-	$: points = [
-		{ x: x1 + skew, y: y1 }, // top-left (skewed right)
-		{ x: x2 + skew, y: y1 }, // top-right (skewed right)
-		{ x: x2 - skew, y: y2 }, // bottom-right (skewed left)
-		{ x: x1 - skew, y: y2 }  // bottom-left (skewed left)
-	];
-	
-	$: {
+	onMount(() => {
+		// Calculate parallelogram points
+		const points = [
+			{ x: x1 + skew, y: y1 }, // top-left (skewed right)
+			{ x: x2 + skew, y: y1 }, // top-right (skewed right)
+			{ x: x2 - skew, y: y2 }, // bottom-right (skewed left)
+			{ x: x1 - skew, y: y2 }  // bottom-left (skewed left)
+		];
+		
 		renderer.polygon(points, fill, stroke, strokeWidth);
-	}
+	});
 </script>

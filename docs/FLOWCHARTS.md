@@ -329,7 +329,7 @@ Here's a simple flowchart demonstrating the building blocks:
 All components work with SVG, Canvas, and WebGPU render targets:
 
 ```svelte
-<!-- Server-side rendering compatible -->
+<!-- SVG rendering (client-side only - uses onMount) -->
 <Chart renderTarget="svg">
   <Box ... />
 </Chart>
@@ -339,11 +339,13 @@ All components work with SVG, Canvas, and WebGPU render targets:
   <Diamond ... />
 </Chart>
 
-<!-- GPU-accelerated (experimental) -->
+<!-- GPU-accelerated (experimental, not yet fully implemented) -->
 <Chart renderTarget="webgpu">
   <Ellipse ... />
 </Chart>
 ```
+
+**Note:** The Chart component and shape/connector components currently initialize in `onMount()`, which means they do not support server-side rendering (SSR). The components will only render on the client side.
 
 ## Notes
 

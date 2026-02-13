@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { getChartContext } from '../../core/context.js';
 	
 	// Component props
@@ -16,19 +17,19 @@
 	const context = getChartContext();
 	const { renderer } = context;
 	
-	$: point = { x, y };
-	
-	$: options = {
-		fontSize,
-		fontFamily,
-		fontWeight,
-		textAnchor,
-		fill,
-		stroke,
-		rotation
-	};
-	
-	$: {
+	onMount(() => {
+		const point = { x, y };
+		
+		const options = {
+			fontSize,
+			fontFamily,
+			fontWeight,
+			textAnchor,
+			fill,
+			stroke,
+			rotation
+		};
+		
 		renderer.text(point, text, options);
-	}
+	});
 </script>

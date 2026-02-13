@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { getChartContext } from '../../core/context.js';
 	
 	// Component props - Bezier curve connector
@@ -16,19 +17,19 @@
 	const context = getChartContext();
 	const { renderer } = context;
 	
-	$: start = { x: startX, y: startY };
-	$: end = { x: endX, y: endY };
-	
-	// Auto-calculate control points if not provided
-	$: cp1 = controlX1 !== undefined && controlY1 !== undefined 
-		? { x: controlX1, y: controlY1 }
-		: { x: startX + (endX - startX) * 0.5, y: startY };
-	
-	$: cp2 = controlX2 !== undefined && controlY2 !== undefined
-		? { x: controlX2, y: controlY2 }
-		: { x: startX + (endX - startX) * 0.5, y: endY };
-	
-	$: {
+	onMount(() => {
+		const start = { x: startX, y: startY };
+		const end = { x: endX, y: endY };
+		
+		// Auto-calculate control points if not provided
+		const cp1 = controlX1 !== undefined && controlY1 !== undefined 
+			? { x: controlX1, y: controlY1 }
+			: { x: startX + (endX - startX) * 0.5, y: startY };
+		
+		const cp2 = controlX2 !== undefined && controlY2 !== undefined
+			? { x: controlX2, y: controlY2 }
+			: { x: startX + (endX - startX) * 0.5, y: endY };
+		
 		renderer.bezierCurve(start, cp1, cp2, end, stroke, strokeWidth);
-	}
+	});
 </script>

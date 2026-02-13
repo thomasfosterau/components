@@ -84,27 +84,42 @@ export interface Renderer {
 	text(point: PancakePoint, text: string, options?: TextOptions): void;
 	
 	/**
-	 * Draw an ellipse (in Pancake coordinates)
+	 * Draw an ellipse
+	 * @param center - Center point in Pancake coordinates (0-100)
+	 * @param radiusX - Horizontal radius in pixels
+	 * @param radiusY - Vertical radius in pixels
 	 */
 	ellipse(center: PancakePoint, radiusX: number, radiusY: number, fill?: string, stroke?: string, strokeWidth?: number): void;
 	
 	/**
-	 * Draw a rounded rectangle (in Pancake coordinates)
+	 * Draw a rounded rectangle
+	 * @param coords - Rectangle bounds in Pancake coordinates (0-100)
+	 * @param radius - Corner radius in pixels
 	 */
 	roundedRect(coords: PancakeCoordinates, radius: number, fill?: string, stroke?: string, strokeWidth?: number): void;
 	
 	/**
-	 * Draw a polygon (in Pancake coordinates)
+	 * Draw a polygon
+	 * @param points - Array of points in Pancake coordinates (0-100)
 	 */
 	polygon(points: PancakePoint[], fill?: string, stroke?: string, strokeWidth?: number): void;
 	
 	/**
-	 * Draw a bezier curve (in Pancake coordinates)
+	 * Draw a bezier curve
+	 * @param start - Start point in Pancake coordinates (0-100)
+	 * @param cp1 - First control point in Pancake coordinates (0-100)
+	 * @param cp2 - Second control point in Pancake coordinates (0-100)
+	 * @param end - End point in Pancake coordinates (0-100)
+	 * @param strokeWidth - Line width in pixels
 	 */
 	bezierCurve(start: PancakePoint, cp1: PancakePoint, cp2: PancakePoint, end: PancakePoint, stroke?: string, strokeWidth?: number): void;
 	
 	/**
-	 * Draw an arrow from start to end point (in Pancake coordinates)
+	 * Draw an arrow from start to end point
+	 * @param start - Start point in Pancake coordinates (0-100)
+	 * @param end - End point in Pancake coordinates (0-100)
+	 * @param strokeWidth - Line width in pixels
+	 * @param arrowSize - Arrow head size in pixels
 	 */
 	arrow(start: PancakePoint, end: PancakePoint, stroke?: string, strokeWidth?: number, arrowSize?: number): void;
 	

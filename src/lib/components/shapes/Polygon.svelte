@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { getChartContext } from '../../core/context.js';
 	import type { PancakePoint } from '../../types/index.js';
 	
@@ -11,7 +12,7 @@
 	const context = getChartContext();
 	const { renderer } = context;
 	
-	$: {
+	onMount(() => {
 		renderer.polygon(points, fill, stroke, strokeWidth);
-	}
+	});
 </script>

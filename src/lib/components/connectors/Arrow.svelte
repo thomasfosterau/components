@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { getChartContext } from '../../core/context.js';
 	
 	// Component props
@@ -14,10 +15,10 @@
 	const context = getChartContext();
 	const { renderer } = context;
 	
-	$: start = { x: startX, y: startY };
-	$: end = { x: endX, y: endY };
-	
-	$: {
+	onMount(() => {
+		const start = { x: startX, y: startY };
+		const end = { x: endX, y: endY };
+		
 		if (showArrow) {
 			renderer.arrow(start, end, stroke, strokeWidth, arrowSize);
 		} else {
@@ -26,5 +27,5 @@
 			renderer.lineTo(end);
 			renderer.stroke(stroke, strokeWidth);
 		}
-	}
+	});
 </script>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { getChartContext } from '../../core/context.js';
 	
 	// Component props
@@ -15,13 +16,13 @@
 	const context = getChartContext();
 	const { renderer } = context;
 	
-	$: coords = { x1, y1, x2, y2 };
-	
-	$: {
+	onMount(() => {
+		const coords = { x1, y1, x2, y2 };
+		
 		if (rounded) {
 			renderer.roundedRect(coords, radius, fill, stroke, strokeWidth);
 		} else {
 			renderer.rect(coords, fill, stroke, strokeWidth);
 		}
-	}
+	});
 </script>

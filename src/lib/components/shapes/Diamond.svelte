@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { getChartContext } from '../../core/context.js';
 	
 	// Component props - for a diamond shape centered at (centerX, centerY)
@@ -13,15 +14,15 @@
 	const context = getChartContext();
 	const { renderer } = context;
 	
-	// Calculate diamond points
-	$: points = [
-		{ x: centerX, y: centerY - height / 2 }, // top
-		{ x: centerX + width / 2, y: centerY }, // right
-		{ x: centerX, y: centerY + height / 2 }, // bottom
-		{ x: centerX - width / 2, y: centerY }  // left
-	];
-	
-	$: {
+	onMount(() => {
+		// Calculate diamond points
+		const points = [
+			{ x: centerX, y: centerY - height / 2 }, // top
+			{ x: centerX + width / 2, y: centerY }, // right
+			{ x: centerX, y: centerY + height / 2 }, // bottom
+			{ x: centerX - width / 2, y: centerY }  // left
+		];
+		
 		renderer.polygon(points, fill, stroke, strokeWidth);
-	}
+	});
 </script>
