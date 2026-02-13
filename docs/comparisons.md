@@ -21,7 +21,7 @@ This document provides detailed comparisons between `@thomasfosterau/charts` and
 | **Canvas Support** | ✅ Yes | N/A | ✅ Manual | ✅ Yes | ❌ No | ❌ No |
 | **WebGPU Support** | ✅ Yes | N/A | ❌ No | ❌ No | ❌ No | ❌ No |
 | **Multi-renderer** | ✅ Yes | N/A | ⚠️ Manual | ⚠️ Limited | ❌ SVG only | ❌ SVG only |
-| **Bundle Size** | Small (~70KB) | N/A | Large (~240KB) | Medium (~170KB) | Large (~200KB) | Medium (~150KB) |
+| **Bundle Size** | Small (~32KB gzipped) | N/A | Large (~240KB) | Medium (~170KB) | Large (~200KB) | Medium (~150KB) |
 | **Learning Curve** | Low | Low | High | Low | Medium | Medium |
 | **Customization** | High | Medium | Very High | Medium | High | High |
 | **Animation** | 🚧 Planned | ✅ Built-in | ✅ Powerful | ✅ Built-in | ✅ Built-in | ❌ Limited |
