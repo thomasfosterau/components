@@ -1,69 +1,77 @@
-# @thomasfosterau/charts - Internal Documentation
+# @thomasfosterau/charts Documentation
 
-Welcome to the internal documentation for `@thomasfosterau/charts`. This directory contains comprehensive documentation about how the library works internally, design decisions, and comparisons with other charting libraries.
+Welcome to the comprehensive documentation for @thomasfosterau/charts - a declarative Svelte charting library with multiple render targets.
 
-## Documentation Overview
+## 📚 Table of Contents
 
-### Architecture & Design
-- **[Architecture](./architecture.md)** - Detailed explanation of the library's architecture and how all components fit together
-- **[Pancake Coordinate System](./pancake-system.md)** - Deep dive into the percentage-based coordinate system
-- **[Renderers](./renderers.md)** - How the renderer abstraction works and implementation details
-- **[Design Decisions](./design-decisions.md)** - Alternative approaches considered and rationale for current design
+### Getting Started
+- [Getting Started Guide](./getting-started.md) - Installation, setup, and your first chart
 
-### Comparisons & Context
-- **[Library Comparisons](./comparisons.md)** - Detailed comparisons with libraries that inspired this project
-- **[Performance](./performance.md)** - Performance characteristics, benchmarks, and optimization strategies
+### Tutorials
+Step-by-step guides to help you learn the library:
+- [Basic Charts](./tutorials/01-basic-charts.md) - Create line, bar, and scatter charts
+- [Advanced Features](./tutorials/02-advanced-features.md) - Scales, axes, and theming
+- [Custom Components](./tutorials/03-custom-components.md) - Build your own chart types
 
-### Extending the Library
-- **[Extending the Library](./extending.md)** - Guide for creating custom components, renderers, and chart types
+### Guides
+In-depth explanations of key concepts:
+- [Render Targets](./guides/render-targets.md) - SVG, Canvas, and WebGPU rendering
+- [Scales and Domains](./guides/scales-and-domains.md) - Understanding D3 scales
+- [Theming](./guides/theming.md) - Colors, styles, and custom themes
+- [SSR Support](./guides/ssr.md) - Server-side rendering with SvelteKit
 
-## Quick Navigation
+### API Reference
+Complete reference for all components and utilities:
+- [API Overview](./api/README.md) - Quick reference
+- [Components](./api/components.md) - Chart, Line, Bar, Scatter, Area, Pie, Axis, Grid, Legend
+- [Utilities](./api/utilities.md) - Scales, formatting, and helper functions
+- [Renderers](./api/renderers.md) - SVG, Canvas, and WebGPU renderers
 
-### For Contributors
-If you're looking to contribute to the library:
-1. Start with [Architecture](./architecture.md) to understand the overall structure
-2. Read [Design Decisions](./design-decisions.md) to understand the philosophy
-3. Check [Extending the Library](./extending.md) for implementation patterns
+## 🚀 Quick Links
 
-### For Users Creating Custom Components
-If you want to build custom chart types:
-1. Read [Pancake Coordinate System](./pancake-system.md) to understand the coordinate system
-2. Study [Renderers](./renderers.md) to understand the renderer interface
-3. Follow the guide in [Extending the Library](./extending.md)
+- [Main README](../README.md) - Project overview
+- [Examples](../examples/README.md) - Code examples
+- [Contributing Guide](../CONTRIBUTING.md) - How to contribute
+- [Features](../FEATURES.md) - Feature comparison and roadmap
 
-### For Performance Optimization
-If you're working with large datasets:
-1. Read [Performance](./performance.md) for benchmarks and recommendations
-2. Check [Renderers](./renderers.md) for renderer-specific optimizations
+## 🎯 What is @thomasfosterau/charts?
 
-## External Documentation
+@thomasfosterau/charts is a modern charting library for Svelte that provides:
 
-For user-facing documentation, see:
-- [README.md](../README.md) - Getting started guide
-- [API.md](../API.md) - Complete API reference
-- [FEATURES.md](../FEATURES.md) - Feature list and roadmap
-- [CONTRIBUTING.md](../CONTRIBUTING.md) - Contribution guidelines
+- **Multiple Render Targets**: Choose between SVG (SSR-compatible), Canvas (high-performance), or WebGPU (GPU-accelerated)
+- **Pancake Coordinates**: Percentage-based coordinate system that works across all renderers
+- **Declarative API**: Intuitive, component-based approach inspired by Swift Charts
+- **Full TypeScript Support**: Type-safe development with excellent IDE support
+- **D3-Powered Scales**: Leverage the power and flexibility of D3's scale system
 
-## Philosophy
+## 🎨 Philosophy
 
 This library is built on several core principles:
 
 1. **Declarative First** - Charts should be as easy to describe as they are to understand
-2. **SSR Compatible** - No browser-only assumptions, works server-side
+2. **SSR Compatible** - Works seamlessly with SvelteKit and server-side rendering
 3. **Performance Matters** - Choose the right render target for your use case
-4. **TypeScript Native** - Types are first-class citizens, not an afterthought
-5. **Svelte Optimized** - Leverage Svelte's reactivity and component model
-6. **Extensible** - Easy to create custom chart types and extend functionality
+4. **TypeScript Native** - Types are first-class citizens
+5. **Svelte Optimized** - Built specifically for Svelte's reactivity model
 
-## Key Innovations
+## 📖 How to Use This Documentation
 
-1. **Pancake Coordinate System** - Percentage-based coordinates (0-100) that are truly renderer-agnostic
-2. **Multi-Target Rendering** - Same component works with SVG, Canvas, and WebGPU
-3. **Context-Based Architecture** - Clean separation of concerns using Svelte contexts
-4. **Scale System Integration** - Seamless integration with D3's powerful scale system
+If you're new to the library, start with the [Getting Started Guide](./getting-started.md) to install and create your first chart.
 
-## Get Help
+Then work through the tutorials in order:
+1. Learn basic chart types
+2. Master advanced features like custom scales and theming
+3. Create your own custom components
 
-- **Issues**: [GitHub Issues](https://github.com/thomasfosterau/charts/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/thomasfosterau/charts/discussions)
-- **Contributing**: See [CONTRIBUTING.md](../CONTRIBUTING.md)
+Refer to the guides when you need deeper understanding of specific concepts, and use the API reference as needed when building your charts.
+
+## 🆘 Getting Help
+
+- Check the [examples](../examples/README.md) for working code
+- Review the [API reference](./api/README.md) for detailed component documentation
+- Read the [guides](./guides/) for in-depth explanations
+- Open an issue on [GitHub](https://github.com/thomasfosterau/charts/issues) if you find a bug or need help
+
+## 📝 License
+
+MIT © Thomas Foster
