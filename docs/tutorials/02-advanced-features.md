@@ -263,8 +263,8 @@ Point scales are like band scales but without width:
   <Grid 
     xScale={xScale} 
     yScale={yScale}
-    showX={true}
-    showY={true}
+    showVertical={true}
+    showHorizontal={true}
   />
   
   <Line {data} x="x" y="y" stroke="#4299e1" />
@@ -295,24 +295,20 @@ Point scales are like band scales but without width:
   <Line data={data2} x="x" y="y" stroke="#48bb78" />
   <Line data={data3} x="x" y="y" stroke="#ed8936" />
   
-  <Legend items={legendItems} position="top-right" />
+  <Legend items={legendItems} position="right" />
 </Chart>
 ```
 
 ### Legend Positions
 
 Available positions:
-- `top-left`
-- `top-center`
-- `top-right`
-- `bottom-left`
-- `bottom-center`
-- `bottom-right`
+- `top`
+- `bottom`
 - `left`
 - `right`
 
 ```svelte
-<Legend items={legendItems} position="bottom-center" />
+<Legend items={legendItems} position="bottom" />
 ```
 
 ## Chart Margins

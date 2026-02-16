@@ -163,17 +163,13 @@ Converts a pancake percentage to pixel coordinates.
 ```typescript
 function pancakeToPixels(
   value: number,
-  size: number,
-  marginStart?: number,
-  marginEnd?: number
+  size: number
 ): number
 ```
 
 **Parameters:**
 - `value`: Pancake coordinate (0-100)
 - `size`: Total size in pixels (width or height)
-- `marginStart` (optional): Left/top margin (default: 0)
-- `marginEnd` (optional): Right/bottom margin (default: 0)
 
 **Returns:** Pixel coordinate
 
@@ -183,15 +179,14 @@ function pancakeToPixels(
 import { pancakeToPixels } from '@thomasfosterau/charts';
 
 const width = 600;
-const margin = { left: 50, right: 50 };
 
 // Convert 50% to pixel position
-const xPixel = pancakeToPixels(50, width, margin.left, margin.right);
-// Returns 300 (center of 500px available space)
+const xPixel = pancakeToPixels(50, width);
+// Returns 300 (center)
 
 // Convert 0% (left edge)
-const leftPixel = pancakeToPixels(0, width, margin.left, margin.right);
-// Returns 50 (left margin)
+const leftPixel = pancakeToPixels(0, width);
+// Returns 0
 ```
 
 ### pixelsToPancake
@@ -202,17 +197,13 @@ Converts pixel coordinates to pancake percentage.
 ```typescript
 function pixelsToPancake(
   value: number,
-  size: number,
-  marginStart?: number,
-  marginEnd?: number
+  size: number
 ): number
 ```
 
 **Parameters:**
 - `value`: Pixel coordinate
 - `size`: Total size in pixels (width or height)
-- `marginStart` (optional): Left/top margin (default: 0)
-- `marginEnd` (optional): Right/bottom margin (default: 0)
 
 **Returns:** Pancake coordinate (0-100)
 
@@ -222,14 +213,13 @@ function pixelsToPancake(
 import { pixelsToPancake } from '@thomasfosterau/charts';
 
 const width = 600;
-const margin = { left: 50, right: 50 };
 
 // Convert pixel 300 to pancake
-const pancakeX = pixelsToPancake(300, width, margin.left, margin.right);
+const pancakeX = pixelsToPancake(300, width);
 // Returns 50 (50%)
 
 // Convert left edge
-const leftPancake = pixelsToPancake(50, width, margin.left, margin.right);
+const leftPancake = pixelsToPancake(0, width);
 // Returns 0 (0%)
 ```
 
@@ -242,10 +232,16 @@ Converts a pancake point to pixel coordinates.
 function pancakePointToPixels(
   point: PancakePoint,
   width: number,
-  height: number,
-  margin: Margin
+  height: number
 ): { x: number; y: number }
 ```
+
+**Parameters:**
+- `point`: Point in pancake coordinates
+- `width`: Chart width in pixels
+- `height`: Chart height in pixels
+
+**Returns:** Point in pixel coordinates
 
 **Usage:**
 
@@ -253,12 +249,7 @@ function pancakePointToPixels(
 import { pancakePointToPixels } from '@thomasfosterau/charts';
 
 const point = { x: 50, y: 50 }; // Center in pancake coordinates
-const pixels = pancakePointToPixels(
-  point,
-  600,  // width
-  400,  // height
-  { top: 20, right: 20, bottom: 40, left: 50 }
-);
+const pixels = pancakePointToPixels(point, 600, 400);
 // Returns { x: 300, y: 200 } (center in pixel coordinates)
 ```
 
@@ -338,28 +329,33 @@ lerp(10, 20, 0.25); // Returns 12.5
 
 ### range
 
-Creates an array of numbers from start to end.
+Creates an array of evenly spaced numbers.
 
 **Signature:**
 ```typescript
-function range(start: number, end: number, step?: number): number[]
+function range(start: number, end: number, count: number): number[]
 ```
+
+**Parameters:**
+- `start`: Start value
+- `end`: End value
+- `count`: Number of values to generate
 
 **Usage:**
 
 ```javascript
 import { range } from '@thomasfosterau/charts';
 
-range(0, 5);       // [0, 1, 2, 3, 4]
-range(0, 10, 2);   // [0, 2, 4, 6, 8]
-range(5, 10);      // [5, 6, 7, 8, 9]
+range(0, 10, 5);     // [0, 2.5, 5, 7.5, 10]
+range(0, 100, 11);   // [0, 10, 20, 30, ..., 100]
+range(5, 10, 3);     // [5, 7.5, 10]
 ```
 
 ## Formatting Utilities
 
 ### formatNumber
 
-Formats numbers with K/M/B suffixes.
+Formats numbers to a fixed number of decimal places.
 
 **Signature:**
 ```typescript
@@ -368,19 +364,20 @@ function formatNumber(value: number, decimals?: number): string
 
 **Parameters:**
 - `value`: Number to format
-- `decimals` (optional): Decimal places (default: 1)
+- `decimals` (optional): Decimal places (default: 2)
 
 **Usage:**
 
 ```javascript
 import { formatNumber } from '@thomasfosterau/charts';
 
-formatNumber(1500);        // "1.5K"
-formatNumber(1000000);     // "1.0M"
-formatNumber(1500000000);  // "1.5B"
-formatNumber(42);          // "42"
-formatNumber(1234.56, 2);  // "1.23K"
+formatNumber(1500);          // "1500.00"
+formatNumber(42);            // "42.00"
+formatNumber(1234.56, 2);    // "1234.56"
+formatNumber(0.1234, 3);     // "0.123"
 ```
+
+**Note**: For K/M/B suffix formatting, use `formatTick()` instead.
 
 ### uniqueId
 
@@ -396,9 +393,9 @@ function uniqueId(prefix?: string): string
 ```javascript
 import { uniqueId } from '@thomasfosterau/charts';
 
-uniqueId();           // "chart_1"
-uniqueId();           // "chart_2"
-uniqueId('axis');     // "axis_1"
+uniqueId();           // "chart-1"
+uniqueId();           // "chart-2"
+uniqueId('axis');     // "axis-1"
 ```
 
 ## Theme Utilities
@@ -428,25 +425,30 @@ getColorFromPalette('pastel', 0);   // "#a0d8f1"
 
 ### mergeTheme
 
-Merges a custom theme with a base theme.
+Merges a custom theme with the default theme.
 
 **Signature:**
 ```typescript
-function mergeTheme(baseTheme: Theme, customTheme: Partial<Theme>): Theme
+function mergeTheme(customTheme: Partial<Theme>): Theme
 ```
+
+**Parameters:**
+- `customTheme`: Partial theme object to merge with default theme
+
+**Returns:** Complete theme object
 
 **Usage:**
 
 ```javascript
-import { mergeTheme, defaultTheme } from '@thomasfosterau/charts';
+import { mergeTheme } from '@thomasfosterau/charts';
 
-const myTheme = mergeTheme(defaultTheme, {
+const myTheme = mergeTheme({
   colors: {
     primary: '#ff6b6b',
     secondary: '#4ecdc4'
   },
   fonts: {
-    base: 'Roboto, sans-serif'
+    family: 'Roboto, sans-serif'
   }
 });
 ```

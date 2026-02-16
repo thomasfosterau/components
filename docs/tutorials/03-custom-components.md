@@ -203,8 +203,7 @@ Create a component that highlights a range between two values.
       renderer.text({ x: centerX, y: centerY }, label, {
         fontSize: 14,
         fill: stroke,
-        textAnchor: 'middle',
-        baseline: 'middle'
+        textAnchor: 'middle'
       });
     }
   });
@@ -242,7 +241,6 @@ Create a candlestick chart component for financial data.
   import { onMount } from 'svelte';
   import { getChartContext } from '@thomasfosterau/charts';
   import type { DataPoint, Scale } from '@thomasfosterau/charts';
-  import { pancakeToPixels } from '@thomasfosterau/charts';
 
   export let data: DataPoint[];
   export let xScale: Scale;
@@ -260,14 +258,20 @@ Create a candlestick chart component for financial data.
       const close = d.close as number;
       const high = d.high as number;
       const low = d.low as number;
-      const x = xScale(d.date);
 
-      // Convert to pancake coordinates
-      const xPos = pancakeToPixels(x, width, margin.left, margin.right);
-      const openY = pancakeToPixels(yScale(open), height, margin.top, margin.bottom);
-      const closeY = pancakeToPixels(yScale(close), height, margin.top, margin.bottom);
-      const highY = pancakeToPixels(yScale(high), height, margin.top, margin.bottom);
-      const lowY = pancakeToPixels(yScale(low), height, margin.top, margin.bottom);
+      // Get pixel positions from scales
+      const xPixel = xScale(d.date);
+      const openPixel = yScale(open);
+      const closePixel = yScale(close);
+      const highPixel = yScale(high);
+      const lowPixel = yScale(low);
+
+      // Convert pixel coordinates to Pancake coordinates (0-100)
+      const xPos = (xPixel / width) * 100;
+      const openY = (openPixel / height) * 100;
+      const closeY = (closePixel / height) * 100;
+      const highY = (highPixel / height) * 100;
+      const lowY = (lowPixel / height) * 100;
 
       const isUp = close > open;
       const color = isUp ? upColor : downColor;
@@ -281,7 +285,6 @@ Create a candlestick chart component for financial data.
       // Draw body (open to close)
       const bodyTop = Math.min(openY, closeY);
       const bodyBottom = Math.max(openY, closeY);
-      const bodyHeight = bodyBottom - bodyTop;
 
       renderer.rect(
         {
@@ -368,14 +371,13 @@ Convert data values to pancake coordinates using scales.
 ```svelte
 <script lang="ts">
   import { getChartContext } from '@thomasfosterau/charts';
-  import { pixelsToPancake } from '@thomasfosterau/charts';
   import type { Scale } from '@thomasfosterau/charts';
 
   export let data: DataPoint[];
   export let xScale: Scale;
   export let yScale: Scale;
 
-  const { renderer, width, height, margin } = getChartContext();
+  const { renderer, width, height } = getChartContext();
 
   onMount(() => {
     data.forEach(d => {
@@ -383,9 +385,9 @@ Convert data values to pancake coordinates using scales.
       const xPixel = xScale(d.x);
       const yPixel = yScale(d.y);
 
-      // Convert to pancake coordinates
-      const x = pixelsToPancake(xPixel, width, margin.left, margin.right);
-      const y = pixelsToPancake(yPixel, height, margin.top, margin.bottom);
+      // Convert pixel coordinates to pancake (0-100)
+      const x = (xPixel / width) * 100;
+      const y = (yPixel / height) * 100;
 
       // Draw something at this position
       renderer.circle({ x, y }, 3, '#4299e1');
@@ -547,7 +549,6 @@ Here's a complete example combining everything we've learned:
 <script lang="ts">
   import { onMount } from 'svelte';
   import { getChartContext } from '@thomasfosterau/charts';
-  import { pixelsToPancake } from '@thomasfosterau/charts';
   import type { Scale } from '@thomasfosterau/charts';
 
   export let data: number[];
@@ -557,7 +558,7 @@ Here's a complete example combining everything we've learned:
   export let fill: string = '#4299e1';
   export let stroke: string = '#2c5282';
 
-  const { renderer, width, height, margin } = getChartContext();
+  const { renderer, width, height } = getChartContext();
 
   onMount(() => {
     // Calculate histogram bins
@@ -576,16 +577,17 @@ Here's a complete example combining everything we've learned:
 
     // Draw histogram bars
     histogram.forEach((count, i) => {
-      const x1 = xScale(min + i * binWidth);
-      const x2 = xScale(min + (i + 1) * binWidth);
-      const y1 = yScale(count);
-      const y2 = yScale(0);
+      const x1Pixel = xScale(min + i * binWidth);
+      const x2Pixel = xScale(min + (i + 1) * binWidth);
+      const y1Pixel = yScale(count);
+      const y2Pixel = yScale(0);
 
+      // Convert to pancake coordinates (0-100)
       const pancakeCoords = {
-        x1: pixelsToPancake(x1, width, margin.left, margin.right),
-        y1: pixelsToPancake(y1, height, margin.top, margin.bottom),
-        x2: pixelsToPancake(x2, width, margin.left, margin.right),
-        y2: pixelsToPancake(y2, height, margin.top, margin.bottom)
+        x1: (x1Pixel / width) * 100,
+        y1: (y1Pixel / height) * 100,
+        x2: (x2Pixel / width) * 100,
+        y2: (y2Pixel / height) * 100
       };
 
       renderer.rect(pancakeCoords, fill, stroke);

@@ -1,35 +1,36 @@
-# Guide: Server-Side Rendering (SSR)
+# Guide: Using with SvelteKit
 
-Learn how to use @thomasfosterau/charts with SvelteKit and server-side rendering.
+Learn how to use @thomasfosterau/charts with SvelteKit for client-side rendering and static site generation.
 
 ## Overview
 
-@thomasfosterau/charts is designed with SSR in mind. The SVG renderer works perfectly on the server without any browser APIs, making it ideal for:
+@thomasfosterau/charts components use `onMount()` for initialization, which means they require client-side JavaScript to render. While the library uses SVG (which is server-side friendly), the current Chart component architecture is **client-side only**.
 
-- SvelteKit applications
-- Static site generation (SSG)
-- Pre-rendered pages
-- SEO-friendly charts
+However, you can still use this library effectively with SvelteKit in the following ways:
 
-## Why SSR for Charts?
+- Client-side rendering with SvelteKit
+- Static site generation with client-side hydration
+- Using the renderer APIs directly for true SSR (advanced)
 
-### Benefits
+## Why Current Components Don't Support SSR
 
-✅ **Better Performance**: Charts render on the server, users see them immediately  
-✅ **SEO Friendly**: Search engines can index chart content  
-✅ **No Loading States**: Charts appear on first paint  
-✅ **Works Without JS**: Charts display even if JavaScript fails  
-✅ **Accessible**: SVG markup is semantic and screen-reader friendly
+The Chart component and its children call `onMount()` to initialize renderers and draw content. This lifecycle hook only runs in the browser, not during server-side rendering.
 
-### When to Use SSR
+## Benefits of Client-Side Rendering
 
-- Blog posts with data visualizations
-- Dashboard landing pages
-- Reports and analytics pages
-- Marketing pages with charts
-- Documentation with examples
+✅ **Interactive Charts**: Full access to browser APIs for interactions  
+✅ **Dynamic Updates**: Can respond to user interactions  
+✅ **Simpler Code**: No need to handle server/client rendering differences  
+✅ **All Render Targets**: Can use SVG, Canvas, or WebGPU
 
-## Basic SSR Setup
+### When to Use Client-Side Rendering
+
+- Interactive dashboards
+- Data visualizations with user interactions
+- Dynamic charts that update based on user input
+- Most SvelteKit applications
+
+## Using with SvelteKit (Client-Side)
 
 ### SvelteKit Page Component
 
@@ -56,6 +57,7 @@ Learn how to use @thomasfosterau/charts with SvelteKit and server-side rendering
     .range([360, 40]);
 </script>
 
+<!-- Chart renders client-side after hydration -->
 <Chart width={600} height={400} renderTarget="svg">
   <Line {data} x="x" y="y" stroke="#4299e1" strokeWidth={2} />
   <Axis scale={xScale} type="x" position="bottom" label="X Axis" gridLines />
@@ -63,7 +65,7 @@ Learn how to use @thomasfosterau/charts with SvelteKit and server-side rendering
 </Chart>
 ```
 
-**Important**: Always use `renderTarget="svg"` for SSR. Canvas and WebGPU require browser APIs.
+**Note**: The chart will render on the client side, not during SSR.
 
 ## Loading Data on the Server
 

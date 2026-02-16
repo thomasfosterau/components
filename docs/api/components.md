@@ -14,7 +14,6 @@ The root container component that sets up the rendering context for all child co
 | `height` | `number` | `400` | Chart height in pixels |
 | `margin` | `Margin` | `{ top: 20, right: 20, bottom: 40, left: 50 }` | Chart margins |
 | `renderTarget` | `RenderTarget` | `'svg'` | Render target: 'svg', 'canvas', or 'webgpu' |
-| `theme` | `Theme` | `defaultTheme` | Theme object for styling |
 
 ### Usage
 
@@ -37,19 +36,6 @@ The root container component that sets up the rendering context for all child co
   margin={{ top: 30, right: 40, bottom: 50, left: 60 }}
 >
   <!-- More space for labels -->
-</Chart>
-```
-
-### With Theme
-
-```svelte
-<script>
-  import { Chart } from '@thomasfosterau/charts';
-  import { darkTheme } from '@thomasfosterau/charts';
-</script>
-
-<Chart width={600} height={400} theme={darkTheme}>
-  <!-- Themed components -->
 </Chart>
 ```
 
@@ -475,8 +461,10 @@ Renders grid lines separately from axes.
 |------|------|---------|-------------|
 | `xScale` | `Scale` | required | X-axis scale |
 | `yScale` | `Scale` | required | Y-axis scale |
-| `showX` | `boolean` | `true` | Show vertical grid lines |
-| `showY` | `boolean` | `true` | Show horizontal grid lines |
+| `showVertical` | `boolean` | `true` | Show vertical grid lines |
+| `showHorizontal` | `boolean` | `true` | Show horizontal grid lines |
+| `xTicks` | `number` | `10` | Number of vertical grid lines |
+| `yTicks` | `number` | `10` | Number of horizontal grid lines |
 | `color` | `string` | theme | Grid line color |
 | `strokeWidth` | `number` | `1` | Grid line width |
 
@@ -490,7 +478,7 @@ Renders grid lines separately from axes.
 </script>
 
 <Chart width={600} height={400}>
-  <Grid xScale={xScale} yScale={yScale} showX showY />
+  <Grid xScale={xScale} yScale={yScale} showVertical showHorizontal />
   <Line {data} x="x" y="y" />
 </Chart>
 ```
@@ -501,8 +489,8 @@ Renders grid lines separately from axes.
 <Grid 
   xScale={xScale} 
   yScale={yScale}
-  showX={true}
-  showY={true}
+  showVertical={true}
+  showHorizontal={true}
   color="rgba(0, 0, 0, 0.05)"
   strokeWidth={1}
 />
@@ -532,10 +520,7 @@ interface LegendItem {
 
 **LegendPosition:**
 ```typescript
-type LegendPosition = 
-  | 'top-left' | 'top-center' | 'top-right'
-  | 'bottom-left' | 'bottom-center' | 'bottom-right'
-  | 'left' | 'right';
+type LegendPosition = 'top' | 'bottom' | 'left' | 'right';
 ```
 
 ### Usage
@@ -562,10 +547,10 @@ type LegendPosition =
 </Chart>
 ```
 
-**Bottom Legend:**
+**Different Position:**
 
 ```svelte
-<Legend items={legendItems} position="bottom-center" />
+<Legend items={legendItems} position="bottom" />
 ```
 
 **Custom Shapes:**

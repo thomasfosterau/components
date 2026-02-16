@@ -67,9 +67,11 @@ interface PancakeCoordinates {
 interface TextOptions {
   fontSize?: number;
   fontFamily?: string;
+  fontWeight?: string | number;
   fill?: string;
+  stroke?: string;
   textAnchor?: 'start' | 'middle' | 'end';
-  baseline?: 'top' | 'middle' | 'bottom' | 'alphabetic';
+  rotation?: number;
 }
 ```
 
@@ -140,9 +142,10 @@ Renders charts as SVG (Scalable Vector Graphics).
   
   let container;
   let renderer;
+  let svgContent = '';
 
   onMount(() => {
-    renderer = new SVGRenderer(container);
+    renderer = new SVGRenderer();
     renderer.initialize(600, 400);
     
     // Draw shapes
@@ -152,10 +155,15 @@ Renders charts as SVG (Scalable Vector Graphics).
     renderer.stroke('#000', 2);
     
     renderer.circle({ x: 50, y: 50 }, 5, '#4299e1');
+    
+    // Get SVG output
+    svgContent = renderer.getOutput() as string;
   });
 </script>
 
-<div bind:this={container}></div>
+<div bind:this={container}>
+  {@html svgContent}
+</div>
 ```
 
 ## CanvasRenderer

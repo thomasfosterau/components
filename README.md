@@ -51,12 +51,14 @@ bun add @thomasfosterau/charts
 ## Render Targets
 
 ### SVG (Default)
-Perfect for SSR and static rendering:
+Perfect for static rendering and client-side use:
 ```svelte
 <Chart renderTarget="svg">
   <!-- Your charts -->
 </Chart>
 ```
+
+**Note**: While SVG is rendered as markup, the Chart component initializes renderers in `onMount()`, so it requires client-side JavaScript. For true SSR, you would need to use the renderer APIs directly.
 
 ### Canvas
 High-performance for dynamic visualizations:

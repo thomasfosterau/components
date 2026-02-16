@@ -13,6 +13,8 @@ Learn how to customize the appearance of your charts with themes, color palettes
 
 ## Built-in Themes
 
+The library provides theme objects that you can use with your chart components.
+
 ### Default Theme
 
 The default theme provides a clean, professional look suitable for most applications.
@@ -23,14 +25,15 @@ The default theme provides a clean, professional look suitable for most applicat
   import { defaultTheme } from '@thomasfosterau/charts';
 </script>
 
-<Chart width={600} height={400} theme={defaultTheme}>
+<!-- Theme values are available but not passed as a prop -->
+<Chart width={600} height={400}>
   <Line {data} x="x" y="y" stroke={defaultTheme.colors.primary} />
 </Chart>
 ```
 
 ### Dark Theme
 
-Perfect for dark mode interfaces.
+Use the dark theme for dark mode interfaces:
 
 ```svelte
 <script>
@@ -38,7 +41,7 @@ Perfect for dark mode interfaces.
   import { darkTheme } from '@thomasfosterau/charts';
 </script>
 
-<Chart width={600} height={400} theme={darkTheme}>
+<Chart width={600} height={400}>
   <Line {data} x="x" y="y" stroke={darkTheme.colors.primary} />
 </Chart>
 ```
@@ -52,33 +55,21 @@ interface Theme {
   colors: {
     primary: string;
     secondary: string;
-    success: string;
-    warning: string;
-    error: string;
     background: string;
-    surface: string;
     text: string;
-    textSecondary: string;
-    border: string;
     grid: string;
+    axis: string;
   };
   fonts: {
-    base: string;
+    family: string;
     size: {
       small: number;
       medium: number;
       large: number;
     };
   };
-  spacing: {
-    small: number;
-    medium: number;
-    large: number;
-  };
-  borderRadius: number;
-  opacity: {
-    disabled: number;
-    hover: number;
+  stroke: {
+    width: number;
   };
 }
 ```
@@ -99,7 +90,7 @@ interface Theme {
 ```svelte
 <script>
   import { Chart, Line } from '@thomasfosterau/charts';
-  import { getColorFromPalette } from '@thomasfosterau/charts';
+  import { getColorFromPalette, colorPalettes } from '@thomasfosterau/charts';
 
   const series = [
     { data: data1, label: 'Series 1' },
@@ -114,7 +105,7 @@ interface Theme {
       data={s.data} 
       x="x" 
       y="y" 
-      stroke={getColorFromPalette('vibrant', i)}
+      stroke={getColorFromPalette(colorPalettes.vibrant, i)}
     />
   {/each}
 </Chart>
@@ -124,22 +115,22 @@ interface Theme {
 
 #### Default Palette
 ```javascript
-['#4299e1', '#48bb78', '#ed8936', '#9f7aea', '#f56565', '#38b2ac']
+['#4299e1', '#48bb78', '#ed8936', '#9f7aea', '#f56565', '#38b2ac', '#ecc94b', '#ed64a6']
 ```
 
 #### Pastel Palette
 ```javascript
-['#a0d8f1', '#a8e6cf', '#ffd3ba', '#d5b2e8', '#ffaaa5', '#b4e7e7']
+['#a7c5eb', '#b4ddb4', '#f5c6a5', '#d4c5f9', '#f9b5ad', '#a4d4d9', '#f9e2ae', '#f5b8d4']
 ```
 
 #### Vibrant Palette
 ```javascript
-['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7b731', '#5f27cd', '#00d2d3']
+['#0077cc', '#00cc88', '#ff8800', '#7733ff', '#ff3366', '#00bbbb', '#ffcc00', '#ff0088']
 ```
 
 #### Monochrome Palette
 ```javascript
-['#2d3748', '#4a5568', '#718096', '#a0aec0', '#cbd5e0', '#e2e8f0']
+['#333333', '#555555', '#777777', '#999999', '#bbbbbb', '#dddddd', '#eeeeee', '#f9f9f9']
 ```
 
 ## Creating Custom Themes
@@ -192,25 +183,26 @@ interface Theme {
 
 ### Merging with Existing Theme
 
-Extend an existing theme with custom values:
+Extend the default theme with custom values:
 
 ```svelte
 <script>
-  import { defaultTheme, mergeTheme } from '@thomasfosterau/charts';
+  import { mergeTheme } from '@thomasfosterau/charts';
 
-  const myTheme = mergeTheme(defaultTheme, {
+  const myTheme = mergeTheme({
     colors: {
       primary: '#ff6b6b',
       secondary: '#4ecdc4'
     },
     fonts: {
-      base: 'Roboto, sans-serif'
+      family: 'Roboto, sans-serif'
     }
   });
 </script>
 
-<Chart width={600} height={400} theme={myTheme}>
-  <Line {data} x="x" y="y" />
+<!-- Use theme colors in your components -->
+<Chart width={600} height={400}>
+  <Line {data} x="x" y="y" stroke={myTheme.colors.primary} />
 </Chart>
 ```
 
