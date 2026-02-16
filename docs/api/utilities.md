@@ -366,15 +366,17 @@ function formatNumber(value: number, decimals?: number): string
 - `value`: Number to format
 - `decimals` (optional): Decimal places (default: 2)
 
+**Returns:** String with fixed decimal places
+
 **Usage:**
 
 ```javascript
 import { formatNumber } from '@thomasfosterau/charts';
 
-formatNumber(1500);          // "1500.00"
+formatNumber(1500);          // "1500.00" (2 decimals by default)
 formatNumber(42);            // "42.00"
-formatNumber(1234.56, 2);    // "1234.56"
-formatNumber(0.1234, 3);     // "0.123"
+formatNumber(1234.567, 2);   // "1234.57" (rounded to 2 decimals)
+formatNumber(0.1, 3);        // "0.100" (padded to 3 decimals)
 ```
 
 **Note**: For K/M/B suffix formatting, use `formatTick()` instead.

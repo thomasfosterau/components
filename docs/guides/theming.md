@@ -13,7 +13,7 @@ Learn how to customize the appearance of your charts with themes, color palettes
 
 ## Built-in Themes
 
-The library provides theme objects that you can use with your chart components.
+The library provides theme objects that you can use with your chart components. While Chart doesn't accept a theme prop directly, you can use theme values to style individual components.
 
 ### Default Theme
 
@@ -21,13 +21,14 @@ The default theme provides a clean, professional look suitable for most applicat
 
 ```svelte
 <script>
-  import { Chart, Line } from '@thomasfosterau/charts';
+  import { Chart, Line, Axis } from '@thomasfosterau/charts';
   import { defaultTheme } from '@thomasfosterau/charts';
 </script>
 
-<!-- Theme values are available but not passed as a prop -->
+<!-- Use theme colors in component props -->
 <Chart width={600} height={400}>
   <Line {data} x="x" y="y" stroke={defaultTheme.colors.primary} />
+  <Axis scale={xScale} type="x" position="bottom" />
 </Chart>
 ```
 
