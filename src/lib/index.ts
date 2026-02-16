@@ -1,6 +1,12 @@
 // Main components
 export { Chart, Line, Bar, Scatter, Area, Pie, Axis, Grid, Legend } from './components/index.js';
 
+// Shape components for flowcharts and diagrams
+export { Box, Diamond, Ellipse, Parallelogram, Polygon, Text } from './components/shapes/index.js';
+
+// Connector components for flowcharts and diagrams
+export { Arrow, CurvedLine, Line as ConnectorLine } from './components/connectors/index.js';
+
 // Renderers
 export { SVGRenderer, CanvasRenderer, WebGPURenderer } from './renderers/index.js';
 

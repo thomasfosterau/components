@@ -93,7 +93,7 @@ this.elements.push(
 );
 }
 
-rect(coords: PancakeCoordinates, fill?: string, stroke?: string): void {
+rect(coords: PancakeCoordinates, fill?: string, stroke?: string, strokeWidth: number = 1): void {
 const { x1, y1, x2, y2 } = pancakeCoordsToPixels(coords, this.width, this.height);
 const width = Math.abs(x2 - x1);
 const height = Math.abs(y2 - y1);
@@ -103,7 +103,10 @@ const y = Math.min(y1, y2);
 const attrs: string[] = [];
 if (fill) attrs.push(`fill="${escapeHtml(fill)}"`);
 else attrs.push('fill="none"');
-if (stroke) attrs.push(`stroke="${escapeHtml(stroke)}"`);
+if (stroke) {
+attrs.push(`stroke="${escapeHtml(stroke)}"`);
+attrs.push(`stroke-width="${strokeWidth}"`);
+}
 attrs.push(`opacity="${this.opacity}"`);
 
 this.elements.push(
@@ -139,6 +142,107 @@ if (rotation) attrs.push(`transform="rotate(${rotation} ${x} ${y})"`);
 
 // Escape text content to prevent XSS
 this.elements.push(`<text ${attrs.join(' ')}>${escapeHtml(text)}</text>`);
+}
+
+ellipse(center: PancakePoint, radiusX: number, radiusY: number, fill?: string, stroke?: string, strokeWidth: number = 1): void {
+const { x, y } = pancakePointToPixels(center, this.width, this.height);
+const attrs: string[] = [];
+
+if (fill) attrs.push(`fill="${escapeHtml(fill)}"`);
+else attrs.push('fill="none"');
+
+if (stroke) {
+attrs.push(`stroke="${escapeHtml(stroke)}"`);
+attrs.push(`stroke-width="${strokeWidth}"`);
+}
+attrs.push(`opacity="${this.opacity}"`);
+
+this.elements.push(
+`<ellipse cx="${x}" cy="${y}" rx="${radiusX}" ry="${radiusY}" ${attrs.join(' ')} />`
+);
+}
+
+roundedRect(coords: PancakeCoordinates, radius: number, fill?: string, stroke?: string, strokeWidth: number = 1): void {
+const { x1, y1, x2, y2 } = pancakeCoordsToPixels(coords, this.width, this.height);
+const width = Math.abs(x2 - x1);
+const height = Math.abs(y2 - y1);
+const x = Math.min(x1, x2);
+const y = Math.min(y1, y2);
+
+const attrs: string[] = [];
+if (fill) attrs.push(`fill="${escapeHtml(fill)}"`);
+else attrs.push('fill="none"');
+if (stroke) {
+attrs.push(`stroke="${escapeHtml(stroke)}"`);
+attrs.push(`stroke-width="${strokeWidth}"`);
+}
+attrs.push(`opacity="${this.opacity}"`);
+
+this.elements.push(
+`<rect x="${x}" y="${y}" width="${width}" height="${height}" rx="${radius}" ry="${radius}" ${attrs.join(' ')} />`
+);
+}
+
+polygon(points: PancakePoint[], fill?: string, stroke?: string, strokeWidth: number = 1): void {
+if (points.length === 0) return;
+
+const pixelPoints = points.map(p => pancakePointToPixels(p, this.width, this.height));
+const pointsStr = pixelPoints.map(p => `${p.x},${p.y}`).join(' ');
+
+const attrs: string[] = [];
+if (fill) attrs.push(`fill="${escapeHtml(fill)}"`);
+else attrs.push('fill="none"');
+if (stroke) {
+attrs.push(`stroke="${escapeHtml(stroke)}"`);
+attrs.push(`stroke-width="${strokeWidth}"`);
+}
+attrs.push(`opacity="${this.opacity}"`);
+
+this.elements.push(
+`<polygon points="${pointsStr}" ${attrs.join(' ')} />`
+);
+}
+
+bezierCurve(start: PancakePoint, cp1: PancakePoint, cp2: PancakePoint, end: PancakePoint, stroke: string = '#000000', strokeWidth: number = 1): void {
+const s = pancakePointToPixels(start, this.width, this.height);
+const c1 = pancakePointToPixels(cp1, this.width, this.height);
+const c2 = pancakePointToPixels(cp2, this.width, this.height);
+const e = pancakePointToPixels(end, this.width, this.height);
+
+const path = `M ${s.x} ${s.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${e.x} ${e.y}`;
+const safeColor = escapeHtml(stroke);
+
+this.elements.push(
+`<path d="${path}" fill="none" stroke="${safeColor}" stroke-width="${strokeWidth}" opacity="${this.opacity}" />`
+);
+}
+
+arrow(start: PancakePoint, end: PancakePoint, stroke: string = '#000000', strokeWidth: number = 1, arrowSize: number = 8): void {
+const s = pancakePointToPixels(start, this.width, this.height);
+const e = pancakePointToPixels(end, this.width, this.height);
+
+// Draw the line
+const line = `M ${s.x} ${s.y} L ${e.x} ${e.y}`;
+const safeColor = escapeHtml(stroke);
+
+this.elements.push(
+`<path d="${line}" fill="none" stroke="${safeColor}" stroke-width="${strokeWidth}" opacity="${this.opacity}" />`
+);
+
+// Calculate arrow head
+const angle = Math.atan2(e.y - s.y, e.x - s.x);
+const arrowAngle = Math.PI / 6; // 30 degrees
+
+const x1 = e.x - arrowSize * Math.cos(angle - arrowAngle);
+const y1 = e.y - arrowSize * Math.sin(angle - arrowAngle);
+const x2 = e.x - arrowSize * Math.cos(angle + arrowAngle);
+const y2 = e.y - arrowSize * Math.sin(angle + arrowAngle);
+
+const arrowHead = `M ${x1} ${y1} L ${e.x} ${e.y} L ${x2} ${y2}`;
+
+this.elements.push(
+`<path d="${arrowHead}" fill="none" stroke="${safeColor}" stroke-width="${strokeWidth}" opacity="${this.opacity}" />`
+);
 }
 
 setOpacity(alpha: number): void {
