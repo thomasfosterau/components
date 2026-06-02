@@ -12,7 +12,9 @@ import SwiftUI
 /// Renders a portable chart spec using Apple's Swift Charts framework.
 @available(iOS 16.0, macOS 13.0, watchOS 9.0, tvOS 16.0, *)
 public struct ChartSpecView: View {
-    private let spec: ChartSpec.ChartSpec
+    // Note: the unqualified name resolves to the ChartSpec *struct* (types
+    // shadow same-named modules in Swift), which is what we want here.
+    private let spec: ChartSpec
     private let rows: [Datum]
 
     /// Creates a chart view.
@@ -21,7 +23,7 @@ public struct ChartSpecView: View {
     ///   - spec: The decoded portable chart spec.
     ///   - rows: Resolved data rows. Required when the spec's data is a
     ///     reference; defaults to the spec's inline values otherwise.
-    public init(spec: ChartSpec.ChartSpec, rows: [Datum]? = nil) {
+    public init(spec: ChartSpec, rows: [Datum]? = nil) {
         self.spec = spec
         switch spec.data {
         case .inline(let values):
@@ -63,7 +65,7 @@ public struct ChartSpecView: View {
     }
 
     private func plottableRows(x: Channel, y: Channel) -> [PlottableRow] {
-        rows.compactMap { datum in
+        rows.compactMap { datum -> PlottableRow? in
             // Rows whose values contradict declared types are skipped here;
             // host apps that want hard failures should validate before rendering.
             guard
