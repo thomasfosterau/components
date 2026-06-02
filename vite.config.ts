@@ -14,7 +14,7 @@ export default defineConfig({
 
   // Vitest — discovers tests across all workspace packages.
   test: {
-    include: ['packages/*/test/**/*.test.ts'],
+    include: ['packages/*/test/**/*.test.ts', 'packages/*/test/**/*.test.tsx'],
   },
 
   // Oxlint — type-aware linting + type checking (vp check).

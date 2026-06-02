@@ -16,11 +16,13 @@ assumptions.
 **Interpreter columns**
 
 - **TS core** — `@thomasfosterau/chart-core` (`computeContext`). Web interpreters that sit on
-  the core — the ProseMirror NodeView (`@thomasfosterau/chart-prosemirror`) and the planned
-  Svelte component — inherit this column.
+  the core — the ProseMirror NodeView (`chart-prosemirror`), the React components (`chart-react`),
+  the Vue components (`chart-vue`), and the planned Svelte component — inherit this column.
 - **Vega-Lite** — `@thomasfosterau/chart-vega` (`emitVegaLite`), the spec → Vega-Lite emitter
   (escape hatch / SSR fallback), validated against the real Vega-Lite compiler
-- **Swift Charts** — the planned Swift package (`ChartSpecKit`) decoding the spec into SwiftUI `ChartContent`
+- **Swift Charts** — `swift/ChartSpecKit`: the `ChartSpec` Codable decoder plus a swappable
+  SwiftUI renderer whose default backend is Apple Swift Charts. Authored but not yet compiled
+  (no Swift toolchain in the authoring environment) — statuses remain 🔵 until `swift test` passes
 - **Compose** — the planned Kotlin/Android interpreter (charting approach not yet chosen; envelope may constrain further)
 - **Media** — planned PDF / raster image / video targets (most likely built on the TS core)
 

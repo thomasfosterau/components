@@ -13,7 +13,7 @@ contract.** Everything else is a per-platform interpreter of that spec.
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | **1 — Spec**         | Durable, declarative, language-neutral JSON chart description. Grammar-of-graphics level: mark + encodings + declared types + data reference. Never geometry, pixels, or renderer names. | [`packages/chart-spec`](./packages/chart-spec) + [`schema/chart-spec.v1.json`](./schema/chart-spec.v1.json) |
 | **2 — Core**         | Pure, synchronous TypeScript. Turns `(spec, box, data)` into scales, dimensions, and geometry. No DOM, no reactivity, no rendering.                                                      | [`packages/chart-core`](./packages/chart-core)                                                              |
-| **3 — Interpreters** | Per-platform renderers: ProseMirror NodeView, Svelte/SvelteKit, React, Swift Charts, Kotlin/Compose, media targets. Each reads the spec and renders it idiomatically.                    | Future packages                                                                                             |
+| **3 — Interpreters** | Per-platform renderers: ProseMirror NodeView, React, Vue, Vega-Lite, Swift, Svelte/SvelteKit, Kotlin/Compose, media targets. Each reads the spec and renders it idiomatically.           | `chart-prosemirror`, `chart-react`, `chart-vue`, `chart-vega`, `swift/ChartSpecKit`                         |
 
 Only the spec (Layer 1) and its emitted JSON Schema may cross a language
 boundary. Swift and Kotlin interpreters decode the same spec JSON; they never
@@ -60,6 +60,9 @@ interpreters honour which spec fields.
 | [`@thomasfosterau/chart-core`](./packages/chart-core)               | Pure TS geometry core: `computeContext(spec, box, data)` → scales, layout, geometry, ticks |
 | [`@thomasfosterau/chart-prosemirror`](./packages/chart-prosemirror) | ProseMirror integration: chart node schema + edit-time NodeView rendering SVG via the core |
 | [`@thomasfosterau/chart-vega`](./packages/chart-vega)               | Spec → Vega-Lite emitter: escape hatch / SSR fallback, validated against the real compiler |
+| [`@thomasfosterau/chart-react`](./packages/chart-react)             | React components: SSR-compatible SVG rendering via the core, hydration-safe                |
+| [`@thomasfosterau/chart-vue`](./packages/chart-vue)                 | Vue 3 components: SSR-compatible SVG rendering via the core, plain render functions        |
+| [`ChartSpecKit`](./swift/ChartSpecKit) (Swift)                      | Swift package: Codable spec decoder + swappable SwiftUI renderer (default: Swift Charts)   |
 
 ## Development
 
