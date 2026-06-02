@@ -1,0 +1,39 @@
+{
+  "name": "@thomasfosterau/chart-vega",
+  "version": "0.0.0",
+  "description": "Spec → Vega-Lite emitter (Layer 3 interpreter): converts portable chart specs to Vega-Lite as an escape hatch and SSR fallback",
+  "keywords": [
+    "chart-vega",
+    "charts",
+    "vega-lite",
+    "visualization"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thomasfosterau/charts.git",
+    "directory": "packages/chart-vega"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "vp pack"
+  },
+  "dependencies": {
+    "@thomasfosterau/chart-spec": "0.0.0"
+  },
+  "devDependencies": {
+    "vega": "^6.2.0",
+    "vega-lite": "^6.4.3"
+  }
+}

@@ -59,6 +59,7 @@ interpreters honour which spec fields.
 | [`@thomasfosterau/chart-spec`](./packages/chart-spec)               | The portable chart spec: types, parse/validate/encode, JSON Schema emission                |
 | [`@thomasfosterau/chart-core`](./packages/chart-core)               | Pure TS geometry core: `computeContext(spec, box, data)` → scales, layout, geometry, ticks |
 | [`@thomasfosterau/chart-prosemirror`](./packages/chart-prosemirror) | ProseMirror integration: chart node schema + edit-time NodeView rendering SVG via the core |
+| [`@thomasfosterau/chart-vega`](./packages/chart-vega)               | Spec → Vega-Lite emitter: escape hatch / SSR fallback, validated against the real compiler |
 
 ## Development
 

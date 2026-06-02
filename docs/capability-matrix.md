@@ -18,7 +18,8 @@ assumptions.
 - **TS core** — `@thomasfosterau/chart-core` (`computeContext`). Web interpreters that sit on
   the core — the ProseMirror NodeView (`@thomasfosterau/chart-prosemirror`) and the planned
   Svelte component — inherit this column.
-- **Vega-Lite** — the planned spec → Vega-Lite emitter (escape hatch / SSR fallback)
+- **Vega-Lite** — `@thomasfosterau/chart-vega` (`emitVegaLite`), the spec → Vega-Lite emitter
+  (escape hatch / SSR fallback), validated against the real Vega-Lite compiler
 - **Swift Charts** — the planned Swift package (`ChartSpecKit`) decoding the spec into SwiftUI `ChartContent`
 - **Compose** — the planned Kotlin/Android interpreter (charting approach not yet chosen; envelope may constrain further)
 - **Media** — planned PDF / raster image / video targets (most likely built on the TS core)
@@ -27,10 +28,10 @@ assumptions.
 
 | Mark    | TS core | Vega-Lite           | Swift Charts   | Compose | Media | Degradation when unsupported            |
 | ------- | ------- | ------------------- | -------------- | ------- | ----- | --------------------------------------- |
-| `bar`   | ✅      | 🔵 `bar`            | 🔵 `BarMark`   | 🔵      | 🔵    | n/a — part of the portable intersection |
-| `line`  | ✅      | 🔵 `line`           | 🔵 `LineMark`  | 🔵      | 🔵    | n/a — part of the portable intersection |
-| `point` | ✅      | 🔵 `point`/`circle` | 🔵 `PointMark` | 🔵      | 🔵    | n/a — part of the portable intersection |
-| `area`  | ✅      | 🔵 `area`           | 🔵 `AreaMark`  | 🔵      | 🔵    | n/a — part of the portable intersection |
+| `bar`   | ✅      | ✅ `bar`            | 🔵 `BarMark`   | 🔵      | 🔵    | n/a — part of the portable intersection |
+| `line`  | ✅      | ✅ `line`           | 🔵 `LineMark`  | 🔵      | 🔵    | n/a — part of the portable intersection |
+| `point` | ✅      | ✅ `point`/`circle` | 🔵 `PointMark` | 🔵      | 🔵    | n/a — part of the portable intersection |
+| `area`  | ✅      | ✅ `area`           | 🔵 `AreaMark`  | 🔵      | 🔵    | n/a — part of the portable intersection |
 
 The v1 mark set is deliberately the intersection of the native charting
 vocabularies. New marks (e.g. `rect`, `rule`, `arc`) require a `specVersion`
@@ -40,27 +41,27 @@ bump and a row here **before** implementation.
 
 | Field              | TS core                 | Vega-Lite | Swift Charts                       | Compose | Media | Degradation when unsupported                                            |
 | ------------------ | ----------------------- | --------- | ---------------------------------- | ------- | ----- | ----------------------------------------------------------------------- |
-| `encoding.x`       | ✅                      | 🔵        | 🔵 `.value(x:)`                    | 🔵      | 🔵    | Required for all v1 marks; a spec without `x`/`y` renders an empty plot |
-| `encoding.y`       | ✅                      | 🔵        | 🔵 `.value(y:)`                    | 🔵      | 🔵    | Same as `x`                                                             |
-| `encoding.color`   | ✅                      | 🔵        | 🔵 `.foregroundStyle(by:)`         | 🔵      | 🔵    | Ignored → single default series colour                                  |
-| `encoding.size`    | ✅ point only           | 🔵        | 🟡 `.symbolSize(by:)` (point only) | 🟡      | 🔵    | Ignored → default mark size                                             |
-| `encoding.opacity` | 🟡 parsed, not resolved | 🔵        | 🟡 limited                         | 🟡      | 🔵    | Ignored → fully opaque marks                                            |
+| `encoding.x`       | ✅                      | ✅        | 🔵 `.value(x:)`                    | 🔵      | 🔵    | Required for all v1 marks; a spec without `x`/`y` renders an empty plot |
+| `encoding.y`       | ✅                      | ✅        | 🔵 `.value(y:)`                    | 🔵      | 🔵    | Same as `x`                                                             |
+| `encoding.color`   | ✅                      | ✅        | 🔵 `.foregroundStyle(by:)`         | 🔵      | 🔵    | Ignored → single default series colour                                  |
+| `encoding.size`    | ✅ point only           | ✅        | 🟡 `.symbolSize(by:)` (point only) | 🟡      | 🔵    | Ignored → default mark size                                             |
+| `encoding.opacity` | 🟡 parsed, not resolved | ✅        | 🟡 limited                         | 🟡      | 🔵    | Ignored → fully opaque marks                                            |
 
 ## Encoding field types
 
 | Type           | TS core             | Vega-Lite | Swift Charts              | Compose | Media | Notes                                                                                        |
 | -------------- | ------------------- | --------- | ------------------------- | ------- | ----- | -------------------------------------------------------------------------------------------- |
-| `quantitative` | ✅ linear scale     | 🔵        | 🔵 `Double` plottable     | 🔵      | 🔵    | Values must be finite JSON numbers                                                           |
-| `temporal`     | ✅ UTC scale        | 🔵        | 🔵 `Date` plottable       | 🔵      | 🔵    | ISO 8601 strings or epoch ms; decoders reconstruct dates from the declared type, never sniff |
-| `ordinal`      | ✅ band/point scale | 🔵        | 🟡 treated as categorical | 🟡      | 🔵    | Ordering is data order                                                                       |
-| `nominal`      | ✅ band/point scale | 🔵        | 🔵 `String` plottable     | 🔵      | 🔵    |                                                                                              |
+| `quantitative` | ✅ linear scale     | ✅        | 🔵 `Double` plottable     | 🔵      | 🔵    | Values must be finite JSON numbers                                                           |
+| `temporal`     | ✅ UTC scale        | ✅        | 🔵 `Date` plottable       | 🔵      | 🔵    | ISO 8601 strings or epoch ms; decoders reconstruct dates from the declared type, never sniff |
+| `ordinal`      | ✅ band/point scale | ✅        | 🟡 treated as categorical | 🟡      | 🔵    | Ordering is data order                                                                       |
+| `nominal`      | ✅ band/point scale | ✅        | 🔵 `String` plottable     | 🔵      | 🔵    |                                                                                              |
 
 ## Data
 
 | Field                   | TS core          | Vega-Lite                      | Swift Charts         | Compose | Media | Degradation when unsupported                                        |
 | ----------------------- | ---------------- | ------------------------------ | -------------------- | ------- | ----- | ------------------------------------------------------------------- |
-| `data.values` (inline)  | ✅               | 🔵 inline `values`             | 🔵 decoded rows      | 🔵      | 🔵    | n/a                                                                 |
-| `data.ref` kind `url`   | 🟡 host resolves | 🔵 `url`                       | 🔵 native fetch      | 🔵      | 🟡    | Interpreters that cannot fetch render an empty chart with the title |
+| `data.values` (inline)  | ✅               | ✅ inline `values`             | 🔵 decoded rows      | 🔵      | 🔵    | n/a                                                                 |
+| `data.ref` kind `url`   | 🟡 host resolves | ✅ `url`                       | 🔵 native fetch      | 🔵      | 🟡    | Interpreters that cannot fetch render an empty chart with the title |
 | `data.ref` kind `query` | 🟡 host resolves | ⛔ host pre-resolves to values | 🟡 host app resolves | 🟡      | 🟡    | Host must resolve before handing to the interpreter                 |
 | `data.ref` kind `node`  | 🟡 host resolves | ⛔ host pre-resolves to values | 🟡 host app resolves | 🟡      | 🟡    | Host must resolve before handing to the interpreter                 |
 
@@ -72,16 +73,16 @@ language.
 
 | Field                                 | TS core | Vega-Lite         | Swift Charts                                  | Compose | Media | Degradation when unsupported                                                              |
 | ------------------------------------- | ------- | ----------------- | --------------------------------------------- | ------- | ----- | ----------------------------------------------------------------------------------------- |
-| `scales.x.domain` / `scales.y.domain` | ✅      | 🔵 `scale.domain` | 🟡 `chartXScale(domain:)`                     | 🟡      | 🔵    | Ignored → inferred from data extent                                                       |
-| `scales.*.nice`                       | ✅      | 🔵 `scale.nice`   | ⛔ ignored (Swift Charts nices automatically) | 🟡      | 🔵    | Ignored → interpreter default                                                             |
-| `scales.*.zero`                       | ✅      | 🔵 `scale.zero`   | ⛔ ignored                                    | 🟡      | 🔵    | Ignored → interpreter default (TS core defaults `zero: true` for bar y-scales regardless) |
+| `scales.x.domain` / `scales.y.domain` | ✅      | ✅ `scale.domain` | 🟡 `chartXScale(domain:)`                     | 🟡      | 🔵    | Ignored → inferred from data extent                                                       |
+| `scales.*.nice`                       | ✅      | ✅ `scale.nice`   | ⛔ ignored (Swift Charts nices automatically) | 🟡      | 🔵    | Ignored → interpreter default                                                             |
+| `scales.*.zero`                       | ✅      | ✅ `scale.zero`   | ⛔ ignored                                    | 🟡      | 🔵    | Ignored → interpreter default (TS core defaults `zero: true` for bar y-scales regardless) |
 
 ## Config
 
 | Field            | TS core                                                | Vega-Lite    | Swift Charts                                                 | Compose | Media                            | Degradation when unsupported     |
 | ---------------- | ------------------------------------------------------ | ------------ | ------------------------------------------------------------ | ------- | -------------------------------- | -------------------------------- |
-| `config.title`   | 🟡 passed through (rendering is the interpreter's job) | 🔵 `title`   | 🔵 SwiftUI label                                             | 🔵      | 🔵                               | Ignored → untitled chart         |
-| `config.tooltip` | — (interaction is per-platform)                        | 🔵 `tooltip` | 🟡 maps to selection/`chartOverlay` if the app implements it | 🟡      | ⛔ static output has no tooltips | Ignored entirely; never an error |
+| `config.title`   | 🟡 passed through (rendering is the interpreter's job) | ✅ `title`   | 🔵 SwiftUI label                                             | 🔵      | 🔵                               | Ignored → untitled chart         |
+| `config.tooltip` | — (interaction is per-platform)                        | ✅ `tooltip` | 🟡 maps to selection/`chartOverlay` if the app implements it | 🟡      | ⛔ static output has no tooltips | Ignored entirely; never an error |
 
 ## Extensions
 
@@ -93,7 +94,7 @@ language.
 
 | Field         | TS core             | Vega-Lite | Swift Charts           | Compose | Media | Behaviour                                                                                                            |
 | ------------- | ------------------- | --------- | ---------------------- | ------- | ----- | -------------------------------------------------------------------------------------------------------------------- |
-| `specVersion` | ✅ enforced (`'1'`) | 🔵        | 🔵 enforced by decoder | 🔵      | 🔵    | Every interpreter must reject spec versions it does not understand, with a clear error — never best-effort rendering |
+| `specVersion` | ✅ enforced (`'1'`) | ✅        | 🔵 enforced by decoder | 🔵      | 🔵    | Every interpreter must reject spec versions it does not understand, with a clear error — never best-effort rendering |
 
 ## Rules for changing this matrix
 
