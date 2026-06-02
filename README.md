@@ -1,176 +1,90 @@
 # @thomasfosterau/charts
 
-A declarative Svelte charting library with multiple render targets (SVG, Canvas, WebGPU) using the Pancake technique.
+A portable, renderer-agnostic charting system built around a durable chart
+specification.
 
-## Features
+## Architecture
 
-- 🎨 **Multiple Render Targets**: SVG (SSR-compatible), Canvas, and WebGPU support
-- 🥞 **Pancake Coordinates**: Percentage-based coordinate system for renderer-agnostic layouts
-- 📊 **Declarative API**: Inspired by Swift Charts and modern web frameworks
-- ⚡ **High Performance**: Optimized rendering with Canvas and WebGPU options
-- 🎯 **Type-Safe**: Built with TypeScript for excellent DX
-- 🚀 **Powered by Bun**: Fast package management and runtime
+The system has three layers with different lifespans, languages, and owners.
+**The persisted chart spec is the durable asset and the only cross-platform
+contract.** Everything else is a per-platform interpreter of that spec.
 
-## Installation
+| Layer                | What                                                                                                                                                                                     | Where                                                                                                       |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **1 — Spec**         | Durable, declarative, language-neutral JSON chart description. Grammar-of-graphics level: mark + encodings + declared types + data reference. Never geometry, pixels, or renderer names. | [`packages/chart-spec`](./packages/chart-spec) + [`schema/chart-spec.v1.json`](./schema/chart-spec.v1.json) |
+| **2 — Core**         | Pure, synchronous TypeScript. Turns `(spec, box, data)` into scales, dimensions, and geometry. No DOM, no reactivity, no rendering.                                                      | [`packages/chart-core`](./packages/chart-core)                                                              |
+| **3 — Interpreters** | Per-platform renderers: ProseMirror NodeView, React, Vue, Vega-Lite, Swift, Svelte/SvelteKit, Kotlin/Compose, media targets. Each reads the spec and renders it idiomatically.           | `chart-prosemirror`, `chart-react`, `chart-vue`, `chart-vega`, `swift/ChartSpecKit`                         |
 
-```bash
-bun add @thomasfosterau/charts
+Only the spec (Layer 1) and its emitted JSON Schema may cross a language
+boundary. Swift and Kotlin interpreters decode the same spec JSON; they never
+consume the TypeScript core.
+
+### Invariants
+
+- The spec is grammar-level: no geometry, pixels, or renderer names in portable parts.
+- Every encoding carries an explicit type (`quantitative` | `ordinal` | `nominal` | `temporal`).
+- `specVersion` is present and respected by every interpreter.
+- Interaction stays out of the portable spec beyond trivial hints (e.g. `tooltip`).
+- The portable subset targets the intersection of native charting envelopes
+  (Swift Charts, Compose); web-only richness lives in `extensions` and degrades gracefully.
+- Effect Schema is a beta surface, isolated entirely inside `chart-spec`.
+
+See [`docs/capability-matrix.md`](./docs/capability-matrix.md) for which
+interpreters honour which spec fields.
+
+## Example spec
+
+```json
+{
+  "specVersion": "1",
+  "mark": "line",
+  "encoding": {
+    "x": { "field": "date", "type": "temporal" },
+    "y": { "field": "price", "type": "quantitative" }
+  },
+  "data": {
+    "values": [
+      { "date": "2024-01-01", "price": 150 },
+      { "date": "2024-01-02", "price": 155.5 }
+    ]
+  },
+  "config": { "title": "Stock price", "tooltip": true }
+}
 ```
 
-## Quick Start
+## Packages
 
-```svelte
-<script>
-  import { Chart, Line, Axis } from '@thomasfosterau/charts';
-  import { createScale, getNiceDomain } from '@thomasfosterau/charts';
-
-  const data = [
-    { x: 0, y: 10 },
-    { x: 1, y: 25 },
-    { x: 2, y: 20 },
-    { x: 3, y: 35 },
-    { x: 4, y: 30 }
-  ];
-
-  const xScale = createScale('linear')
-    .domain(getNiceDomain(data.map(d => d.x), 0))
-    .range([50, 550]);
-
-  const yScale = createScale('linear')
-    .domain(getNiceDomain(data.map(d => d.y), 0.1))
-    .range([360, 40]);
-</script>
-
-<Chart width={600} height={400} renderTarget="svg">
-  <Line {data} x="x" y="y" stroke="#4299e1" strokeWidth={2} />
-  <Axis scale={xScale} type="x" position="bottom" label="X Axis" gridLines />
-  <Axis scale={yScale} type="y" position="left" label="Y Axis" gridLines />
-</Chart>
-```
-
-## Render Targets
-
-### SVG (Default)
-Perfect for static rendering and client-side use:
-```svelte
-<Chart renderTarget="svg">
-  <!-- Your charts -->
-</Chart>
-```
-
-**Note**: While SVG is rendered as markup, the Chart component initializes renderers in `onMount()`, so it requires client-side JavaScript. For true SSR, you would need to use the renderer APIs directly.
-
-### Canvas
-High-performance for dynamic visualizations:
-```svelte
-<Chart renderTarget="canvas">
-  <!-- Your charts -->
-</Chart>
-```
-
-### WebGPU
-GPU-accelerated rendering for complex visualizations:
-```svelte
-<Chart renderTarget="webgpu">
-  <!-- Your charts -->
-</Chart>
-```
-
-## Chart Types
-
-### Line Chart
-```svelte
-<Line data={myData} x="date" y="value" stroke="#4299e1" />
-```
-
-### Bar Chart
-```svelte
-<Bar data={myData} x="category" y="value" fill="#48bb78" />
-```
-
-### Scatter Plot
-```svelte
-<Scatter data={myData} x="x" y="y" radius={5} fill="#ed8936" />
-```
-
-## The Pancake Technique
-
-This library uses the "Pancake" coordinate system, where all positions are specified as percentages (0-100) rather than pixels. This makes the rendering truly device-independent and allows the same chart description to work across SVG, Canvas, and WebGPU renderers.
-
-## Documentation
-
-📚 **Comprehensive documentation is available in the [docs](./docs) directory:**
-
-### Getting Started
-- [Getting Started Guide](./docs/getting-started.md) - Installation, setup, and your first chart
-
-### Tutorials
-- [Basic Charts](./docs/tutorials/01-basic-charts.md) - Learn all chart types
-- [Advanced Features](./docs/tutorials/02-advanced-features.md) - Scales, theming, and more
-- [Custom Components](./docs/tutorials/03-custom-components.md) - Build your own chart types
-
-### Guides
-- [Render Targets](./docs/guides/render-targets.md) - SVG vs Canvas vs WebGPU
-- [Scales and Domains](./docs/guides/scales-and-domains.md) - Understanding D3 scales
-- [Theming](./docs/guides/theming.md) - Colors, styles, and themes
-- [SSR Support](./docs/guides/ssr.md) - Server-side rendering with SvelteKit
-
-### API Reference
-- [API Overview](./docs/api/README.md) - Quick reference
-- [Components](./docs/api/components.md) - Complete component API
-- [Utilities](./docs/api/utilities.md) - Helper functions and scales
-- [Renderers](./docs/api/renderers.md) - Rendering backends
-
-## Quick API Reference
-
-### Components
-- `Chart` - Root container component
-- `Line` - Line chart visualization
-- `Bar` - Bar chart visualization
-- `Scatter` - Scatter plot visualization
-- `Area` - Area chart visualization
-- `Pie` - Pie/Donut chart
-- `Axis` - Chart axis with ticks and labels
-- `Grid` - Standalone grid lines
-- `Legend` - Chart legend
-
-### Utilities
-- `createScale()` - Create D3-style scales
-- `getNiceDomain()` - Calculate optimal domain ranges
-- `getTicks()` - Generate tick values
-- `formatTick()` - Format tick labels
-
-### Renderers
-- `SVGRenderer` - Server-side rendering compatible
-- `CanvasRenderer` - High-performance Canvas API
-- `WebGPURenderer` - GPU-accelerated rendering
+| Package                                                             | Description                                                                                |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [`@thomasfosterau/chart-spec`](./packages/chart-spec)               | The portable chart spec: types, parse/validate/encode, JSON Schema emission                |
+| [`@thomasfosterau/chart-core`](./packages/chart-core)               | Pure TS geometry core: `computeContext(spec, box, data)` → scales, layout, geometry, ticks |
+| [`@thomasfosterau/chart-prosemirror`](./packages/chart-prosemirror) | ProseMirror integration: chart node schema + edit-time NodeView rendering SVG via the core |
+| [`@thomasfosterau/chart-vega`](./packages/chart-vega)               | Spec → Vega-Lite emitter: escape hatch / SSR fallback, validated against the real compiler |
+| [`@thomasfosterau/chart-react`](./packages/chart-react)             | React components: SSR-compatible SVG rendering via the core, hydration-safe                |
+| [`@thomasfosterau/chart-vue`](./packages/chart-vue)                 | Vue 3 components: SSR-compatible SVG rendering via the core, plain render functions        |
+| [`ChartSpecKit`](./swift/ChartSpecKit) (Swift)                      | Swift package: Codable spec decoder + swappable SwiftUI renderer (default: Swift Charts)   |
 
 ## Development
 
+This is an npm workspace managed with [Vite+](https://viteplus.dev) (`vp`).
+
 ```bash
-# Install dependencies
-bun install
-
-# Run development server
-bun run dev
-
-# Build the library
-bun run build
-
-# Run type checking
-bun run check
-
-# Format code
-bun run format
+npm install        # install all workspace dependencies
+npm test           # vp test — run all package tests (Vitest)
+npm run check      # vp check — format, lint, and type check
+npm run build      # build all packages (tsdown via vp pack)
+npm run emit-schema  # regenerate schema/chart-spec.v1.json
 ```
+
+The JSON Schema artifact at `schema/chart-spec.v1.json` is committed and kept
+in sync by a test; if you change the spec schema, rerun `npm run emit-schema`.
 
 ## Versioning
 
-This project uses [Changesets](https://github.com/changesets/changesets) for version management.
+This project uses [Changesets](https://github.com/changesets/changesets):
 
-To create a changeset:
 ```bash
-bun run changeset
+npm run changeset
 ```
 
 ## License

@@ -1,0 +1,46 @@
+{
+  "name": "@thomasfosterau/chart-prosemirror",
+  "version": "0.0.0",
+  "description": "ProseMirror integration (Layer 3 interpreter): chart node schema and NodeView rendering portable chart specs at edit time",
+  "keywords": [
+    "chart-prosemirror",
+    "charts",
+    "nodeview",
+    "prosemirror",
+    "visualization"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thomasfosterau/charts.git",
+    "directory": "packages/chart-prosemirror"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "vp pack"
+  },
+  "dependencies": {
+    "@thomasfosterau/chart-core": "0.0.0",
+    "@thomasfosterau/chart-spec": "0.0.0"
+  },
+  "devDependencies": {
+    "prosemirror-model": "^1.25.7",
+    "prosemirror-state": "^1.4.4",
+    "prosemirror-view": "^1.41.8"
+  },
+  "peerDependencies": {
+    "prosemirror-model": "^1.0.0",
+    "prosemirror-view": "^1.0.0"
+  }
+}

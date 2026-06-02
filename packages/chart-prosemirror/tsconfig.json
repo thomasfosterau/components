@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // Layer 3 interpreter: this package legitimately touches the DOM
+    // (unlike chart-spec / chart-core, which must stay DOM-free).
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts", "vite.config.ts"]
+}

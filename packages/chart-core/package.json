@@ -1,0 +1,42 @@
+{
+  "name": "@thomasfosterau/chart-core",
+  "version": "0.0.0",
+  "description": "Pure TypeScript chart geometry core (Layer 2): computes scales, layout, geometry, and ticks from a portable chart spec",
+  "keywords": [
+    "chart-core",
+    "charts",
+    "d3",
+    "geometry",
+    "visualization"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thomasfosterau/charts.git",
+    "directory": "packages/chart-core"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "vp pack"
+  },
+  "dependencies": {
+    "@thomasfosterau/chart-spec": "0.0.0",
+    "d3-scale": "^4.0.2",
+    "d3-shape": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/d3-scale": "^4.0.8",
+    "@types/d3-shape": "^3.1.6"
+  }
+}
