@@ -68,11 +68,11 @@ public struct ChartSpecView: View {
         rows.compactMap { datum -> PlottableRow? in
             // Rows whose values contradict declared types are skipped here;
             // host apps that want hard failures should validate before rendering.
+            // Note: `try?` flattens the optional, so a thrown type violation and
+            // a missing value both yield nil → the row is skipped either way.
             guard
                 let xValue = try? x.typedValue(from: datum),
-                let yValue = try? y.typedValue(from: datum),
-                let unwrappedX = xValue,
-                let unwrappedY = yValue
+                let yValue = try? y.typedValue(from: datum)
             else { return nil }
 
             var colorCategory: String?
@@ -80,7 +80,7 @@ public struct ChartSpecView: View {
                case .categorical(let category)? = try? colorChannel.typedValue(from: datum) {
                 colorCategory = category
             }
-            return PlottableRow(x: unwrappedX, y: unwrappedY, color: colorCategory)
+            return PlottableRow(x: xValue, y: yValue, color: colorCategory)
         }
     }
 
