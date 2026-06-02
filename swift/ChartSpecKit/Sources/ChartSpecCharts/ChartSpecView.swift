@@ -12,7 +12,9 @@ import SwiftUI
 /// Renders a portable chart spec using Apple's Swift Charts framework.
 @available(iOS 16.0, macOS 13.0, watchOS 9.0, tvOS 16.0, *)
 public struct ChartSpecView: View {
-    private let spec: ChartSpec.ChartSpec
+    // Note: the unqualified name resolves to the ChartSpec *struct* (types
+    // shadow same-named modules in Swift), which is what we want here.
+    private let spec: ChartSpec
     private let rows: [Datum]
 
     /// Creates a chart view.
@@ -21,7 +23,7 @@ public struct ChartSpecView: View {
     ///   - spec: The decoded portable chart spec.
     ///   - rows: Resolved data rows. Required when the spec's data is a
     ///     reference; defaults to the spec's inline values otherwise.
-    public init(spec: ChartSpec.ChartSpec, rows: [Datum]? = nil) {
+    public init(spec: ChartSpec, rows: [Datum]? = nil) {
         self.spec = spec
         switch spec.data {
         case .inline(let values):
@@ -63,14 +65,14 @@ public struct ChartSpecView: View {
     }
 
     private func plottableRows(x: Channel, y: Channel) -> [PlottableRow] {
-        rows.compactMap { datum in
+        rows.compactMap { datum -> PlottableRow? in
             // Rows whose values contradict declared types are skipped here;
             // host apps that want hard failures should validate before rendering.
+            // Note: `try?` flattens the optional, so a thrown type violation and
+            // a missing value both yield nil → the row is skipped either way.
             guard
                 let xValue = try? x.typedValue(from: datum),
-                let yValue = try? y.typedValue(from: datum),
-                let unwrappedX = xValue,
-                let unwrappedY = yValue
+                let yValue = try? y.typedValue(from: datum)
             else { return nil }
 
             var colorCategory: String?
@@ -78,7 +80,7 @@ public struct ChartSpecView: View {
                case .categorical(let category)? = try? colorChannel.typedValue(from: datum) {
                 colorCategory = category
             }
-            return PlottableRow(x: unwrappedX, y: unwrappedY, color: colorCategory)
+            return PlottableRow(x: xValue, y: yValue, color: colorCategory)
         }
     }
 
