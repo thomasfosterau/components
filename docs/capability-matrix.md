@@ -15,7 +15,9 @@ assumptions.
 
 **Interpreter columns**
 
-- **TS core** — `@thomasfosterau/chart-core` (`computeContext`)
+- **TS core** — `@thomasfosterau/chart-core` (`computeContext`). Web interpreters that sit on
+  the core — the ProseMirror NodeView (`@thomasfosterau/chart-prosemirror`) and the planned
+  Svelte component — inherit this column.
 - **Vega-Lite** — the planned spec → Vega-Lite emitter (escape hatch / SSR fallback)
 - **Swift Charts** — the planned Swift package (`ChartSpecKit`) decoding the spec into SwiftUI `ChartContent`
 - **Compose** — the planned Kotlin/Android interpreter (charting approach not yet chosen; envelope may constrain further)

@@ -54,10 +54,11 @@ interpreters honour which spec fields.
 
 ## Packages
 
-| Package                                               | Description                                                                                |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| [`@thomasfosterau/chart-spec`](./packages/chart-spec) | The portable chart spec: types, parse/validate/encode, JSON Schema emission                |
-| [`@thomasfosterau/chart-core`](./packages/chart-core) | Pure TS geometry core: `computeContext(spec, box, data)` → scales, layout, geometry, ticks |
+| Package                                                             | Description                                                                                |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [`@thomasfosterau/chart-spec`](./packages/chart-spec)               | The portable chart spec: types, parse/validate/encode, JSON Schema emission                |
+| [`@thomasfosterau/chart-core`](./packages/chart-core)               | Pure TS geometry core: `computeContext(spec, box, data)` → scales, layout, geometry, ticks |
+| [`@thomasfosterau/chart-prosemirror`](./packages/chart-prosemirror) | ProseMirror integration: chart node schema + edit-time NodeView rendering SVG via the core |
 
 ## Development
 

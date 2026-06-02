@@ -7,6 +7,8 @@ export default defineConfig({
       // depend on built dist output. Published packages point at dist.
       '@thomasfosterau/chart-spec': new URL('./packages/chart-spec/src/index.ts', import.meta.url)
         .pathname,
+      '@thomasfosterau/chart-core': new URL('./packages/chart-core/src/index.ts', import.meta.url)
+        .pathname,
     },
   },
 
