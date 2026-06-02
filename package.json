@@ -1,0 +1,36 @@
+{
+  "name": "@thomasfosterau/charts-workspace",
+  "private": true,
+  "description": "Portable chart specification and interpreters (spec / core / interpreters architecture)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thomasfosterau/charts.git"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "test": "vp test",
+    "check": "vp check",
+    "lint": "vp lint",
+    "fmt": "vp fmt",
+    "build": "vp run -r build",
+    "emit-schema": "npm run emit-schema -w @thomasfosterau/chart-spec",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "npm run build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.9",
+    "@voidzero-dev/vite-plus-core": "0.1.24",
+    "typescript": "^5.7.2",
+    "vite-plus": "0.1.24",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.24"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.1.24",
+    "vitest": "$vitest"
+  }
+}
