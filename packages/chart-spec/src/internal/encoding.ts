@@ -1,0 +1,43 @@
+import { Schema } from 'effect';
+
+/**
+ * The declared type of an encoded field (the Vega-Lite model).
+ *
+ * Explicit types are non-negotiable: JSON has no dates and no ordering, so
+ * every interpreter (TS, Swift, Kotlin) reconstructs typed plottable values
+ * from these declarations — never by sniffing JSON runtime values.
+ */
+export const FieldType = Schema.Literals([
+  'quantitative',
+  'ordinal',
+  'nominal',
+  'temporal',
+]).annotate({
+  identifier: 'FieldType',
+  description:
+    'The declared type of an encoded field. Interpreters reconstruct typed values ' +
+    'from this declaration, never by sniffing JSON values.',
+});
+
+/** A mapping from a data field to a visual channel, with an explicit type. */
+export const Channel = Schema.Struct({
+  field: Schema.String.annotate({
+    description: 'The name of the field in each datum that this channel reads.',
+  }),
+  type: FieldType,
+}).annotate({
+  identifier: 'Channel',
+  description: 'A field-to-channel mapping with an explicit declared type.',
+});
+
+/** Field-to-channel mappings. */
+export const Encoding = Schema.Struct({
+  x: Schema.optionalKey(Channel),
+  y: Schema.optionalKey(Channel),
+  color: Schema.optionalKey(Channel),
+  size: Schema.optionalKey(Channel),
+  opacity: Schema.optionalKey(Channel),
+}).annotate({
+  identifier: 'Encoding',
+  description: 'Field-to-channel mappings describing how data maps to visual channels.',
+});

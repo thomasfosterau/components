@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/thomasfosterau/charts/schema/chart-spec.v1.json",
+  "$ref": "#/$defs/ChartSpec",
+  "$defs": {
+    "SpecVersion": {
+      "type": "string",
+      "enum": [
+        "1"
+      ],
+      "description": "The portable chart spec version this document conforms to."
+    },
+    "Mark": {
+      "type": "string",
+      "enum": [
+        "bar",
+        "line",
+        "point",
+        "area"
+      ],
+      "description": "The mark (geometric primitive) used to render the chart. Restricted to the intersection of native charting vocabularies."
+    },
+    "FieldType": {
+      "type": "string",
+      "enum": [
+        "quantitative",
+        "ordinal",
+        "nominal",
+        "temporal"
+      ],
+      "description": "The declared type of an encoded field. Interpreters reconstruct typed values from this declaration, never by sniffing JSON values."
+    },
+    "Channel": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "The name of the field in each datum that this channel reads."
+        },
+        "type": {
+          "$ref": "#/$defs/FieldType"
+        }
+      },
+      "required": [
+        "field",
+        "type"
+      ],
+      "additionalProperties": false,
+      "description": "A field-to-channel mapping with an explicit declared type."
+    },
+    "Encoding": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "$ref": "#/$defs/Channel"
+        },
+        "y": {
+          "$ref": "#/$defs/Channel"
+        },
+        "color": {
+          "$ref": "#/$defs/Channel"
+        },
+        "size": {
+          "$ref": "#/$defs/Channel"
+        },
+        "opacity": {
+          "$ref": "#/$defs/Channel"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Field-to-channel mappings describing how data maps to visual channels."
+    },
+    "DatumValue": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "A single value inside a data row: a flat JSON primitive."
+    },
+    "Datum": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/DatumValue"
+      },
+      "description": "A single data row: a flat record of JSON primitives."
+    },
+    "InlineData": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Datum"
+          }
+        }
+      },
+      "required": [
+        "values"
+      ],
+      "additionalProperties": false,
+      "description": "Inline data: small datasets embedded directly in the spec."
+    },
+    "DataRefKind": {
+      "type": "string",
+      "enum": [
+        "query",
+        "node",
+        "url"
+      ],
+      "description": "The kind of external data reference: a live query, another content node, or a URL."
+    },
+    "DataRef": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "$ref": "#/$defs/DataRefKind"
+            },
+            "id": {
+              "type": "string",
+              "description": "Identifier of the referenced dataset (query id, node id, or URL)."
+            }
+          },
+          "required": [
+            "kind",
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "description": "A reference to an externally stored dataset, resolved by the host."
+    },
+    "Data": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/InlineData"
+        },
+        {
+          "$ref": "#/$defs/DataRef"
+        }
+      ],
+      "description": "The chart data: exactly one of inline values or an external reference."
+    },
+    "DomainValue": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "description": "A domain entry: a number for quantitative, an ISO 8601 string for temporal, or a category value for ordinal/nominal."
+    },
+    "ScaleHint": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DomainValue"
+          }
+        },
+        "nice": {
+          "type": "boolean",
+          "description": "Round the domain to human-friendly values."
+        },
+        "zero": {
+          "type": "boolean",
+          "description": "Force the domain to include zero."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Optional scale hints. Interpreters may infer or override these."
+    },
+    "Scales": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "$ref": "#/$defs/ScaleHint"
+        },
+        "y": {
+          "$ref": "#/$defs/ScaleHint"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Per-channel scale hints."
+    },
+    "Config": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The chart title."
+        },
+        "tooltip": {
+          "type": "boolean",
+          "description": "Whether tooltips are enabled. A trivial declarative hint — real interaction is per-platform application code, not document data."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Portable presentation hints."
+    },
+    "Extensions": {
+      "type": "object",
+      "description": "Web-only, non-portable hints. Native interpreters ignore this entirely."
+    },
+    "ChartSpec": {
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "$ref": "#/$defs/SpecVersion"
+        },
+        "mark": {
+          "$ref": "#/$defs/Mark"
+        },
+        "encoding": {
+          "$ref": "#/$defs/Encoding"
+        },
+        "data": {
+          "$ref": "#/$defs/Data"
+        },
+        "scales": {
+          "$ref": "#/$defs/Scales"
+        },
+        "config": {
+          "$ref": "#/$defs/Config"
+        },
+        "extensions": {
+          "$ref": "#/$defs/Extensions"
+        }
+      },
+      "required": [
+        "specVersion",
+        "mark",
+        "encoding",
+        "data"
+      ],
+      "additionalProperties": false,
+      "title": "Portable Chart Specification",
+      "description": "A renderer-agnostic, framework-agnostic, language-neutral chart description. Grammar-of-graphics level: mark + encodings + declared data types + data reference."
+    }
+  }
+}
