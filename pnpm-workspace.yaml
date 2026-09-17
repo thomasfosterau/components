@@ -24,6 +24,11 @@ packages:
 catalogMode: strict
 
 catalog:
+  # A REQUIRED peer of bits-ui (its date and calendar primitives import it),
+  # declared here as a runtime dependency of the package because peers are
+  # never auto-installed in this workspace (see `autoInstallPeers` below) and a
+  # consumer should not have to know bits-ui's peer list to use a Dialog.
+  '@internationalized/date': ^3.8.1
   # OPTIONAL PEER of the published package, never installed here: the maps
   # entry point reaches it only through DynamicMap's dynamic import(), and the
   # dev/test/Storybook resolution in packages/components/vite.config.ts stands

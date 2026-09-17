@@ -61,6 +61,7 @@
     "./theme.css": "./dist/theme.css"
   },
   "dependencies": {
+    "@internationalized/date": "catalog:",
     "@lucide/svelte": "catalog:",
     "bits-ui": "catalog:",
     "clsx": "catalog:"
