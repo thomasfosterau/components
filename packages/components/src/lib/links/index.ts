@@ -4,4 +4,4 @@
  * @module
  */
 
-export {};
+export { default as EmailLink } from './EmailLink.svelte';
