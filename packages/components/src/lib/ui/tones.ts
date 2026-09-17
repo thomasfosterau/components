@@ -135,3 +135,53 @@ export const textTone: Record<Tone, string> = {
   warning: 'text-warning',
   error: 'text-error',
 };
+
+/** Heading levels, for any component that renders a caller-chosen heading. */
+export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+
+export type LinkVariant = 'primary' | 'muted' | 'plain';
+
+export const linkVariant: Record<LinkVariant, string> = {
+  primary: 'link link-primary link-hover',
+  muted: 'link link-hover',
+  plain: 'link link-hover text-base-content/70',
+};
+
+export type CardVariant = 'border' | 'dash' | 'plain';
+
+export const cardVariant: Record<CardVariant, string> = {
+  border: 'card-border',
+  dash: 'card-dash',
+  plain: '',
+};
+
+export const cardSize: Record<Size, string> = {
+  xs: 'card-xs',
+  sm: 'card-sm',
+  md: 'card-md',
+  lg: 'card-lg',
+  xl: 'card-xl',
+};
+
+export type DisclosureVariant = 'arrow' | 'plus' | 'plain';
+
+/** daisyUI `collapse` markers — the affordance on a native `<details>`. */
+export const collapseVariant: Record<DisclosureVariant, string> = {
+  arrow: 'collapse-arrow',
+  plus: 'collapse-plus',
+  plain: '',
+};
+
+/** The two chip steps. A chip is a dense inline unit, so it stops at `md`. */
+export type ChipSize = 'sm' | 'md';
+
+export const chipSize: Record<ChipSize, string> = {
+  sm: 'gap-1 text-xs',
+  md: 'gap-1.5 text-sm',
+};
+
+/** The swatch square beside a chip's label, sized to match {@link chipSize}. */
+export const chipSwatchSize: Record<ChipSize, string> = {
+  sm: 'size-2',
+  md: 'size-2.5',
+};

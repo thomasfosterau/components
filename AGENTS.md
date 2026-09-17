@@ -33,6 +33,8 @@ This repo is a **publishable npm library**, not an application — the only arti
 - **Links and locale go through the context.** `getComponentsContext()` supplies `href(path)`, `navigate(url)`, `isCurrent(href)` and `locale()`; a component never imports `$app/*` and never reads `window.location` itself. Every `Intl` formatter takes a `locales` prop and falls back to `locale()`.
 - **No Effect.** Async callbacks are `(…, signal: AbortSignal) => Promise<T>`; optional values are `T | undefined`. Effect adapters live in the consuming apps.
 - **Ids are minted with `$props.id()`** and overridable by an `id` prop.
+- **Optional props are declared `T | undefined`, never bare `prop?: T`.** The workspace compiles with `exactOptionalPropertyTypes`, under which `prop?: T` rejects an explicitly forwarded `undefined`, so `<Button {tone}>` from a caller whose own `tone` is optional would not compile. Parenthesise function types: `onSelect?: (() => void) | undefined`.
+- **In a `.ts` test, `render(Component, props)` cannot take a prop named `anchor`, `target`, `props`, `events`, `context` or `intro`** — those are Svelte's mount options; nest such props under `props:`.
 
 - **daisyUI classes come from a literal lookup table, never a template string.** Tailwind 4 extracts classes by scanning source text, so ``class={`btn-${variant}`}`` emits nothing at all:
 
