@@ -1,9 +1,4 @@
 {
   "extends": "./tsconfig.base.json",
-  "include": [
-    "vite.config.ts",
-    "packages/chart-*/src/**/*.ts",
-    "packages/chart-*/test/**/*.ts",
-    "packages/chart-*/scripts/**/*.ts"
-  ]
+  "include": ["vite.config.ts"]
 }

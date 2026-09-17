@@ -1,7 +1,7 @@
 {
   "name": "@thomasfosterau/monorepo",
   "private": true,
-  "description": "Svelte component library and portable chart specification / interpreters, in one Vite+ workspace",
+  "description": "Accessible Svelte components, in a Vite+ workspace",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -18,23 +18,19 @@
     "lint": "vp lint",
     "fmt": "vp fmt",
     "build": "vp run -r build",
-    "emit-schema": "npm run emit-schema -w @thomasfosterau/chart-spec",
+    "build:demo": "npm run build:demo -w @thomasfosterau/components",
     "changeset": "changeset",
     "version": "changeset version",
     "release": "npm run build && changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
-    "@types/react": "^19.2.16",
-    "@types/react-dom": "^19.2.3",
+    "@sveltejs/vite-plugin-svelte": "^7.3.0",
     "@voidzero-dev/vite-plus-core": "0.3.2",
-    "happy-dom": "^20.9.0",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
+    "svelte": "^5.57.0",
     "typescript": "6.0.3",
     "vite-plus": "0.3.2",
-    "vitest": "4.1.11",
-    "vue": "^3.5.35"
+    "vitest": "4.1.11"
   },
   "overrides": {
     "typescript": "6.0.3",
