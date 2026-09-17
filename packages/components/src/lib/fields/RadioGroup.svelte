@@ -23,7 +23,6 @@
 -->
 <script lang="ts">
   import { RadioGroup } from 'bits-ui';
-  import clsx from 'clsx';
   import type { HTMLAttributes } from 'svelte/elements';
   import FieldErrors from './FieldErrors.svelte';
   import { toFieldOptions, type FieldOptionInput } from './field-types.ts';
@@ -92,7 +91,7 @@
     aria-orientation={orientation}
     aria-describedby={describedBy === '' ? undefined : describedBy}
     aria-invalid={invalid ? 'true' : undefined}
-    class={clsx('flex gap-3', orientation === 'horizontal' ? 'flex-row flex-wrap' : 'flex-col')}
+    class={['flex gap-3', orientation === 'horizontal' ? 'flex-row flex-wrap' : 'flex-col']}
   >
     {#each entries as option (option.value)}
       <RadioGroup.Item

@@ -35,7 +35,6 @@
   pointer geometry.
 -->
 <script lang="ts" generics="T extends CanvasElement">
-  import clsx from 'clsx';
   import type { Snippet } from 'svelte';
   import type { SVGAttributes } from 'svelte/elements';
   import type { CanvasElement, Point, VectorDocument, Viewport } from './types.ts';
@@ -204,7 +203,7 @@
 </script>
 
 <div
-  class={clsx('bg-base-100 relative overflow-hidden select-none', className)}
+  class={['bg-base-100 relative overflow-hidden select-none', className]}
   style:width="{width}px"
   style:height="{height}px"
   style:touch-action="none"

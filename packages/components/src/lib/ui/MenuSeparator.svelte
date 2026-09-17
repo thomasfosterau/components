@@ -10,7 +10,6 @@
 -->
 <script lang="ts">
   import { DropdownMenu } from 'bits-ui';
-  import clsx from 'clsx';
   import { getMenuMode } from './menu-context.ts';
 
   interface Props {
@@ -24,7 +23,7 @@
 
 {#if mode() === 'dropdown'}
   <li role="none">
-    <DropdownMenu.Separator class={clsx('divider my-1 h-px', className)} />
+    <DropdownMenu.Separator class={['divider my-1 h-px', className]} />
   </li>
 {:else}
   <li role="separator" class={['divider my-1 h-px', className]}></li>

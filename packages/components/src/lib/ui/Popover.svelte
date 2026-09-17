@@ -21,7 +21,6 @@
 <script lang="ts">
   import { X } from '@lucide/svelte';
   import { Popover } from 'bits-ui';
-  import clsx from 'clsx';
   import type { Snippet } from 'svelte';
   import Button from './Button.svelte';
   import VisuallyHidden from './VisuallyHidden.svelte';
@@ -72,7 +71,7 @@
       {sideOffset}
       role="dialog"
       aria-labelledby={title === undefined ? undefined : titleId}
-      class={clsx('card card-border bg-base-100 rounded-box z-50 w-72 p-4 shadow-md', className)}
+      class={['card card-border bg-base-100 rounded-box z-50 w-72 p-4 shadow-md', className]}
     >
       {#if closeLabel !== undefined}
         <Popover.Close>

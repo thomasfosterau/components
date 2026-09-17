@@ -49,7 +49,6 @@
 -->
 <script lang="ts" generics="T">
   import { Combobox } from 'bits-ui';
-  import clsx from 'clsx';
   import type { Snippet } from 'svelte';
   import { inputSize, type FieldSize } from './field-types.ts';
 
@@ -243,7 +242,7 @@
       aria-invalid={invalid ? 'true' : undefined}
       oninput={typed}
       onkeydown={keydown}
-      class={clsx('input w-full', inputSize[size], invalid && 'input-error')}
+      class={['input w-full', inputSize[size], invalid && 'input-error']}
     />
 
     <Combobox.Portal>

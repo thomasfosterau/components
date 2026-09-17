@@ -7,14 +7,13 @@
   matches what a sighted reader sees, rather than `aria-label` guessing at it.
   Use it for content that must be READ. Content that must merely be reachable
   (a skip link) wants `sr-only focus:not-sr-only` instead, which this component
-  supports because the caller's `class` is appended after its own.
+  supports because the caller's `class` is merged last by Svelte's class array.
 
   The clipping itself is Tailwind's `sr-only` utility, which this package does
   NOT ship — it comes from the consumer's Tailwind build, the same as every
   other class here. See the README's `@source` note.
 -->
 <script lang="ts">
-  import clsx from 'clsx';
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
 
@@ -25,4 +24,4 @@
   let { children, class: className, ...rest }: Props = $props();
 </script>
 
-<span {...rest} class={clsx('sr-only', className)}>{@render children()}</span>
+<span {...rest} class={['sr-only', className]}>{@render children()}</span>

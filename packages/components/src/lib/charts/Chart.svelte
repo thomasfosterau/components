@@ -41,7 +41,6 @@
   chart: this is geometry and a table, not a focus-managed widget.
 -->
 <script lang="ts">
-  import clsx from 'clsx';
   import type { ChartKind, ChartSeries } from './types.ts';
 
   interface Props {
@@ -147,7 +146,7 @@
   };
 </script>
 
-<figure class={clsx('not-prose space-y-2', className)}>
+<figure class={['not-prose space-y-2', className]}>
   <figcaption class="space-y-1">
     <p class="text-base font-semibold">{title}</p>
     {#if description !== ''}

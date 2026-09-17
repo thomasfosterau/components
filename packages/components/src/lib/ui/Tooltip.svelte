@@ -22,7 +22,6 @@
 -->
 <script lang="ts">
   import { Tooltip } from 'bits-ui';
-  import clsx from 'clsx';
   import type { Snippet } from 'svelte';
 
   interface Props {
@@ -67,10 +66,10 @@
       <Tooltip.Content
         {side}
         {sideOffset}
-        class={clsx(
+        class={[
           'bg-neutral text-neutral-content rounded-box z-50 max-w-xs px-3 py-1.5 text-sm shadow-md',
           className,
-        )}
+        ]}
       >
         {#if content}
           {@render content()}
