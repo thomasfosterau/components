@@ -18,7 +18,7 @@
   });
 </script>
 
-<Story name="From the hotkey registry (press ⌘K / Ctrl+K)">
+<Story name="From the hotkey registry (press Cmd+K or Ctrl+K)">
   <HotkeyDemo>
     <CommandPalette />
   </HotkeyDemo>
