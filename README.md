@@ -1,54 +1,39 @@
 # @thomasfosterau/components
 
-Accessible Svelte 5 components styled with Tailwind CSS 4 and built on
-[Melt UI](https://next.melt-ui.com), in a [Vite+](https://viteplus.dev)
-workspace.
+Accessible Svelte 5 UI primitives — [Tailwind CSS 4](https://tailwindcss.com) and [daisyUI 5](https://daisyui.com) for styling, [bits-ui](https://bits-ui.com) for interaction — in a [Vite+](https://viteplus.dev) workspace.
 
-| Package                                               | Description                                      |
-| ----------------------------------------------------- | ------------------------------------------------ |
-| [`@thomasfosterau/components`](./packages/components) | The component library, plus a SvelteKit demo app |
+| Package                                               | Description                              |
+| ----------------------------------------------------- | ---------------------------------------- |
+| [`@thomasfosterau/components`](./packages/components) | The published library (`svelte-package`) |
 
-See [`packages/components`](./packages/components) for the component reference
-and prop tables.
+The component reference lives in [`packages/components`](./packages/components). This file covers the workspace.
 
 ## Development
 
-```bash
-npm install          # install all workspace dependencies
-npm run dev          # start the demo app (SvelteKit)
-npm test             # vp test — Vitest, server-rendering the components
-npm run check        # vp check, then svelte-check for the Svelte package
-npm run lint         # vp lint — oxlint, type-aware
-npm run fmt          # vp fmt — oxfmt, the formatter of record
-npm run build        # svelte-package → packages/components/dist
-npm run build:demo   # build the demo app
+The toolchain is **Vite+** (the `vp` CLI) on **Node + pnpm**. Everything goes through `vp` — `vp install`, `vp add`, `vp run <script>`, `vp exec <bin>` — rather than bare `pnpm`/`npm`.
+
+```sh
+pnpm install                                        # dependencies + the Vite+ git hooks
+vp check                                            # format + lint (oxfmt + oxlint)
+vp run check                                        # the type-check gate (svelte-check)
+vp run -r test:unit                                 # the component suite, in real Chromium
+vp run -r build                                     # svelte-package -> packages/components/dist
+vp run --filter ./packages/components storybook     # the dev loop, port 6006
+vp run --filter ./packages/components storybook:build
 ```
+
+`vp check` and `vp run check` and `vp run -r test:unit` are the meaningful pre-push gates. There is no pre-push hook; the pre-commit hook runs `vp staged` (format + lint on staged files) only.
 
 ### Toolchain notes
 
-- `packages/components` is a SvelteKit package: its types come from the
-  generated `$app/tsconfig`, so `vp check` skips it and `svelte-check` type
-  checks it instead.
-- `.svelte` files are outside oxfmt's remit. Everything else in the workspace
-  is formatted by `vp fmt`; the `.svelte` files follow the same style
-  (two-space indent, single quotes) by hand.
-- SvelteKit 3 has no `svelte.config.js`. Configuration lives in the
-  `sveltekit()` call in `packages/components/vite.config.ts`, and `$lib` is
-  replaced by the `#lib/*` subpath import declared in that package's
-  `package.json`.
-- TypeScript is pinned to 6.0.3 workspace-wide: SvelteKit 3 declares a
-  `typescript@^6` peer, and an unpinned tree resolves 7.x and fails to install.
-- Tests run in the server environment and assert on `render` from
-  `svelte/server`. Covering client-side interaction would mean Vitest browser
-  mode, which is what Svelte recommends over a DOM shim.
+- **Versions are catalogued.** Every external version lives in [`pnpm-workspace.yaml`](./pnpm-workspace.yaml) under `catalog:`; package.json files carry only `catalog:` or `workspace:*`, and `catalogMode: strict` enforces it. Edit the catalog, then `pnpm install`, then commit the regenerated `pnpm-lock.yaml`.
+- **The tests drive a real browser.** Vitest browser mode over Playwright Chromium, headless everywhere. Locally that needs a Chromium matching the pinned `playwright` (`pnpm exec playwright install chromium`, or an image that pre-installs one under `PLAYWRIGHT_BROWSERS_PATH`); CI installs it in a step of its own.
+- **`.svelte` files are outside oxfmt's remit** and are kept in the same style by hand — two-space indent, single quotes. Everything else is formatted by `vp fmt`.
+- **TypeScript is the TS6 JS compiler**, aliased in the catalog: `svelte-check` drives TypeScript through its JS API, which TypeScript 7 does not ship until 7.1.
 
 ## Versioning
 
-This project uses [Changesets](https://github.com/changesets/changesets):
-
-```bash
-npm run changeset
-```
+[Changesets](https://github.com/changesets/changesets). Add one with `pnpm changeset` in any pull request that changes published behaviour; the release workflow opens a version PR and publishes on merge.
 
 ## License
 
