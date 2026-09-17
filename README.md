@@ -1,12 +1,12 @@
 # @thomasfosterau/components
 
-Accessible Svelte 5 UI primitives — [Tailwind CSS 4](https://tailwindcss.com) and [daisyUI 5](https://daisyui.com) for styling, [bits-ui](https://bits-ui.com) for interaction — in a [Vite+](https://viteplus.dev) workspace.
+Accessible Svelte 5 UI primitives — [Tailwind CSS 4](https://tailwindcss.com) and [daisyUI 5](https://daisyui.com) for styling, [bits-ui](https://bits-ui.com) for interaction — in a [Vite+](https://viteplus.dev) workspace. 107 components across 17 families, consolidated out of the owner's four Svelte 5 apps into one publishable library.
 
 | Package                                               | Description                              |
 | ----------------------------------------------------- | ---------------------------------------- |
 | [`@thomasfosterau/components`](./packages/components) | The published library (`svelte-package`) |
 
-The component reference lives in [`packages/components`](./packages/components). This file covers the workspace.
+This is a publishable-library workspace, not an application: the only build artifact is `packages/components/dist`. The component reference — installation, app integration, and every family's props table — lives in [`packages/components/README.md`](./packages/components/README.md). This file covers the workspace itself.
 
 ## Development
 
@@ -16,13 +16,13 @@ The toolchain is **Vite+** (the `vp` CLI) on **Node + pnpm**. Everything goes th
 pnpm install                                        # dependencies + the Vite+ git hooks
 vp check                                            # format + lint (oxfmt + oxlint)
 vp run check                                        # the type-check gate (svelte-check)
-vp run -r test:unit                                 # the component suite, in real Chromium
+vp run -r test:unit                                 # the component suite, in headless Chromium under Vitest browser mode
 vp run -r build                                     # svelte-package -> packages/components/dist
 vp run --filter ./packages/components storybook     # the dev loop, port 6006
 vp run --filter ./packages/components storybook:build
 ```
 
-`vp check` and `vp run check` and `vp run -r test:unit` are the meaningful pre-push gates. There is no pre-push hook; the pre-commit hook runs `vp staged` (format + lint on staged files) only.
+`vp check`, `vp run check` and `vp run -r test:unit` are the meaningful pre-push gates. There is no pre-push hook; the pre-commit hook runs `vp staged` (format + lint on staged files) only.
 
 ### Toolchain notes
 
