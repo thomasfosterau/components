@@ -1,11 +1,13 @@
-export { default as Button } from './components/Button.svelte';
-export { default as Card } from './components/Card.svelte';
-export { default as CardContent } from './components/CardContent.svelte';
-export { default as CardDescription } from './components/CardDescription.svelte';
-export { default as CardHeader } from './components/CardHeader.svelte';
-export { default as CardTitle } from './components/CardTitle.svelte';
-export { default as Dialog } from './components/Dialog.svelte';
-export { default as Select } from './components/Select.svelte';
-export { default as Tooltip } from './components/Tooltip.svelte';
+/**
+ * Accessible Svelte 5 UI primitives.
+ *
+ * Everything exported here is app-agnostic: it takes props and snippets,
+ * spreads the native attributes of the element it renders, and reads no
+ * global state. Styling is daisyUI semantic classes over the tokens in
+ * `./theme.css`, which ships beside this barrel as the package's
+ * `./theme.css` export.
+ *
+ * @module @thomasfosterau/components
+ */
 
-export type { SelectItem } from './types.js';
+export { default as VisuallyHidden } from './ui/VisuallyHidden.svelte';

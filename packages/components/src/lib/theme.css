@@ -1,0 +1,94 @@
+/*
+ * The library's design tokens: two daisyUI themes, `light` and `dark`, that
+ * every component in this package renders on.
+ *
+ * Shipped as the package's `./theme.css` export and imported by BOTH
+ * consumers — an application's CSS entry, and Storybook's
+ * `.storybook/preview.css` relatively — so there is exactly one copy of every
+ * token.
+ *
+ * **This is the whole styling vocabulary.** A component here reaches for a
+ * semantic name — `bg-base-200`, `text-error`, `btn-primary` — and never for
+ * a raw palette class (`bg-green-700`), a hex, or an `oklch()` of its own. Two
+ * vocabularies for one palette is how a design system drifts.
+ *
+ * The values below are DELIBERATELY NEUTRAL: an achromatic surface ramp and a
+ * single mid-slate brand hue, so the library looks like nothing in particular
+ * out of the box. They are a starting point, not a brand. An application
+ * overrides them by declaring its own `light` / `dark` themes after importing
+ * this file, or by naming its own themes entirely and never importing it.
+ */
+@plugin "daisyui/theme" {
+  name: 'light';
+  default: true;
+  color-scheme: light;
+  /* Surfaces: a neutral off-white ramp. */
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(96% 0 0);
+  --color-base-300: oklch(91% 0 0);
+  --color-base-content: oklch(22% 0 0);
+  /* Brand: slate. Replace these four pairs, not the surface ramp. */
+  --color-primary: oklch(45% 0.03 260);
+  --color-primary-content: oklch(98% 0 0);
+  --color-secondary: oklch(55% 0.02 260);
+  --color-secondary-content: oklch(98% 0 0);
+  --color-accent: oklch(60% 0.02 260);
+  --color-accent-content: oklch(98% 0 0);
+  --color-neutral: oklch(30% 0 0);
+  --color-neutral-content: oklch(96% 0 0);
+  /* Status: blue / green / amber / red, at their conventional roles. */
+  --color-info: oklch(62.3% 0.214 259.815);
+  --color-info-content: oklch(97% 0.01 260);
+  --color-success: oklch(59.6% 0.145 163.225);
+  --color-success-content: oklch(97% 0.02 163);
+  --color-warning: oklch(76.9% 0.188 70.08);
+  --color-warning-content: oklch(28% 0.07 70);
+  --color-error: oklch(57.7% 0.245 27.325);
+  --color-error-content: oklch(97% 0.01 27);
+  --radius-selector: 1rem;
+  --radius-field: 0.375rem;
+  --radius-box: 0.75rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: 'dark';
+  prefersdark: true;
+  color-scheme: dark;
+  /* Surfaces: the same ramp inverted — not a different ramp. */
+  --color-base-100: oklch(18% 0 0);
+  --color-base-200: oklch(22% 0 0);
+  --color-base-300: oklch(28% 0 0);
+  --color-base-content: oklch(95% 0 0);
+  /* Brand: the light theme's hue, stepped for a dark surface rather than
+     flipped — a colour that clears contrast on white rarely clears it on
+     near-black. */
+  --color-primary: oklch(72% 0.04 260);
+  --color-primary-content: oklch(20% 0.01 260);
+  --color-secondary: oklch(66% 0.03 260);
+  --color-secondary-content: oklch(20% 0.01 260);
+  --color-accent: oklch(70% 0.03 260);
+  --color-accent-content: oklch(20% 0.01 260);
+  --color-neutral: oklch(26% 0 0);
+  --color-neutral-content: oklch(92% 0 0);
+  --color-info: oklch(70.7% 0.165 254.624);
+  --color-info-content: oklch(20% 0.05 255);
+  --color-success: oklch(76.5% 0.177 163.223);
+  --color-success-content: oklch(20% 0.05 163);
+  --color-warning: oklch(82.8% 0.189 84.429);
+  --color-warning-content: oklch(25% 0.07 84);
+  --color-error: oklch(70.4% 0.191 22.216);
+  --color-error-content: oklch(20% 0.05 22);
+  --radius-selector: 1rem;
+  --radius-field: 0.375rem;
+  --radius-box: 0.75rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}

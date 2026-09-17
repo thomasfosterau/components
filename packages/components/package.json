@@ -1,66 +1,63 @@
 {
+  "$schema": "https://www.schemastore.org/package",
   "name": "@thomasfosterau/components",
   "version": "0.1.0",
-  "description": "Accessible Svelte 5 components styled with Tailwind CSS and built on Melt UI",
+  "description": "Accessible Svelte 5 UI primitives — Tailwind CSS 4 and daisyUI 5 for styling, bits-ui for interaction",
   "keywords": [
     "accessibility",
+    "bits-ui",
     "components",
-    "melt-ui",
+    "daisyui",
     "svelte",
     "svelte5",
-    "tailwind",
+    "tailwindcss",
     "ui-library"
   ],
   "license": "MIT",
+  "author": "Thomas Foster <me@thomasfoster.au>",
   "repository": {
     "type": "git",
     "url": "https://github.com/thomasfosterau/components.git",
     "directory": "packages/components"
   },
   "files": [
-    "dist",
-    "!dist/**/*.test.*",
-    "!dist/**/*.spec.*"
+    "dist"
   ],
   "type": "module",
-  "sideEffects": [
-    "**/*.css"
-  ],
+  "sideEffects": false,
   "types": "./dist/index.d.ts",
   "svelte": "./dist/index.js",
-  "imports": {
-    "#lib/*": "./src/lib/*"
-  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "svelte": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./styles.css": "./dist/styles/app.css"
-  },
-  "scripts": {
-    "prepare": "svelte-kit sync || echo ''",
-    "dev": "vp dev",
-    "build": "svelte-kit sync && svelte-package",
-    "preview": "vp preview",
-    "build:demo": "vp build",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+    "./theme.css": "./dist/theme.css"
   },
   "dependencies": {
-    "clsx": "^2.1.1",
-    "melt": "^0.44.0"
+    "@lucide/svelte": "catalog:",
+    "bits-ui": "catalog:",
+    "clsx": "catalog:"
   },
   "devDependencies": {
-    "@sveltejs/adapter-auto": "8.0.0-next.4",
-    "@sveltejs/kit": "3.0.0-next.27",
-    "@sveltejs/package": "3.0.0-next.8",
-    "@sveltejs/vite-plugin-svelte": "^7.3.0",
-    "@tailwindcss/vite": "^4.3.3",
-    "svelte": "^5.57.0",
-    "svelte-check": "^4.7.6",
-    "tailwindcss": "^4.3.3"
+    "@storybook/addon-a11y": "catalog:",
+    "@storybook/addon-svelte-csf": "catalog:",
+    "@storybook/sveltekit": "catalog:",
+    "@sveltejs/kit": "catalog:",
+    "@sveltejs/package": "catalog:",
+    "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/browser-playwright": "catalog:",
+    "daisyui": "catalog:",
+    "playwright": "catalog:",
+    "storybook": "catalog:",
+    "svelte": "catalog:",
+    "svelte-check": "catalog:",
+    "tailwindcss": "catalog:",
+    "vitest-browser-svelte": "catalog:"
   },
   "peerDependencies": {
     "svelte": "^5.30.1"
