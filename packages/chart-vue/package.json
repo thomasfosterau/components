@@ -1,0 +1,43 @@
+{
+  "name": "@thomasfosterau/chart-vue",
+  "version": "0.0.0",
+  "description": "Vue 3 components (Layer 3 interpreter): renders portable chart specs as SVG via the chart core, SSR-compatible",
+  "keywords": [
+    "chart-vue",
+    "charts",
+    "ssr",
+    "visualization",
+    "vue"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thomasfosterau/charts.git",
+    "directory": "packages/chart-vue"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "vp pack"
+  },
+  "dependencies": {
+    "@thomasfosterau/chart-core": "0.0.0",
+    "@thomasfosterau/chart-spec": "0.0.0"
+  },
+  "devDependencies": {
+    "vue": "^3.5.35"
+  },
+  "peerDependencies": {
+    "vue": "^3.3.0"
+  }
+}
