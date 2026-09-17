@@ -5,6 +5,11 @@
  * `aria-invalid` on the control in step with the hint and error paragraphs
  * `FormField` renders, without either side knowing the other's markup.
  *
+ * The daisyUI size tables live here for the same reason `ui/tones.ts` holds
+ * the button ones: Tailwind only generates classes it can see verbatim, so a
+ * `input-${size}` template string emits nothing at build time. Every field
+ * component looks a complete class name up rather than building one.
+ *
  * @module
  */
 
@@ -21,3 +26,65 @@ export interface FieldControl {
 
 /** Size steps shared by the field primitives (daisyUI has no `xl` field). */
 export type FieldSize = 'xs' | 'sm' | 'md' | 'lg';
+
+/** One entry of a `Select`, `RadioGroup` or `CheckboxGroup`. */
+export interface FieldOption {
+  readonly value: string;
+  readonly label: string;
+  readonly disabled?: boolean | undefined;
+}
+
+/**
+ * What an options prop accepts: full options, or bare strings for the common
+ * case where the value and the label are the same word.
+ */
+export type FieldOptionInput = FieldOption | string;
+
+/** Widen the bare-string shorthand into full {@link FieldOption}s. */
+export function toFieldOptions(options: readonly FieldOptionInput[]): readonly FieldOption[] {
+  return options.map((option) =>
+    typeof option === 'string' ? { value: option, label: option } : option,
+  );
+}
+
+export const inputSize: Record<FieldSize, string> = {
+  xs: 'input-xs',
+  sm: 'input-sm',
+  md: 'input-md',
+  lg: 'input-lg',
+};
+
+export const textareaSize: Record<FieldSize, string> = {
+  xs: 'textarea-xs',
+  sm: 'textarea-sm',
+  md: 'textarea-md',
+  lg: 'textarea-lg',
+};
+
+export const selectSize: Record<FieldSize, string> = {
+  xs: 'select-xs',
+  sm: 'select-sm',
+  md: 'select-md',
+  lg: 'select-lg',
+};
+
+export const checkboxSize: Record<FieldSize, string> = {
+  xs: 'checkbox-xs',
+  sm: 'checkbox-sm',
+  md: 'checkbox-md',
+  lg: 'checkbox-lg',
+};
+
+export const toggleSize: Record<FieldSize, string> = {
+  xs: 'toggle-xs',
+  sm: 'toggle-sm',
+  md: 'toggle-md',
+  lg: 'toggle-lg',
+};
+
+export const fileInputSize: Record<FieldSize, string> = {
+  xs: 'file-input-xs',
+  sm: 'file-input-sm',
+  md: 'file-input-md',
+  lg: 'file-input-lg',
+};
