@@ -24,6 +24,11 @@ packages:
 catalogMode: strict
 
 catalog:
+  # OPTIONAL PEER of the published package, never installed here: the maps
+  # entry point reaches it only through DynamicMap's dynamic import(), and the
+  # dev/test/Storybook resolution in packages/components/vite.config.ts stands
+  # in for it. The range is what consumers must satisfy.
+  'mapbox-gl': ^3.0.0
   '@changesets/cli': ^3.0.3
   # Lucide icon set as Svelte 5 components. Catalogued and installed ahead of
   # its first consumer: the real components land on top of this scaffold and
@@ -112,6 +117,12 @@ overrides:
   '@sveltejs/kit': 'catalog:'
 
 nodeLinker: hoisted
+
+# Peers are declared, never auto-installed: every peer this workspace needs is
+# a catalogued devDependency already, and the one OPTIONAL peer (`mapbox-gl`)
+# must stay absent so the maps suite exercises the path a consumer without it
+# takes (see packages/components/vite.config.ts).
+autoInstallPeers: false
 
 # Install scripts are opt-in. `playwright` is deliberately ABSENT: its
 # postinstall downloads a browser bundle, which the session image already

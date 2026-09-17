@@ -92,3 +92,70 @@
   --depth: 1;
   --noise: 0;
 }
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * Categorical chart slots — appended block, owned by `charts/`.
+ *
+ * The one part of the palette a component reads as a raw custom property
+ * rather than through a Tailwind class, because a series colour is chosen by
+ * INDEX at runtime and Tailwind only emits classes it can see spelled out.
+ *
+ * Four slots, and **validated rather than chosen by eye**: the figures below
+ * were measured against the two themes above (`--color-base-100` is
+ * `oklch(100% 0 0)` → #ffffff in light, `oklch(18% 0 0)` → #121212 in dark),
+ * with dichromacy simulated by the Machado (2009) severity-1.0 matrices on
+ * linear sRGB and separation as Euclidean ΔE in OKLab ×100.
+ *
+ *   light — #008236 #4f39f6 #e17100 #155dfc
+ *     contrast on the surface 4.94 / 6.44 / 3.19 / 5.26 : 1
+ *     worst ADJACENT pair: normal ΔE 37.6, simulated-dichromat ΔE 8.3
+ *   dark — #00a63e #615fff #e17100 #155dfc
+ *     contrast on the surface 5.85 / 4.11 / 5.89 / 3.58 : 1
+ *     worst ADJACENT pair: normal ΔE 38.6, simulated-dichromat ΔE 9.8
+ *
+ * Every slot clears 3:1 against its own surface; every adjacent pair clears the
+ * ΔE ≥ 15 normal-vision floor and the ΔE ≥ 8 dichromat floor in both modes.
+ * The dark set is STEPPED for the dark surface, not flipped: slots 1 and 2 move
+ * one step lighter, slots 3 and 4 already sit inside both modes' bands.
+ *
+ * Three rules the slots exist to make keepable:
+ *
+ * - **Order is the safety mechanism.** The gates above are measured on ADJACENT
+ *   pairs, which is what a line, bar or stack puts side by side. Re-ordering
+ *   the slots invalidates the measurement — slots 2 and 4 (indigo and blue) are
+ *   ΔE 2.7 apart in light and 0.4 in dark under simulated dichromacy, so a
+ *   chart that puts them side by side has no colour difference for that reader
+ *   at all.
+ * - **Four is the cap, and three is the cap for a form that compares EVERY
+ *   pair at once** (a scatter, a choropleth, a pie). A fifth series is a design
+ *   problem — fold it into an "other" series, or facet — never a generated hue.
+ *   `Chart` draws a fifth in `--color-neutral` and names it in the legend
+ *   rather than inventing one. Even at three, the 1↔3 pair falls to ΔE 4.9
+ *   under protanopia, which is the reason `Chart`'s `sr-only` data table is
+ *   always in the DOM: colour is the fast path, never the only one.
+ * - **Status colours are not series colours.** `--color-success` / `-warning` /
+ *   `-error` mean a STATE, and slot 3 is deliberately amber-600 rather than the
+ *   amber-500 that IS `--color-warning`, so a series can never impersonate one.
+ *
+ * A consumer replacing the two themes above should replace these four with
+ * their own measured set, in the same order.
+ * ──────────────────────────────────────────────────────────────────────────── */
+:root {
+  /*
+   * One declaration per slot, not one per mode: `light-dark()` resolves against
+   * the `color-scheme` each daisyUI theme already sets — `light` on the `light`
+   * theme, `dark` on the `dark` one, and on whichever the OS asks for by
+   * default. Writing the dark set out a second time under `[data-theme]` and a
+   * third under `prefers-color-scheme` is how two of the three drift apart.
+   */
+  --color-chart-1: light-dark(
+    oklch(52.7% 0.154 150.069),
+    oklch(62.7% 0.194 149.214)
+  ); /* green-700 / -600 */
+  --color-chart-2: light-dark(
+    oklch(51.1% 0.262 276.966),
+    oklch(58.5% 0.233 277.117)
+  ); /* indigo-600 / -500 */
+  --color-chart-3: oklch(66.6% 0.179 58.318); /* amber-600, inside both bands */
+  --color-chart-4: oklch(54.6% 0.245 262.881); /* blue-600, inside both bands */
+}
