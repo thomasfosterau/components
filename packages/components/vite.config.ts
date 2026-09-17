@@ -108,6 +108,24 @@ export default defineConfig({
   // `svelte-package` never emit CSS through it.
   plugins: [absentOptionalPeers(), svelte(), tailwindcss()],
 
+  // Every runtime dependency the browser suite reaches, pre-bundled BEFORE the
+  // first test file loads. Left to discovery, Vite optimises `bits-ui` (and
+  // the rest) the first time a test imports it, then reloads the page — and
+  // every test file in flight at that moment fails with "Failed to fetch
+  // dynamically imported module" while the ones already running lose their
+  // DOM mid-click. A warm local cache hides it; a fresh CI runner does not.
+  // Vitest's own warning for that reload names this field as the fix.
+  optimizeDeps: {
+    include: [
+      '@lucide/svelte',
+      '@testing-library/jest-dom/vitest',
+      'bits-ui',
+      'clsx',
+      'svelte',
+      'vitest-browser-svelte',
+    ],
+  },
+
   test: {
     include: ['tests/**/*.test.ts'],
     // Registers the jest-dom matchers.
