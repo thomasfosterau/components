@@ -1,14 +1,15 @@
 # @thomasfosterau/components
 
-A collection of accessible, customizable Svelte components styled with Tailwind CSS and built with Melt UI.
+Accessible, customizable Svelte 5 components styled with Tailwind CSS 4 and
+built on [Melt UI](https://next.melt-ui.com).
 
 ## Features
 
-- 🎨 **Styled with Tailwind CSS** - Beautiful default styles that are fully customizable
-- ♿ **Accessible by default** - Built with Melt UI for WCAG compliance
-- 🔧 **Highly customizable** - Override any class with your own Tailwind classes
-- 📦 **Tree-shakeable** - Only bundle the components you use
-- 🎯 **TypeScript support** - Full type definitions included
+- 🎨 **Styled with Tailwind CSS 4** — sensible defaults, every class overridable
+- ♿ **Accessible by default** — Melt UI handles focus, keyboard and ARIA
+- 🧩 **Runes and snippets** — written for Svelte 5, no legacy APIs
+- 📦 **Tree-shakeable** — only bundle the components you use
+- 🎯 **Typed** — full type definitions, including component props
 
 ## Installation
 
@@ -18,33 +19,29 @@ npm install @thomasfosterau/components
 
 ### Prerequisites
 
-This library requires the following peer dependencies:
+- `svelte` `^5.30.1`
+- `tailwindcss` `^4.0.0`
 
-- `svelte` ^4.0.0
-- `tailwindcss` ^3.0.0
+Tailwind 4 has no `tailwind.config.js`, so point it at this package from your
+CSS entry instead:
 
-You'll also need to configure Tailwind CSS in your project. Add this library's path to your `tailwind.config.js`:
-
-```js
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    './src/**/*.{html,js,svelte,ts}',
-    './node_modules/@thomasfosterau/components/**/*.{svelte,js,ts}'
-  ],
-  // ... rest of your config
-}
+```css
+@import 'tailwindcss';
+@source '../node_modules/@thomasfosterau/components/dist';
 ```
+
+If you would rather ship the library's pre-compiled stylesheet, import
+`@thomasfosterau/components/styles.css` instead.
 
 ## Components
 
 ### Button
 
-A versatile button component with multiple variants and sizes.
-
 ```svelte
-<script>
+<script lang="ts">
   import { Button } from '@thomasfosterau/components';
+
+  let count = $state(0);
 </script>
 
 <Button>Default</Button>
@@ -53,27 +50,30 @@ A versatile button component with multiple variants and sizes.
 <Button variant="ghost">Ghost</Button>
 
 <Button size="sm">Small</Button>
-<Button size="md">Medium</Button>
 <Button size="lg">Large</Button>
 
 <Button disabled>Disabled</Button>
+<Button onclick={() => count++}>Clicked {count} times</Button>
 <Button class="bg-blue-500 hover:bg-blue-600">Custom styles</Button>
 ```
 
-**Props:**
-- `variant`: `'default' | 'secondary' | 'outline' | 'ghost'` (default: `'default'`)
-- `size`: `'sm' | 'md' | 'lg'` (default: `'md'`)
-- `disabled`: `boolean` (default: `false`)
-- `type`: `'button' | 'submit' | 'reset'` (default: `'button'`)
-- `class`: `string` - Override or extend default classes
+**Props:** every `<button>` attribute, plus
+
+- `variant`: `'default' | 'secondary' | 'outline' | 'ghost'` — default `'default'`
+- `size`: `'sm' | 'md' | 'lg'` — default `'md'`
+- `class`: `string` — appended to the default classes
 
 ### Card
 
-A card component with optional header, title, description, and content sections.
-
 ```svelte
-<script>
-  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@thomasfosterau/components';
+<script lang="ts">
+  import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent
+  } from '@thomasfosterau/components';
 </script>
 
 <Card>
@@ -81,128 +81,130 @@ A card component with optional header, title, description, and content sections.
     <CardTitle>Card Title</CardTitle>
     <CardDescription>Card description</CardDescription>
   </CardHeader>
-  <CardContent>
-    Your content here
-  </CardContent>
+  <CardContent>Your content here</CardContent>
 </Card>
 ```
 
+Each card part takes the attributes of the element it renders (`div`, `div`,
+`h3`, `p`, `div` respectively) plus a `class` prop.
+
 ### Dialog
 
-An accessible modal dialog built with Melt UI.
+Renders a native `<dialog>` opened with `showModal()`, so it gets the top layer,
+focus trapping and Escape handling from the platform.
 
 ```svelte
-<script>
-  import { Dialog } from '@thomasfosterau/components';
+<script lang="ts">
+  import { Dialog, Button } from '@thomasfosterau/components';
+
+  let open = $state(false);
 </script>
 
-<Dialog 
-  title="Dialog Title" 
-  description="Optional description"
->
+<Dialog bind:open title="Dialog Title" description="Optional description">
   Dialog content goes here
 </Dialog>
 ```
 
-**Props:**
-- `open`: `boolean` - Control dialog visibility
-- `title`: `string` - Dialog title
-- `description`: `string` - Optional description
-- `overlayClass`: `string` - Override overlay classes
-- `contentClass`: `string` - Override content classes
-- `titleClass`: `string` - Override title classes
-- `descriptionClass`: `string` - Override description classes
-
-### Select
-
-A dropdown select component with keyboard navigation and accessibility.
+Bring your own trigger and footer with snippets:
 
 ```svelte
-<script>
-  import { Select } from '@thomasfosterau/components';
+<Dialog bind:open title="Delete project">
+  {#snippet trigger(attrs)}
+    <Button variant="outline" {...attrs}>Delete…</Button>
+  {/snippet}
 
-  const items = [
-    { value: 'apple', label: 'Apple' },
-    { value: 'banana', label: 'Banana' },
-    { value: 'orange', label: 'Orange' }
-  ];
+  This cannot be undone.
 
-  let selected;
-</script>
-
-<Select {items} bind:selected placeholder="Choose an option..." />
+  {#snippet footer(close)}
+    <Button variant="outline" onclick={close}>Cancel</Button>
+    <Button onclick={() => { remove(); close(); }}>Delete</Button>
+  {/snippet}
+</Dialog>
 ```
 
 **Props:**
-- `items`: `Array<{ value: string, label: string, disabled?: boolean }>` - Options to display
-- `selected`: `Item | undefined` - Currently selected item
-- `placeholder`: `string` - Placeholder text
-- `triggerClass`: `string` - Override trigger button classes
-- `contentClass`: `string` - Override dropdown menu classes
-- `itemClass`: `string` - Override item classes
+
+- `open`: `boolean` — bindable
+- `title`, `description`: `string`
+- `triggerLabel`: `string` — label for the built-in trigger; ignored when the `trigger` snippet is given
+- `trigger`: `Snippet<[attrs]>` — spread `attrs` onto your own trigger element
+- `footer`: `Snippet<[close]>` — replaces the built-in Close button
+- `triggerClass`, `overlayClass`, `contentClass`, `titleClass`, `descriptionClass`: `string`
+
+### Select
+
+```svelte
+<script lang="ts">
+  import { Select, type SelectItem } from '@thomasfosterau/components';
+
+  const items: SelectItem[] = [
+    { value: 'apple', label: 'Apple' },
+    { value: 'banana', label: 'Banana' },
+    { value: 'grape', label: 'Grape', disabled: true }
+  ];
+
+  let value = $state<string | undefined>(undefined);
+</script>
+
+<Select {items} bind:value placeholder="Choose an option…" label="Fruit" />
+```
+
+**Props:**
+
+- `items`: `SelectItem[]` — `{ value, label, disabled? }`
+- `value`: `string | undefined` — bindable, the selected item's `value`
+- `placeholder`: `string`
+- `label`: `string` — accessible name for the trigger
+- `triggerClass`, `contentClass`, `itemClass`: `string`
 
 ### Tooltip
 
-A tooltip component that appears on hover.
-
 ```svelte
-<script>
+<script lang="ts">
   import { Tooltip } from '@thomasfosterau/components';
 </script>
 
-<Tooltip text="Helpful tooltip text">
+<Tooltip text="Helpful tooltip text" placement="top">
   <span>Hover over me</span>
 </Tooltip>
 ```
 
 **Props:**
-- `text`: `string` - Tooltip content
-- `triggerClass`: `string` - Override trigger classes
-- `contentClass`: `string` - Override tooltip classes
+
+- `text`: `string` — tooltip body; ignored when the `content` snippet is given
+- `content`: `Snippet` — rich tooltip body
+- `placement`: `'top' | 'right' | 'bottom' | 'left'` — default `'top'`
+- `openDelay`, `closeDelay`: `number` — milliseconds, both default `0`
+- `triggerClass`, `contentClass`: `string`
 
 ## Customization
 
-All components support class overrides through the `class` prop (or specific class props for complex components). You can:
-
-1. **Extend default styles**: Add new classes alongside defaults
-2. **Override specific styles**: Use Tailwind's utility classes to override defaults
-3. **Complete custom styling**: Pass entirely custom class strings
-
-Example:
+Every component appends your `class` (or `*Class`) prop after its own classes,
+so Tailwind's later-wins ordering lets you override anything:
 
 ```svelte
-<!-- Extend with additional spacing -->
 <Button class="px-8">Wide Button</Button>
+<Button class="bg-purple-500 text-white hover:bg-purple-600">Custom Color</Button>
 
-<!-- Override colors completely -->
-<Button class="bg-purple-500 hover:bg-purple-600 text-white">Custom Color</Button>
-
-<!-- Card with custom background -->
-<Card class="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0">
+<Card class="border-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
   <CardContent>Custom styled card</CardContent>
 </Card>
 ```
 
 ## Development
 
+Run these from the repository root, or from this directory:
+
 ```bash
-# Install dependencies
-npm install
-
-# Start dev server with demo
-npm run dev
-
-# Build the library
-npm run build
-
-# Type checking
-npm run check
+npm run dev     # demo app on http://localhost:5173
+npm run build   # svelte-package → dist/
+npm run check   # svelte-check
 ```
+
+SvelteKit 3 has no `svelte.config.js`: configuration lives in the `sveltekit()`
+plugin call in `vite.config.ts`, and `$lib` is replaced by the `#lib/*` subpath
+import declared in `package.json`.
 
 ## License
 
 MIT
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.

@@ -1,9 +1,27 @@
-# @thomasfosterau/charts
+# thomasfosterau
 
-A portable, renderer-agnostic charting system built around a durable chart
-specification.
+A Vite+ npm workspace holding two things: an accessible Svelte component
+library, and a portable, renderer-agnostic charting system built around a
+durable chart specification.
 
-## Architecture
+| Package                                                             | Description                                                                                |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [`@thomasfosterau/components`](./packages/components)               | Accessible Svelte 5 components styled with Tailwind CSS 4 and built on Melt UI             |
+| [`@thomasfosterau/chart-spec`](./packages/chart-spec)               | The portable chart spec: types, parse/validate/encode, JSON Schema emission                |
+| [`@thomasfosterau/chart-core`](./packages/chart-core)               | Pure TS geometry core: `computeContext(spec, box, data)` → scales, layout, geometry, ticks |
+| [`@thomasfosterau/chart-prosemirror`](./packages/chart-prosemirror) | ProseMirror integration: chart node schema + edit-time NodeView rendering SVG via the core |
+| [`@thomasfosterau/chart-vega`](./packages/chart-vega)               | Spec → Vega-Lite emitter: escape hatch / SSR fallback, validated against the real compiler |
+| [`@thomasfosterau/chart-react`](./packages/chart-react)             | React components: SSR-compatible SVG rendering via the core, hydration-safe                |
+| [`@thomasfosterau/chart-vue`](./packages/chart-vue)                 | Vue 3 components: SSR-compatible SVG rendering via the core, plain render functions        |
+
+## Component library
+
+See [`packages/components`](./packages/components) for the full component
+reference. `npm run dev` starts its demo app.
+
+## Charts
+
+### Architecture
 
 The system has three layers with different lifespans, languages, and owners.
 **The persisted chart spec is the durable asset and the only cross-platform
@@ -13,13 +31,15 @@ contract.** Everything else is a per-platform interpreter of that spec.
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | **1 — Spec**         | Durable, declarative, language-neutral JSON chart description. Grammar-of-graphics level: mark + encodings + declared types + data reference. Never geometry, pixels, or renderer names. | [`packages/chart-spec`](./packages/chart-spec) + [`schema/chart-spec.v1.json`](./schema/chart-spec.v1.json) |
 | **2 — Core**         | Pure, synchronous TypeScript. Turns `(spec, box, data)` into scales, dimensions, and geometry. No DOM, no reactivity, no rendering.                                                      | [`packages/chart-core`](./packages/chart-core)                                                              |
-| **3 — Interpreters** | Per-platform renderers: ProseMirror NodeView, React, Vue, Vega-Lite, Swift, Svelte/SvelteKit, Kotlin/Compose, media targets. Each reads the spec and renders it idiomatically.           | `chart-prosemirror`, `chart-react`, `chart-vue`, `chart-vega`, `swift/ChartSpecKit`                         |
+| **3 — Interpreters** | Per-platform renderers: ProseMirror NodeView, React, Vue, Vega-Lite, Swift, Svelte/SvelteKit, Kotlin/Compose, media targets. Each reads the spec and renders it idiomatically.           | `chart-prosemirror`, `chart-react`, `chart-vue`, `chart-vega`                                               |
 
 Only the spec (Layer 1) and its emitted JSON Schema may cross a language
 boundary. Swift and Kotlin interpreters decode the same spec JSON; they never
-consume the TypeScript core.
+consume the TypeScript core. The Swift interpreter (`ChartSpecKit`) was not
+migrated into this workspace and still lives in
+[`thomasfosterau/charts`](https://github.com/thomasfosterau/charts).
 
-### Invariants
+#### Invariants
 
 - The spec is grammar-level: no geometry, pixels, or renderer names in portable parts.
 - Every encoding carries an explicit type (`quantitative` | `ordinal` | `nominal` | `temporal`).
@@ -32,7 +52,7 @@ consume the TypeScript core.
 See [`docs/capability-matrix.md`](./docs/capability-matrix.md) for which
 interpreters honour which spec fields.
 
-## Example spec
+### Example spec
 
 ```json
 {
@@ -52,29 +72,24 @@ interpreters honour which spec fields.
 }
 ```
 
-## Packages
-
-| Package                                                             | Description                                                                                |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| [`@thomasfosterau/chart-spec`](./packages/chart-spec)               | The portable chart spec: types, parse/validate/encode, JSON Schema emission                |
-| [`@thomasfosterau/chart-core`](./packages/chart-core)               | Pure TS geometry core: `computeContext(spec, box, data)` → scales, layout, geometry, ticks |
-| [`@thomasfosterau/chart-prosemirror`](./packages/chart-prosemirror) | ProseMirror integration: chart node schema + edit-time NodeView rendering SVG via the core |
-| [`@thomasfosterau/chart-vega`](./packages/chart-vega)               | Spec → Vega-Lite emitter: escape hatch / SSR fallback, validated against the real compiler |
-| [`@thomasfosterau/chart-react`](./packages/chart-react)             | React components: SSR-compatible SVG rendering via the core, hydration-safe                |
-| [`@thomasfosterau/chart-vue`](./packages/chart-vue)                 | Vue 3 components: SSR-compatible SVG rendering via the core, plain render functions        |
-| [`ChartSpecKit`](./swift/ChartSpecKit) (Swift)                      | Swift package: Codable spec decoder + swappable SwiftUI renderer (default: Swift Charts)   |
-
 ## Development
 
 This is an npm workspace managed with [Vite+](https://viteplus.dev) (`vp`).
 
 ```bash
-npm install        # install all workspace dependencies
-npm test           # vp test — run all package tests (Vitest)
-npm run check      # vp check — format, lint, and type check
-npm run build      # build all packages (tsdown via vp pack)
+npm install          # install all workspace dependencies
+npm run dev          # start the component library demo app (SvelteKit)
+npm test             # vp test — run all package tests (Vitest)
+npm run check        # vp check, then svelte-check for the Svelte package
+npm run lint         # vp lint — oxlint, type-aware
+npm run fmt          # vp fmt — oxfmt, the formatter of record
+npm run build        # build all packages (tsdown via vp pack, svelte-package for components)
 npm run emit-schema  # regenerate schema/chart-spec.v1.json
 ```
+
+`packages/components` is a SvelteKit package, so `vp check` skips it and it is
+type checked by `svelte-check` instead. `.svelte` files are outside oxfmt's
+remit; the rest of the workspace is formatted by `vp fmt`.
 
 The JSON Schema artifact at `schema/chart-spec.v1.json` is committed and kept
 in sync by a test; if you change the spec schema, rerun `npm run emit-schema`.

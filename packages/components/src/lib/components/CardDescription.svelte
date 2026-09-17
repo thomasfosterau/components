@@ -1,15 +1,18 @@
 <script lang="ts">
-	import { clsx } from 'clsx';
+  import { clsx } from 'clsx';
+  import type { HTMLAttributes } from 'svelte/elements';
+  import type { Snippet } from 'svelte';
 
-	// Allow consumers to override any class
-	let className = '';
-	export { className as class };
+  type Props = Omit<HTMLAttributes<HTMLParagraphElement>, 'class'> & {
+    class?: string;
+    children?: Snippet;
+  };
 
-	const baseClasses = 'text-sm text-slate-600';
+  let { class: className = '', children, ...rest }: Props = $props();
 
-	$: classes = clsx(baseClasses, className);
+  const classes = $derived(clsx('text-sm text-slate-600', className));
 </script>
 
-<p class={classes} {...$$restProps}>
-	<slot />
+<p class={classes} {...rest}>
+  {@render children?.()}
 </p>

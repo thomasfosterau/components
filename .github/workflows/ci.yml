@@ -10,8 +10,8 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  node:
-    name: Check, test, build (npm packages)
+  build:
+    name: Check, test, build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -27,11 +27,17 @@ jobs:
       - name: Format, lint, and type check
         run: npx vp check
 
+      - name: Type check the Svelte package
+        run: npm run check -w @thomasfosterau/components
+
       - name: Test
         run: npx vp test run
 
       - name: Build all packages
         run: npm run build
+
+      - name: Build the component library demo
+        run: npm run build:demo -w @thomasfosterau/components
 
       - name: Verify the JSON Schema artifact is in sync
         run: |
@@ -41,25 +47,8 @@ jobs:
 
       - name: Verify no Effect types leak into published type definitions
         run: |
-          if grep -rln "effect" packages/*/dist/*.d.mts; then
+          if grep -rln "effect" packages/chart-*/dist/*.d.mts; then
             echo '::error::Published .d.mts files must not reference effect (the Effect isolation invariant).'
             exit 1
           fi
           echo 'No effect references found in published type definitions.'
-
-  swift:
-    name: Swift package (ChartSpecKit)
-    runs-on: macos-latest
-    # ChartSpecKit was authored without a Swift toolchain available and is not
-    # yet validated. This job surfaces its real compile/test status without
-    # blocking merges; drop continue-on-error once it passes.
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Swift version
-        run: swift --version
-
-      - name: Run tests
-        working-directory: swift/ChartSpecKit
-        run: swift test

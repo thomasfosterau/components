@@ -1,15 +1,18 @@
 <script lang="ts">
-	import { clsx } from 'clsx';
+  import { clsx } from 'clsx';
+  import type { HTMLAttributes } from 'svelte/elements';
+  import type { Snippet } from 'svelte';
 
-	// Allow consumers to override any class
-	let className = '';
-	export { className as class };
+  type Props = Omit<HTMLAttributes<HTMLDivElement>, 'class'> & {
+    class?: string;
+    children?: Snippet;
+  };
 
-	const baseClasses = 'flex flex-col space-y-1.5 p-6';
+  let { class: className = '', children, ...rest }: Props = $props();
 
-	$: classes = clsx(baseClasses, className);
+  const classes = $derived(clsx('flex flex-col space-y-1.5 p-6', className));
 </script>
 
-<div class={classes} {...$$restProps}>
-	<slot />
+<div class={classes} {...rest}>
+  {@render children?.()}
 </div>

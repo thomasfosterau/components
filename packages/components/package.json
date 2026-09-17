@@ -1,60 +1,67 @@
 {
   "name": "@thomasfosterau/components",
   "version": "0.1.0",
-  "description": "A collection of generic Svelte components styled with Tailwind CSS and built with Melt UI for accessibility",
+  "description": "Accessible Svelte 5 components styled with Tailwind CSS and built on Melt UI",
+  "keywords": [
+    "accessibility",
+    "components",
+    "melt-ui",
+    "svelte",
+    "svelte5",
+    "tailwind",
+    "ui-library"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thomasfosterau/components.git",
+    "directory": "packages/components"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*"
+  ],
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "types": "./dist/index.d.ts",
+  "svelte": "./dist/index.js",
+  "imports": {
+    "#lib/*": "./src/lib/*"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "svelte": "./dist/index.js",
       "default": "./dist/index.js"
-    }
+    },
+    "./styles.css": "./dist/styles/app.css"
   },
-  "files": [
-    "dist"
-  ],
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build && npm run package",
-    "package": "svelte-kit sync && svelte-package",
-    "preview": "vite preview",
+    "dev": "vp dev",
+    "build": "svelte-kit sync && svelte-package",
+    "preview": "vp preview",
+    "build:demo": "vp build",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
   },
-  "peerDependencies": {
-    "svelte": "^4.0.0"
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "melt": "^0.44.0"
   },
   "devDependencies": {
-    "@sveltejs/adapter-auto": "^3.0.0",
-    "@sveltejs/kit": "^2.0.0",
-    "@sveltejs/package": "^2.0.0",
-    "@sveltejs/vite-plugin-svelte": "^3.0.0",
-    "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.32",
-    "svelte": "^4.2.8",
-    "svelte-check": "^3.6.0",
-    "tailwindcss": "^3.4.0",
-    "tslib": "^2.6.2",
-    "typescript": "^5.3.3",
-    "vite": "^5.0.3"
+    "@sveltejs/adapter-auto": "8.0.0-next.4",
+    "@sveltejs/kit": "3.0.0-next.27",
+    "@sveltejs/package": "3.0.0-next.8",
+    "@sveltejs/vite-plugin-svelte": "^7.3.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "svelte": "^5.57.0",
+    "svelte-check": "^4.7.6",
+    "tailwindcss": "^4.3.3"
   },
-  "dependencies": {
-    "@melt-ui/pp": "^0.3.2",
-    "@melt-ui/svelte": "^0.76.0",
-    "clsx": "^2.1.0"
-  },
-  "svelte": "./dist/index.js",
-  "keywords": [
-    "svelte",
-    "components",
-    "tailwind",
-    "melt-ui",
-    "ui-library",
-    "accessibility"
-  ],
-  "author": "Thomas Foster",
-  "license": "MIT"
+  "peerDependencies": {
+    "svelte": "^5.30.1"
+  }
 }

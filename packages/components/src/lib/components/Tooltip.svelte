@@ -1,44 +1,60 @@
 <script lang="ts">
-	import { createTooltip } from '@melt-ui/svelte';
-	import { clsx } from 'clsx';
-	import { fade } from 'svelte/transition';
+  import { clsx } from 'clsx';
+  import { Tooltip } from 'melt/builders';
+  import type { Snippet } from 'svelte';
 
-	export let text: string;
-	
-	// Allow consumers to override classes
-	let triggerClass = '';
-	export { triggerClass as triggerClass };
-	let contentClass = '';
-	export { contentClass as contentClass };
+  type Props = {
+    /** Tooltip text. Ignored when the `content` snippet is given. */
+    text?: string;
+    /** Element the tooltip describes. */
+    children?: Snippet;
+    /** Replaces the plain-text tooltip body. */
+    content?: Snippet;
+    placement?: 'top' | 'right' | 'bottom' | 'left';
+    openDelay?: number;
+    closeDelay?: number;
+    triggerClass?: string;
+    contentClass?: string;
+  };
 
-	const {
-		elements: { trigger, content, arrow },
-		states: { open }
-	} = createTooltip({
-		positioning: {
-			placement: 'top'
-		},
-		openDelay: 0,
-		closeDelay: 0,
-		closeOnPointerDown: false,
-		forceVisible: true
-	});
+  let {
+    text = '',
+    children,
+    content,
+    placement = 'top',
+    openDelay = 0,
+    closeDelay = 0,
+    triggerClass = '',
+    contentClass = ''
+  }: Props = $props();
+
+  const tooltip = new Tooltip({
+    openDelay: () => openDelay,
+    closeDelay: () => closeDelay,
+    closeOnPointerDown: false,
+    floatingConfig: () => ({ computePosition: { placement } })
+  });
 </script>
 
-<span use:melt={$trigger} class={clsx('inline-block', triggerClass)}>
-	<slot />
+<span {...tooltip.trigger} class={clsx('inline-block', triggerClass)}>
+  {@render children?.()}
 </span>
 
-{#if $open}
-	<div
-		use:melt={$content}
-		transition:fade={{ duration: 100 }}
-		class={clsx(
-			'z-50 rounded-md bg-slate-900 px-3 py-1.5 text-sm text-slate-50 shadow-md',
-			contentClass
-		)}
-	>
-		<div use:melt={$arrow} />
-		{text}
-	</div>
-{/if}
+<!--
+  The content element is a `span` so that a tooltip can be used inline inside a
+  paragraph without producing invalid HTML.
+-->
+<span
+  {...tooltip.content}
+  class={clsx(
+    'z-50 block rounded-md bg-slate-900 px-3 py-1.5 text-sm text-slate-50 shadow-md',
+    contentClass
+  )}
+>
+  <span {...tooltip.arrow} class="absolute block size-2 rotate-45 bg-slate-900"></span>
+  {#if content}
+    {@render content()}
+  {:else}
+    {text}
+  {/if}
+</span>
