@@ -1,6 +1,6 @@
 # @thomasfosterau/components
 
-Accessible Svelte 5 UI primitives, styled with [Tailwind CSS 4](https://tailwindcss.com) + [daisyUI 5](https://daisyui.com) and built on [bits-ui](https://bits-ui.com). 107 components across 17 families: 12 in the core barrel, 5 behind their own entry points.
+Accessible Svelte 5 UI primitives, styled with [Tailwind CSS 4](https://tailwindcss.com) + [daisyUI 5](https://daisyui.com) and built on [bits-ui](https://bits-ui.com). 102 components across 16 families: 12 in the core barrel, 4 behind their own entry points. The five maps components live in the sibling package [`@thomasfosterau/components-maps`](../maps/README.md).
 
 Four rules hold across all of them:
 
@@ -24,7 +24,6 @@ pnpm add @thomasfosterau/components
 | `svelte` | `^5.30.1` | A declared peer. The components are compiled by your build, not pre-compiled. |
 | `tailwindcss` | `^4.0.0` | Not a declared peer, but **required**: the components emit Tailwind classes and ship none. |
 | `daisyui` | `^5.0.0` | Same — the class vocabulary is daisyUI's (`btn`, `input`, `bg-base-200`, `text-error`). |
-| `mapbox-gl` | `^3.0.0`, optional | Only if you use `@thomasfosterau/components/maps`' `DynamicMap` or `Map`. Declared `optional` in `peerDependenciesMeta`; nothing else in the package imports it. |
 
 Tailwind 4 has no `tailwind.config.js`, so wire it up from your CSS entry. Two lines matter: `@source`, which is what makes Tailwind scan this package's `dist/` and emit the classes it uses, and the `theme.css` import (or your own themes), which supplies the daisyUI tokens the components are designed against.
 
@@ -92,7 +91,6 @@ Heavier families are separate `exports` entries so a consumer that never uses th
 | --- | --- | --- |
 | `@thomasfosterau/components` | ui, layout, feedback, fields, forms, data, infobox, formatting, links, media, hotkeys, search | The core barrel — everything below in one import. |
 | `@thomasfosterau/components/citations` | citations | `Citation`, `Footnote`, `ReferenceList`, `FootnoteList`, `CreditList`, `DOILink`/`ISBNLink`/`ISSNLink`, `formatCitation`, `BibliographyManager`. |
-| `@thomasfosterau/components/maps` | maps | `StaticMap`, `DynamicMap`, `Map`, `MapEditor`, `MapShapeView`. `mapbox-gl` is an optional peer, reached only through `DynamicMap`'s dynamic `import()` — importing this entry point pulls in no mapping engine. |
 | `@thomasfosterau/components/canvas` | canvas | `VectorCanvas` and the pan/zoom/history/geometry toolkit underneath it. |
 | `@thomasfosterau/components/charts` | charts | `Chart` — one component, plain SVG, no charting dependency. |
 | `@thomasfosterau/components/tips` | tips | `Tip`, `PopoverTip`, `createTipStore`, `createTipStack`. |
@@ -729,42 +727,14 @@ Series colours come from four validated theme slots, `--color-chart-1…4`, assi
 
 `oninteract` reports `{ phase: 'down'|'move'|'up', tool, point, detail, native }` in CANVAS coordinates, already snapped when `doc.grid.snap` is set. `canvas/history.ts` gives pure undo/redo over `Transform`s rather than document snapshots (`emptyHistory`, `applyTransform`, `invertTransform`, `diffTransform`, `recordEdit`, `undo`, `redo`, `HISTORY_LIMIT = 100`) — a history of edits is bounded by the size of the edits, not the size of the plan. `canvas/utils.ts` gives the geometry underneath it: `screenToCanvas`/`canvasToScreen`, `snapToGrid`, `distance`, `pointInRect`, `pointNearLine`, `sortByZIndex`, `boundingBox`, `rotatePoint`, `panBy`, `zoomAbout`, `generateId`.
 
-# maps
+# maps — moved
 
-`@thomasfosterau/components/maps`. A static raster, the interactive Mapbox GL surface, the one that upgrades from the first to the second, a plan editor, and the seam between the editor's shapes and a stored GeoJSON geometry.
+Maps live in a package of their own: **[`@thomasfosterau/components-maps`](../maps/README.md)** — `StaticMap`, `DynamicMap`, `Map`, `MapEditor`, `MapShapeView`, plus `staticMapUrl` and the GeoJSON ↔ canvas seam.
 
-**`mapbox-gl` is an optional peer**, reached only through `DynamicMap`'s dynamic `import()`. Importing this barrel pulls in no mapping engine; `StaticMap` needs nothing but an access token and arithmetic, and `MapEditor` not even that.
+They were split out because their behaviour needs a specific third-party engine, `mapbox-gl`. A component that needs one lives in its own package adjacent to this one, so this one stays free of it: nothing here imports `mapbox-gl`, it is no longer a peer of this package at any level, and `@thomasfosterau/components/maps` is no longer an entry point. In the maps package `mapbox-gl` is a **required** peer — installing that package is the decision to render a map.
 
-| Component | Purpose | Props | Snippets | ARIA |
-| --- | --- | --- | --- | --- |
-| `StaticMap` | One raster from the Mapbox Static Images API. No JavaScript, no WebGL; renders on the server | `style`, `view`, `width`, `height`, `accessToken`, `alt` (**required**), `overlay?`, `class?`, plus native `<img>` attributes (`style` excepted — it is the MAP style here) | — | `<img>` named by `alt`. Required rather than defaulted: a map is content, and a decorative empty alt withholds it silently |
-| `DynamicMap` | The interactive WebGL half: Mapbox GL, panned and zoomed | `accessToken`, `style`, `camera`, `height?`, `label? = 'Map'`, `panHintLabel? = 'Use two fingers to move the map'`, `unavailableLabel? = 'Map unavailable'`, `class?`, plus native `<div>` attributes | — | `role="application"` named by `label`. When the engine cannot load, replaced by a `<p>` carrying `unavailableLabel` |
-| `Map` | The raster first, the live map once the page has hydrated | `accessToken`, `style`, `camera`, `width`, `height`, `alt`, `interactive?`, `panHintLabel?`, `unavailableLabel?`, `class?` | — | one name, `alt`, serves both halves |
-| `MapEditor` | A plan-drawing surface: areas, paths and points on a snapping grid, selected, dragged, reshaped and drawn | `doc`, `selected?`, `tool?`, `width?`, `height?`, `label? = 'Plan editor'`, `onchange?`, `onselect?`, `onviewportchange?`, `newShape?`, `class?` | — | inherited from `VectorCanvas`: one `role="application"` surface named by `label` |
-| `MapShapeView` | How one area, path or point is drawn. Renders `<g>`, so it lives inside an `<svg>` | `shape`, `selected?`, `editable?` | — | none of its own, deliberately — naming every shape would put hundreds of unreachable nodes inside a widget a screen reader is being told to pass keys through |
-
-```svelte
-<script lang="ts">
-  import { Map, MapEditor, blankShape, type MapEdit } from '@thomasfosterau/components/maps';
-</script>
-
-<!-- Raster first, live map after hydration; interactive={false} pins the raster. -->
-<Map accessToken={PUBLIC_MAPBOX_TOKEN} style={{ username: 'mapbox', styleId: 'outdoors-v12' }}
-  camera={{ centre: { longitude: 144.963, latitude: -37.814 }, zoom: 13 }} width={640} height={360}
-  alt="The site's location in Naarm / Melbourne" />
-
-<MapEditor {doc} {selected} {tool} label="Site plan"
-  onchange={(next, edit: MapEdit) => {
-    doc = next;
-    if (edit.committed) history = recordEdit(history, edit.transform, edit.transform.type);
-  }}
-  onselect={(ids) => { selected = ids; }}
-  newShape={(kind, at) => blankShape(kind, crypto.randomUUID(), at)} />
+```sh
+pnpm add @thomasfosterau/components-maps mapbox-gl
 ```
 
-`select` picks, drags and reshapes; `pan` moves the viewport; `draw-polygon`/`draw-line` place a corner per press and finish on a double-press or a press back on the first corner — both need a `newShape` supplied by the page, the only place that knows what a new shape should default to. `staticMapUrl` (`maps/static-url.ts`) is the Static Images URL as a plain function; `maps/geojson.ts` gives the exact, invertible conversion between a stored GeoJSON geometry and canvas coordinates (`geoFrame`, `geometryFrame`, `canvasFromGeo`, `geoFromCanvas`, `geometryShapes`, `shapesGeometry`). See `packages/components/CLAUDE.md`'s Terms section for the shape/grip/committed-edit/geo-frame vocabulary.
-
-```jsonc
-// the consuming application's package.json
-"dependencies": { "mapbox-gl": "^3" }
-```
+`MapEditor` is still built on `@thomasfosterau/components/canvas`, which the maps package takes as a `workspace:*` dependency; see [Canvas](#canvas) for the toolkit underneath it.

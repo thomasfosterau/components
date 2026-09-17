@@ -21,40 +21,6 @@ const cacheInputs = [
   { pattern: 'pnpm-lock.yaml', base: 'workspace' as const },
 ];
 
-/**
- * `mapbox-gl` is an OPTIONAL PEER of the published package and is deliberately
- * NOT installed here: this repository renders no map of its own, and taking
- * ~800 kB of WebGL as a devDependency to type-check one component would make
- * the "optional" in `peerDependenciesMeta` a fiction nobody could check.
- *
- * Vite resolves the two specifiers in `maps/DynamicMap.svelte`'s dynamic
- * `import()` at TRANSFORM time and fails hard when they are absent — which
- * takes down the browser suite and Storybook, neither of which ever needed the
- * engine. This answers both with a module that throws when it is evaluated, so
- * the component follows exactly the path it follows in an application that
- * never installed the peer: the `catch`, and `unavailableLabel`.
- *
- * It is a DEV/TEST/STORYBOOK resolution only. `svelte-package` copies source
- * and bundles nothing, so a consumer's own bundler resolves `mapbox-gl` for
- * real — and the types come from `src/lib/maps/mapbox-gl.d.ts`, not from here.
- */
-const ABSENT_PEERS: Readonly<Record<string, string>> = {
-  'mapbox-gl': '\0absent-peer:mapbox-gl',
-  // Kept off a `.css` id: Vite routes anything whose id looks like a
-  // stylesheet through the CSS pipeline, which would try to parse this
-  // JavaScript as CSS.
-  'mapbox-gl/dist/mapbox-gl.css': '\0absent-peer:mapbox-gl-stylesheet',
-};
-
-const absentOptionalPeers = () => ({
-  name: 'components:absent-optional-peers',
-  resolveId: (source: string): string | undefined => ABSENT_PEERS[source],
-  load: (id: string): string | undefined =>
-    id.startsWith('\0absent-peer:')
-      ? `throw new Error(${JSON.stringify(`Optional peer not installed: ${id.slice('\0absent-peer:'.length)}`)});`
-      : undefined,
-});
-
 export default defineConfig({
   run: {
     tasks: {
@@ -94,10 +60,17 @@ export default defineConfig({
       // above (they are `src/` files), and rendering them is a review
       // affordance, not a gate. `--no-open` because agent sessions have no
       // browser to hand the URL to.
-      storybook: { command: 'storybook dev -p 6006 --no-open', dependsOn: ['sync'], cache: false },
+      // `build` is a dependency of both, not just `sync`: the `stories` glob
+      // reaches into the sibling packages/maps, whose components import
+      // `@thomasfosterau/components/canvas` — this package's own built `dist/`.
+      storybook: {
+        command: 'storybook dev -p 6006 --no-open',
+        dependsOn: ['sync', 'build'],
+        cache: false,
+      },
       'storybook:build': {
         command: 'storybook build',
-        dependsOn: ['sync'],
+        dependsOn: ['sync', 'build'],
         output: ['storybook-static/**'],
       },
     },
@@ -106,7 +79,7 @@ export default defineConfig({
   // `tailwindcss()` is here for Storybook only (`.storybook/preview.css`
   // imports the Tailwind + daisyUI stack a consumer runs); the unit suite and
   // `svelte-package` never emit CSS through it.
-  plugins: [absentOptionalPeers(), svelte(), tailwindcss()],
+  plugins: [svelte(), tailwindcss()],
 
   // Every runtime dependency the browser suite reaches, pre-bundled BEFORE the
   // first test file loads. Left to discovery, Vite optimises `bits-ui` (and

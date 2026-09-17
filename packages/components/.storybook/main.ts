@@ -8,7 +8,10 @@ import type { StorybookConfig } from '@storybook/sveltekit';
  * and the a11y addon so every story is audited as it is reviewed.
  */
 const config: StorybookConfig = {
-  stories: ['../src/**/*.stories.@(ts|svelte)'],
+  // ONE Storybook for the design system, reaching across into the sibling
+  // packages/maps rather than a second install there: two Storybooks for one
+  // design system is two review surfaces that can disagree.
+  stories: ['../src/**/*.stories.@(ts|svelte)', '../../maps/src/stories/**/*.stories.@(ts|svelte)'],
   addons: ['@storybook/addon-svelte-csf', '@storybook/addon-a11y'],
   framework: {
     name: '@storybook/sveltekit',

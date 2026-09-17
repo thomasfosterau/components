@@ -7,6 +7,7 @@
    definitions of `light` fighting over the cascade. */
 @import 'tailwindcss';
 @source '../src';
+@source '../../maps/src';
 @plugin "daisyui" {
   themes: false;
 }

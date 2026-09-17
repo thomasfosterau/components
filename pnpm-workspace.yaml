@@ -25,14 +25,17 @@ catalogMode: strict
 
 catalog:
   # A REQUIRED peer of bits-ui (its date and calendar primitives import it),
-  # declared here as a runtime dependency of the package because peers are
-  # never auto-installed in this workspace (see `autoInstallPeers` below) and a
-  # consumer should not have to know bits-ui's peer list to use a Dialog.
+  # declared as a runtime `dependency` of packages/components rather than left
+  # to peer resolution, because a consumer should not have to know bits-ui's
+  # peer list to use a Dialog.
   '@internationalized/date': ^3.8.1
-  # OPTIONAL PEER of the published package, never installed here: the maps
-  # entry point reaches it only through DynamicMap's dynamic import(), and the
-  # dev/test/Storybook resolution in packages/components/vite.config.ts stands
-  # in for it. The range is what consumers must satisfy.
+  # The REQUIRED peer of `@thomasfosterau/components-maps` — and the reason
+  # that package exists at all, adjacent to `packages/components` rather than
+  # inside it: a component whose behaviour needs a specific third-party engine
+  # lives in its own package, so the core library stays free of it. Installed
+  # here as a devDependency of packages/maps too, so that package's own browser
+  # suite and its stories load the real module. The range is what consumers
+  # must satisfy.
   'mapbox-gl': ^3.0.0
   '@changesets/cli': ^3.0.3
   # Lucide icon set as Svelte 5 components. Catalogued and installed ahead of
@@ -70,7 +73,6 @@ catalog:
   # focus handling. A runtime `dependency`, not a peer: consumers should not
   # have to know the library exists.
   bits-ui: ^2.19.0
-  clsx: ^2.1.1
   daisyui: ^5.7.28
   # The ONLY consumer is the Vitest browser provider above (`playwright: "*"`
   # peer); this repo has no Playwright test suite of its own, which is why it
@@ -122,12 +124,6 @@ overrides:
   '@sveltejs/kit': 'catalog:'
 
 nodeLinker: hoisted
-
-# Peers are declared, never auto-installed: every peer this workspace needs is
-# a catalogued devDependency already, and the one OPTIONAL peer (`mapbox-gl`)
-# must stay absent so the maps suite exercises the path a consumer without it
-# takes (see packages/components/vite.config.ts).
-autoInstallPeers: false
 
 # Install scripts are opt-in. `playwright` is deliberately ABSENT: its
 # postinstall downloads a browser bundle, which the session image already

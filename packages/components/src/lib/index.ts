@@ -10,9 +10,12 @@
  * {@link ComponentsContext}: locale, href resolution, navigation and the
  * current-page check.
  *
- * The heavier families — `citations`, `maps`, `canvas`, `charts`, `tips` —
- * are separate entry points (`@thomasfosterau/components/<family>`), not
- * re-exported here.
+ * The heavier families — `citations`, `canvas`, `charts`, `tips` — are
+ * separate entry points (`@thomasfosterau/components/<family>`), not
+ * re-exported here. The maps family lives one package over, in
+ * `@thomasfosterau/components-maps`: its behaviour needs a specific
+ * third-party engine (`mapbox-gl`), and a component that needs one lives in
+ * its own package so this one stays free of it.
  *
  * @module @thomasfosterau/components
  */

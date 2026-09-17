@@ -1,12 +1,13 @@
 # @thomasfosterau/components
 
-Accessible Svelte 5 UI primitives — [Tailwind CSS 4](https://tailwindcss.com) and [daisyUI 5](https://daisyui.com) for styling, [bits-ui](https://bits-ui.com) for interaction — in a [Vite+](https://viteplus.dev) workspace. 107 components across 17 families, consolidated out of the owner's four Svelte 5 apps into one publishable library.
+Accessible Svelte 5 UI primitives — [Tailwind CSS 4](https://tailwindcss.com) and [daisyUI 5](https://daisyui.com) for styling, [bits-ui](https://bits-ui.com) for interaction — in a [Vite+](https://viteplus.dev) workspace. 107 components across 17 families, consolidated out of the owner's four Svelte 5 apps into two publishable packages.
 
-| Package                                               | Description                              |
-| ----------------------------------------------------- | ---------------------------------------- |
+| Package | Description |
+| --- | --- |
 | [`@thomasfosterau/components`](./packages/components) | The published library (`svelte-package`) |
+| [`@thomasfosterau/components-maps`](./packages/maps) | Mapbox GL maps and a plan editor, split out so the core library carries no mapping engine (`mapbox-gl` is its required peer) |
 
-This is a publishable-library workspace, not an application: the only build artifact is `packages/components/dist`. The component reference — installation, app integration, and every family's props table — lives in [`packages/components/README.md`](./packages/components/README.md). This file covers the workspace itself.
+This is a publishable-library workspace, not an application: the build artifacts are `packages/components/dist` and `packages/maps/dist`. A component whose behaviour needs a specific third-party dependency lives in its own package adjacent to `packages/components`, so the core stays free of it — `maps` is the only one so far. The component reference — installation, app integration, and every family's props table — lives in [`packages/components/README.md`](./packages/components/README.md) and [`packages/maps/README.md`](./packages/maps/README.md). This file covers the workspace itself.
 
 ## Development
 
@@ -16,9 +17,9 @@ The toolchain is **Vite+** (the `vp` CLI) on **Node + pnpm**. Everything goes th
 pnpm install                                        # dependencies + the Vite+ git hooks
 vp check                                            # format + lint (oxfmt + oxlint)
 vp run check                                        # the type-check gate (svelte-check)
-vp run -r test:unit                                 # the component suite, in headless Chromium under Vitest browser mode
-vp run -r build                                     # svelte-package -> packages/components/dist
-vp run --filter ./packages/components storybook     # the dev loop, port 6006
+vp run -r test:unit                                 # both suites, in headless Chromium under Vitest browser mode
+vp run -r build                                     # svelte-package -> packages/{components,maps}/dist
+vp run --filter ./packages/components storybook     # the dev loop, port 6006 — one Storybook, both packages' stories
 vp run --filter ./packages/components storybook:build
 ```
 

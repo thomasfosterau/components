@@ -2,12 +2,12 @@
 
 Project conventions live here; personal style preferences live in user memory.
 
-This repo is a **publishable npm library**, not an application — the only artifact that matters is `packages/components/dist`, and everything below exists to keep that artifact small, typed and accessible. The toolchain, workspace shape, catalog discipline, task graph and session hook are copied from the owner's app repos (the Gardeneria / Website foundation) so a component authored here compiles identically in the app that consumes it; the three places the two deliberately differ are commented where they occur (`playwright`'s pin, the browser-mode test suite, and the absence of a stage/deploy graph).
+This repo is a **publishable npm library** — two of them, in fact — not an application. The artifacts that matter are `packages/components/dist` and `packages/maps/dist`, and everything below exists to keep them small, typed and accessible. The toolchain, workspace shape, catalog discipline, task graph and session hook are copied from the owner's app repos (the Gardeneria / Website foundation) so a component authored here compiles identically in the app that consumes it; the three places the two deliberately differ are commented where they occur (`playwright`'s pin, the browser-mode test suite, and the absence of a stage/deploy graph).
 
 ## Common pitfalls
 
 - **Never edit a version in a `package.json`.** Every external version lives in [`pnpm-workspace.yaml`](pnpm-workspace.yaml) under `catalog:`; package.json files carry only `catalog:` or `workspace:*`, and `catalogMode: strict` rejects anything else at install. After editing the catalog, run `pnpm install` and commit the regenerated `pnpm-lock.yaml` — a stale lockfile fails every CI job at once with `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH`.
-- **`dist/` is the product; `src/routes` does not exist.** This is a `svelte-package` library, not a SvelteKit app. There is no demo app, no adapter and no `app.html`. Nothing under `src/lib/` may import `$app/*`, `$env/*` or anything else SvelteKit only resolves inside an app — SvelteKit is here to run `svelte-kit sync` and `svelte-package`, nothing more.
+- **`dist/` is the product; `src/routes` does not exist.** Both packages are `svelte-package` libraries, not SvelteKit apps. There is no demo app, no adapter and no `app.html`. Nothing under either `src/lib/` may import `$app/*`, `$env/*` or anything else SvelteKit only resolves inside an app — SvelteKit is here to run `svelte-kit sync` and `svelte-package`, nothing more. `packages/maps` consumes its sibling the way a consumer does, through `@thomasfosterau/components`' published `exports` and therefore its built `dist/` — never a relative path into the other package's `src/`, which is why its `check` and `test:unit` take a `{ task: 'build', from: 'dependencies' }` edge.
 - **`"sideEffects": false` is a claim about `dist/`, and it is load-bearing.** Every emitted `.js` must be pure declarations: no bare imports, no top-level `await`, no top-level statements. A `<script module>` block may only declare. It is what lets a consumer's bundler drop the components they don't use.
 - **Accessibility regresses silently.** Type errors don't catch a lost accessible name, a broken focus order or a dropped `aria-*` relationship. That is the whole reason the suite drives a real browser.
 
@@ -27,7 +27,7 @@ This repo is a **publishable npm library**, not an application — the only arti
   <span {...rest} class={['sr-only', className]}>{@render children()}</span>
   ```
 
-  Svelte 5's class arrays (`class={[…]}`) merge with `clsx` semantics natively — use them in templates; import `clsx` only in a `.ts` helper. The caller's `class` goes **last**, so Tailwind's later-wins ordering lets them override anything. A component that swallows `id`, `aria-*` or `data-*` is a bug — a consumer cannot label, test or hook into it.
+  Svelte 5's class arrays (`class={[…]}`) merge natively (clsx semantics, no dependency) — there is no `clsx` in this workspace, and a `.svelte` file never needs one. The caller's `class` goes **last**, so Tailwind's later-wins ordering lets them override anything. A component that swallows `id`, `aria-*` or `data-*` is a bug — a consumer cannot label, test or hook into it.
 
 - **Every string is a prop with an English default.** There is no message catalogue and the context carries no copy: `dismissLabel = 'Dismiss'`, `previousLabel = 'Previous'`. Accessible-name props end in `Label`. An i18n app passes its own messages at the call site.
 - **Links and locale go through the context.** `getComponentsContext()` supplies `href(path)`, `navigate(url)`, `isCurrent(href)` and `locale()`; a component never imports `$app/*` and never reads `window.location` itself. Every `Intl` formatter takes a `locales` prop and falls back to `locale()`.
@@ -50,8 +50,11 @@ This repo is a **publishable npm library**, not an application — the only arti
 - **Semantic tokens only.** `bg-base-200`, `text-error`, `btn-primary` — never `bg-green-700`, a hex or an `oklch()` inside a component. The vocabulary is [`packages/components/src/lib/theme.css`](packages/components/src/lib/theme.css); two vocabularies for one palette is how a design system drifts.
 - **bits-ui owns interaction.** Anything with focus management, keyboard semantics, a popover, or an ARIA relationship between elements is built on a bits-ui primitive rather than hand-rolled. Hand-rolling is the exception, and it needs a reason in the component's header comment.
 - **ARIA is part of the contract, not decoration.** A component's accessible name, role and state are its public API as much as its props are, and they are pinned by a test.
-- **Every component ships with a story and a browser test.** One `*.stories.svelte` / `*.stories.ts` per component under `src/stories/<family>/` and one `tests/<family>/<Component>.test.ts`, both mirroring `src/lib/<family>/` — not beside the component, because `svelte-package` copies every `src/lib/` file into `dist/` and stories must not ship. Snippet-taking components use Svelte CSF (`defineMeta` + `<Story>`), prop-only ones plain CSF.
-- **Families and entry points.** Core families (`ui`, `feedback`, `layout`, `fields`, `forms`, `data`, `infobox`, `formatting`, `links`, `media`, `hotkeys`, `search`) are re-exported from the root barrel; `citations`, `maps`, `canvas`, `charts` and `tips` are separate `exports` entries (`@thomasfosterau/components/<family>`) so a consumer that never uses them never loads them. A new family gets a barrel, an `exports` entry if heavy, and a README section.
+- **Every component ships with a story and a browser test.** One `*.stories.svelte` / `*.stories.ts` per component under `src/stories/<family>/` and one `tests/<family>/<Component>.test.ts`, both mirroring `src/lib/<family>/` (in `packages/maps`, which is one family, the `<family>/` level is dropped) — not beside the component, because `svelte-package` copies every `src/lib/` file into `dist/` and stories must not ship. Snippet-taking components use Svelte CSF (`defineMeta` + `<Story>`), prop-only ones plain CSF.
+- **Families, entry points, and when a family becomes a package.** Core families (`ui`, `feedback`, `layout`, `fields`, `forms`, `data`, `infobox`, `formatting`, `links`, `media`, `hotkeys`, `search`) are re-exported from `@thomasfosterau/components`' root barrel; `citations`, `canvas`, `charts` and `tips` are separate `exports` entries (`@thomasfosterau/components/<family>`) so a consumer that never uses them never loads them. A new family gets a barrel, an `exports` entry if heavy, and a README section.
+
+  **A component whose behaviour needs a specific third-party dependency lives in its own package adjacent to `packages/components`, so the core stays free of it** — the dependency becomes that package's REQUIRED peer, and installing the package is the decision to take it on. `maps` is the worked example: `@thomasfosterau/components-maps`, `mapbox-gl` required. An "optional peer" of the core library is the shape this rule replaces; nothing in this workspace could check it, so it was a fiction. `canvas`, `charts`, `citations` and `tips` need no such dependency and stay where they are.
+
 - **Prefer vertical slices per component** over horizontal sweeps: component → barrel export → story → test → README row, finished, before starting the next.
 
 ## Documentation surfaces
@@ -63,9 +66,9 @@ Durable knowledge has one home each: a **decision, findings report, or invariant
 - `pnpm install` — dependencies, plus the Vite+ git hooks (pre-commit runs `vp staged`: format + lint on staged files). There is **no pre-push hook** — run the gates yourself before pushing.
 - `vp check` — format + lint (oxfmt + oxlint) over the workspace. Distinct from `vp run check`.
 - `vp run check` — the type-check gate: the root aggregate over every package's `check` (`svelte-kit sync` + `svelte-check`).
-- `vp run -r test:unit` — the component suite, in headless Chromium under Vitest browser mode.
-- `vp run -r build` — `svelte-package` → `packages/components/dist`.
-- `vp run --filter ./packages/components storybook` — the dev loop on port 6006; `storybook:build` for the static build.
+- `vp run -r test:unit` — both packages' suites, in headless Chromium under Vitest browser mode.
+- `vp run -r build` — `svelte-package` → `packages/components/dist` and `packages/maps/dist`.
+- `vp run --filter ./packages/components storybook` — the dev loop on port 6006; `storybook:build` for the static build. **One Storybook for the workspace**: its `stories` glob reaches across into `packages/maps/src/stories`, so there is no `.storybook/` in that package.
 
 `vp check`, `vp run check` and `vp run -r test:unit` are the meaningful pre-push gates.
 

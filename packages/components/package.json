@@ -38,11 +38,6 @@
       "svelte": "./dist/citations/index.js",
       "default": "./dist/citations/index.js"
     },
-    "./maps": {
-      "types": "./dist/maps/index.d.ts",
-      "svelte": "./dist/maps/index.js",
-      "default": "./dist/maps/index.js"
-    },
     "./canvas": {
       "types": "./dist/canvas/index.d.ts",
       "svelte": "./dist/canvas/index.js",
@@ -63,8 +58,7 @@
   "dependencies": {
     "@internationalized/date": "catalog:",
     "@lucide/svelte": "catalog:",
-    "bits-ui": "catalog:",
-    "clsx": "catalog:"
+    "bits-ui": "catalog:"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "catalog:",
@@ -86,12 +80,6 @@
     "vitest-browser-svelte": "catalog:"
   },
   "peerDependencies": {
-    "mapbox-gl": "catalog:",
     "svelte": "^5.30.1"
-  },
-  "peerDependenciesMeta": {
-    "mapbox-gl": {
-      "optional": true
-    }
   }
 }
