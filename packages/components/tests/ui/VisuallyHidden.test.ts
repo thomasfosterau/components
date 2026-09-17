@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { createRawSnippet } from 'svelte';
-import VisuallyHidden from '../src/lib/ui/VisuallyHidden.svelte';
+import VisuallyHidden from '../../src/lib/ui/VisuallyHidden.svelte';
 
 /**
  * `children` is a snippet, and a `.ts` test has no template to declare one in

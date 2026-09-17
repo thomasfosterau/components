@@ -2,7 +2,7 @@
   "$schema": "https://www.schemastore.org/package",
   "name": "@thomasfosterau/components",
   "version": "0.1.0",
-  "description": "Accessible Svelte 5 UI primitives — Tailwind CSS 4 and daisyUI 5 for styling, bits-ui for interaction",
+  "description": "Accessible Svelte 5 UI primitives — Tailwind CSS 4 and daisyUI 5 for styling, bits-ui for interaction, every string a prop",
   "keywords": [
     "accessibility",
     "bits-ui",
@@ -32,6 +32,31 @@
       "types": "./dist/index.d.ts",
       "svelte": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./citations": {
+      "types": "./dist/citations/index.d.ts",
+      "svelte": "./dist/citations/index.js",
+      "default": "./dist/citations/index.js"
+    },
+    "./maps": {
+      "types": "./dist/maps/index.d.ts",
+      "svelte": "./dist/maps/index.js",
+      "default": "./dist/maps/index.js"
+    },
+    "./canvas": {
+      "types": "./dist/canvas/index.d.ts",
+      "svelte": "./dist/canvas/index.js",
+      "default": "./dist/canvas/index.js"
+    },
+    "./charts": {
+      "types": "./dist/charts/index.d.ts",
+      "svelte": "./dist/charts/index.js",
+      "default": "./dist/charts/index.js"
+    },
+    "./tips": {
+      "types": "./dist/tips/index.d.ts",
+      "svelte": "./dist/tips/index.js",
+      "default": "./dist/tips/index.js"
     },
     "./theme.css": "./dist/theme.css"
   },

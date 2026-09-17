@@ -24,10 +24,15 @@ This repo is a **publishable npm library**, not an application — the only arti
   ```
 
   ```svelte
-  <span {...rest} class={clsx('sr-only', className)}>{@render children()}</span>
+  <span {...rest} class={['sr-only', className]}>{@render children()}</span>
   ```
 
-  `clsx` merges; the caller's `class` goes **last**, so Tailwind's later-wins ordering lets them override anything. A component that swallows `id`, `aria-*` or `data-*` is a bug — a consumer cannot label, test or hook into it.
+  Svelte 5's class arrays (`class={[…]}`) merge with `clsx` semantics natively — use them in templates; import `clsx` only in a `.ts` helper. The caller's `class` goes **last**, so Tailwind's later-wins ordering lets them override anything. A component that swallows `id`, `aria-*` or `data-*` is a bug — a consumer cannot label, test or hook into it.
+
+- **Every string is a prop with an English default.** There is no message catalogue and the context carries no copy: `dismissLabel = 'Dismiss'`, `previousLabel = 'Previous'`. Accessible-name props end in `Label`. An i18n app passes its own messages at the call site.
+- **Links and locale go through the context.** `getComponentsContext()` supplies `href(path)`, `navigate(url)`, `isCurrent(href)` and `locale()`; a component never imports `$app/*` and never reads `window.location` itself. Every `Intl` formatter takes a `locales` prop and falls back to `locale()`.
+- **No Effect.** Async callbacks are `(…, signal: AbortSignal) => Promise<T>`; optional values are `T | undefined`. Effect adapters live in the consuming apps.
+- **Ids are minted with `$props.id()`** and overridable by an `id` prop.
 
 - **daisyUI classes come from a literal lookup table, never a template string.** Tailwind 4 extracts classes by scanning source text, so ``class={`btn-${variant}`}`` emits nothing at all:
 
@@ -43,7 +48,8 @@ This repo is a **publishable npm library**, not an application — the only arti
 - **Semantic tokens only.** `bg-base-200`, `text-error`, `btn-primary` — never `bg-green-700`, a hex or an `oklch()` inside a component. The vocabulary is [`packages/components/src/lib/theme.css`](packages/components/src/lib/theme.css); two vocabularies for one palette is how a design system drifts.
 - **bits-ui owns interaction.** Anything with focus management, keyboard semantics, a popover, or an ARIA relationship between elements is built on a bits-ui primitive rather than hand-rolled. Hand-rolling is the exception, and it needs a reason in the component's header comment.
 - **ARIA is part of the contract, not decoration.** A component's accessible name, role and state are its public API as much as its props are, and they are pinned by a test.
-- **Every component ships with a story and a browser test.** One `*.stories.svelte` / `*.stories.ts` per component under `src/stories/<group>/`, mirroring `src/lib/<group>/` — not beside the component, because `svelte-package` copies every `src/lib/` file into `dist/` and stories must not ship. Snippet-taking components use Svelte CSF (`defineMeta` + `<Story>`), prop-only ones plain CSF.
+- **Every component ships with a story and a browser test.** One `*.stories.svelte` / `*.stories.ts` per component under `src/stories/<family>/` and one `tests/<family>/<Component>.test.ts`, both mirroring `src/lib/<family>/` — not beside the component, because `svelte-package` copies every `src/lib/` file into `dist/` and stories must not ship. Snippet-taking components use Svelte CSF (`defineMeta` + `<Story>`), prop-only ones plain CSF.
+- **Families and entry points.** Core families (`ui`, `feedback`, `layout`, `fields`, `forms`, `data`, `infobox`, `formatting`, `links`, `media`, `hotkeys`, `search`) are re-exported from the root barrel; `citations`, `maps`, `canvas`, `charts` and `tips` are separate `exports` entries (`@thomasfosterau/components/<family>`) so a consumer that never uses them never loads them. A new family gets a barrel, an `exports` entry if heavy, and a README section.
 - **Prefer vertical slices per component** over horizontal sweeps: component → barrel export → story → test → README row, finished, before starting the next.
 
 ## Documentation surfaces
