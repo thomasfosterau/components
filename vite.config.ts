@@ -1,52 +1,74 @@
-import { svelte } from '@sveltejs/vite-plugin-svelte';
+/**
+ * Root workspace config. Owns the repo-wide format/lint/staged passes (read
+ * statically by `vp fmt` / `vp lint` / `vp staged`) and the one aggregate
+ * task — `check`, the type-check gate over every package.
+ *
+ * The Svelte plugin, the browser test suite, the `svelte-package` build and
+ * the Storybook tasks all live in packages/components/vite.config.ts: this
+ * file deliberately compiles nothing, so adding a second package never means
+ * editing it.
+ */
+
 import { defineConfig } from 'vite-plus';
 
 export default defineConfig({
-  // The component package is a SvelteKit app; here we only need enough of the
-  // Svelte plugin to compile `.svelte` files for the workspace test run.
-  plugins: [svelte({ configFile: false })],
-
-  // `melt` ships `.svelte.js` rune modules that it imports as `.svelte`, so it
-  // has to go through the Svelte plugin rather than be externalised.
-  ssr: {
-    noExternal: ['melt'],
+  // Staged-file checks run by `vp staged` (pre-commit). Routed by type: oxfmt
+  // cannot format `.svelte`, so Svelte goes through lint alone while the
+  // oxfmt-supported types get the full format+lint+fix pass.
+  staged: {
+    '*.{js,ts,css,json,md}': 'vp check --fix',
+    '*.svelte': 'vp lint --fix',
   },
 
-  // Vitest — discovers tests across all workspace packages. Components are
-  // exercised through `render` from `svelte/server`, so the suite runs in the
-  // server environment. Testing client-side interaction would mean Vitest
-  // browser mode, which is what Svelte itself recommends over a DOM shim.
-  test: {
-    include: ['packages/*/test/**/*.test.ts'],
-    environment: 'node',
+  run: {
+    tasks: {
+      // The type-check gate, as one task: every package's `check` pipeline
+      // (`svelte-kit sync` + svelte-check). A pure graph node — the root
+      // takes `@thomasfosterau/components` as a dependency purely so this
+      // edge reaches it.
+      check: {
+        command: "echo 'check: all type gates green'",
+        dependsOn: [{ from: 'dependencies', task: 'check' }],
+        cache: false,
+      },
+    },
   },
 
-  // Oxlint — type-aware linting + type checking (vp check).
-  //
-  // `packages/components` is a SvelteKit package: its types come from the
-  // generated `$app/tsconfig` and its `.svelte` files are outside oxlint's
-  // remit, so it is type checked by `svelte-check` instead (see the workspace
-  // `check` script).
+  // Oxlint. Type-aware linting is intentionally OFF: the package's types come
+  // from the `svelte-kit sync` output and its `.svelte` files are outside
+  // oxlint's remit either way, so type checking stays svelte-check's job via
+  // `vp run check`.
   lint: {
     ignorePatterns: [
       '**/dist/**',
       '**/node_modules/**',
       '**/.svelte-kit/**',
-      // Covered by `svelte-check`, and its tsconfig depends on files that only
-      // exist after `svelte-kit sync`.
-      'packages/components/src/**',
+      '**/storybook-static/**',
+      '**/coverage/**',
     ],
     options: {
-      typeAware: true,
-      typeCheck: true,
+      typeAware: false,
+      typeCheck: false,
     },
   },
 
   // Oxfmt — formatter of record for the workspace. `.svelte` files are outside
-  // its remit and are kept in the same style by hand.
+  // its remit and are kept in the same style by hand. `sortTailwindcss` is on
+  // because this is a Tailwind library: class order is a diff-noise source
+  // otherwise, and a literal lookup table (see AGENTS.md) is exactly the shape
+  // it can sort.
   fmt: {
-    ignorePatterns: ['**/dist/**', '**/.svelte-kit/**'],
+    ignorePatterns: ['**/dist/**', '**/.svelte-kit/**', '**/storybook-static/**'],
     singleQuote: true,
     semi: true,
+    sortTailwindcss: {},
+    overrides: [
+      {
+        files: ['**/*.md'],
+        options: {
+          proseWrap: 'never',
+        },
+      },
+    ],
   },
 });

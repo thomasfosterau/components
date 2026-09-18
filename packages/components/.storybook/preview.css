@@ -1,0 +1,14 @@
+/* Storybook-only stylesheet: the same Tailwind + daisyUI stack a consumer
+   runs, on the library's own tokens, so a story renders exactly as an
+   application does.
+
+   `themes: false` disables daisyUI's built-in themes; the two this library
+   ships are declared by `theme.css` below, and having both would mean two
+   definitions of `light` fighting over the cascade. */
+@import 'tailwindcss';
+@source '../src';
+@source '../../maps/src';
+@plugin "daisyui" {
+  themes: false;
+}
+@import '../src/lib/theme.css';

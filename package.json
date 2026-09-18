@@ -1,43 +1,37 @@
 {
+  "$schema": "https://www.schemastore.org/package",
   "name": "@thomasfosterau/monorepo",
+  "version": "0.0.0",
   "private": true,
-  "description": "Accessible Svelte components, in a Vite+ workspace",
+  "description": "Accessible Svelte 5 components — Tailwind CSS 4, daisyUI 5 and bits-ui, in a Vite+ workspace",
   "license": "MIT",
+  "author": "Thomas Foster <me@thomasfoster.au>",
   "repository": {
     "type": "git",
     "url": "https://github.com/thomasfosterau/components.git"
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "type": "module",
   "scripts": {
-    "dev": "npm run dev -w @thomasfosterau/components",
-    "test": "vp test",
-    "check": "vp check && npm run check -w @thomasfosterau/components",
-    "lint": "vp lint",
-    "fmt": "vp fmt",
-    "build": "vp run -r build",
-    "build:demo": "npm run build:demo -w @thomasfosterau/components",
+    "prepare": "vp config",
     "changeset": "changeset",
     "version": "changeset version",
-    "release": "npm run build && changeset publish"
+    "release": "vp run -r build && pnpm publish -r --access public --provenance"
+  },
+  "dependencies": {
+    "@thomasfosterau/components": "workspace:*",
+    "@thomasfosterau/components-maps": "workspace:*"
   },
   "devDependencies": {
-    "@changesets/cli": "^3.0.3",
-    "@sveltejs/vite-plugin-svelte": "^7.3.0",
-    "@voidzero-dev/vite-plus-core": "0.3.2",
-    "svelte": "^5.57.0",
-    "typescript": "6.0.3",
-    "vite-plus": "0.3.2",
-    "vitest": "4.1.11"
-  },
-  "overrides": {
-    "typescript": "6.0.3",
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.3.2"
+    "@changesets/cli": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   },
   "engines": {
-    "node": ">=22.17"
+    "node": ">=22",
+    "pnpm": ">=11"
   },
-  "packageManager": "npm@11.16.0"
+  "packageManager": "pnpm@11.26.0"
 }

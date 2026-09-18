@@ -1,9 +1,0 @@
-@import 'tailwindcss';
-
-/*
- * Consumers pull this file in alongside their own Tailwind entry so that the
- * utility classes baked into the components are generated in their build:
- *
- *   @import 'tailwindcss';
- *   @source '../node_modules/@thomasfosterau/components/dist';
- */

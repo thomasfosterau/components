@@ -1,0 +1,58 @@
+{
+  "$schema": "https://www.schemastore.org/package",
+  "name": "@thomasfosterau/components-maps",
+  "version": "0.1.0",
+  "description": "Mapbox GL maps and a plan editor for @thomasfosterau/components — a static raster, the interactive surface, and the GeoJSON seam",
+  "keywords": [
+    "accessibility",
+    "components",
+    "geojson",
+    "mapbox-gl",
+    "maps",
+    "svelte",
+    "svelte5",
+    "ui-library"
+  ],
+  "license": "MIT",
+  "author": "Thomas Foster <me@thomasfoster.au>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thomasfosterau/components.git",
+    "directory": "packages/maps"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "svelte": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@thomasfosterau/components": "workspace:*"
+  },
+  "devDependencies": {
+    "@storybook/sveltekit": "catalog:",
+    "@sveltejs/kit": "catalog:",
+    "@sveltejs/package": "catalog:",
+    "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/browser-playwright": "catalog:",
+    "mapbox-gl": "catalog:",
+    "playwright": "catalog:",
+    "svelte": "catalog:",
+    "svelte-check": "catalog:",
+    "vitest-browser-svelte": "catalog:"
+  },
+  "peerDependencies": {
+    "mapbox-gl": "catalog:",
+    "svelte": "^5.30.1"
+  }
+}
