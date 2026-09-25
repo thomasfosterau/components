@@ -92,6 +92,8 @@ export default defineConfig({
     include: [
       '@lucide/svelte',
       '@testing-library/jest-dom/vitest',
+      '@thomasfosterau/effect-forms-svelte',
+      'effect/Schema',
       'bits-ui',
       'clsx',
       'svelte',

@@ -24,6 +24,7 @@ pnpm add @thomasfosterau/components
 | `svelte` | `^5.30.1` | A declared peer. The components are compiled by your build, not pre-compiled. |
 | `tailwindcss` | `^4.0.0` | Not a declared peer, but **required**: the components emit Tailwind classes and ship none. |
 | `daisyui` | `^5.0.0` | Same — the class vocabulary is daisyUI's (`btn`, `input`, `bg-base-200`, `text-error`). |
+| `@thomasfosterau/effect-forms-svelte` | `^0.1.0` | An **optional** declared peer, needed only by the `/entity-form` entry (and bringing its own required peer, `effect` 4). Nothing else in the package imports it. |
 
 Tailwind 4 has no `tailwind.config.js`, so wire it up from your CSS entry. Two lines matter: `@source`, which is what makes Tailwind scan this package's `dist/` and emit the classes it uses, and the `theme.css` import (or your own themes), which supplies the daisyUI tokens the components are designed against.
 
@@ -94,6 +95,7 @@ Heavier families are separate `exports` entries so a consumer that never uses th
 | `@thomasfosterau/components/canvas` | canvas | `VectorCanvas` and the pan/zoom/history/geometry toolkit underneath it. |
 | `@thomasfosterau/components/charts` | charts | `Chart` — one component, plain SVG, no charting dependency. |
 | `@thomasfosterau/components/tips` | tips | `Tip`, `PopoverTip`, `createTipStore`, `createTipStack`. |
+| `@thomasfosterau/components/entity-form` | forms | `EntityForm` — needs the optional peer `@thomasfosterau/effect-forms-svelte` (see [entity-form](#entity-form)). |
 | `@thomasfosterau/components/seo` | seo | `Head`, `JsonLd`, `serializeJsonLd`, `ogImageUrl` and the share-card constants. |
 | `@thomasfosterau/components/theme.css` | — | The daisyUI theme skeleton (see [Installation](#installation)). |
 
@@ -653,6 +655,32 @@ One component, because a palette is one thing: a dialog, a query box, and rows f
 ```
 
 A `Citation` or `Footnote` rendered with no `setupBibliography()` provider above it still works — `getBibliographyContext()` falls back to a fresh, standalone manager rather than throwing.
+
+# entity-form
+
+`@thomasfosterau/components/entity-form`. The renderer for [`@thomasfosterau/effect-forms-svelte`](https://github.com/thomasfosterau/effect-forms)'s `defineEntityForm` definitions. It is the only entry point that reaches Effect, so it is kept separate and its form library is an optional peer: `pnpm add @thomasfosterau/effect-forms-svelte effect` if you use it.
+
+| Component | Purpose | Props | Snippets | ARIA |
+| --- | --- | --- | --- | --- |
+| `EntityForm` | Walks `definition.entriesFor(mode)` in declaration order. Scalar entries render as `FormField` + `TextInput` (`url` / numeric `inputmode`), `DateInput` (`type: 'date'`) or `Textarea` (multiline). Select entries render as `Select` over the field's derived enum values. Widget entries render the entry's own component through the bridge | `definition: EntityFormDefinition`, `mode: 'create' \| 'update'`, `cancelHref?`, `action?` (a named action), `initial?: Record<string, string>` (seeded once, at mount, so it lands in SSR HTML), `initialRows?` (per `rows` widget), `fieldProps?` (per widget key), `enhance?: (form) => attributes` (default: the store's own `form.props`), `cancelLabel? = 'Cancel'`, `pendingLabel? = 'Saving…'`, `selectPlaceholder? = 'Choose…'`, `requiredLabel?`, plus native `<form>` attributes | — | each control is labelled by its `FormField`. Errors are `aria-describedby`. Root errors are a `FormErrors` alert |
+
+Field labels, submit labels and option labels come from the definition's own message thunks. Every other string is a prop.
+
+**The widget bridge.** A `custom` or `rows` widget receives its definition's `props()`, then your `fieldProps[key]`, then `name` / `value` / `onChange` / `errors`, in that order. The bridge goes last, so neither of the first two can sever the store binding. A `custom` widget bridges a string field of the store. A `rows` widget bridges a row list held by the renderer and serialises it itself. A `gate: true` widget disables submit while its value is empty. A create form whose command carries a client id gets a `crypto.randomUUID()` minted once per mount, so a retried submission stays idempotent.
+
+**SvelteKit.** This package cannot import `$app/forms`, so pass your app's `enhanceForm` (the `$app/forms`-backed spreadable attributes, which effect-forms#2 moves into `@thomasfosterau/effect-forms-svelte/kit`):
+
+```svelte
+<script lang="ts">
+  import { EntityForm } from '@thomasfosterau/components/entity-form';
+  import { enhanceForm } from '$lib/effect-form';
+  import { bookForm } from '$lib/entity-forms/book';
+
+  let { data } = $props();
+</script>
+
+<EntityForm definition={bookForm} mode="update" initial={data.initial} cancelHref={`/books/${data.id}`} enhance={enhanceForm} />
+```
 
 # seo
 

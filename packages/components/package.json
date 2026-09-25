@@ -58,6 +58,11 @@
       "svelte": "./dist/seo/index.js",
       "default": "./dist/seo/index.js"
     },
+    "./entity-form": {
+      "types": "./dist/forms/entity-form.d.ts",
+      "svelte": "./dist/forms/entity-form.js",
+      "default": "./dist/forms/entity-form.js"
+    },
     "./theme.css": "./dist/theme.css"
   },
   "dependencies": {
@@ -74,9 +79,11 @@
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@testing-library/jest-dom": "catalog:",
+    "@thomasfosterau/effect-forms-svelte": "catalog:",
     "@types/node": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "daisyui": "catalog:",
+    "effect": "catalog:",
     "playwright": "catalog:",
     "storybook": "catalog:",
     "svelte": "catalog:",
@@ -85,6 +92,12 @@
     "vitest-browser-svelte": "catalog:"
   },
   "peerDependencies": {
+    "@thomasfosterau/effect-forms-svelte": "catalog:",
     "svelte": "^5.30.1"
+  },
+  "peerDependenciesMeta": {
+    "@thomasfosterau/effect-forms-svelte": {
+      "optional": true
+    }
   }
 }
