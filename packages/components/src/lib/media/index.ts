@@ -8,3 +8,8 @@
 export { default as Image } from './Image.svelte';
 export { default as Video } from './Video.svelte';
 export { default as Figure } from './Figure.svelte';
+export {
+  imageDimensions,
+  ImageDimensionsUnavailable,
+  type ImageDimensions,
+} from './image-dimensions.ts';

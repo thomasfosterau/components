@@ -537,6 +537,8 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 <Figure caption="A row of tomato seedlings"><img src={photo.src} alt="Tomato seedlings" /></Figure>
 ```
 
+`imageDimensions(file: Blob): Promise<{ width, height }>` reads an image file's intrinsic pixel size with `createImageBitmap`, in the browser, so an upload form can submit `width` / `height` with the binary (it is what `ImageInput` measures with). It rejects with `ImageDimensionsUnavailable` where there is no `createImageBitmap` (on a server), and with the browser's own error for a file that does not decode.
+
 # hotkeys
 
 One registry answers "what can the viewer do right now"; `HotkeyProvider` matches keystrokes against it, `HotkeyHelpDialog` lists what carries a trigger, and `search`'s `CommandPalette` lists what is palette-visible. An app creates the registry in its root layout, renders `HotkeyProvider` once, and registers actions from anywhere below — global ones from the layout, page ones from the page, torn down on unmount.
