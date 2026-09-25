@@ -329,6 +329,7 @@ Every primitive accepts it by spread — `<TextInput {...control} bind:value />`
 | `CheckboxGroup` | Several boxes, one question | `legend`, `options`, `values ⚓: string[]`, `name?`, `hint?`, `errors?`, `required?`, `disabled?`, `size?` | — | a `Fieldset` of `Checkbox` |
 | `RadioGroup` | One choice from a short list | `legend`, `options`, `value ⚓`, `orientation? = 'vertical'`, `name?`, `hint?`, `errors?`, `required?`, `disabled?` | — | bits-ui `RadioGroup`: one tab stop, arrows move and select, wrap-around |
 | `Toggle` | A setting that takes effect now | `checked ⚓`, `label`, `description?`, `onChange?: (next) => Promise<boolean> \| boolean`, `size?`, `invalid?`, `describedBy?` | — | `role="switch"` on a native checkbox; `description` is `aria-describedby`, never folded into the name; `aria-busy` while `onChange` is in flight |
+| `PushToggle` | Web Push for THIS browser behind a `Toggle`: reads the subscription on mount, subscribes / unsubscribes through the app's own client | `available: boolean`, `enable: (signal) => Promise<PushEnableResult>` (`{ _tag: 'enabled' \| 'unsupported' \| 'unavailable' \| 'denied' }` — resolves, never throws), `disable: (signal) => Promise<unknown>`, `supported?` / `readSubscribed?` (default: the browser's own checks), `label? = 'Send push notifications to this browser'`, `description?`, `unavailableMessage?`, `unsupportedMessage?`, `deniedMessage?` (English defaults) | — | `Toggle`'s; the refusal message is a polite live region |
 | `DateInput` | An ISO calendar date | `value ⚓` (`YYYY-MM-DD`), `min?`, `max?`, `size?`, `invalid?`, `describedBy?` | — | native `<input type="date">` |
 | `FileInput` | A file, with a size cap | `file ⚓: File \| undefined`, `accept?`, `maxBytes?`, `tooLargeMessage? = 'That file is too large.'`, `onSelect?`, `size?`, `invalid?`, `describedBy?` | — | native file input; an over-size file is cleared and explained in an `alert` |
 | `ImageInput` | `FileInput` + preview + dimension probe | `file ⚓`, `width ⚓`, `height ⚓`, `previewAlt? = 'Preview of the selected image'`, `name?`, `accept?`, `maxBytes?`, `tooLargeMessage?` | — | preview `<img>` named by `previewAlt`; emits hidden `width`/`height` inputs once `name` is set |
@@ -496,6 +497,7 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 | `NumberFormat` (also exported as `Number`; `NumberFormat` is primary, since a `Number` export would shadow the global) | `<data>` with a raw `value` attribute and `Intl.NumberFormat` text | `value: number \| bigint`, `locales?`, `style?`, `unit?`, `unitDisplay?`, `currency?`, `currencyDisplay?`, `maximumFractionDigits?`, `minimumFractionDigits?`, `signDisplay?`, `notation?`, `options?: Intl.NumberFormatOptions` (wins) | — | native `<data>` semantics only |
 | `FormatList<T>` | Renders items through `Intl.ListFormat.formatToParts`, so conjunction/disjunction text ("and", ", ") comes from the runtime | `items: readonly T[]`, `style? = 'long'`, `type? = 'conjunction'`, `locales?` | `children(item: T)` | no wrapper element |
 | `RelativeTime` | "3 hours ago" / "in 2 days" via `Intl.RelativeTimeFormat`, picking the largest unit whose magnitude rounds to ≥ 1 | `value: Date \| number \| string`, `now?` (pin it in tests), `locales?`, `numeric? = 'auto'`, `style? = 'long'` | — | `<time datetime=ISO title=absolute>` — the absolute instant is never hidden |
+| `Year` | `<time>` with just a year — `datetime="1925"` — and its `Intl.DateTimeFormat` rendering | `value: Date \| number \| string` (a number is a calendar year; an instant contributes its UTC year), `locales?`, `era?`, `representation? = 'numeric'` (`'2-digit'`) | — | native `<time>`; `datetime` is a valid HTML year string (ISO instant before 1 CE) |
 | `Highlight` (+ exported `tokenise`) | Best-effort client-side token highlight for search results | `text: string`, `query: string` | — | `<mark>` per matched token; naive — a UX nicety, not the authoritative FTS match |
 
 ```svelte
@@ -503,6 +505,7 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 <NumberFormat value={price} style="currency" currency="AUD" />
 <p><FormatList items={tags}>{#snippet children(tag)}<Badge>{tag}</Badge>{/snippet}</FormatList></p>
 <RelativeTime value={comment.createdAt} />
+<Year value={book.yearPublished} itemprop="datePublished" />
 <p><Highlight text={result.title} query={searchQuery} /></p>
 ```
 
@@ -511,11 +514,13 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
 | `EmailLink` | A `mailto:` anchor whose query string is built with `URLSearchParams`, so every value is correctly encoded | `email: string`, `subject?`, `body?`, `cc?`, `bcc?`, `class` merged last, spreads `HTMLAnchorAttributes` | `children?` — replaces the link text; defaults to the address | native `<a>` — visible text is the accessible name |
+| `ContextLinks` | The "About: X, Y" row under a piece of content. Renders nothing for an empty list | `links: readonly ContextLinkItem[]` (`{ href, label }`; each `href` resolved through the context), `label? = 'About'`, `class` merged last, spreads `HTMLAttributes<HTMLParagraphElement>` | — | a paragraph of links; each link's text is its name |
 
 ```svelte
 <EmailLink email="hello@thomasfoster.au" subject="Question about your garden">
   {#snippet children()}Contact us{/snippet}
 </EmailLink>
+<ContextLinks links={[{ href: `/taxa/${taxon.id}`, label: taxon.name }]} />
 ```
 
 # media
