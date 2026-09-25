@@ -26,6 +26,25 @@ describe('serializeJsonLd', () => {
     });
     expect(out).toContain('\\u2028');
     expect(out).toContain('\\u2029');
+    expect(out).not.toContain(String.fromCharCode(0x2028));
+    expect(out).not.toContain(String.fromCharCode(0x2029));
+    expect(JSON.parse(out)).toEqual({
+      '@context': 'https://schema.org',
+      headline: `a${String.fromCharCode(0x2028)}b${String.fromCharCode(0x2029)}c`,
+    });
+  });
+
+  it('escapes <!-- so the HTML parser cannot enter the script-data-escaped state', () => {
+    const data = {
+      '@context': 'https://schema.org',
+      headline: '<!--<script>',
+      description: '<!-- --> </SCRIPT >',
+    };
+    const out = serializeJsonLd(data);
+    expect(out).not.toContain('<!--');
+    expect(out).not.toMatch(/<\/script/i);
+    expect(out).not.toContain('<');
+    expect(JSON.parse(out)).toEqual(data);
   });
 
   it('produces valid JSON that round-trips to the input', () => {
