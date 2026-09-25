@@ -1,6 +1,6 @@
 # @thomasfosterau/components
 
-Accessible Svelte 5 UI primitives — [Tailwind CSS 4](https://tailwindcss.com) and [daisyUI 5](https://daisyui.com) for styling, [bits-ui](https://bits-ui.com) for interaction — in a [Vite+](https://viteplus.dev) workspace. 107 components across 17 families, consolidated out of the owner's four Svelte 5 apps into two publishable packages.
+Accessible Svelte 5 UI primitives — [Tailwind CSS 4](https://tailwindcss.com) and [daisyUI 5](https://daisyui.com) for styling, [bits-ui](https://bits-ui.com) for interaction — in a [Vite+](https://viteplus.dev) workspace. 119 components across 18 families, consolidated out of the owner's four Svelte 5 apps into two publishable packages.
 
 | Package | Description |
 | --- | --- |

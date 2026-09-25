@@ -1,6 +1,6 @@
 # @thomasfosterau/components
 
-Accessible Svelte 5 UI primitives, styled with [Tailwind CSS 4](https://tailwindcss.com) + [daisyUI 5](https://daisyui.com) and built on [bits-ui](https://bits-ui.com). 102 components across 16 families: 12 in the core barrel, 4 behind their own entry points. The five maps components live in the sibling package [`@thomasfosterau/components-maps`](../maps/README.md).
+Accessible Svelte 5 UI primitives, styled with [Tailwind CSS 4](https://tailwindcss.com) + [daisyUI 5](https://daisyui.com) and built on [bits-ui](https://bits-ui.com). 114 components across 17 families: 12 in the core barrel, 5 behind their own entry points (plus `EntityForm`, the `forms` family's one component with an optional peer, behind its own). The five maps components live in the sibling package [`@thomasfosterau/components-maps`](../maps/README.md).
 
 Four rules hold across all of them:
 
