@@ -1,5 +1,5 @@
-import { userEvent } from 'vitest/browser';
-import { afterEach, expect, test } from 'vitest';
+import { userEvent } from 'vite-plus/test/browser';
+import { afterEach, expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import ThemeToggle from '../../src/lib/ui/ThemeToggle.svelte';
 

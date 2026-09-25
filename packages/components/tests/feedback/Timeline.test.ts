@@ -4,7 +4,7 @@
  * introduced by `currentLabel` rather than by the filled marker alone.
  */
 
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import Timeline from '../../src/lib/feedback/Timeline.svelte';
 import type { TimelineEntry } from '../../src/lib/feedback/Timeline.svelte';

@@ -18,7 +18,7 @@
  * @module tests/canvas/pointer
  */
 
-import type { Locator } from 'vitest/browser';
+import type { Locator } from 'vite-plus/test/browser';
 
 /** A point in the surface's own CSS pixels, measured from its top-left corner. */
 export interface At {

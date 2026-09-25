@@ -4,8 +4,8 @@
  * `aria-expanded` to drift out of step.
  */
 
-import { expect, test } from 'vitest';
-import { userEvent } from 'vitest/browser';
+import { expect, test } from 'vite-plus/test';
+import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import TreeListFixture from './fixtures/TreeListFixture.svelte';
 

@@ -1,6 +1,6 @@
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
-import { userEvent } from '@vitest/browser/context';
+import { userEvent } from 'vite-plus/test/browser/context';
 import { createRawSnippet } from 'svelte';
 import PopoverTip from '../../src/lib/tips/PopoverTip.svelte';
 import { createTipStack } from '../../src/lib/tips/tip-stack.ts';

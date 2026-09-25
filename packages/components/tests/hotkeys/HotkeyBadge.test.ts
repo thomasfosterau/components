@@ -14,7 +14,7 @@
  */
 
 import { flushSync, mount, unmount } from 'svelte';
-import { afterEach, expect, test } from 'vitest';
+import { afterEach, expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import HotkeyBadge from '../../src/lib/hotkeys/HotkeyBadge.svelte';
 

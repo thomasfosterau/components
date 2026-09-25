@@ -8,7 +8,7 @@
  * @module tests/static-url
  */
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { staticMapUrl } from '../src/lib/static-url.ts';
 
 describe('staticMapUrl', () => {

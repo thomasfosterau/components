@@ -23,7 +23,7 @@
  * @module tests/Map
  */
 
-import { expect, test, vi } from 'vitest';
+import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import Map from '../src/lib/Map.svelte';
 

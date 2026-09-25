@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import PageHeader from '../../src/lib/layout/PageHeader.svelte';
 import PageHeaderFixture from './fixtures/PageHeaderFixture.svelte';

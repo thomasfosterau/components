@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import Breadcrumbs from '../../src/lib/layout/Breadcrumbs.svelte';
 import BreadcrumbsItemFixture from './fixtures/BreadcrumbsItemFixture.svelte';

@@ -10,7 +10,7 @@
  * @module tests/canvas/geometry
  */
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import type { CanvasElement } from '../../src/lib/canvas/types.ts';
 import {
   boundingBox,

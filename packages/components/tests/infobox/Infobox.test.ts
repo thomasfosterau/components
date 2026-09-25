@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import Infobox from '../../src/lib/infobox/Infobox.svelte';
 import InfoboxLinksRowContextFixture from './fixtures/InfoboxLinksRowContextFixture.svelte';

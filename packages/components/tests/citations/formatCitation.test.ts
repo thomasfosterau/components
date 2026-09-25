@@ -5,7 +5,7 @@
  * nothing but a title, which is a state an ingested-but-unenriched reference
  * genuinely reaches).
  */
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { formatCitation, type Citation } from '../../src/lib/citations/citation.ts';
 
 const article: Citation = {

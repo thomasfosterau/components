@@ -9,8 +9,8 @@
  * the reported change, which is the whole of what it promises.
  */
 
-import { expect, test, vi } from 'vitest';
-import { userEvent } from 'vitest/browser';
+import { expect, test, vi } from 'vite-plus/test';
+import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import TableFixture from './fixtures/TableFixture.svelte';
 import { rows } from './fixtures/table-data.ts';

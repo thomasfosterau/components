@@ -5,7 +5,7 @@
  * — a row with nothing in it renders nothing at all.
  */
 
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import DescriptionRowFixture from './fixtures/DescriptionRowFixture.svelte';
 

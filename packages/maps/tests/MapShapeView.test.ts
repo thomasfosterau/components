@@ -11,7 +11,7 @@
  * @module tests/MapShapeView
  */
 
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import type { MapShape } from '../src/lib/shapes.ts';
 import ShapeViewFixture from './fixtures/ShapeViewFixture.svelte';

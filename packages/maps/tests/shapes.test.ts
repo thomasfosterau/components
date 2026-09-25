@@ -9,7 +9,7 @@
  * @module tests/shapes
  */
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import type { VectorDocument } from '@thomasfosterau/components/canvas';
 import {
   blankShape,

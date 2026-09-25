@@ -15,7 +15,7 @@
     "prepare": "vp config",
     "changeset": "changeset",
     "version": "changeset version",
-    "release": "vp run -r build && pnpm publish -r --access public --provenance"
+    "release": "vp run -r build && node scripts/publish.mjs"
   },
   "dependencies": {
     "@thomasfosterau/components": "workspace:*",

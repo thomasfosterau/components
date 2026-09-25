@@ -1,4 +1,4 @@
-import { expect, test, vi } from 'vitest';
+import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import FileInput from '../../src/lib/fields/FileInput.svelte';
 import { textFile } from './files.ts';

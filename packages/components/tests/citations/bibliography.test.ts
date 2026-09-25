@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { BibliographyManager } from '../../src/lib/citations/bibliography.svelte.ts';
 import type { Citation } from '../../src/lib/citations/citation.ts';
 

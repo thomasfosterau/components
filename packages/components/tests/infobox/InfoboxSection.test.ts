@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import InfoboxSection from '../../src/lib/infobox/InfoboxSection.svelte';
 import { htmlSnippet } from './snippets.ts';

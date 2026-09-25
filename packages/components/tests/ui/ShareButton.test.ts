@@ -1,5 +1,5 @@
-import { userEvent } from 'vitest/browser';
-import { afterEach, expect, test, vi } from 'vitest';
+import { userEvent } from 'vite-plus/test/browser';
+import { afterEach, expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import ShareButton from '../../src/lib/ui/ShareButton.svelte';
 

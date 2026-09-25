@@ -5,7 +5,7 @@
  * functions rather than derivations inside the component.
  */
 
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import {
   PAGE_LIMIT_PARAM,
   PAGE_OFFSET_PARAM,

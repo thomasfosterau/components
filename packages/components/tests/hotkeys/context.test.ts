@@ -12,7 +12,7 @@
  * provider → context → consumer round-trip.
  */
 
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import HotkeyNoProviderFixture from './fixtures/HotkeyNoProviderFixture.svelte';
 import HotkeyProviderFixture from './fixtures/HotkeyProviderFixture.svelte';

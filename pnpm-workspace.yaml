@@ -153,3 +153,8 @@ peerDependencyRules:
 # pulled before it reaches this workspace. Unit is MINUTES, not seconds
 # (`opts.minimumReleaseAge * 60 * 1e3` in pnpm's own source), so 1 day = 1440.
 minimumReleaseAge: 1440
+# First-party releases are exempt: `@thomasfosterau/*` is published by the
+# owner (from this repo and its siblings), so holding it a day only delays
+# adoption of a release the owner just cut, and protects against nothing.
+minimumReleaseAgeExclude:
+  - '@thomasfosterau/*'

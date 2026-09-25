@@ -5,8 +5,8 @@
  * Chromium; a DOM shim models none of this faithfully.
  */
 
-import { expect, test } from 'vitest';
-import { userEvent } from 'vitest/browser';
+import { expect, test } from 'vite-plus/test';
+import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import DialogFixture from './fixtures/DialogFixture.svelte';
 

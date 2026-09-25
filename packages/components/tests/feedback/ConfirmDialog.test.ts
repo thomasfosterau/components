@@ -5,8 +5,8 @@
  * real submit inside a real form or the no-JavaScript path does not exist.
  */
 
-import { expect, test, vi } from 'vitest';
-import { userEvent } from 'vitest/browser';
+import { expect, test, vi } from 'vite-plus/test';
+import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import ConfirmDialogFixture from './fixtures/ConfirmDialogFixture.svelte';
 
