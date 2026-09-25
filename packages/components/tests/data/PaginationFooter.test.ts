@@ -5,7 +5,7 @@
  * about which request they came from.
  */
 
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import PaginationFooter from '../../src/lib/data/PaginationFooter.svelte';
 

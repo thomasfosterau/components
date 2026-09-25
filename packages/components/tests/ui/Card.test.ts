@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import Card from '../../src/lib/ui/Card.svelte';
 import { htmlSnippet, textSnippet } from './snippets.ts';

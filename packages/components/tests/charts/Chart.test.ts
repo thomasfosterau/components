@@ -10,8 +10,8 @@
  * @module tests/charts/Chart
  */
 
-import { describe, expect, test } from 'vitest';
-import { userEvent } from 'vitest/browser';
+import { describe, expect, test } from 'vite-plus/test';
+import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import Chart from '../../src/lib/charts/Chart.svelte';
 import type { ChartSeries } from '../../src/lib/charts/types.ts';

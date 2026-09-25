@@ -9,8 +9,8 @@
  * stub `navigator.platform`; what this file pins is the routing around it.
  */
 
-import { expect, test } from 'vitest';
-import { userEvent } from 'vitest/browser';
+import { expect, test } from 'vite-plus/test';
+import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import HotkeyAppFixture from './fixtures/HotkeyAppFixture.svelte';
 

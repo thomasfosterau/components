@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import ImageInput from '../../src/lib/fields/ImageInput.svelte';
 import { fileFromDataUrl, PNG_3x2, textFile } from './files.ts';

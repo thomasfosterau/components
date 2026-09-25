@@ -6,8 +6,8 @@
  * library's `Dialog` underneath.
  */
 
-import { expect, test } from 'vitest';
-import { userEvent } from 'vitest/browser';
+import { expect, test } from 'vite-plus/test';
+import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import HotkeyAppFixture from './fixtures/HotkeyAppFixture.svelte';
 

@@ -5,7 +5,7 @@
  * through on the way to the next row.
  */
 
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import LinkListItem from '../../src/lib/data/LinkListItem.svelte';
 

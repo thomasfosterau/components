@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import CitationMarker from '../../src/lib/citations/Citation.svelte';
 import type { Citation } from '../../src/lib/citations/citation.ts';

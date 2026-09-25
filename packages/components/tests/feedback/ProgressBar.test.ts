@@ -4,7 +4,7 @@
  * `value` attribute at all) when no value is given.
  */
 
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import ProgressBar from '../../src/lib/feedback/ProgressBar.svelte';
 

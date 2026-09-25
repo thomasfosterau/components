@@ -24,7 +24,7 @@
  */
 
 import { flushSync } from 'svelte';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test, vi } from 'vite-plus/test';
 import { HotkeyRegistry } from '../../src/lib/hotkeys/registry.svelte.ts';
 import type { CommandAction } from '../../src/lib/hotkeys/types.ts';
 

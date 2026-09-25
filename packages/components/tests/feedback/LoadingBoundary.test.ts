@@ -4,8 +4,8 @@
  * it, because its state only survives a subtree that was never torn down.
  */
 
-import { expect, test } from 'vitest';
-import { userEvent } from 'vitest/browser';
+import { expect, test } from 'vite-plus/test';
+import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import { createRawSnippet } from 'svelte';
 import LoadingBoundary from '../../src/lib/feedback/LoadingBoundary.svelte';

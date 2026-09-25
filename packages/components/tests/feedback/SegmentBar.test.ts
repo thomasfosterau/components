@@ -5,7 +5,7 @@
  * accessibility tree.
  */
 
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import SegmentBar from '../../src/lib/feedback/SegmentBar.svelte';
 

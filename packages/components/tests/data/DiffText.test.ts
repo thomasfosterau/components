@@ -4,7 +4,7 @@
  * page into somewhere with no styling at all.
  */
 
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import DiffText from '../../src/lib/data/DiffText.svelte';
 import type { DiffSegment } from '../../src/lib/data/diff.ts';

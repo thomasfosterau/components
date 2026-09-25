@@ -5,7 +5,7 @@
  * empty `<dd>` claiming the page looked and found a blank.
  */
 
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import DescriptionListFixture from './fixtures/DescriptionListFixture.svelte';
 

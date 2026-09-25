@@ -16,7 +16,7 @@
  * @module tests/DynamicMap
  */
 
-import { expect, test, vi } from 'vitest';
+import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import DynamicMap from '../src/lib/DynamicMap.svelte';
 

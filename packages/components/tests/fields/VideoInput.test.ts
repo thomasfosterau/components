@@ -1,4 +1,4 @@
-import { expect, test, vi } from 'vitest';
+import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import VideoInput from '../../src/lib/fields/VideoInput.svelte';
 import VideoInputFixture from './fixtures/VideoInputFixture.svelte';

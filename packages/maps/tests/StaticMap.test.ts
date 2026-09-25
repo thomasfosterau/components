@@ -13,7 +13,7 @@
  * @module tests/StaticMap
  */
 
-import { expect, test } from 'vitest';
+import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import StaticMap from '../src/lib/StaticMap.svelte';
 

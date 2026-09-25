@@ -1,6 +1,6 @@
-import { expect, test, vi } from 'vitest';
+import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
-import { userEvent } from '@vitest/browser/context';
+import { userEvent } from 'vite-plus/test/browser/context';
 import Tip from '../../src/lib/tips/Tip.svelte';
 import { createTipStack } from '../../src/lib/tips/tip-stack.ts';
 import { createTipStore, memoryTipStorage } from '../../src/lib/tips/tip-store.svelte.ts';

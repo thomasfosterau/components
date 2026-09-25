@@ -76,6 +76,8 @@ Durable knowledge has one home each: a **decision, findings report, or invariant
 
 Changesets. Any PR that changes published behaviour adds one (`pnpm changeset`); `.github/workflows/release.yml` opens a "Version Packages" PR while unreleased changesets exist and publishes with provenance once it merges. The default branch is `main` — that is what `.changeset/config.json`'s `baseBranch` must say.
 
+Publishing is **npm Trusted Publishing (OIDC)** from the protected `release` environment — there is no `NPM_TOKEN` anywhere. `pnpm publish` cannot do OIDC, so the publish step is [`scripts/publish.mjs`](scripts/publish.mjs): `pnpm pack` per package (which rewrites `catalog:` / `workspace:*`) and `npm publish <tarball>`. Never switch it back to `pnpm publish -r` or `changeset publish`. The one-time owner setup — the `release` environment and a trusted publisher per package — is in [README.md](README.md#releasing).
+
 ## Worktree workflow
 
 Agent work uses git worktrees under `.claude/worktrees/`, one per feature branch. The model is `main` plus short-lived feature branches off it. Branch off `main`, PR against `main`, squash-merge. Name branches `issue-<n>-<slug>` for issue-linked work, or a plain descriptive slug otherwise.
@@ -95,10 +97,10 @@ Don't merge `main` into the worktree branch. Merging lets git silently auto-reso
 
 ## Claude Code conventions
 
-- The toolchain is **Vite+** (the `vp` CLI) on **Node + pnpm**. Invoke everything through `vp` — `vp run <script>`, `vp exec <bin>`; use `vp exec` instead of `npx`, and reach for `vp` rather than bare `pnpm`/`npm`/`yarn`. The sanctioned non-`vp` invocations: `pnpm install` (and `pnpm install --frozen-lockfile` in CI), `pnpm changeset` / `pnpm publish` on the release path, and `pnpm exec playwright install` in CI.
+- The toolchain is **Vite+** (the `vp` CLI) on **Node + pnpm**. Invoke everything through `vp` — `vp run <script>`, `vp exec <bin>`; use `vp exec` instead of `npx`, and reach for `vp` rather than bare `pnpm`/`npm`/`yarn`. The sanctioned non-`vp` invocations: `pnpm install` (and `pnpm install --frozen-lockfile` in CI), `pnpm changeset` and `scripts/publish.mjs` (`pnpm pack` + `npm publish`) on the release path, and `pnpm exec playwright install` in CI.
 - Use the `gh` CLI for all GitHub operations. The GitHub MCP server is intentionally not configured.
 - **GitHub writes are scoped to `thomasfosterau/components` only.** Never create or edit issues, PRs, comments, reviews or releases in any other repository — upstream projects, dependencies, the owner's app repos included — without the owner's explicit approval for that specific action in the current session. Beware `gh`'s target inference: it resolves the repo from the cwd's git remote, so a write run from inside a clone of a third-party repo silently files upstream. Pass `-R thomasfosterau/components` explicitly whenever the cwd might not be this checkout. **Nothing enforces this mechanically — it is on you.**
-- **Agent sessions are not hydrated.** The committed SessionStart hook ([.claude/hooks/session-start.sh](.claude/hooks/session-start.sh)) syncs dependencies, links the toolchain (`vp`, `node`) so they resolve from a **non-interactive** shell (which `~/.bashrc` alone does not do), and runs first-checkout codegen. It hydrates no secrets: `NPM_TOKEN` exists only in the release workflow, so nothing here can publish.
+- **Agent sessions are not hydrated.** The committed SessionStart hook ([.claude/hooks/session-start.sh](.claude/hooks/session-start.sh)) syncs dependencies, links the toolchain (`vp`, `node`) so they resolve from a **non-interactive** shell (which `~/.bashrc` alone does not do), and runs first-checkout codegen. It hydrates no secrets, and publishing needs an OIDC token that only the release workflow's `release` environment can mint, so nothing here can publish.
 - New rules: formatter/lint config goes in `vite.config.ts` first; rules that must be visible when touching certain files go in `.claude/rules/`; otherwise in this file.
 
 ## Verification

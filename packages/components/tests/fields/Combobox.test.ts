@@ -1,5 +1,5 @@
-import { userEvent } from 'vitest/browser';
-import { expect, test, vi } from 'vitest';
+import { userEvent } from 'vite-plus/test/browser';
+import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import ComboboxFormFixture, { type Taxon } from './fixtures/ComboboxFormFixture.svelte';
 

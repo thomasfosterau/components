@@ -1,52 +1,87 @@
 name: Release
 
+# Changesets release flow: on every push to `main`, changesets/action either
+# opens/updates the "Version Packages" pull request (while unreleased
+# changesets exist) or, once that pull request has merged, publishes every
+# package whose version is not yet on npm and tags the release.
+#
+# Publishing is npm Trusted Publishing (OIDC) — there is NO `NPM_TOKEN` secret
+# and none is read here. The job's `id-token: write` lets the npm CLI exchange
+# a GitHub-minted token for a short-lived publish credential, scoped to this
+# repository, this workflow file and the `release` environment, which is what
+# each package's trusted publisher on npmjs.com names. Provenance is attached
+# by the same exchange (`NPM_CONFIG_PROVENANCE`).
+#
+# The publish step is `scripts/publish.mjs`, not `changeset publish`: pnpm's
+# publish path cannot do OIDC, so the script packs with pnpm (which rewrites
+# `catalog:` / `workspace:*`) and publishes the tarball with npm. See its
+# header for the details.
+
 on:
   push:
     branches: [main]
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
-permissions:
-  contents: read
+# Nothing by default; the job grants exactly what it uses.
+permissions: {}
 
 jobs:
   release:
     name: Version or publish
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # A protected environment (deployment branches: `main` only), named by the
+    # trusted publisher on npmjs.com — a workflow run from any other ref cannot
+    # mint a publish credential even if it copies this file.
+    environment: release
     permissions:
+      # Commit the version bump, push tags, create GitHub releases.
       contents: write
+      # Open / update the "Version Packages" pull request.
       pull-requests: write
-      # Required for npm provenance — `pnpm publish --provenance` mints an
-      # OIDC token to attest the build.
+      # npm Trusted Publishing (OIDC) and provenance.
       id-token: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
 
-      - uses: actions/setup-node@v5
+      # No `registry-url`: that writes an `.npmrc` whose `_authToken` reads
+      # `NODE_AUTH_TOKEN`, and a configured token — even an empty placeholder
+      # — is what npm tries instead of OIDC.
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version: 22
           cache: pnpm
-          registry-url: https://registry.npmjs.org
 
+      # Trusted Publishing needs npm >= 11.5.1; Node 22 bundles npm 10.
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@latest
+
+      # `--ignore-scripts`: the root `prepare` only installs the Vite+ git
+      # hooks, and nothing on the build path needs an install script.
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
-      # Opens (or updates) a "Version Packages" pull request while unreleased
-      # changesets exist, and publishes once that pull request is merged. The
-      # publish path runs `vp run -r build` first (see the root `release`
-      # script) — `files` is `["dist"]`, so a stale or missing build publishes
-      # an empty package rather than failing.
-      - uses: changesets/action@v1
+      - name: Put the toolchain on PATH
+        run: echo "$GITHUB_WORKSPACE/node_modules/.bin" >> "$GITHUB_PATH"
+
+      # The publish path runs `vp run -r build` first (the root `release`
+      # script) — `files` is `["dist"]`, so a stale or missing build would
+      # publish an empty package rather than fail.
+      #
+      # `pnpm run`, not `vp run`, for the script itself: `vp run` does not
+      # forward the ambient `ACTIONS_ID_TOKEN_REQUEST_URL` / `_TOKEN` that npm
+      # needs for OIDC, and npm then falls back to token auth and fails with
+      # ENEEDAUTH.
+      - uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
-          version: pnpm changeset version
-          publish: pnpm run release
-          commit: 'chore: version packages'
-          title: 'chore: version packages'
+          version-script: pnpm changeset version
+          publish-script: pnpm run release
+          commit-message: 'chore: version packages'
+          pr-title: 'chore: version packages'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'

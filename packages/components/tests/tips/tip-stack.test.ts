@@ -1,4 +1,4 @@
-import { expect, test, describe } from 'vitest';
+import { expect, test, describe } from 'vite-plus/test';
 import { createTipStack } from '../../src/lib/tips/tip-stack.ts';
 
 describe('createTipStack', () => {
