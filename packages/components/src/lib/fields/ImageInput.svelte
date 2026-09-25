@@ -2,7 +2,7 @@
   ImageInput — a `FileInput` that also measures the picture and previews it.
 
   It exists for one thing a server cannot do cheaply: read a file's INTRINSIC
-  DIMENSIONS. `createImageBitmap` decodes it in the browser the moment it is
+  DIMENSIONS. `createImageBitmap` (via `media/image-dimensions.ts`) decodes it in the browser the moment it is
   chosen, so the form has `width` / `height` to submit alongside the binary and
   the page that later renders the image can reserve its box on first paint
   instead of reflowing when it loads.
@@ -22,6 +22,7 @@
 -->
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
+  import { imageDimensions } from '../media/image-dimensions.ts';
   import FileInput from './FileInput.svelte';
   import type { FieldSize } from './field-types.ts';
 
@@ -70,10 +71,7 @@
   const measure = async (chosen: File): Promise<void> => {
     measuring = true;
     try {
-      const bitmap = await createImageBitmap(chosen);
-      width = bitmap.width;
-      height = bitmap.height;
-      bitmap.close();
+      ({ width, height } = await imageDimensions(chosen));
     } catch {
       width = undefined;
       height = undefined;

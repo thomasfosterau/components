@@ -37,3 +37,21 @@ export { default as FootnoteList } from './FootnoteList.svelte';
 export { default as ISBNLink } from './ISBNLink.svelte';
 export { default as ISSNLink } from './ISSNLink.svelte';
 export { default as ReferenceList } from './ReferenceList.svelte';
+// The CSL-type renderers, over the local record shapes in `./csl.ts` (which
+// will align with `@thomasfosterau/biblio` once that is published).
+export { default as BookCitation } from './BookCitation.svelte';
+export { default as ChapterCitation } from './ChapterCitation.svelte';
+export { default as ScholarlyArticleCitation } from './ScholarlyArticleCitation.svelte';
+export { default as ThesisCitation } from './ThesisCitation.svelte';
+export { default as ReportCitation } from './ReportCitation.svelte';
+export { default as Publisher } from './Publisher.svelte';
+export type {
+  BookRecord,
+  ChapterRecord,
+  CitationDate,
+  CreditedRecord,
+  PublisherRecord,
+  ReportRecord,
+  ScholarlyArticleRecord,
+  ThesisRecord,
+} from './csl.ts';

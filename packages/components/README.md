@@ -1,6 +1,6 @@
 # @thomasfosterau/components
 
-Accessible Svelte 5 UI primitives, styled with [Tailwind CSS 4](https://tailwindcss.com) + [daisyUI 5](https://daisyui.com) and built on [bits-ui](https://bits-ui.com). 102 components across 16 families: 12 in the core barrel, 4 behind their own entry points. The five maps components live in the sibling package [`@thomasfosterau/components-maps`](../maps/README.md).
+Accessible Svelte 5 UI primitives, styled with [Tailwind CSS 4](https://tailwindcss.com) + [daisyUI 5](https://daisyui.com) and built on [bits-ui](https://bits-ui.com). 114 components across 17 families: 12 in the core barrel, 5 behind their own entry points (plus `EntityForm`, the `forms` family's one component with an optional peer, behind its own). The five maps components live in the sibling package [`@thomasfosterau/components-maps`](../maps/README.md).
 
 Four rules hold across all of them:
 
@@ -24,6 +24,7 @@ pnpm add @thomasfosterau/components
 | `svelte` | `^5.30.1` | A declared peer. The components are compiled by your build, not pre-compiled. |
 | `tailwindcss` | `^4.0.0` | Not a declared peer, but **required**: the components emit Tailwind classes and ship none. |
 | `daisyui` | `^5.0.0` | Same — the class vocabulary is daisyUI's (`btn`, `input`, `bg-base-200`, `text-error`). |
+| `@thomasfosterau/effect-forms-svelte` | `^0.1.0` | An **optional** declared peer, needed only by the `/entity-form` entry (and bringing its own required peer, `effect` 4). Nothing else in the package imports it. |
 
 Tailwind 4 has no `tailwind.config.js`, so wire it up from your CSS entry. Two lines matter: `@source`, which is what makes Tailwind scan this package's `dist/` and emit the classes it uses, and the `theme.css` import (or your own themes), which supplies the daisyUI tokens the components are designed against.
 
@@ -90,10 +91,12 @@ Heavier families are separate `exports` entries so a consumer that never uses th
 | Entry point | Families | Notes |
 | --- | --- | --- |
 | `@thomasfosterau/components` | ui, layout, feedback, fields, forms, data, infobox, formatting, links, media, hotkeys, search | The core barrel — everything below in one import. |
-| `@thomasfosterau/components/citations` | citations | `Citation`, `Footnote`, `ReferenceList`, `FootnoteList`, `CreditList`, `DOILink`/`ISBNLink`/`ISSNLink`, `formatCitation`, `BibliographyManager`. |
+| `@thomasfosterau/components/citations` | citations | `Citation`, `Footnote`, `ReferenceList`, `FootnoteList`, `CreditList`, `DOILink`/`ISBNLink`/`ISSNLink`, the CSL-type renderers (`BookCitation`, `ChapterCitation`, `ScholarlyArticleCitation`, `ThesisCitation`, `ReportCitation`, `Publisher`), `formatCitation`, `BibliographyManager`. |
 | `@thomasfosterau/components/canvas` | canvas | `VectorCanvas` and the pan/zoom/history/geometry toolkit underneath it. |
 | `@thomasfosterau/components/charts` | charts | `Chart` — one component, plain SVG, no charting dependency. |
 | `@thomasfosterau/components/tips` | tips | `Tip`, `PopoverTip`, `createTipStore`, `createTipStack`. |
+| `@thomasfosterau/components/entity-form` | forms | `EntityForm` — needs the optional peer `@thomasfosterau/effect-forms-svelte` (see [entity-form](#entity-form)). |
+| `@thomasfosterau/components/seo` | seo | `Head`, `JsonLd`, `serializeJsonLd`, `ogImageUrl` and the share-card constants. |
 | `@thomasfosterau/components/theme.css` | — | The daisyUI theme skeleton (see [Installation](#installation)). |
 
 ---
@@ -328,6 +331,7 @@ Every primitive accepts it by spread — `<TextInput {...control} bind:value />`
 | `CheckboxGroup` | Several boxes, one question | `legend`, `options`, `values ⚓: string[]`, `name?`, `hint?`, `errors?`, `required?`, `disabled?`, `size?` | — | a `Fieldset` of `Checkbox` |
 | `RadioGroup` | One choice from a short list | `legend`, `options`, `value ⚓`, `orientation? = 'vertical'`, `name?`, `hint?`, `errors?`, `required?`, `disabled?` | — | bits-ui `RadioGroup`: one tab stop, arrows move and select, wrap-around |
 | `Toggle` | A setting that takes effect now | `checked ⚓`, `label`, `description?`, `onChange?: (next) => Promise<boolean> \| boolean`, `size?`, `invalid?`, `describedBy?` | — | `role="switch"` on a native checkbox; `description` is `aria-describedby`, never folded into the name; `aria-busy` while `onChange` is in flight |
+| `PushToggle` | Web Push for THIS browser behind a `Toggle`: reads the subscription on mount, subscribes / unsubscribes through the app's own client | `available: boolean`, `enable: (signal) => Promise<PushEnableResult>` (`{ _tag: 'enabled' \| 'unsupported' \| 'unavailable' \| 'denied' }` — resolves, never throws), `disable: (signal) => Promise<unknown>`, `supported?` / `readSubscribed?` (default: the browser's own checks), `label? = 'Send push notifications to this browser'`, `description?`, `unavailableMessage?`, `unsupportedMessage?`, `deniedMessage?` (English defaults) | — | `Toggle`'s; the refusal message is a polite live region |
 | `DateInput` | An ISO calendar date | `value ⚓` (`YYYY-MM-DD`), `min?`, `max?`, `size?`, `invalid?`, `describedBy?` | — | native `<input type="date">` |
 | `FileInput` | A file, with a size cap | `file ⚓: File \| undefined`, `accept?`, `maxBytes?`, `tooLargeMessage? = 'That file is too large.'`, `onSelect?`, `size?`, `invalid?`, `describedBy?` | — | native file input; an over-size file is cleared and explained in an `alert` |
 | `ImageInput` | `FileInput` + preview + dimension probe | `file ⚓`, `width ⚓`, `height ⚓`, `previewAlt? = 'Preview of the selected image'`, `name?`, `accept?`, `maxBytes?`, `tooLargeMessage?` | — | preview `<img>` named by `previewAlt`; emits hidden `width`/`height` inputs once `name` is set |
@@ -495,6 +499,7 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 | `NumberFormat` (also exported as `Number`; `NumberFormat` is primary, since a `Number` export would shadow the global) | `<data>` with a raw `value` attribute and `Intl.NumberFormat` text | `value: number \| bigint`, `locales?`, `style?`, `unit?`, `unitDisplay?`, `currency?`, `currencyDisplay?`, `maximumFractionDigits?`, `minimumFractionDigits?`, `signDisplay?`, `notation?`, `options?: Intl.NumberFormatOptions` (wins) | — | native `<data>` semantics only |
 | `FormatList<T>` | Renders items through `Intl.ListFormat.formatToParts`, so conjunction/disjunction text ("and", ", ") comes from the runtime | `items: readonly T[]`, `style? = 'long'`, `type? = 'conjunction'`, `locales?` | `children(item: T)` | no wrapper element |
 | `RelativeTime` | "3 hours ago" / "in 2 days" via `Intl.RelativeTimeFormat`, picking the largest unit whose magnitude rounds to ≥ 1 | `value: Date \| number \| string`, `now?` (pin it in tests), `locales?`, `numeric? = 'auto'`, `style? = 'long'` | — | `<time datetime=ISO title=absolute>` — the absolute instant is never hidden |
+| `Year` | `<time>` with just a year — `datetime="1925"` — and its `Intl.DateTimeFormat` rendering | `value: Date \| number \| string` (a number is a calendar year; an instant contributes its UTC year), `locales?`, `era?`, `representation? = 'numeric'` (`'2-digit'`) | — | native `<time>`; `datetime` is a valid HTML year string (ISO instant before 1 CE) |
 | `Highlight` (+ exported `tokenise`) | Best-effort client-side token highlight for search results | `text: string`, `query: string` | — | `<mark>` per matched token; naive — a UX nicety, not the authoritative FTS match |
 
 ```svelte
@@ -502,6 +507,7 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 <NumberFormat value={price} style="currency" currency="AUD" />
 <p><FormatList items={tags}>{#snippet children(tag)}<Badge>{tag}</Badge>{/snippet}</FormatList></p>
 <RelativeTime value={comment.createdAt} />
+<Year value={book.yearPublished} itemprop="datePublished" />
 <p><Highlight text={result.title} query={searchQuery} /></p>
 ```
 
@@ -510,11 +516,13 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
 | `EmailLink` | A `mailto:` anchor whose query string is built with `URLSearchParams`, so every value is correctly encoded | `email: string`, `subject?`, `body?`, `cc?`, `bcc?`, `class` merged last, spreads `HTMLAnchorAttributes` | `children?` — replaces the link text; defaults to the address | native `<a>` — visible text is the accessible name |
+| `ContextLinks` | The "About: X, Y" row under a piece of content. Renders nothing for an empty list | `links: readonly ContextLinkItem[]` (`{ href, label }`; each `href` resolved through the context), `label? = 'About'`, `class` merged last, spreads `HTMLAttributes<HTMLParagraphElement>` | — | a paragraph of links; each link's text is its name |
 
 ```svelte
 <EmailLink email="hello@thomasfoster.au" subject="Question about your garden">
   {#snippet children()}Contact us{/snippet}
 </EmailLink>
+<ContextLinks links={[{ href: `/taxa/${taxon.id}`, label: taxon.name }]} />
 ```
 
 # media
@@ -530,6 +538,8 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 <Video hlsUrl={video.hlsUrl} posterUrl={video.posterUrl} title="Spring garden tour" onReady={attachHlsJs} />
 <Figure caption="A row of tomato seedlings"><img src={photo.src} alt="Tomato seedlings" /></Figure>
 ```
+
+`imageDimensions(file: Blob): Promise<{ width, height }>` reads an image file's intrinsic pixel size with `createImageBitmap`, in the browser, so an upload form can submit `width` / `height` with the binary (it is what `ImageInput` measures with). It rejects with `ImageDimensionsUnavailable` where there is no `createImageBitmap` (on a server), and with the browser's own error for a file that does not decode.
 
 # hotkeys
 
@@ -618,6 +628,14 @@ One component, because a palette is one thing: a dialog, a query box, and rows f
 | `DOILink` | A DOI as a resolvable `https://doi.org/<doi>` link | `doi: string`, `itemprop?`, `children?` (defaults to the bare DOI), plus native anchor attributes | `children?` | `target="_blank" rel="noreferrer"` |
 | `ISBNLink` | An ISBN as a resolvable WorldCat lookup link | `isbn: string`, `itemprop?`, `children?`, plus native anchor attributes | `children?` | as `DOILink` |
 | `ISSNLink` | An ISSN as a resolvable WorldCat lookup link | `issn: string`, `itemprop?`, `children?`, plus native anchor attributes | `children?` | as `DOILink` |
+| `BookCitation` | A book as a compact author–date reference: "Authors, _Title_ editors translators (3rd edition: 1969) _Series_ Place: Publisher pp 304 available online at … ISBN" | `book: BookRecord`, `itemprop?`, `untitledLabel? = 'Untitled book'`, `noDateLabel? = 'no date'`, `editionLabel? = (e) => \`${e} edition\``, `pageCountLabel? = 'pp'`, `availableOnlineLabel? = 'available online at'`, `locales?` | — | Schema.org `Book` microdata; contributors through `CreditList`, in credit order |
+| `ChapterCitation` | "Authors, 'Chapter', in `BookCitation` ch 4 (pp 101–130)" — the containing book nested under `isPartOf` when the record carries it | `chapter: ChapterRecord`, `untitledLabel? = 'Untitled chapter'`, `inLabel? = 'in'`, `chapterLabel? = 'ch'`, `pageLabel? = 'p'`, `pagesLabel? = 'pp'`, `bookLabels?` (forwarded), `locales?` | — | Schema.org `Chapter` microdata |
+| `ScholarlyArticleCitation` | "Authors, 'Title' (2019) _Periodical_ 12 (3) pp 45–67 DOI ISSN" | `article: ScholarlyArticleRecord`, `itemid?`, `untitledLabel? = 'Untitled article'`, `noDateLabel?`, `pageLabel?`, `pagesLabel?`, `availableOnlineLabel?`, `locales?` | — | `ScholarlyArticle` → `PublicationIssue` → `PublicationVolume` → `Periodical` microdata |
+| `ThesisCitation` | "Author, _Title_ (2019) PhD thesis, Institution" | `thesis: ThesisRecord`, `untitledLabel? = 'Untitled thesis'`, `degreeLabel? = (d) => d ? \`${d} thesis\` : 'thesis'`, `availableOnlineLabel?`, `locales?` | — | Schema.org `Thesis`; the institution is `sourceOrganization` |
+| `ReportCitation` | "Authors, _Title_ editors translators (2021) Place: Publisher pp 88" | `report: ReportRecord`, `itemid?`, `untitledLabel? = 'Untitled report'`, `noDateLabel?`, `pageCountLabel?`, `availableOnlineLabel?`, `locales?` | — | Schema.org `Report` microdata |
+| `Publisher` | "Place: Name" — a publisher or awarding institution | `publisher: PublisherRecord` (`{ name, itemtype? = 'Organization', address?: { locality?, region?, country? } }`), `itemprop? = 'publisher'` | — | `Person` / `Organization` with a `PostalAddress` of the present parts |
+
+**The CSL-type records are local.** `BookRecord`, `ChapterRecord`, `ScholarlyArticleRecord`, `ThesisRecord`, `ReportRecord`, `PublisherRecord` and `CitationDate` are defined in this package for now, because the bibliographic model they will align with, `@thomasfosterau/biblio`, is not published yet. Contributors are resolved `Credit`s in credit order, not linkage. An app maps its resources onto these shapes at its own seam. The JSON:API `included` resolver (website's `citations/hydrate.ts`) belongs to effect-jsonapi's client helpers, not here.
 
 `formatCitation`, `BibliographyManager`, `setupBibliography`, `getBibliographyContext`, and the `CitationData`/`CitationKind`/`FootnoteData`/`Credit` types are also exported. (`Citation` and `Footnote` name the components; the data shapes are `CitationData`/`FootnoteData` to avoid a value/type collision.)
 
@@ -637,6 +655,70 @@ One component, because a palette is one thing: a dialog, a query box, and rows f
 ```
 
 A `Citation` or `Footnote` rendered with no `setupBibliography()` provider above it still works — `getBibliographyContext()` falls back to a fresh, standalone manager rather than throwing.
+
+# entity-form
+
+`@thomasfosterau/components/entity-form`. The renderer for [`@thomasfosterau/effect-forms-svelte`](https://github.com/thomasfosterau/effect-forms)'s `defineEntityForm` definitions. It is the only entry point that reaches Effect, so it is kept separate and its form library is an optional peer: `pnpm add @thomasfosterau/effect-forms-svelte effect` if you use it.
+
+| Component | Purpose | Props | Snippets | ARIA |
+| --- | --- | --- | --- | --- |
+| `EntityForm` | Walks `definition.entriesFor(mode)` in declaration order. Scalar entries render as `FormField` + `TextInput` (`url` / numeric `inputmode`), `DateInput` (`type: 'date'`) or `Textarea` (multiline). Select entries render as `Select` over the field's derived enum values. Widget entries render the entry's own component through the bridge | `definition: EntityFormDefinition`, `mode: 'create' \| 'update'`, `cancelHref?`, `action?` (a named action), `initial?: Record<string, string>` (seeded once, at mount, so it lands in SSR HTML), `initialRows?` (per `rows` widget), `fieldProps?` (per widget key), `enhance?: (form) => attributes` (default: the store's own `form.props`), `cancelLabel? = 'Cancel'`, `pendingLabel? = 'Saving…'`, `selectPlaceholder? = 'Choose…'`, `requiredLabel?`, plus native `<form>` attributes | — | each control is labelled by its `FormField`. Errors are `aria-describedby`. Root errors are a `FormErrors` alert |
+
+Field labels, submit labels and option labels come from the definition's own message thunks. Every other string is a prop.
+
+**The widget bridge.** A `custom` or `rows` widget receives its definition's `props()`, then your `fieldProps[key]`, then `name` / `value` / `onChange` / `errors`, in that order. The bridge goes last, so neither of the first two can sever the store binding. A `custom` widget bridges a string field of the store. A `rows` widget bridges a row list held by the renderer and serialises it itself. A `gate: true` widget disables submit while its value is empty. A create form whose command carries a client id gets a `crypto.randomUUID()` minted once per mount, so a retried submission stays idempotent.
+
+**SvelteKit.** This package cannot import `$app/forms`, so pass your app's `enhanceForm` (the `$app/forms`-backed spreadable attributes, which effect-forms#2 moves into `@thomasfosterau/effect-forms-svelte/kit`):
+
+```svelte
+<script lang="ts">
+  import { EntityForm } from '@thomasfosterau/components/entity-form';
+  import { enhanceForm } from '$lib/effect-form';
+  import { bookForm } from '$lib/entity-forms/book';
+
+  let { data } = $props();
+</script>
+
+<EntityForm definition={bookForm} mode="update" initial={data.initial} cancelHref={`/books/${data.id}`} enhance={enhanceForm} />
+```
+
+# seo
+
+`@thomasfosterau/components/seo`. Per-page `<head>` metadata and structured data. Both components render only into `<svelte:head>` — nothing in the body.
+
+| Component | Purpose | Props | Snippets | ARIA |
+| --- | --- | --- | --- | --- |
+| `Head` | Title (with a site-name suffix), description, keywords, robots, canonical URL, `hreflang` alternates, a feed link, Open Graph + Twitter / X tags, share image, `article:*`, `prev` / `next` | `title: string`, `siteName?`, `titleSeparator? = ' \| '`, `description?`, `keywords?`, `type?: SchemaPageType` (derives `og:type`), `openGraphType?`, `canonical?`, `pathname?` (defaults to `window.location.pathname`; pass `page.url.pathname` for SSR), `canonicalHref?` (defaults to the context `href`), `alternates?` / `locales?`, `ogLocale?` (defaults to the context locale, `-` → `_`), `feed?: { path, title? = 'Latest changes', type? = 'application/feed+json' }`, `robots?`, `image?` → `shareCard?` → `defaultImage?` (precedence), `shareCardPath? = '/og'`, `shareCardAlt?` (defaults to `"<title> — <siteName>"`), `published?`, `modified?`, `section?`, `tags?`, `twitterCard? = 'summary_large_image'`, `twitterSite?`, `twitterCreator?`, `prevUrl?`, `nextUrl?` | — | — (head metadata only) |
+| `JsonLd` | One `<script type="application/ld+json">` block, serialised by `serializeJsonLd` | `data: JsonLdObject \| null \| undefined` — nullish renders nothing | — | — |
+
+`serializeJsonLd(data)` escapes `<`, `>`, `&`, U+2028 and U+2029 so authored text cannot close the script element; the output is still valid JSON. `ogImageUrl(card, { href?, basePath? })` builds the content-addressed share-card URL `<basePath>/<slug>.png?t=…&d=…&v=…`, where the `v` token is the card's `updatedAt` in epoch milliseconds, so a content change always mints a new URL (link-preview scrapers only re-fetch a URL they have not seen). It returns `undefined` for a blank title. The param names (`OG_TITLE_PARAM`, `OG_SUBTITLE_PARAM`, `OG_VERSION_PARAM`), the length caps and `OG_IMAGE_WIDTH` / `OG_IMAGE_HEIGHT` are exported so a card renderer reads back exactly what `Head` wrote. The renderer itself is server code and does not live here.
+
+**Canonical on the production origin.** `Head` resolves the canonical URL, the feed and the share card through `canonicalHref`, which defaults to the components context's `href`. If your `href` returns relative, locale-prefixed paths, pass an absolute resolver instead:
+
+```svelte
+<script lang="ts">
+  import { Head, JsonLd } from '@thomasfosterau/components/seo';
+  import { page } from '$app/state';
+  import { locales } from '$lib/paraglide/runtime';
+  import * as m from '$lib/paraglide/messages';
+
+  const canonicalHref = (path: string) => new URL(path, 'https://example.org').href;
+</script>
+
+<Head
+  title={post.title}
+  siteName={m.site_name()}
+  description={post.summary}
+  type="BlogPosting"
+  pathname={page.url.pathname}
+  {canonicalHref}
+  {locales}
+  shareCard={{ id: post.id, title: post.title, description: post.summary, updatedAt: post.updatedAt }}
+  defaultImage={{ url: canonicalHref('/og-default.png'), alt: m.site_name(), width: 1200, height: 630, type: 'image/png' }}
+  feed={{ path: '/feed.json', title: m.feed_title() }}
+/>
+<JsonLd data={buildBlogPostingJsonLd(post)} />
+```
 
 # tips
 

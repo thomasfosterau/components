@@ -26,24 +26,24 @@
   export interface Credit {
     readonly name: string;
     /** Link to the credited party's own page, if it has one. */
-    readonly href?: string;
+    readonly href?: string | undefined;
     /** Present exactly when the credit resolved to a real Agent. */
-    readonly itemtype?: 'Person' | 'Organization';
+    readonly itemtype?: 'Person' | 'Organization' | undefined;
   }
 
   interface Props {
     credits: readonly Credit[];
     /** The role this list credits — also the default Schema.org `itemprop`. */
-    role?: 'author' | 'editor' | 'translator' | string;
+    role?: string | undefined;
     /** Count → the role's punctuation, e.g. `(n) => (n > 1 ? '(eds)' : '(ed)')`. */
-    roleLabel?: (count: number) => string;
-    roleLabelPosition?: 'before' | 'after';
+    roleLabel?: ((count: number) => string) | undefined;
+    roleLabelPosition?: 'before' | 'after' | undefined;
     /** Overrides `role` as the Schema.org property each credit carries. */
-    itemprop?: string;
-    locales?: string | readonly string[];
-    style?: Intl.ListFormatOptions['style'];
-    type?: Intl.ListFormatOptions['type'];
-    class?: string;
+    itemprop?: string | undefined;
+    locales?: string | readonly string[] | undefined;
+    style?: Intl.ListFormatOptions['style'] | undefined;
+    type?: Intl.ListFormatOptions['type'] | undefined;
+    class?: string | undefined;
   }
 
   let {
@@ -100,9 +100,6 @@
       {:else}
         {part.value}
       {/if}
-    {/each}
-    {#if labelText !== '' && resolvedPosition === 'after'}
-      {labelText}
-    {/if}
-  </span>
+    {/each}{#if labelText !== '' && resolvedPosition === 'after'}{' '}{labelText}{/if}</span
+  >
 {/if}

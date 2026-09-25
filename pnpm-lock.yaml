@@ -36,6 +36,9 @@ catalogs:
     '@testing-library/jest-dom':
       specifier: ^7.0.1
       version: 7.0.1
+    '@thomasfosterau/effect-forms-svelte':
+      specifier: ^0.1.0
+      version: 0.1.0
     '@types/node':
       specifier: ^26.4.1
       version: 26.6.1
@@ -48,6 +51,9 @@ catalogs:
     daisyui:
       specifier: ^5.7.28
       version: 5.7.38
+    effect:
+      specifier: 4.0.0-rc.115
+      version: 4.0.0-rc.115
     mapbox-gl:
       specifier: ^3.0.0
       version: 3.30.0
@@ -145,6 +151,9 @@ importers:
       '@testing-library/jest-dom':
         specifier: 'catalog:'
         version: 7.0.1(@testing-library/dom@10.4.2)(vitest@4.1.11)
+      '@thomasfosterau/effect-forms-svelte':
+        specifier: 'catalog:'
+        version: 0.1.0(effect@4.0.0-rc.115)(svelte@5.57.0)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.1
@@ -154,6 +163,9 @@ importers:
       daisyui:
         specifier: 'catalog:'
         version: 5.7.38
+      effect:
+        specifier: 'catalog:'
+        version: 4.0.0-rc.115
       playwright:
         specifier: 'catalog:'
         version: 1.56.1
@@ -1284,6 +1296,19 @@ packages:
     peerDependencies:
       '@testing-library/dom': '>=7.21.4'
 
+  '@thomasfosterau/effect-forms-svelte@0.1.0':
+    resolution: {integrity: sha512-knY2SOFUF4C3dbLH9gPgCFsapj85eVcFTru46ouAiH0+VzF+AV2h2Qy3eZFG1XhlXUNEC8oMQ1y8IP80nyGq3Q==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      effect: ^4.0.0-beta.102
+      svelte: ^5.57.0
+
+  '@thomasfosterau/effect-forms@0.1.0':
+    resolution: {integrity: sha512-/wa9JzL9PsDRrrNmmr1pOq7VZ08mLp3ZNVhNlY1aJgPS84GWn4Fw1Y8cY9AScqojAy8fDXiH0h5iP+c8bwXElw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      effect: ^4.0.0-beta.102
+
   '@tybys/wasm-util@0.10.4':
     resolution: {integrity: sha512-W3c4gRigFS0T/Ma4qIYF3GDAc5AQdHb1yL5znJT1Zv1YaD9Kitx656wBjvr19qbiosmZT8lWDM5BEMynUqX65A==}
 
@@ -1739,6 +1764,9 @@ packages:
 
   dom-accessibility-api@0.6.3:
     resolution: {integrity: sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w==}
+
+  effect@4.0.0-rc.115:
+    resolution: {integrity: sha512-ogYulZ5ffeOzrJqQrG0XOkDO5lKn2s9KNHhoxJy/6wKUkF0i12dlVXWA9TgsgQ+zV/JzizyG0+XMPepZEQX6vw==}
 
   enhanced-resolve@5.25.1:
     resolution: {integrity: sha512-nGXts5znJzmWPu+mIE9izCOzdg63oJca2mDzGWWTth7sr4aCToKcoyFVBQwN75Ij5Pf6p510EwkTqViTRzDV+w==}
@@ -3250,6 +3278,16 @@ snapshots:
     dependencies:
       '@testing-library/dom': 10.4.2
 
+  '@thomasfosterau/effect-forms-svelte@0.1.0(effect@4.0.0-rc.115)(svelte@5.57.0)':
+    dependencies:
+      '@thomasfosterau/effect-forms': 0.1.0(effect@4.0.0-rc.115)
+      effect: 4.0.0-rc.115
+      svelte: 5.57.0
+
+  '@thomasfosterau/effect-forms@0.1.0(effect@4.0.0-rc.115)':
+    dependencies:
+      effect: 4.0.0-rc.115
+
   '@tybys/wasm-util@0.10.4':
     dependencies:
       tslib: 2.8.1
@@ -3596,6 +3634,8 @@ snapshots:
   dom-accessibility-api@0.5.16: {}
 
   dom-accessibility-api@0.6.3: {}
+
+  effect@4.0.0-rc.115: {}
 
   enhanced-resolve@5.25.1:
     dependencies:

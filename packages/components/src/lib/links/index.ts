@@ -5,3 +5,4 @@
  */
 
 export { default as EmailLink } from './EmailLink.svelte';
+export { default as ContextLinks, type ContextLinkItem } from './ContextLinks.svelte';
