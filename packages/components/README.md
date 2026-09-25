@@ -94,6 +94,7 @@ Heavier families are separate `exports` entries so a consumer that never uses th
 | `@thomasfosterau/components/canvas` | canvas | `VectorCanvas` and the pan/zoom/history/geometry toolkit underneath it. |
 | `@thomasfosterau/components/charts` | charts | `Chart` — one component, plain SVG, no charting dependency. |
 | `@thomasfosterau/components/tips` | tips | `Tip`, `PopoverTip`, `createTipStore`, `createTipStack`. |
+| `@thomasfosterau/components/seo` | seo | `Head`, `JsonLd`, `serializeJsonLd`, `ogImageUrl` and the share-card constants. |
 | `@thomasfosterau/components/theme.css` | — | The daisyUI theme skeleton (see [Installation](#installation)). |
 
 ---
@@ -637,6 +638,44 @@ One component, because a palette is one thing: a dialog, a query box, and rows f
 ```
 
 A `Citation` or `Footnote` rendered with no `setupBibliography()` provider above it still works — `getBibliographyContext()` falls back to a fresh, standalone manager rather than throwing.
+
+# seo
+
+`@thomasfosterau/components/seo`. Per-page `<head>` metadata and structured data. Both components render only into `<svelte:head>` — nothing in the body.
+
+| Component | Purpose | Props | Snippets | ARIA |
+| --- | --- | --- | --- | --- |
+| `Head` | Title (with a site-name suffix), description, keywords, robots, canonical URL, `hreflang` alternates, a feed link, Open Graph + Twitter / X tags, share image, `article:*`, `prev` / `next` | `title: string`, `siteName?`, `titleSeparator? = ' \| '`, `description?`, `keywords?`, `type?: SchemaPageType` (derives `og:type`), `openGraphType?`, `canonical?`, `pathname?` (defaults to `window.location.pathname`; pass `page.url.pathname` for SSR), `canonicalHref?` (defaults to the context `href`), `alternates?` / `locales?`, `ogLocale?` (defaults to the context locale, `-` → `_`), `feed?: { path, title? = 'Latest changes', type? = 'application/feed+json' }`, `robots?`, `image?` → `shareCard?` → `defaultImage?` (precedence), `shareCardPath? = '/og'`, `shareCardAlt?` (defaults to `"<title> — <siteName>"`), `published?`, `modified?`, `section?`, `tags?`, `twitterCard? = 'summary_large_image'`, `twitterSite?`, `twitterCreator?`, `prevUrl?`, `nextUrl?` | — | — (head metadata only) |
+| `JsonLd` | One `<script type="application/ld+json">` block, serialised by `serializeJsonLd` | `data: JsonLdObject \| null \| undefined` — nullish renders nothing | — | — |
+
+`serializeJsonLd(data)` escapes `<`, `>`, `&`, U+2028 and U+2029 so authored text cannot close the script element; the output is still valid JSON. `ogImageUrl(card, { href?, basePath? })` builds the content-addressed share-card URL `<basePath>/<slug>.png?t=…&d=…&v=…`, where the `v` token is the card's `updatedAt` in epoch milliseconds, so a content change always mints a new URL (link-preview scrapers only re-fetch a URL they have not seen). It returns `undefined` for a blank title. The param names (`OG_TITLE_PARAM`, `OG_SUBTITLE_PARAM`, `OG_VERSION_PARAM`), the length caps and `OG_IMAGE_WIDTH` / `OG_IMAGE_HEIGHT` are exported so a card renderer reads back exactly what `Head` wrote. The renderer itself is server code and does not live here.
+
+**Canonical on the production origin.** `Head` resolves the canonical URL, the feed and the share card through `canonicalHref`, which defaults to the components context's `href`. If your `href` returns relative, locale-prefixed paths, pass an absolute resolver instead:
+
+```svelte
+<script lang="ts">
+  import { Head, JsonLd } from '@thomasfosterau/components/seo';
+  import { page } from '$app/state';
+  import { locales } from '$lib/paraglide/runtime';
+  import * as m from '$lib/paraglide/messages';
+
+  const canonicalHref = (path: string) => new URL(path, 'https://example.org').href;
+</script>
+
+<Head
+  title={post.title}
+  siteName={m.site_name()}
+  description={post.summary}
+  type="BlogPosting"
+  pathname={page.url.pathname}
+  {canonicalHref}
+  {locales}
+  shareCard={{ id: post.id, title: post.title, description: post.summary, updatedAt: post.updatedAt }}
+  defaultImage={{ url: canonicalHref('/og-default.png'), alt: m.site_name(), width: 1200, height: 630, type: 'image/png' }}
+  feed={{ path: '/feed.json', title: m.feed_title() }}
+/>
+<JsonLd data={buildBlogPostingJsonLd(post)} />
+```
 
 # tips
 
