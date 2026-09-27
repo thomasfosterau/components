@@ -26,6 +26,20 @@ test('an authored </script> cannot break out of the block', async () => {
   expect(JSON.parse(blocks()[0]?.textContent ?? '')).toEqual(data);
 });
 
+test('an authored <!-- cannot swallow the closing tag or leak into the head', async () => {
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: '<!--<script>',
+    description: '--></script><img src=x onerror=alert(1)>',
+  };
+  await render(JsonLd, { data });
+
+  expect(blocks()).toHaveLength(1);
+  expect(document.head.querySelector('img')).toBeNull();
+  expect(JSON.parse(blocks()[0]?.textContent ?? '')).toEqual(data);
+});
+
 test('null and undefined render nothing', async () => {
   await render(JsonLd, { data: null });
   await render(JsonLd, { data: undefined });

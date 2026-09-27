@@ -3,9 +3,10 @@
    * Emits one Schema.org JSON-LD graph node as a
    * `<script type="application/ld+json">` block in `<svelte:head>`.
    *
-   * The JSON goes through {@link serializeJsonLd}, which escapes `<`, `>` and
-   * `&`, so authored content cannot close the script element and inject
-   * markup. `data` of `null` / `undefined` renders nothing, so a builder that
+   * The JSON goes through {@link serializeJsonLd}, which escapes `<`, `>`,
+   * `&`, U+2028 and U+2029, so authored content can neither close the script
+   * element nor open an HTML comment inside it and inject markup. `data` of
+   * `null` / `undefined` renders nothing, so a builder that
    * may have nothing to emit (a degenerate breadcrumb trail) can be wired
    * without a call-site `{#if}`.
    */
