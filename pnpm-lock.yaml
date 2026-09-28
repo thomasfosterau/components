@@ -52,8 +52,8 @@ catalogs:
       specifier: ^5.7.44
       version: 5.7.44
     effect:
-      specifier: 4.0.0-rc.115
-      version: 4.0.0-rc.115
+      specifier: 4.0.0-rc.117
+      version: 4.0.0-rc.117
     mapbox-gl:
       specifier: ^3.31.0
       version: 3.31.0
@@ -153,7 +153,7 @@ importers:
         version: 7.0.1(@testing-library/dom@10.4.2)(vitest@4.1.11)
       '@thomasfosterau/effect-forms-svelte':
         specifier: 'catalog:'
-        version: 0.1.0(effect@4.0.0-rc.115)(svelte@5.57.1)
+        version: 0.1.0(effect@4.0.0-rc.117)(svelte@5.57.1)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.3
@@ -165,7 +165,7 @@ importers:
         version: 5.7.44
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-rc.115
+        version: 4.0.0-rc.117
       playwright:
         specifier: 'catalog:'
         version: 1.56.1
@@ -1765,8 +1765,8 @@ packages:
   dom-accessibility-api@0.6.3:
     resolution: {integrity: sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w==}
 
-  effect@4.0.0-rc.115:
-    resolution: {integrity: sha512-ogYulZ5ffeOzrJqQrG0XOkDO5lKn2s9KNHhoxJy/6wKUkF0i12dlVXWA9TgsgQ+zV/JzizyG0+XMPepZEQX6vw==}
+  effect@4.0.0-rc.117:
+    resolution: {integrity: sha512-UUyi9QiOW4nySFIBM3KnYbNMd9EZliOdKfBcyLD0mPMPheO2fkuXS5y0opjWc9oqzlJxPQICEGm8gGw3kh9j/w==}
 
   enhanced-resolve@5.25.1:
     resolution: {integrity: sha512-nGXts5znJzmWPu+mIE9izCOzdg63oJca2mDzGWWTth7sr4aCToKcoyFVBQwN75Ij5Pf6p510EwkTqViTRzDV+w==}
@@ -3277,15 +3277,15 @@ snapshots:
     dependencies:
       '@testing-library/dom': 10.4.2
 
-  '@thomasfosterau/effect-forms-svelte@0.1.0(effect@4.0.0-rc.115)(svelte@5.57.1)':
+  '@thomasfosterau/effect-forms-svelte@0.1.0(effect@4.0.0-rc.117)(svelte@5.57.1)':
     dependencies:
-      '@thomasfosterau/effect-forms': 0.1.0(effect@4.0.0-rc.115)
-      effect: 4.0.0-rc.115
+      '@thomasfosterau/effect-forms': 0.1.0(effect@4.0.0-rc.117)
+      effect: 4.0.0-rc.117
       svelte: 5.57.1
 
-  '@thomasfosterau/effect-forms@0.1.0(effect@4.0.0-rc.115)':
+  '@thomasfosterau/effect-forms@0.1.0(effect@4.0.0-rc.117)':
     dependencies:
-      effect: 4.0.0-rc.115
+      effect: 4.0.0-rc.117
 
   '@tybys/wasm-util@0.10.4':
     dependencies:
@@ -3634,7 +3634,7 @@ snapshots:
 
   dom-accessibility-api@0.6.3: {}
 
-  effect@4.0.0-rc.115: {}
+  effect@4.0.0-rc.117: {}
 
   enhanced-resolve@5.25.1:
     dependencies:
