@@ -5,7 +5,7 @@ Accessible Svelte 5 UI primitives — [Tailwind CSS 4](https://tailwindcss.com) 
 | Package | Description |
 | --- | --- |
 | [`@thomasfosterau/components`](./packages/components) | Accessible Svelte 5 UI primitives — Tailwind CSS 4 and daisyUI 5 for styling, bits-ui for interaction, every string a prop |
-| [`@thomasfosterau/components-maps`](./packages/maps) | Mapbox GL maps and a plan editor for `@thomasfosterau/components` — a static raster, the interactive surface, and the GeoJSON seam (`mapbox-gl` is its required peer) |
+| [`@thomasfosterau/components-maps`](./packages/maps) | Mapbox GL maps and a plan editor for `@thomasfosterau/components` — a static raster, the interactive surface, and the GeoJSON seam |
 
 This is a publishable-library workspace, not an application: the build artifacts are `packages/components/dist` and `packages/maps/dist`. The component reference — installation, app integration, and every family's props table — lives in [`packages/components/README.md`](./packages/components/README.md) and [`packages/maps/README.md`](./packages/maps/README.md). This file covers the workspace itself.
 
@@ -34,7 +34,7 @@ The pre-push gates, in CI's order, are listed in [AGENTS.md § Verification](./A
 
 ## Versioning
 
-[Changesets](https://github.com/changesets/changesets). Add one with `pnpm changeset` in any pull request that changes published behaviour; the release workflow opens a version PR and publishes on merge. Docs-, CI- and tooling-only changes need none.
+[Changesets](https://github.com/changesets/changesets). Add one with `pnpm changeset` in any pull request that changes published behaviour; the release workflow opens a version PR and publishes on merge. Which changes need one is in [AGENTS.md § Branches and pull requests](./AGENTS.md#branches-and-pull-requests).
 
 ## Releasing
 
