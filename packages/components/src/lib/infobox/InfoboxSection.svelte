@@ -1,3 +1,6 @@
+<!-- @component
+A titled group of `InfoboxRow`s, with dividing rules between them.
+-->
 <!--
   InfoboxSection — a titled group of `InfoboxRow`s, with the dividing rules
   between them.

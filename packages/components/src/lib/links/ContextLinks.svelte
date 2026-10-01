@@ -1,3 +1,6 @@
+<!-- @component
+The "About: Rosa canina, Bed 4" row under a piece of content: a leading label, then a link per subject.
+-->
 <!--
   ContextLinks — the "About: Rosa canina, Bed 4" row under a piece of content:
   a leading label, then the things the content is about, each a link.
@@ -22,8 +25,12 @@
   }
 
   interface Props extends HTMLAttributes<HTMLParagraphElement> {
+    /** The subjects, each rendered as a link. */
     links: readonly ContextLinkItem[];
-    /** The leading word, rendered as `"<label>:"`. */
+    /**
+     * The leading word, rendered as `"<label>:"`.
+     * @defaultValue `'About'`
+     */
     label?: string | undefined;
   }
 

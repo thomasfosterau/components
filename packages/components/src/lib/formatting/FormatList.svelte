@@ -1,3 +1,6 @@
+<!-- @component
+Renders `items` through `Intl.ListFormat`, with each item drawn by the `children` snippet and the joining words from the locale.
+-->
 <!--
   FormatList<T> — renders `items` through `Intl.ListFormat`, letting the
   `children` snippet render each element while literal text ("and", ", ")
@@ -11,10 +14,24 @@
   import { getComponentsContext } from '../context.svelte.ts';
 
   interface Props {
+    /** The items to join. */
     items: readonly T[];
+    /**
+     * `Intl.ListFormat` style.
+     * @defaultValue `'long'`
+     */
     style?: Intl.ListFormatOptions['style'];
+    /**
+     * `Intl.ListFormat` type.
+     * @defaultValue `'conjunction'`
+     */
     type?: Intl.ListFormatOptions['type'];
+    /**
+     * Locale(s) for `Intl` formatting; omitted, the components context's `locale()`.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
+    /** Renders one item. */
     children: Snippet<[T]>;
   }
 

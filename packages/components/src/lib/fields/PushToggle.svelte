@@ -1,3 +1,6 @@
+<!-- @component
+A `Toggle` that subscribes this browser to Web Push, or unsubscribes it, through the caller’s `enable` / `disable`.
+-->
 <!--
   PushToggle — the browser half of Web Push behind one `Toggle`: it reads
   whether THIS browser is subscribed, and turns the subscription on or off
@@ -47,15 +50,36 @@
     enable: (signal: AbortSignal) => Promise<PushEnableResult>;
     /** Unsubscribe this browser. Its resolved value is ignored. */
     disable: (signal: AbortSignal) => Promise<unknown>;
-    /** Whether this browser can do Web Push at all. Defaults to feature detection. */
+    /**
+     * Whether this browser can do Web Push at all.
+     * @defaultValue feature detection (`serviceWorker` and `PushManager`)
+     */
     supported?: boolean | undefined;
-    /** Whether this browser is subscribed now. Defaults to asking the service worker's `PushManager`. */
+    /**
+     * Whether this browser is subscribed now.
+     * @defaultValue asks the service worker's `PushManager`
+     */
     readSubscribed?: ((signal: AbortSignal) => Promise<boolean>) | undefined;
+    /**
+     * Text beside the switch; its accessible name.
+     * @defaultValue `'Send push notifications to this browser'`
+     */
     label?: string | undefined;
+    /** A sentence under the switch. */
     description?: string | undefined;
+    /**
+     * Shown instead of the switch when `available` is false.
+     * @defaultValue `"Push notifications aren't available on this site yet."`
+     */
     unavailableMessage?: string | undefined;
+    /**
+     * Shown instead of the switch when the browser cannot do Web Push.
+     * @defaultValue `"This browser can't receive push notifications."`
+     */
     unsupportedMessage?: string | undefined;
+    /** Shown when the browser’s notification permission is denied. */
     deniedMessage?: string | undefined;
+    /** Extra classes, merged last. */
     class?: string | undefined;
   }
 

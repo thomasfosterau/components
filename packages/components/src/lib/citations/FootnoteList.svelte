@@ -1,3 +1,6 @@
+<!-- @component
+The notes a page’s `<Footnote>` markers registered, in registration order.
+-->
 <!--
   FootnoteList — the notes a page's `<Footnote>` markers registered, in
   registration order.
@@ -8,11 +11,20 @@
   import { getBibliographyContext } from './bibliography.svelte.ts';
 
   interface Props {
-    /** Heading text. */
+    /**
+     * Heading text.
+     * @defaultValue `'Notes'`
+     */
     title?: string;
-    /** Render the heading. Off when the page supplies its own. */
+    /**
+     * Render the heading. Off when the page supplies its own.
+     * @defaultValue `true`
+     */
     showTitle?: boolean;
-    /** Heading level, for a page whose outline this list sits deeper in. */
+    /**
+     * Heading level, for a page whose outline this list sits deeper in.
+     * @defaultValue `2`
+     */
     headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   }
 

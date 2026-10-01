@@ -1,3 +1,6 @@
+<!-- @component
+Content for assistive technology only: in the DOM and the accessibility tree, clipped out of the visual rendering.
+-->
 <!--
   VisuallyHidden — content for assistive technology only: present in the
   accessibility tree and in the DOM, clipped out of the visual rendering.
@@ -18,6 +21,7 @@
   import type { HTMLAttributes } from 'svelte/elements';
 
   interface Props extends HTMLAttributes<HTMLSpanElement> {
+    /** The content. */
     children: Snippet<[]>;
   }
 

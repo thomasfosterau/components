@@ -1,3 +1,6 @@
+<!-- @component
+A daisyUI `table` from column definitions and rows, with optional sortable headers and activatable rows.
+-->
 <!--
   Table — columns in, rows in, a daisyUI `table` out.
 
@@ -37,6 +40,7 @@
   interface Props extends Omit<HTMLTableAttributes, 'children'> {
     /** The rows to draw, in the order to draw them. */
     rows: readonly T[];
+    /** Column definitions: header, cell renderer, sort key. */
     columns: readonly TableColumn<T>[];
     /** Stable identity per row — the `{#each}` key. */
     rowKey: (row: T) => string;
@@ -44,7 +48,12 @@
     caption?: string | undefined;
     /** Keep the caption for assistive technology only. */
     captionHidden?: boolean | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: Size | undefined;
+    /** Stripe alternate rows. */
     zebra?: boolean | undefined;
     /**
      * Stick the header row while the body scrolls. Needs the scroll container
@@ -58,13 +67,19 @@
     onSort?: ((sort: SortState | undefined) => void) | undefined;
     /** Makes every row activatable by pointer and keyboard. */
     onSelect?: ((row: T) => void) | undefined;
-    /** The line shown instead of an empty body. */
+    /**
+     * The line shown instead of an empty body.
+     * @defaultValue `'Nothing to show.'`
+     */
     emptyMessage?: string | undefined;
     /** Richer empty state, in place of `emptyMessage`. */
     emptyState?: Snippet<[]> | undefined;
     /** A `<tfoot>` row — totals, or a summary. Render `<td>`/`<th>` cells. */
     foot?: Snippet<[]> | undefined;
-    /** How a sortable column's button is named. */
+    /**
+     * How a sortable column's button is named.
+     * @defaultValue `"Sort by <header>"`
+     */
     sortLabel?: ((column: TableColumn<T>) => string) | undefined;
     /** Classes on the scroll container the table sits in. */
     containerClass?: string | undefined;

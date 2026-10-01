@@ -1,3 +1,6 @@
+<!-- @component
+The label, hint and errors frame around one control, handing it the `FieldControl` wiring.
+-->
 <!--
   FormField — the label + hint + errors frame around one control.
 
@@ -33,11 +36,19 @@
     label: string;
     /** Guidance rendered under the control. */
     hint?: string | undefined;
-    /** Validation messages; any at all marks the control invalid. */
+    /**
+     * Validation messages; any at all marks the control invalid.
+     * @defaultValue `[]`
+     */
     errors?: readonly string[] | undefined;
+    /** Marks the control required and reads `requiredLabel` after the label. */
     required?: boolean | undefined;
-    /** Read out after the label when `required`. */
+    /**
+     * Read out after the label when `required`.
+     * @defaultValue `'(required)'`
+     */
     requiredLabel?: string | undefined;
+    /** The control; receives the `FieldControl` props to spread. */
     children: Snippet<[FieldControl]>;
   }
 

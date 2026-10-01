@@ -1,3 +1,6 @@
+<!-- @component
+The `?` overlay listing every hotkey the viewer can press right now, grouped into this page and everywhere.
+-->
 <!--
   HotkeyHelpDialog — the `?` overlay: every hotkey the current viewer can
   press right now, grouped into "This page" and "Everywhere", with
@@ -22,13 +25,25 @@
   import type { RegisteredAction } from './types.ts';
 
   interface Props {
-    /** The dialog's accessible name. */
+    /**
+     * The dialog's accessible name.
+     * @defaultValue `'Keyboard shortcuts'`
+     */
     title?: string | undefined;
-    /** Accessible name of the corner close button. */
+    /**
+     * Accessible name of the corner close button.
+     * @defaultValue `'Close'`
+     */
     closeLabel?: string | undefined;
-    /** Shown when nothing with a trigger is registered. */
+    /**
+     * Shown when nothing with a trigger is registered.
+     * @defaultValue `'No keyboard shortcuts are available on this page.'`
+     */
     emptyLabel?: string | undefined;
-    /** Section headings, in render order. */
+    /**
+     * Section headings, in render order.
+     * @defaultValue `{ page: 'This page', global: 'Everywhere' }`
+     */
     groupLabels?: { page: string; global: string } | undefined;
     /** What `$mod` reads as on Apple platforms. */
     commandLabel?: string | undefined;

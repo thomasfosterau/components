@@ -1,3 +1,6 @@
+<!-- @component
+Hands a title, a URL and some text to the platform share sheet.
+-->
 <!--
   ShareButton — hands a title, a URL and some text to the platform share
   sheet.
@@ -32,11 +35,24 @@
     text?: string | undefined;
     /** The URL to share; the current page when omitted. */
     url?: string | undefined;
-    /** The button's text. */
+    /**
+     * The button's text.
+     * @defaultValue `'Share'`
+     */
     label?: string | undefined;
+    /** Semantic colour. */
     tone?: Tone | undefined;
+    /**
+     * daisyUI button style.
+     * @defaultValue `'ghost'`
+     */
     variant?: ButtonVariant | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'sm'`
+     */
     size?: Size | undefined;
+    /** Extra classes, merged last. */
     class?: string | undefined;
     /** The share sheet completed. */
     onShare?: ((data: ShareData) => void) | undefined;

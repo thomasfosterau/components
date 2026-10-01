@@ -1,3 +1,6 @@
+<!-- @component
+A small floating panel anchored to a trigger, on bits-ui’s `Popover`.
+-->
 <!--
   Popover — a small floating panel anchored to a trigger, on bits-ui's
   `Popover`.
@@ -28,18 +31,33 @@
   interface Props {
     /** Whether the panel is open. Bindable. */
     open?: boolean | undefined;
+    /**
+     * Which side of the trigger the panel opens on.
+     * @defaultValue `'bottom'`
+     */
     side?: 'top' | 'right' | 'bottom' | 'left' | undefined;
+    /**
+     * Alignment against the trigger along that side.
+     * @defaultValue `'center'`
+     */
     align?: 'start' | 'center' | 'end' | undefined;
-    /** Distance in pixels from the trigger. */
+    /**
+     * Distance in pixels from the trigger.
+     * @defaultValue `8`
+     */
     sideOffset?: number | undefined;
     /** Heading for the panel; becomes its accessible name. */
     title?: string | undefined;
-    /** Accessible name of the close button. Omit to hide the button. */
+    /**
+     * Accessible name of the close button. Omit to hide the button.
+     * @defaultValue `'Close'`
+     */
     closeLabel?: string | undefined;
     /** Extra classes on the panel. */
     class?: string | undefined;
     /** The trigger — the caller's own element, spreading `props` onto it. */
     trigger: Snippet<[{ props: Record<string, unknown> }]>;
+    /** The panel content. */
     children: Snippet<[]>;
   }
 

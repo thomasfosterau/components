@@ -1,3 +1,6 @@
+<!-- @component
+A `mailto:` link whose subject, body, cc and bcc are correctly encoded.
+-->
 <!--
   EmailLink — a `mailto:` anchor, its query string (`subject`/`body`/`cc`/
   `bcc`) built with `URLSearchParams` so every value is correctly encoded.
@@ -10,10 +13,15 @@
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
   interface Props extends HTMLAnchorAttributes {
+    /** The address. */
     email: string;
+    /** Pre-filled subject line. */
     subject?: string | undefined;
+    /** Pre-filled message body. */
     body?: string | undefined;
+    /** Address to copy. */
     cc?: string | undefined;
+    /** Address to blind-copy. */
     bcc?: string | undefined;
     /** Replaces the link text; defaults to the address itself. */
     children?: Snippet<[]>;

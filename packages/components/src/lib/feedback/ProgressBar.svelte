@@ -1,3 +1,6 @@
+<!-- @component
+A native `<progress>` in a daisyUI tone.
+-->
 <!--
   ProgressBar — a native `<progress>` in a daisyUI tone.
 
@@ -23,7 +26,15 @@
     label: string;
     /** Current value in `[0, max]`. Omit for an indeterminate bar. */
     value?: number | undefined;
+    /**
+     * The value that means complete.
+     * @defaultValue `100`
+     */
     max?: number | undefined;
+    /**
+     * Semantic colour.
+     * @defaultValue `'primary'`
+     */
     tone?: Tone | undefined;
     /** Print the percentage beside the bar. */
     showValue?: boolean | undefined;

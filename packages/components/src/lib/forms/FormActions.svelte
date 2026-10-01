@@ -1,3 +1,6 @@
+<!-- @component
+The submit and cancel row that closes a form.
+-->
 <!--
   FormActions — the submit / cancel row that closes a form.
 
@@ -18,17 +21,31 @@
   import type { Tone } from '../ui/tones.ts';
 
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-    /** Idle label of the submit button. */
+    /**
+     * Idle label of the submit button.
+     * @defaultValue `'Save'`
+     */
     submitLabel?: string | undefined;
-    /** Label while the form is in flight. */
+    /**
+     * Label while the form is in flight.
+     * @defaultValue `'Saving…'`
+     */
     pendingLabel?: string | undefined;
     /** The form is being submitted. */
     pending?: boolean | undefined;
     /** Extra disable condition — a required picker still empty, say. */
     disabled?: boolean | undefined;
+    /**
+     * Colour of the submit button.
+     * @defaultValue `'primary'`
+     */
     tone?: Tone | undefined;
     /** Where cancel goes. Omit for a form with no cancel affordance. */
     cancelHref?: string | undefined;
+    /**
+     * Text of the cancel control.
+     * @defaultValue `'Cancel'`
+     */
     cancelLabel?: string | undefined;
     /** Extra controls, rendered after cancel. */
     children?: Snippet<[]> | undefined;

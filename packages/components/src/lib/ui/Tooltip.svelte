@@ -1,3 +1,6 @@
+<!-- @component
+Supplementary text on hover and on keyboard focus, on bits-ui’s `Tooltip`.
+-->
 <!--
   Tooltip — supplementary text on hover and on keyboard focus, on bits-ui's
   `Tooltip`.
@@ -29,11 +32,20 @@
     text?: string | undefined;
     /** Richer tooltip content, in place of `text`. */
     content?: Snippet<[]> | undefined;
-    /** Preferred side of the trigger; flipped on collision. */
+    /**
+     * Preferred side of the trigger; flipped on collision.
+     * @defaultValue `'top'`
+     */
     side?: 'top' | 'right' | 'bottom' | 'left' | undefined;
-    /** Distance in pixels from the trigger. */
+    /**
+     * Distance in pixels from the trigger.
+     * @defaultValue `6`
+     */
     sideOffset?: number | undefined;
-    /** Milliseconds of hover before it opens. */
+    /**
+     * Milliseconds of hover before it opens.
+     * @defaultValue `400`
+     */
     openDelay?: number | undefined;
     /** Whether the tooltip is open. Bindable. */
     open?: boolean | undefined;

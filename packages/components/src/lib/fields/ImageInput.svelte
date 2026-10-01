@@ -1,3 +1,6 @@
+<!-- @component
+A `FileInput` that also measures the chosen image and previews it.
+-->
 <!--
   ImageInput — a `FileInput` that also measures the picture and previews it.
 
@@ -33,14 +36,30 @@
     width?: number | undefined;
     /** Measured intrinsic height, in pixels. */
     height?: number | undefined;
-    /** Alternative text for the local preview. */
+    /**
+     * Alternative text for the local preview.
+     * @defaultValue `'Preview of the selected image'`
+     */
     previewAlt?: string | undefined;
+    /**
+     * The `accept` filter passed to the file input.
+     * @defaultValue `'image/jpeg,image/png,image/gif,image/webp,image/avif'`
+     */
     accept?: string | undefined;
+    /** Largest accepted file, in bytes; a larger file is rejected with `tooLargeMessage`. */
     maxBytes?: number | undefined;
+    /**
+     * Shown when the chosen file exceeds `maxBytes`.
+     * @defaultValue `FileInput`'s
+     */
     tooLargeMessage?: string | undefined;
+    /** Called with the accepted file, or `undefined` when the selection is cleared. */
     onSelect?: ((file: File | undefined) => void) | undefined;
+    /** daisyUI size step. */
     size?: FieldSize | undefined;
+    /** `FieldControl`: the field is in error — sets `aria-invalid` and the error style. */
     invalid?: boolean | undefined;
+    /** `FieldControl`: space-separated ids for `aria-describedby`. */
     describedBy?: string | undefined;
   }
 

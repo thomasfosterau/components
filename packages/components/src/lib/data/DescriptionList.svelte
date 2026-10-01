@@ -1,3 +1,6 @@
+<!-- @component
+Label/value pairs as a `grid`, a bordered `card`, `divided` rows or `inline` pairs.
+-->
 <!--
   DescriptionList — label / value pairs, in the four shapes a detail page
   wants them: a two-column `grid`, a bordered `card` with the labels in a
@@ -30,12 +33,19 @@
   type Variant = DescriptionListStyle['variant'];
 
   interface Props extends HTMLAttributes<HTMLElement> {
+    /**
+     * The layout.
+     * @defaultValue `'grid'`
+     */
     variant?: Variant | undefined;
     /** Render values in a fixed-width face that breaks anywhere. */
     mono?: boolean | undefined;
     /** Render rows whose value is empty, rather than dropping them. */
     showEmpty?: boolean | undefined;
-    /** What an empty value reads as when `showEmpty`. */
+    /**
+     * What an empty value reads as when `showEmpty`.
+     * @defaultValue `'unrecorded'`
+     */
     emptyLabel?: string | undefined;
     /** The rows — `DescriptionRow`s, or any other `<dt>`/`<dd>` pairs. */
     children: Snippet<[]>;

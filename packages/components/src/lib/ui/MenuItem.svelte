@@ -1,3 +1,6 @@
+<!-- @component
+One entry of a `Menu`, in whichever mode the enclosing `Menu` declared.
+-->
 <!--
   MenuItem — one entry of a `Menu`, in whichever of the two modes the
   enclosing `Menu` declared.
@@ -34,11 +37,13 @@
     onSelect?: (() => void) | undefined;
     /** Whether this item is the current page; defaults to the context's answer. */
     current?: boolean | undefined;
+    /** Shown but not activatable. */
     disabled?: boolean | undefined;
     /** Leading icon. Decorative. */
     icon?: Snippet<[]> | undefined;
     /** Extra classes on the `<li>`. */
     class?: string | undefined;
+    /** The item text. */
     children: Snippet<[]>;
   }
 

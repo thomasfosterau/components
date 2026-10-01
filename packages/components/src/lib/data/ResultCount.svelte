@@ -1,3 +1,6 @@
+<!-- @component
+The "Showing 24 of 310" line under a list.
+-->
 <!--
   ResultCount — "Showing 24 of 310" under a list.
 
@@ -22,6 +25,10 @@
     total: number;
     /** The whole line, when "Showing x of y" is not the sentence wanted. */
     label?: ((shown: number, total: number) => string) | undefined;
+    /**
+     * Locale(s) for `Intl` formatting; omitted, the components context's `locale()`.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
   }
 

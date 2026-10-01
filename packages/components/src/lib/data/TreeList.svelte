@@ -1,3 +1,6 @@
+<!-- @component
+One collapsible node of a hierarchy: an always-visible summary row and a subtree that folds away under it.
+-->
 <!--
   TreeList — one collapsible node of a hierarchy: a summary row that is always
   visible, and a subtree that folds away under it.
@@ -25,7 +28,10 @@
   import type { HTMLAttributes } from 'svelte/elements';
 
   interface Props extends Omit<HTMLAttributes<HTMLUListElement>, 'title' | 'children'> {
-    /** Whether the subtree starts unfolded. Bindable. */
+    /**
+     * Whether the subtree starts unfolded. Bindable.
+     * @defaultValue `true`
+     */
     open?: boolean | undefined;
     /** The always-visible summary row — its own text, or richer markup. */
     title: string | Snippet<[]>;

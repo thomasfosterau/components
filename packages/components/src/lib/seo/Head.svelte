@@ -1,3 +1,6 @@
+<!-- @component
+Per-page `<head>` metadata: title, description, canonical URL, `hreflang` alternates, Open Graph and Twitter / X tags, `article:*` and pagination links.
+-->
 <script lang="ts">
   /**
    * Per-page `<head>` metadata: the title (with an optional site-name
@@ -46,17 +49,27 @@
     title: string;
     /** Appended to every title as `"<title><titleSeparator><siteName>"`, and emitted as `og:site_name`. */
     siteName?: string | undefined;
+    /**
+     * Between the title and `siteName`.
+     * @defaultValue `' | '`
+     */
     titleSeparator?: string;
+    /** Meta and Open Graph description. */
     description?: string | null | undefined;
+    /** Meta keywords. */
     keywords?: readonly string[] | undefined;
     /** The Schema.org page type — only used to derive `og:type`. */
     type?: SchemaPageType | undefined;
+    /** An explicit `og:type`; wins over the one derived from `type`. */
     openGraphType?: OpenGraphType | undefined;
     /** An explicit canonical URL. Wins over `pathname`. */
     canonical?: string | undefined;
     /** The current path, resolved through `canonicalHref` into the canonical URL. */
     pathname?: string | undefined;
-    /** Resolves an app-relative path to an absolute URL on the production origin. */
+    /**
+     * Resolves an app-relative path to an absolute URL on the production origin.
+     * @defaultValue the components context’s `href`
+     */
     canonicalHref?: ((path: string) => string) | undefined;
     /** Explicit `hreflang` alternates. Wins over `locales`. */
     alternates?: readonly AlternateLink[] | undefined;
@@ -69,27 +82,46 @@
     locales?: readonly string[] | undefined;
     /** `og:locale`, in Open Graph's `language_TERRITORY` form. */
     ogLocale?: string | undefined;
+    /** An RSS, Atom or JSON Feed link. */
     feed?: FeedLink | undefined;
+    /** The robots directive. */
     robots?: Robots | undefined;
     /** An explicit share image. Wins over `shareCard` and `defaultImage`. */
     image?: HeadImage | undefined;
     /** Build a per-page share card URL with {@link ogImageUrl}. */
     shareCard?: OgImageCard | undefined;
-    /** Where the share-card renderer is mounted. Default `/og`. */
+    /**
+     * Where the share-card renderer is mounted.
+     * @defaultValue `/og`
+     */
     shareCardPath?: string | undefined;
-    /** The share card's alt text. Default `"<card title> — <siteName>"`. */
+    /**
+     * The share card's alt text.
+     * @defaultValue `"<card title> — <siteName>"`
+     */
     shareCardAlt?: ((card: OgImageCard) => string) | undefined;
     /** The share image when neither `image` nor `shareCard` gives one. */
     defaultImage?: HeadImage | undefined;
+    /** `article:published_time`. */
     published?: Date | undefined;
+    /** `article:modified_time`. */
     modified?: Date | undefined;
     /** `article:section`. Blank is treated as absent. */
     section?: string | undefined;
+    /** `article:tag`, one per entry. */
     tags?: readonly string[] | undefined;
+    /**
+     * The Twitter / X card type.
+     * @defaultValue `'summary_large_image'`
+     */
     twitterCard?: TwitterCard;
+    /** The site’s Twitter / X handle. */
     twitterSite?: string | undefined;
+    /** The author’s Twitter / X handle. */
     twitterCreator?: string | undefined;
+    /** The previous page in a paginated series (`rel="prev"`). */
     prevUrl?: string | undefined;
+    /** The next page in a paginated series (`rel="next"`). */
     nextUrl?: string | undefined;
   }
 

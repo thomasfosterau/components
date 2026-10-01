@@ -1,3 +1,6 @@
+<!-- @component
+The row body most lists want: a linked title, a line of context under it, and short badges.
+-->
 <!--
   LinkListItem — the row body most lists want: a linked title, a line of
   context under it, and short markers.
@@ -24,6 +27,7 @@
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
     /** Where the title links to; resolved through the components context. */
     href: string;
+    /** The link text. */
     title: string;
     /** A line of context under the title — an owner, a parent, a date. */
     subtitle?: string | undefined;

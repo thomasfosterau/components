@@ -1,3 +1,6 @@
+<!-- @component
+An ISBN rendered as a WorldCat lookup link that opens in a new tab.
+-->
 <!--
   ISBNLink — an ISBN rendered as a resolvable WorldCat lookup link.
 
@@ -12,8 +15,16 @@
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
   interface Props extends HTMLAnchorAttributes {
+    /** The ISBN, without a prefix. */
     isbn: string;
+    /**
+     * Schema.org `itemprop` on the link, when the identifier is a property of an enclosing item.
+     */
     itemprop?: string;
+    /**
+     * Replaces the link text.
+     * @defaultValue the bare ISBN
+     */
     children?: Snippet<[]>;
   }
 

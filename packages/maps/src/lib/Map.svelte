@@ -1,3 +1,6 @@
+<!-- @component
+A static raster map first, upgraded to the interactive map once the page has hydrated.
+-->
 <!--
   Map — the static raster first, the interactive map once the page has
   hydrated.
@@ -31,19 +34,26 @@
   interface Props {
     /** A public-scope Mapbox token — safe in the client by design. */
     accessToken: string;
+    /** The Mapbox style to render. */
     style: MapStyle;
+    /** The centre, zoom, bearing and pitch. */
     camera: MapCamera;
     /** Intrinsic size of the raster, and the height the live map takes. */
     width: number;
+    /** Intrinsic height of the raster, and the height of the live map. */
     height: number;
     /** What this map tells the reader; `''` only where it is decoration. */
     alt: string;
-    /** Whether to upgrade to the pannable map at all. */
+    /**
+     * Whether to upgrade to the pannable map at all.
+     * @defaultValue `true`
+     */
     interactive?: boolean;
     /** Passed to `DynamicMap`; the one-off two-finger hint. */
     panHintLabel?: string;
     /** Passed to `DynamicMap`; shown when Mapbox GL or WebGL is unavailable. */
     unavailableLabel?: string;
+    /** Extra classes, merged last. */
     class?: string | undefined;
   }
 

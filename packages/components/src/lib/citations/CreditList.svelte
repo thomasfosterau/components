@@ -1,3 +1,6 @@
+<!-- @component
+A locale-joined byline for one credited role (authors, editors, translators), each name in Schema.org microdata.
+-->
 <!--
   CreditList — a locale-joined byline for one role: the authors, the editors,
   the translators, or any other credited role a citation carries. Generalises
@@ -32,17 +35,35 @@
   }
 
   interface Props {
+    /** The people or organisations credited, in order. */
     credits: readonly Credit[];
-    /** The role this list credits — also the default Schema.org `itemprop`. */
+    /**
+     * The role this list credits — also the default Schema.org `itemprop`.
+     * @defaultValue `'author'`
+     */
     role?: string | undefined;
     /** Count → the role's punctuation, e.g. `(n) => (n > 1 ? '(eds)' : '(ed)')`. */
     roleLabel?: ((count: number) => string) | undefined;
+    /**
+     * Whether `roleLabel` goes before or after the names.
+     * @defaultValue `'before'` for `role="translator"`, otherwise `'after'`
+     */
     roleLabelPosition?: 'before' | 'after' | undefined;
     /** Overrides `role` as the Schema.org property each credit carries. */
     itemprop?: string | undefined;
+    /** Locale(s) for `Intl` formatting; omitted, the components context's `locale()`. */
     locales?: string | readonly string[] | undefined;
+    /**
+     * `Intl.ListFormat` style.
+     * @defaultValue `'long'`
+     */
     style?: Intl.ListFormatOptions['style'] | undefined;
+    /**
+     * `Intl.ListFormat` type.
+     * @defaultValue `'conjunction'`
+     */
     type?: Intl.ListFormatOptions['type'] | undefined;
+    /** Extra classes, merged last. */
     class?: string | undefined;
   }
 

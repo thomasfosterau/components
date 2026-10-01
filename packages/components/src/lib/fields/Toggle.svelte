@@ -1,3 +1,6 @@
+<!-- @component
+A switch for an on/off setting that takes effect immediately, rather than a checkbox submitted with a form.
+-->
 <!--
   Toggle — a switch: an on/off setting that takes effect immediately, rather
   than a checkbox whose value is submitted with a form.
@@ -24,6 +27,7 @@
   import { toggleSize, type FieldSize } from './field-types.ts';
 
   interface Props extends Omit<HTMLInputAttributes, 'type' | 'checked' | 'size' | 'onchange'> {
+    /** Whether the switch is on. Bindable. */
     checked?: boolean;
     /** Text beside the switch; becomes its accessible name. */
     label: string;
@@ -35,8 +39,17 @@
      * Omitted, the switch is uncontrolled and simply follows the click.
      */
     onChange?: ((next: boolean) => Promise<boolean> | boolean) | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: FieldSize | undefined;
+    /** `FieldControl`: the field is in error — sets `aria-invalid` and the error style. */
     invalid?: boolean | undefined;
+    /**
+     * `FieldControl`: space-separated ids for `aria-describedby`.
+     * @defaultValue `''`
+     */
     describedBy?: string | undefined;
   }
 

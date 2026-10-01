@@ -1,3 +1,6 @@
+<!-- @component
+A `Table` with client-side sorting, filtering across every column and paging, for a list that is already entirely in hand.
+-->
 <!--
   DataGrid — the three controls a reader wants over a list that is already
   entirely in hand: sort a column, filter across every column, page through
@@ -31,37 +34,93 @@
   import type { SortState, TableColumn } from './table-types.ts';
 
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+    /** Every row; sorting, filtering and paging happen here. */
     rows: readonly T[];
+    /** Column definitions: header, cell renderer, sort key. */
     columns: readonly TableColumn<T>[];
     /** Stable identity per row — the `{#each}` key. */
     rowKey: (row: T) => string;
     /** Offer the filter box. */
     filterable?: boolean | undefined;
-    /** Offer the pager; every row renders when false. */
+    /**
+     * Offer the pager; every row renders when false.
+     * @defaultValue `true`
+     */
     paginated?: boolean | undefined;
+    /**
+     * Rows per page until the reader picks another size.
+     * @defaultValue `10`
+     */
     pageSize?: number | undefined;
+    /**
+     * The choices offered in the rows-per-page select.
+     * @defaultValue `[10, 25, 50, 100]`
+     */
     pageSizeOptions?: readonly number[] | undefined;
     /** The table's accessible name, rendered as its `<caption>`. */
     caption?: string | undefined;
+    /** Keep the caption for assistive technology only. */
     captionHidden?: boolean | undefined;
+    /** daisyUI size step. */
     size?: Size | undefined;
+    /** Stripe alternate rows. */
     zebra?: boolean | undefined;
+    /** Stick the header row while the body scrolls; see `Table`. */
     pinRows?: boolean | undefined;
     /** Which column starts sorted. Bindable; `undefined` is the caller's order. */
     sort?: SortState | undefined;
     /** Makes every row activatable by pointer and keyboard; see `Table`. */
     onSelect?: ((row: T) => void) | undefined;
+    /** The line shown when no row matches. */
     emptyMessage?: string | undefined;
+    /** Richer empty state, in place of `emptyMessage`. */
     emptyState?: Snippet<[]> | undefined;
+    /**
+     * Accessible name of the filter box.
+     * @defaultValue `'Search'`
+     */
     filterLabel?: string | undefined;
+    /**
+     * Placeholder in the filter box.
+     * @defaultValue `'Search…'`
+     */
     filterPlaceholder?: string | undefined;
+    /**
+     * Label of the rows-per-page select.
+     * @defaultValue `'Rows per page'`
+     */
     rowsPerPageLabel?: string | undefined;
+    /**
+     * The range line under the table.
+     * @defaultValue `"Showing <start> to <end> of <total>"`
+     */
     showingLabel?: ((start: number, end: number, total: number) => string) | undefined;
+    /**
+     * The page status between the pager arms.
+     * @defaultValue `"Page <page> of <pages>"`
+     */
     pageOfLabel?: ((page: number, pages: number) => string) | undefined;
+    /**
+     * Text of the previous-page control.
+     * @defaultValue `'Previous'`
+     */
     previousLabel?: string | undefined;
+    /**
+     * Text of the next-page control.
+     * @defaultValue `'Next'`
+     */
     nextLabel?: string | undefined;
+    /**
+     * Accessible name of the pager landmark.
+     * @defaultValue `'Pagination'`
+     */
     paginationLabel?: string | undefined;
+    /** How a sortable column’s button is named; see `Table`. */
     sortLabel?: ((column: TableColumn<T>) => string) | undefined;
+    /**
+     * Locale(s) for `Intl` formatting; omitted, the components context's `locale()`.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
   }
 

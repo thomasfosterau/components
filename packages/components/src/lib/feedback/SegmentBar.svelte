@@ -1,3 +1,6 @@
+<!-- @component
+One horizontal bar split into proportional, coloured segments: a vote share, a storage breakdown, a pass/fail split.
+-->
 <!--
   SegmentBar — one horizontal bar split into proportional, coloured segments:
   a vote share, a storage breakdown, a pass/fail split.
@@ -43,14 +46,20 @@
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'role'> {
     /** What the bar shows. Leads the accessible label. */
     label: string;
+    /** The parts, in order; widths are proportional to their values. */
     segments: readonly BarSegment[];
     /** Print each segment's percentage inside it when it fits. */
     showValues?: boolean | undefined;
     /** Draw a marker at this fraction — a 50% majority line, a quota. */
     marker?: number | undefined;
+    /**
+     * Bar height step.
+     * @defaultValue `'md'`
+     */
     size?: BarSize | undefined;
     /** Locale(s) for the percentages. Defaults to the components context's. */
     locales?: string | readonly string[] | undefined;
+    /** Extra classes, merged last. */
     class?: string | undefined;
   }
 

@@ -1,3 +1,6 @@
+<!-- @component
+Draws one area, path or point of a plan, with grips or indicators when selected.
+-->
 <!--
   MapShapeView — how one area, path or point is drawn.
 
@@ -54,7 +57,9 @@
   }
 
   interface Props {
+    /** The shape to draw. */
     shape: MapShape;
+    /** Draw the selection highlight and vertex markers. */
     selected?: boolean;
     /** Whether this shape's vertices can be dragged; grips instead of indicators. */
     editable?: boolean;

@@ -1,3 +1,6 @@
+<!-- @component
+Several checkboxes answering one question, inside one `Fieldset`.
+-->
 <!--
   CheckboxGroup — several checkboxes answering one question, inside one
   `Fieldset`.
@@ -22,15 +25,33 @@
     legend: string;
     /** Full options, or bare strings when value and label are the same. */
     options: readonly FieldOptionInput[];
-    /** The ticked values. */
+    /**
+     * The ticked values.
+     * @defaultValue `[]`
+     */
     values?: string[];
     /** Posted field name; every box shares it, as a multi-value field. */
     name?: string | undefined;
+    /** Guidance rendered under the legend. */
     hint?: string | undefined;
+    /**
+     * Validation messages; any at all marks the group invalid.
+     * @defaultValue `[]`
+     */
     errors?: readonly string[] | undefined;
+    /** Marks the group required and reads `requiredLabel` after the legend. */
     required?: boolean | undefined;
+    /**
+     * Read out after the legend when `required`.
+     * @defaultValue `'(required)'`
+     */
     requiredLabel?: string | undefined;
+    /** Disables every option. */
     disabled?: boolean | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: FieldSize | undefined;
   }
 

@@ -1,3 +1,6 @@
+<!-- @component
+The daisyUI `badge`: a short inline label for a status, a count or a category.
+-->
 <!--
   Badge — the daisyUI `badge`: a short, inline label for a status, a count or
   a category.
@@ -29,8 +32,20 @@
   } from './tones.ts';
 
   interface Props extends HTMLAttributes<HTMLSpanElement> {
+    /**
+     * Semantic colour.
+     * @defaultValue `'neutral'`
+     */
     tone?: Tone | undefined;
+    /**
+     * daisyUI badge style.
+     * @defaultValue `'soft'`
+     */
     variant?: BadgeVariant | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: Size | undefined;
     /**
      * A CSS custom-property name the app's theme declares (`--party-alp`).
@@ -38,6 +53,7 @@
      * colour when the token is undeclared.
      */
     colourToken?: string | undefined;
+    /** The label. */
     children: Snippet<[]>;
   }
 

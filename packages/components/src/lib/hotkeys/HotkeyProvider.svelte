@@ -1,3 +1,6 @@
+<!-- @component
+The single global `keydown` listener that drives the hotkey registry; hotkeys never fire while the reader is typing.
+-->
 <!--
   HotkeyProvider — the single global `keydown` listener that drives the hotkey
   registry. Owns the sequence buffer (for `g p`-style triggers) and enforces

@@ -1,3 +1,6 @@
+<!-- @component
+A daisyUI `input` over a native `<input>`, with a bindable `value` and `FieldControl` wiring.
+-->
 <!--
   TextInput — daisyUI `input` over a native `<input>`, with a bindable `value`
   and the `FieldControl` wiring (`describedBy` → `aria-describedby`, `invalid`
@@ -14,12 +17,27 @@
   import { inputSize, type FieldSize } from './field-types.ts';
 
   interface Props extends Omit<HTMLInputAttributes, 'type' | 'value' | 'size'> {
+    /**
+     * The text. Bindable.
+     * @defaultValue `''`
+     */
     value?: string;
-    /** The text-ish `type`s. Dates have `DateInput`, files have `FileInput`. */
+    /**
+     * The text-ish `type`s. Dates have `DateInput`, files have `FileInput`.
+     * @defaultValue `'text'`
+     */
     type?: 'text' | 'email' | 'url' | 'password' | 'tel' | 'number' | 'search' | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: FieldSize | undefined;
+    /** `FieldControl`: the field is in error — sets `aria-invalid` and the error style. */
     invalid?: boolean | undefined;
-    /** Ids for `aria-describedby`; empty means none. */
+    /**
+     * Ids for `aria-describedby`; empty means none.
+     * @defaultValue `''`
+     */
     describedBy?: string | undefined;
   }
 

@@ -1,3 +1,6 @@
+<!-- @component
+An HLS video player (Cloudflare Stream shape) with a placeholder while the upload is still pending or processing.
+-->
 <!--
   Video — the player for an HLS-served video (Cloudflare Stream shape:
   manifest URL + poster + an upload lifecycle).
@@ -29,8 +32,12 @@
     title: string;
     /** Intrinsic dimensions, when known — reserves the box against layout shift. */
     width?: number | undefined;
+    /** Intrinsic height, when known. */
     height?: number | undefined;
-    /** Where the upload is in its lifecycle. */
+    /**
+     * Where the upload is in its lifecycle.
+     * @defaultValue `'ready'`
+     */
     uploadState?: 'pending' | 'processing' | 'ready' | 'failed';
     /** Copy for the non-playable placeholder state, supplied by the app (this package holds no messages). */
     statusLabel?: string | undefined;
@@ -38,6 +45,7 @@
     onReady?: ((element: HTMLVideoElement) => void) | undefined;
     /** A captions track URL (WebVTT). When absent, an empty track is still rendered — see below. */
     captionsSrc?: string | undefined;
+    /** Extra classes, merged last. */
     class?: string | undefined;
   }
 

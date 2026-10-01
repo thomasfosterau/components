@@ -1,3 +1,6 @@
+<!-- @component
+A `<time>` element carrying just a year, for dates whose precision really is a year.
+-->
 <!--
   Year — a `<time>` element carrying just a year: `datetime="1925"`, and
   `Intl.DateTimeFormat`'s locale rendering of the year (with its era, when
@@ -22,9 +25,17 @@
   interface Props extends HTMLTimeAttributes {
     /** A calendar year, or an instant (its UTC year is used). */
     value: Date | number | string;
+    /**
+     * Locale(s) for `Intl` formatting; omitted, the components context's `locale()`.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
     /** Append the era: `1925 AD`. */
     era?: Intl.DateTimeFormatOptions['era'];
+    /**
+     * Four digits or two.
+     * @defaultValue `'numeric'`
+     */
     representation?: 'numeric' | '2-digit' | undefined;
   }
 

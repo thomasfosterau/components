@@ -1,3 +1,6 @@
+<!-- @component
+A link off the site that opens in a new tab with the right `rel`, and says so to assistive technology.
+-->
 <!--
   ExternalLink — a link off the site, with the `rel` decision made for the
   call site.
@@ -24,17 +27,30 @@
   import VisuallyHidden from './VisuallyHidden.svelte';
 
   interface Props extends Omit<HTMLAnchorAttributes, 'href'> {
+    /** The absolute URL. */
     href: string;
+    /**
+     * The link weight.
+     * @defaultValue `'muted'`
+     */
     variant?: LinkVariant | undefined;
     /**
      * Whether the destination is user-supplied. `true` (the default) adds
      * `nofollow`; pass `false` only for an address this site composed itself.
+     * @defaultValue `true`
      */
     untrusted?: boolean | undefined;
-    /** Show the trailing new-tab icon. */
+    /**
+     * Show the trailing new-tab icon.
+     * @defaultValue `true`
+     */
     showIcon?: boolean | undefined;
-    /** The announcement appended to the link text, for assistive technology. */
+    /**
+     * The announcement appended to the link text, for assistive technology.
+     * @defaultValue `'(opens in a new tab)'`
+     */
     newTabLabel?: string | undefined;
+    /** The link text. */
     children: Snippet<[]>;
   }
 

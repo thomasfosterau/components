@@ -1,3 +1,6 @@
+<!-- @component
+The daisyUI `alert`: a tone-coloured notice with an icon, an optional lead-in and an optional dismiss button.
+-->
 <!--
   Alert — the daisyUI `alert`: a tone-coloured notice with an icon, an
   optional bold lead-in and an optional dismiss button.
@@ -28,7 +31,15 @@
   import VisuallyHidden from './VisuallyHidden.svelte';
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
+    /**
+     * Status colour and icon.
+     * @defaultValue `'info'`
+     */
     tone?: StatusTone | undefined;
+    /**
+     * daisyUI alert style.
+     * @defaultValue `'soft'`
+     */
     variant?: AlertVariant | undefined;
     /** Bold lead-in rendered above the body. */
     title?: string | undefined;
@@ -41,8 +52,12 @@
     icon?: Snippet<[]> | undefined;
     /** When set, renders a dismiss button that calls it. */
     onDismiss?: (() => void) | undefined;
-    /** Accessible name of the dismiss button. */
+    /**
+     * Accessible name of the dismiss button.
+     * @defaultValue `'Dismiss'`
+     */
     dismissLabel?: string | undefined;
+    /** The message. */
     children: Snippet<[]>;
   }
 

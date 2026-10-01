@@ -1,3 +1,6 @@
+<!-- @component
+A rule between groups of `MenuItem`s.
+-->
 <!--
   MenuSeparator — a rule between groups of `MenuItem`s.
 
@@ -13,6 +16,7 @@
   import { getMenuMode } from './menu-context.ts';
 
   interface Props {
+    /** Extra classes, merged last. */
     class?: string | undefined;
   }
 

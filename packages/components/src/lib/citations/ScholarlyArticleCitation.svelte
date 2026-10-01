@@ -1,3 +1,6 @@
+<!-- @component
+A journal article as "Authors, ‘Title’ (2019) <cite>Periodical</cite> 12 (3) pp 45–67", with the Schema.org article → issue → volume → periodical chain as microdata.
+-->
 <!--
   ScholarlyArticleCitation — a journal article as "Authors, 'Title' (2019)
   <cite>Periodical</cite> 12 (3) pp 45–67 doi ISSN", with the Schema.org
@@ -15,14 +18,36 @@
   import type { ScholarlyArticleRecord } from './csl.ts';
 
   interface Props {
+    /** The article to cite. */
     article: ScholarlyArticleRecord;
     /** Microdata `itemid` — the article's canonical URL. */
     itemid?: string | undefined;
+    /**
+     * Rendered in place of a missing title.
+     * @defaultValue `'Untitled article'`
+     */
     untitledLabel?: string | undefined;
+    /**
+     * Rendered in place of a missing date.
+     * @defaultValue `'no date'`
+     */
     noDateLabel?: string | undefined;
+    /**
+     * Abbreviation before a single page.
+     * @defaultValue `'p'`
+     */
     pageLabel?: string | undefined;
+    /**
+     * Abbreviation before a page range.
+     * @defaultValue `'pp'`
+     */
     pagesLabel?: string | undefined;
+    /**
+     * Lead-in before the record’s URL.
+     * @defaultValue `'available online at'`
+     */
     availableOnlineLabel?: string | undefined;
+    /** Locale(s) for the joined name lists; omitted, the components context's `locale()`. */
     locales?: string | readonly string[] | undefined;
   }
 

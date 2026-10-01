@@ -1,3 +1,6 @@
+<!-- @component
+A plan-drawing surface for areas, paths and points on a snapping grid: select, drag, reshape and draw.
+-->
 <!--
   MapEditor — a plan-drawing surface: areas as polygons, paths as lines and
   points as markers, laid out on a snapping grid, selected, dragged, reshaped
@@ -73,13 +76,32 @@
   type MapTool = 'select' | 'pan' | 'draw-polygon' | 'draw-line';
 
   interface Props {
+    /** The plan to edit; the caller owns it and applies `onchange`. */
     doc: VectorDocument<MapShape>;
-    /** Which shapes are selected; the caller owns the set. */
+    /**
+     * Which shapes are selected; the caller owns the set.
+     * @defaultValue an empty set
+     */
     selected?: ReadonlySet<string>;
+    /**
+     * The active tool.
+     * @defaultValue `'select'`
+     */
     tool?: MapTool;
+    /**
+     * Viewport width in CSS pixels.
+     * @defaultValue `800`
+     */
     width?: number;
+    /**
+     * Viewport height in CSS pixels.
+     * @defaultValue `600`
+     */
     height?: number;
-    /** Names the surface for assistive tech. */
+    /**
+     * Names the surface for assistive tech.
+     * @defaultValue `'Plan editor'`
+     */
     label?: string;
     /**
      * The document after an edit, and the edit itself for an undo stack.
@@ -94,6 +116,7 @@
     onviewportchange?: ((viewport: Viewport) => void) | undefined;
     /** The page's defaults for a newly drawn shape. Absent means drawing is off. */
     newShape?: ((kind: 'polygon' | 'line', at: Point) => MapShape) | undefined;
+    /** Extra classes, merged last. */
     class?: string | undefined;
   }
 

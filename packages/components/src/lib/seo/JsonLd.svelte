@@ -1,3 +1,6 @@
+<!-- @component
+One Schema.org JSON-LD node as an XSS-safe `<script type="application/ld+json">` block in `<svelte:head>`.
+-->
 <script lang="ts">
   /**
    * Emits one Schema.org JSON-LD graph node as a
@@ -13,6 +16,7 @@
   import { serializeJsonLd, type JsonLdObject } from './json-ld.ts';
 
   interface Props {
+    /** The node to serialise; nothing is emitted for `null` or `undefined`. */
     data: JsonLdObject | null | undefined;
   }
 

@@ -1,3 +1,6 @@
+<!-- @component
+A list in one of four shapes — `compact` links, `stacked` rows, a `grid` or `cards` — with an optional feed mode for windowed streams.
+-->
 <!--
   ItemList — the list every index page and detail section renders, in the four
   shapes those pages actually use: a `compact` run of links, `stacked` rows
@@ -31,7 +34,12 @@
   type Variant = 'compact' | 'stacked' | 'grid' | 'cards';
 
   interface Props extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
+    /** The items, each rendered by the `item` snippet. */
     items: readonly T[];
+    /**
+     * The layout.
+     * @defaultValue `'compact'`
+     */
     variant?: Variant | undefined;
     /** Stable identity per item — the `{#each}` key. */
     getKey: (item: T, index: number) => string;
@@ -39,7 +47,10 @@
     item: Snippet<[T, number]>;
     /** Rendered in place of the list when there is nothing in it. */
     empty?: Snippet<[]> | undefined;
-    /** The line shown when there is nothing and no `empty` snippet. */
+    /**
+     * The line shown when there is nothing and no `empty` snippet.
+     * @defaultValue `'Nothing here yet.'`
+     */
     emptyMessage?: string | undefined;
     /** Render as an ARIA feed. */
     feed?: boolean | undefined;

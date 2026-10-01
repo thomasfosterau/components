@@ -1,3 +1,6 @@
+<!-- @component
+The summary rail beside an entity page’s prose: an optional header and image above a body of labelled facts.
+-->
 <!--
   Infobox — the summary rail beside an entity page's prose: an optional
   header, an optional image, and a body of labelled facts.
@@ -38,9 +41,14 @@
   } from './types.ts';
 
   interface Props extends Omit<HTMLAttributes<HTMLElement>, 'children' | 'title'> {
+    /** Heading of the rail; also its accessible name. */
     title?: string | undefined;
+    /** A line under the title. */
     subtitle?: string | undefined;
-    /** Accessible name for the region when there is no `title`. */
+    /**
+     * Accessible name for the region when there is no `title`.
+     * @defaultValue `'Key facts'`
+     */
     label?: string;
     /** Renders an `InfoboxImage` above the body. */
     image?: InfoboxImageSpec | undefined;

@@ -1,3 +1,6 @@
+<!-- @component
+A DOI rendered as a `https://doi.org/<doi>` link that opens in a new tab.
+-->
 <!--
   DOILink — a DOI rendered as a resolvable `https://doi.org/<doi>` link.
 
@@ -12,8 +15,16 @@
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
   interface Props extends HTMLAnchorAttributes {
+    /** The DOI, without a prefix. */
     doi: string;
+    /**
+     * Schema.org `itemprop` on the link, when the identifier is a property of an enclosing item.
+     */
     itemprop?: string;
+    /**
+     * Replaces the link text.
+     * @defaultValue the bare DOI
+     */
     children?: Snippet<[]>;
   }
 

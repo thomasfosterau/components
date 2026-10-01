@@ -1,3 +1,6 @@
+<!-- @component
+A native `<details>` wearing daisyUI’s `collapse`.
+-->
 <!--
   Disclosure — a native `<details>` wearing daisyUI's `collapse`.
 
@@ -24,9 +27,14 @@
     open?: boolean | undefined;
     /** The summary — its own text, or a snippet for richer markup. */
     title: string | Snippet<[]>;
+    /**
+     * The expand indicator: an arrow, a plus, or none.
+     * @defaultValue `'arrow'`
+     */
     variant?: DisclosureVariant | undefined;
     /** Extra classes on the `collapse-content` wrapper. */
     contentClass?: string | undefined;
+    /** The content revealed when open. */
     children: Snippet<[]>;
   }
 

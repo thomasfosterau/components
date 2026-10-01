@@ -1,3 +1,6 @@
+<!-- @component
+An `<a>` styled as a daisyUI `btn`, for navigation that reads as an action; it keeps every link behaviour.
+-->
 <!--
   LinkButton — an `<a>` wearing the daisyUI `btn`, for navigation that reads
   as an action ("View results", "Edit"). It is a link, not a button: it
@@ -30,17 +33,29 @@
   } from './tones.ts';
 
   interface Props extends Omit<HTMLAnchorAttributes, 'href'> {
+    /** The target; an app path is resolved through the components context. */
     href: string;
+    /** Semantic colour. */
     tone?: Tone | undefined;
+    /**
+     * daisyUI button style.
+     * @defaultValue `'solid'`
+     */
     variant?: ButtonVariant | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: Size | undefined;
     /** Renders the button as unavailable without removing its text. */
     disabled?: boolean | undefined;
+    /** Full-width. */
     block?: boolean | undefined;
     /** Open in a new tab with the safe `rel`. */
     external?: boolean | undefined;
     /** Leading icon. */
     icon?: Snippet<[]> | undefined;
+    /** The link text. */
     children: Snippet<[]>;
   }
 

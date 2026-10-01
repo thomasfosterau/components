@@ -1,3 +1,6 @@
+<!-- @component
+The app shell’s navigation column: a brand mark, the primary links and an account block.
+-->
 <!--
   Sidebar — the app shell's standing navigation column: a brand mark at the
   top, the primary links in the middle, an account block at the bottom.
@@ -35,6 +38,10 @@
     label?: string | undefined;
     /** A visible heading over the links ("Browse", "Your account"). */
     title?: string | undefined;
+    /**
+     * The heading level, so the page outline stays intact.
+     * @defaultValue `2`
+     */
     headingLevel?: HeadingLevel | undefined;
     /** The brand mark, above the links. */
     brand?: Snippet<[]> | undefined;

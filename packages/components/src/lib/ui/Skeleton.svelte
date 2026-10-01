@@ -1,3 +1,6 @@
+<!-- @component
+daisyUI `skeleton` placeholders — a block, a circle or lines of text — for a surface whose data has not arrived.
+-->
 <!--
   Skeleton — daisyUI `skeleton` placeholders for a surface whose data has not
   arrived. Three shapes: a `block` (one box, sized by the caller's `class`), a
@@ -16,10 +19,20 @@
   import type { HTMLAttributes } from 'svelte/elements';
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
+    /**
+     * The placeholder shape.
+     * @defaultValue `'block'`
+     */
     variant?: 'block' | 'text' | 'circle' | undefined;
-    /** Rows for the `text` variant. */
+    /**
+     * Rows for the `text` variant.
+     * @defaultValue `3`
+     */
     lines?: number | undefined;
-    /** What assistive technology announces in place of the shimmer. */
+    /**
+     * What assistive technology announces in place of the shimmer.
+     * @defaultValue `'Loading'`
+     */
     label?: string | undefined;
   }
 

@@ -1,3 +1,6 @@
+<!-- @component
+A `type="search"` field with a leading icon, a clear button while there is text, and a spinner while `pending`.
+-->
 <!--
   SearchInput — a `type="search"` field in daisyUI's composite `input`
   wrapper, with a leading icon, a clear button while there is text, and a
@@ -24,6 +27,10 @@
   interface Props extends Omit<HTMLInputAttributes, 'type' | 'value' | 'size'> {
     /** Accessible name of the field. */
     label: string;
+    /**
+     * The query. Bindable.
+     * @defaultValue `''`
+     */
     value?: string;
     /** Fires on every change with the current text. */
     onInput?: ((query: string) => void) | undefined;
@@ -33,8 +40,15 @@
     onClear?: (() => void) | undefined;
     /** A search is in flight. */
     pending?: boolean | undefined;
-    /** Accessible name of the clear button. */
+    /**
+     * Accessible name of the clear button.
+     * @defaultValue `'Clear search'`
+     */
     clearLabel?: string | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: FieldSize | undefined;
   }
 

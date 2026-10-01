@@ -1,3 +1,6 @@
+<!-- @component
+A report as "Authors, <cite>Title</cite> (2021) Canberra: Department of X pp 88", with Schema.org `Report` microdata.
+-->
 <!--
   ReportCitation — a report as "Authors, <cite>Title</cite> (2021) Canberra:
   Department of X pp 88", with Schema.org Report microdata. Same shape as
@@ -14,12 +17,31 @@
   import type { ReportRecord } from './csl.ts';
 
   interface Props {
+    /** The report to cite. */
     report: ReportRecord;
+    /** Schema.org `itemid` on the root. */
     itemid?: string | undefined;
+    /**
+     * Rendered in place of a missing title.
+     * @defaultValue `'Untitled report'`
+     */
     untitledLabel?: string | undefined;
+    /**
+     * Rendered in place of a missing date.
+     * @defaultValue `'no date'`
+     */
     noDateLabel?: string | undefined;
+    /**
+     * Abbreviation after a page count.
+     * @defaultValue `'pp'`
+     */
     pageCountLabel?: string | undefined;
+    /**
+     * Lead-in before the record’s URL.
+     * @defaultValue `'available online at'`
+     */
     availableOnlineLabel?: string | undefined;
+    /** Locale(s) for the joined name lists; omitted, the components context's `locale()`. */
     locales?: string | readonly string[] | undefined;
   }
 

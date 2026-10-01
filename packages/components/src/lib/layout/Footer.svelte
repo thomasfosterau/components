@@ -1,3 +1,6 @@
+<!-- @component
+The site footer: a `contentinfo` landmark with columns of links and an optional aside for the brand and attribution notices.
+-->
 <!--
   Footer — the site footer: a `contentinfo` landmark holding the columns of
   links an app puts at the bottom of every page, and an optional `aside` for

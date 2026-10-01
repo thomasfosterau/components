@@ -1,3 +1,6 @@
+<!-- @component
+The row of filter options above a list, as links rather than a form.
+-->
 <!--
   FilterBar — the row of filter options above a list, as links rather than a
   form.
@@ -25,6 +28,7 @@
   import type { FilterOption } from './types.ts';
 
   interface Props extends HTMLAttributes<HTMLElement> {
+    /** The filters; the current one gets `aria-current`. */
     options: readonly FilterOption[];
     /** Accessible name for the row — say which axis it filters on. */
     label: string;

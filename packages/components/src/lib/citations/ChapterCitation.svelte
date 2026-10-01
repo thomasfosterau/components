@@ -1,3 +1,6 @@
+<!-- @component
+A chapter as "Author, ‘Chapter title’, in <book> ch 4 (pp 101–130)", with Schema.org `Chapter` microdata.
+-->
 <!--
   ChapterCitation — a chapter as "Author, 'Chapter title', in <BookCitation>
   ch 4 (pp 101–130)", with Schema.org Chapter microdata. When the record
@@ -13,14 +16,39 @@
   import type { ChapterRecord } from './csl.ts';
 
   interface Props {
+    /** The chapter to cite; its `book`, when present, is cited in full. */
     chapter: ChapterRecord;
+    /**
+     * Rendered in place of a missing title.
+     * @defaultValue `'Untitled chapter'`
+     */
     untitledLabel?: string | undefined;
+    /**
+     * The word before the containing book.
+     * @defaultValue `'in'`
+     */
     inLabel?: string | undefined;
+    /**
+     * Abbreviation before a chapter number.
+     * @defaultValue `'ch'`
+     */
     chapterLabel?: string | undefined;
+    /**
+     * Abbreviation before a single page.
+     * @defaultValue `'p'`
+     */
     pageLabel?: string | undefined;
+    /**
+     * Abbreviation before a page range.
+     * @defaultValue `'pp'`
+     */
     pagesLabel?: string | undefined;
+    /** Locale(s) for the joined name lists; omitted, the components context's `locale()`. */
     locales?: string | readonly string[] | undefined;
-    /** Forwarded to the nested `BookCitation`. */
+    /**
+     * Forwarded to the nested `BookCitation`.
+     * @defaultValue `{}`
+     */
     bookLabels?:
       | {
           untitledLabel?: string | undefined;

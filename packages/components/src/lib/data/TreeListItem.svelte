@@ -1,3 +1,6 @@
+<!-- @component
+One leaf under a `TreeList`, drawn with the connector rule that makes the nesting readable.
+-->
 <!--
   TreeListItem — one leaf under a `TreeList`, drawn with the connector rule
   that makes the nesting readable.
@@ -15,6 +18,7 @@
   import type { HTMLAttributes } from 'svelte/elements';
 
   interface Props extends Omit<HTMLAttributes<HTMLLIElement>, 'children'> {
+    /** The content. */
     children?: Snippet<[]> | undefined;
   }
 

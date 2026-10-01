@@ -1,3 +1,6 @@
+<!-- @component
+The block at the top of a page: its heading, supporting facts and actions.
+-->
 <!--
   PageHeader — the block at the top of a page: what the page is about, and
   what you can do to it.
@@ -41,8 +44,15 @@
     title: string | Snippet<[]>;
     /** Supporting line under the heading. */
     subtitle?: string | undefined;
+    /**
+     * The heading level, so the page outline stays intact.
+     * @defaultValue `1`
+     */
     headingLevel?: HeadingLevel | undefined;
-    /** Accessible name of the `actions` group. */
+    /**
+     * Accessible name of the `actions` group.
+     * @defaultValue `'Page actions'`
+     */
     actionsLabel?: string | undefined;
     /** Rendered above the heading — breadcrumbs, an eyebrow label, a badge. */
     eyebrow?: Snippet<[]> | undefined;

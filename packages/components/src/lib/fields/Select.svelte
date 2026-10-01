@@ -1,3 +1,6 @@
+<!-- @component
+A native `<select>` in daisyUI styling over a list of options, with an optional placeholder and `FieldControl` wiring.
+-->
 <!--
   Select — a native `<select>` in daisyUI `select` styling over a list of
   options, with a bindable `value`, an optional placeholder option (disabled,
@@ -19,11 +22,24 @@
   interface Props extends Omit<HTMLSelectAttributes, 'value' | 'size'> {
     /** Full options, or bare strings when value and label are the same. */
     options: readonly FieldOptionInput[];
+    /**
+     * The selected option’s value; `''` selects the placeholder. Bindable.
+     * @defaultValue `''`
+     */
     value?: string;
     /** Disabled first option, shown while nothing is selected. */
     placeholder?: string | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: FieldSize | undefined;
+    /** `FieldControl`: the field is in error — sets `aria-invalid` and the error style. */
     invalid?: boolean | undefined;
+    /**
+     * `FieldControl`: space-separated ids for `aria-describedby`.
+     * @defaultValue `''`
+     */
     describedBy?: string | undefined;
   }
 

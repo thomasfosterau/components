@@ -1,3 +1,6 @@
+<!-- @component
+A tab strip that is either a tab widget over panels (`mode="panels"`) or navigation between sibling routes (`mode="links"`).
+-->
 <!--
   Tabs — one strip, two things.
 
@@ -32,20 +35,38 @@
   import { tabsSize, tabsVariant, type TabItem, type TabsMode, type TabsVariant } from './types.ts';
 
   interface Props {
+    /** The tabs, in order. */
     items: readonly TabItem[];
+    /**
+     * `panels` for a tab widget; `links` for navigation between routes.
+     * @defaultValue `'panels'`
+     */
     mode?: TabsMode | undefined;
     /**
      * The selected value (panels) or the current one (links); `''` means
      * unset — panels then select the first enabled item and links fall back to
      * the context's current-page check. Bindable.
+     * @defaultValue `''`
      */
     value?: string | undefined;
-    /** Accessible name of the tab list / the navigation landmark. */
+    /**
+     * Accessible name of the tab list / the navigation landmark.
+     * @defaultValue `'Sections'`
+     */
     label?: string | undefined;
+    /**
+     * daisyUI tab style.
+     * @defaultValue `'border'`
+     */
     variant?: TabsVariant | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: Size | undefined;
     /** One panel's content, in `panels` mode. Without it, no panels render. */
     panel?: Snippet<[TabItem]> | undefined;
+    /** Extra classes, merged last. */
     class?: string | undefined;
   }
 

@@ -1,3 +1,6 @@
+<!-- @component
+An inline note marker that registers its note with the surrounding footnote list, tracked separately from citations.
+-->
 <!--
   Footnote — an inline note marker, tracked separately from citations.
 
@@ -20,7 +23,10 @@
     content: string;
     /** A custom marker (`*`, `†`) instead of the auto-assigned number. */
     symbol?: string;
-    /** The marker's accessible name — a bare number or symbol announces nothing on its own. */
+    /**
+     * The marker's accessible name — a bare number or symbol announces nothing on its own.
+     * @defaultValue `"Footnote <marker>: <content>"`
+     */
     footnoteLabel?: (marker: string, content: string) => string;
   }
 

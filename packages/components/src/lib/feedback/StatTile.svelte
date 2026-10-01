@@ -1,3 +1,6 @@
+<!-- @component
+One daisyUI `stat`: a headline figure with its label and optional change line and description; wrap a row in `Stats`.
+-->
 <!--
   StatTile — one daisyUI `stat`: a headline figure with its label, an optional
   change line and an optional description. Wrap a row of them in `Stats`.
@@ -43,11 +46,20 @@
     delta?: StatDelta | undefined;
     /** Plain description, rendered after the delta when both are present. */
     description?: string | undefined;
-    /** Announced in place of the rising arrow. */
+    /**
+     * Announced in place of the rising arrow.
+     * @defaultValue `'Up'`
+     */
     upLabel?: string | undefined;
-    /** Announced in place of the falling arrow. */
+    /**
+     * Announced in place of the falling arrow.
+     * @defaultValue `'Down'`
+     */
     downLabel?: string | undefined;
-    /** Announced in place of the flat marker. */
+    /**
+     * Announced in place of the flat marker.
+     * @defaultValue `'No change'`
+     */
     flatLabel?: string | undefined;
     /** Locale(s) for the figures. Defaults to the components context's. */
     locales?: string | readonly string[] | undefined;

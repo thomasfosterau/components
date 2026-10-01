@@ -1,3 +1,6 @@
+<!-- @component
+A daisyUI `textarea` with a bindable `value` and `FieldControl` wiring.
+-->
 <!--
   Textarea — daisyUI `textarea` with a bindable `value` and the same
   `FieldControl` wiring as `TextInput`.
@@ -10,9 +13,22 @@
   import { textareaSize, type FieldSize } from './field-types.ts';
 
   interface Props extends Omit<HTMLTextareaAttributes, 'value'> {
+    /**
+     * The text. Bindable.
+     * @defaultValue `''`
+     */
     value?: string;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: FieldSize | undefined;
+    /** `FieldControl`: the field is in error — sets `aria-invalid` and the error style. */
     invalid?: boolean | undefined;
+    /**
+     * `FieldControl`: space-separated ids for `aria-describedby`.
+     * @defaultValue `''`
+     */
     describedBy?: string | undefined;
   }
 

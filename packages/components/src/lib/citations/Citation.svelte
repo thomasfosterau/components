@@ -1,3 +1,6 @@
+<!-- @component
+An inline reference marker that registers its source with the surrounding bibliography and renders the number it was given.
+-->
 <!--
   Citation — an inline reference marker that registers its source with the
   surrounding bibliography and renders the number it was given.
@@ -21,11 +24,20 @@
   interface Props {
     /** The source being cited. */
     citation: Citation;
-    /** `superscript` renders `[1]` raised; `inline` renders `(1)` on the line. */
+    /**
+     * `superscript` renders `[1]` raised; `inline` renders `(1)` on the line.
+     * @defaultValue `'superscript'`
+     */
     format?: 'inline' | 'superscript';
-    /** Link to the `<ReferenceList>` entry. Off when there is no list on the page. */
+    /**
+     * Link to the `<ReferenceList>` entry. Off when there is no list on the page.
+     * @defaultValue `true`
+     */
     linkToReference?: boolean;
-    /** The marker's accessible name — a bare "1" announces nothing on its own. */
+    /**
+     * The marker's accessible name — a bare "1" announces nothing on its own.
+     * @defaultValue `"Reference <n>: <title>"`
+     */
     referenceLabel?: (n: number, title: string) => string;
   }
 

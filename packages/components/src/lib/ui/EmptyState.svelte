@@ -1,3 +1,6 @@
+<!-- @component
+The quiet card an index or result list shows instead of a bare empty list: a heading, optional copy, icon and call to action.
+-->
 <!--
   EmptyState — the quiet card an index or a result list shows instead of a
   bare empty `<ul>`: a heading, optional supporting copy, an optional icon
@@ -22,6 +25,10 @@
     title: string;
     /** Supporting copy explaining the state or the next step. */
     description?: string | undefined;
+    /**
+     * The heading level, so the page outline stays intact.
+     * @defaultValue `2`
+     */
     headingLevel?: HeadingLevel | undefined;
     /** Decorative icon rendered above the heading. */
     icon?: Snippet<[]> | undefined;

@@ -1,3 +1,6 @@
+<!-- @component
+"3 days ago" / "in 2 hours" via `Intl.RelativeTimeFormat`, in the largest unit whose magnitude is at least one.
+-->
 <!--
   RelativeTime — "3 days ago" / "in 2 hours" via `Intl.RelativeTimeFormat`,
   picking the largest unit (seconds → years) whose magnitude is at least one.
@@ -12,11 +15,24 @@
   import { getComponentsContext } from '../context.svelte.ts';
 
   interface Props extends HTMLTimeAttributes {
+    /** The instant: a `Date`, epoch milliseconds or an ISO string. */
     value: Date | number | string;
     /** The instant "now" is measured from; defaults to the current wall clock at render. */
     now?: Date | number | undefined;
+    /**
+     * Locale(s) for `Intl` formatting; omitted, the components context's `locale()`.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
+    /**
+     * `Intl.RelativeTimeFormat` `numeric`; `auto` allows "yesterday".
+     * @defaultValue `'auto'`
+     */
     numeric?: Intl.RelativeTimeFormatOptions['numeric'];
+    /**
+     * `Intl.RelativeTimeFormat` `style`.
+     * @defaultValue `'long'`
+     */
     style?: Intl.RelativeTimeFormatOptions['style'];
   }
 

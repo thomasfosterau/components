@@ -1,3 +1,6 @@
+<!-- @component
+A pan-and-zoom SVG surface over a `VectorDocument`, with each element drawn by a renderer snippet the application supplies.
+-->
 <!--
   VectorCanvas — a pan-and-zoom SVG surface over a {@link VectorDocument}, with
   the elements drawn by a renderer the application supplies.
@@ -41,19 +44,39 @@
   import { panBy, screenToCanvas, snapToGrid, sortByZIndex, zoomAbout } from './utils.ts';
 
   interface Props extends Omit<SVGAttributes<SVGSVGElement>, 'width' | 'height' | 'class'> {
+    /** The document to draw: its elements, viewport and grid. */
     doc: VectorDocument<T>;
-    /** Which elements the application considers selected. */
+    /**
+     * Which elements the application considers selected.
+     * @defaultValue an empty set
+     */
     selected?: ReadonlySet<string>;
-    /** The application's active tool; `pan` is the one this component handles. */
+    /**
+     * The application's active tool; `pan` is the one this component handles.
+     * @defaultValue `'select'`
+     */
     tool?: string;
-    /** Viewport size in CSS pixels. */
+    /**
+     * Viewport size in CSS pixels.
+     * @defaultValue `800`
+     */
     width?: number;
+    /**
+     * Viewport height in CSS pixels.
+     * @defaultValue `600`
+     */
     height?: number;
     /** Draws one element, told whether it is selected. */
     element?: Snippet<[T, boolean]>;
-    /** Whether pointer input is accepted at all. */
+    /**
+     * Whether pointer input is accepted at all.
+     * @defaultValue `true`
+     */
     interactive?: boolean;
-    /** Names the surface for assistive tech. */
+    /**
+     * Names the surface for assistive tech.
+     * @defaultValue `'Vector editing canvas'`
+     */
     label?: string;
     /**
      * The viewport after a pan or a zoom.
