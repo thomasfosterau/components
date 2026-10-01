@@ -1,52 +1,40 @@
-# packages/components — the published library
+# @thomasfosterau/components
 
-Everything in this package ends up in `dist/` and on npm. It is a `svelte-package` library: `svelte-kit sync` generates the ambient types, `svelte-package` copies `src/lib/` into `dist/` compiling nothing, and the consumer's build compiles the `.svelte` files. The repo-wide authoring rules (runes and snippets only, attribute spreading, `class` merging with Svelte class arrays, literal daisyUI lookup tables, bits-ui for interaction, ARIA as contract) live in the root [AGENTS.md](../../AGENTS.md); this file carries what is specific to the package.
+The core library: everything under `src/lib/` ends up in `dist/` and on npm. `svelte-kit sync` generates the ambient types, `svelte-package` copies `src/lib/` into `dist/` compiling nothing, and the consumer's build compiles the `.svelte` files. Repo-wide authoring rules are in the root [AGENTS.md](../../AGENTS.md).
 
-## Layout
+## Boundary
 
-| Path | What it is |
-| --- | --- |
-| `src/lib/index.ts` | The barrel. Every public component is exported here, and only from here. |
-| `src/lib/<group>/` | The components. **Everything under `src/lib/` ships** — `svelte-package` copies it verbatim. |
-| `src/lib/theme.css` | The design tokens, exported as `./theme.css`. |
-| `src/stories/<group>/` | Stories, mirroring `src/lib/<group>/`. Outside `src/lib/`, so they never ship. |
-| `tests/` | The browser suite. One file per group; `tests/setup.ts` registers the jest-dom matchers. |
-| `.storybook/` | Storybook 10 config — for the whole workspace, `packages/maps`' stories included. `preview.css` is the only place the Tailwind + daisyUI stack is built here. |
+- **`effect` and `@thomasfosterau/effect-forms-svelte` are reachable from one file.** `forms/EntityForm.svelte`, through the `./entity-form` entry (`forms/entity-form.ts`), which is not re-exported from `forms/index.ts` or the root barrel. The form library is an optional peer, so importing it anywhere else would make every consumer install it. `EntityForm` imports only `createForm` and types; everything it renders is this package's own field primitives.
+- **Nothing heavy on the always-loaded path.** The root barrel (`src/lib/index.ts`) is imported by every consumer on every page. A dependency it pulls in eagerly needs a better reason than convenience; a component that needs a specific third-party dependency belongs in its own package (AGENTS.md § Conventions, `packages/maps` is the example).
+- **The public surface is `exports`.** The root barrel `src/lib/index.ts` re-exports the core families; the other public entries are `src/lib/<family>/index.ts` (`citations`, `canvas`, `charts`, `tips`, `seo`), `forms/entity-form.ts` and `theme.css`, each listed in `package.json` `exports`. Anything reachable from an `exports` entry is a semver commitment and needs a changeset to change.
 
-Type-checked together: `tsconfig.json`'s `include` is `["src", "tests", ".storybook"]`, so a broken story or test fails `vp run check` exactly like a broken component does.
+## Invariants
+
+- **Everything under `src/lib/` ships.** Stories (`src/stories/<family>/`) and tests (`tests/<family>/<Component>.test.ts`) live outside it and mirror `src/lib/<family>/`. `tsconfig.json`'s `include` is `["src", "tests", ".storybook"]`, so a broken story or test fails `vp run check` exactly like a broken component does.
+- **`theme.css` is reached through a CSS `@import`, never a JS import**, which is why `"sideEffects": false` holds despite a stylesheet being in the package.
+- **Refine, don't redesign.** Extend an existing primitive rather than adding a parallel one; a new one-off component is usually a sign the shared primitive needs a prop.
 
 ## Design tokens
 
-[`src/lib/theme.css`](src/lib/theme.css) declares the `light` / `dark` daisyUI themes, and BOTH consumers import it — an application through the package's `./theme.css` export, Storybook's `.storybook/preview.css` relatively — so there is exactly one copy of every token. The values are deliberately neutral (achromatic surfaces, one slate brand hue): this library ships a _starting point_, not a brand, and a consumer is expected to redeclare the two themes.
+[`src/lib/theme.css`](src/lib/theme.css) declares the `light` / `dark` daisyUI themes, and both consumers import it — an application through the package's `./theme.css` export, Storybook's `.storybook/preview.css` relatively — so there is exactly one copy of every token. The values are deliberately neutral (achromatic surfaces, one slate brand hue): this library ships a _starting point_, not a brand, and a consumer is expected to redeclare the two themes.
 
 `@plugin "daisyui" { themes: false; }` in `preview.css` is load-bearing: daisyUI's built-in themes are also called `light` and `dark`, and enabling both sets means two definitions of each fighting over the cascade.
 
 ## Testing
 
-Vitest **browser mode**, headless Chromium through Playwright — not a DOM shim. This library's contract is focus order, keyboard handling and the accessibility tree, and happy-dom/jsdom model none of those faithfully enough to be evidence.
+Vitest **browser mode**, headless Chromium through Playwright — not a DOM shim. This library's contract is focus order, keyboard handling and the accessibility tree, and happy-dom/jsdom model none of those faithfully enough to be evidence. `tests/setup.ts` registers the jest-dom matchers.
 
 - `render` comes from `vitest-browser-svelte` and is **async** — `await render(...)`, or every locator call lands on a `Promise`.
 - Assertions go through `expect.element(locator)`, which retries; the matchers are `@testing-library/jest-dom`'s.
 - A `.ts` test has no template to declare a snippet in. Use Svelte's `createRawSnippet`, whose fragment must be a **single element** (wrap bare text in a `<span>`).
 - Prefer accessible queries — `getByRole`, `getByLabelText`, `getByText` — over test ids. A test that can only find the element by `data-testid` is not testing the thing the component promises.
-
-The browser binary is resolved by Playwright from `PLAYWRIGHT_BROWSERS_PATH`, and the catalog pins `playwright` to the release whose Chromium revision the session image carries. See that catalog entry before bumping it.
+- **Vitest's Playwright locator mutates the `position` object you pass it.** `locator.click({ position })` (and `dblclick`/`dropTo`) scale `position` into page pixels in place, so a point declared once and reused drifts by the iframe's scale on its second use. `tests/canvas/pointer.ts`'s `copy(at)` exists for this: pass a fresh `{ x, y }` per call.
 
 ## Storybook
 
-`vp run --filter ./packages/components storybook` (dev, port 6006) and `storybook:build`. This is the ONE Storybook for the design system: its `stories` glob also reaches across into the sibling `packages/maps/src/stories`, and `.storybook/preview.css` `@source`s that package's `src` so Tailwind emits the classes its components ask for. Two Storybooks for one design system is two review surfaces that can disagree. Both tasks depend on this package's own `build`, because a maps story imports `@thomasfosterau/components/canvas` — i.e. this package's `dist/`. Deliberately **outside** the `check` graph: the stories are type-checked by `check` (they are `src/` files), but rendering them is a review affordance, not a gate. The a11y addon is installed — a story with outstanding violations in that panel is not ready for review.
+`vp run --filter ./packages/components storybook` (dev, port 6006) and `storybook:build`. This is the one Storybook for the workspace: its `stories` glob also reaches across into `packages/maps/src/stories`, and `.storybook/preview.css` `@source`s that package's `src` so Tailwind emits the classes its components ask for. Both tasks depend on this package's own `build`, because a maps story imports `@thomasfosterau/components/canvas` — this package's `dist/`. Storybook is outside the `check` graph: the stories are type-checked by `check`, but rendering them is a review affordance; CI runs `storybook:build`. The a11y addon is installed — a story with outstanding violations in that panel is not ready for review.
 
 A story must not depend on anything the consumer would not have: no app state, no network, no `localStorage` writes (the next reviewer inherits them).
-
-## Local invariants
-
-- **Stay app-agnostic.** Nothing here may import `$app/*`, `$env/*`, or reach for a global. A component that needs one piece of application behaviour takes it as a prop.
-- **Refine, don't redesign.** Extend an existing primitive rather than adding a parallel one; a new one-off component is usually a sign the shared primitive needs a prop.
-- **`"sideEffects": false`.** `exports` points at `svelte-package` output, so the field is a claim about `dist/`: every emitted `.js` is pure declarations. `theme.css` is reached through a CSS `@import`, never a JS import, which is why the claim holds despite a stylesheet being in the package.
-- **Nothing heavy on the always-loaded path.** The barrel is imported by every consumer on every page. A dependency the barrel pulls in eagerly needs a better reason than convenience — reach it through a dynamic `import()` inside the one component that needs it, and give that component its own package.
-- **A component whose behaviour needs a specific third-party dependency does not live here.** It lives in its own package adjacent to this one, taking that dependency as a REQUIRED peer, so this package stays free of it. `@thomasfosterau/components-maps` (`mapbox-gl`) is the worked example — see [packages/maps/CLAUDE.md](../maps/CLAUDE.md).
-- **`effect` and `@thomasfosterau/effect-forms-svelte` are reachable from ONE file.** `forms/EntityForm.svelte`, through the `./entity-form` entry (`forms/entity-form.ts`), which is not re-exported from `forms/index.ts` or the root barrel. The form library is an optional peer, so importing it anywhere else would make every consumer install it. `EntityForm` imports only `createForm` and types; everything it renders is this package's own field primitives.
-- **The public surface is the barrel.** A component not exported from `src/lib/index.ts` is an implementation detail; a component exported from it is a semver commitment and needs a changeset to change.
 
 ## Terms
 
@@ -54,14 +42,10 @@ A story must not depend on anything the consumer would not have: no app state, n
 
 - **`ItemList` feed mode** — `data/ItemList`'s `feed?` prop switches its wrapper from `<ul>`/`<li>` (the default, where the list structure alone is the semantics) to `<div role="feed" aria-label aria-busy>` of `<article aria-posinset aria-setsize tabindex="-1">`. Feed mode is for a stream where only a window is ever in the DOM (infinite scroll, "load more") — `aria-posinset`/`aria-setsize` state each item's position in the whole even though the DOM only holds a slice, and `busy` reflects a fetch in flight for more. Use the default `<ul>` mode for a list that is entirely in the DOM at once.
 
-- **Chart palette rules** (`theme.css`'s "Categorical chart slots" block, `charts/Chart.svelte`) — four validated custom properties, `--color-chart-1…4`, assigned to series by ORDER and never cycled:
-  - **Order is the safety mechanism.** The separation gates are measured on ADJACENT pairs — what a line, bar or stack actually puts side by side. Re-ordering the slots invalidates the measurement: slots 2 and 4 (indigo/blue) are ΔE 2.7 apart in light and 0.4 in dark under simulated dichromacy, i.e. no colour difference at all for that reader if put next to each other.
+- **Chart palette rules** (`theme.css`'s "Categorical chart slots" block, `charts/Chart.svelte`) — four validated custom properties, `--color-chart-1…4`, assigned to series by order and never cycled:
+  - **Order is the safety mechanism.** The separation gates are measured on adjacent pairs — what a line, bar or stack actually puts side by side. Re-ordering the slots invalidates the measurement: slots 2 and 4 (indigo/blue) are ΔE 2.7 apart in light and 0.4 in dark under simulated dichromacy, i.e. no colour difference at all for that reader if put next to each other.
   - **Four is the cap; three is the cap for a form that compares every pair at once** (a scatter, a choropleth, a pie), where even the best-separated pair (1↔3) falls to ΔE 4.9 under protanopia. A fifth series is a design problem — fold it into "other", or facet — never a generated hue; `Chart` draws a fifth in `--color-neutral` and names it in the legend.
-  - **Status colours are not series colours.** Slot 3 is amber-600, not the amber-500 that IS `--color-warning` — a series can never impersonate a state.
+  - **Status colours are not series colours.** Slot 3 is amber-600, not the amber-500 that is `--color-warning` — a series can never impersonate a state.
   - This is why `Chart`'s `sr-only` data table is always in the DOM regardless of `showTable`: colour is the fast path, never the only one. A consumer replacing `theme.css`'s two themes must replace all four chart slots with their own measured set, in the same order.
 
 - **Tip store frequency vs. status** (`tips/tip-store.svelte.ts`) — `shouldDisplay` checks `TipStatus` before it checks `TipFrequency`: a tip in status `dismissed` or `completed` never shows again regardless of `frequency`, even `'immediate'`. `dismiss(id)` and `complete(id)` are both terminal — the distinction is for the app's own read of `getState`, not for `shouldDisplay`'s behaviour, which treats them identically. Frequency (`immediate`/`hourly`/`daily`/`weekly`/`once`) only gates re-display for a tip that is still in `pending`/`available`.
-
-- **Two test-infra gotchas the implementing agents hit:**
-  - **Vitest's Playwright locator mutates the `position` object you pass it.** `locator.click({ position })` (and `dblclick`/`dropTo`) scale `position` into page pixels by mutating the object in place, so a point a spec declares once as a constant and reuses is a different point the second time — it fails quietly (the first use is correct, later ones drift by the iframe's scale). `tests/canvas/pointer.ts`'s `copy(at)` exists for this: always pass a fresh `{ x, y }` per call, never the same object twice.
-  - **`render(Component, props)` cannot take a prop literally named `anchor`, `target`, `props`, `events`, `context` or `intro`** — those are Svelte's own mount options and are intercepted before your props are. Nest a real prop of one of those names under `props:` instead. (Also stated in the root [AGENTS.md](../../AGENTS.md), restated here because it is this package's tests that hit it.)

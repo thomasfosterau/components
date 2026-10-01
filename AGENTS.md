@@ -1,13 +1,16 @@
 # AGENTS.md
 
-Project conventions live here; personal style preferences live in user memory.
+`CLAUDE.md` is a symlink to this file. This repo publishes two Svelte 5 component libraries consumed by the owner's apps (website, gardeneria, preferenceflow, in-the-dark); the artifacts that matter are `packages/components/dist` and `packages/maps/dist`, and everything below exists to keep them small, typed and accessible. The toolchain, workspace shape, catalog discipline and session hook are copied from the app repos so a component authored here compiles identically in the app that consumes it; the places the two deliberately differ are commented where they occur (`playwright`'s pin, the browser-mode test suite, the absence of a stage/deploy graph).
 
-This repo is a **publishable npm library** — two of them, in fact — not an application. The artifacts that matter are `packages/components/dist` and `packages/maps/dist`, and everything below exists to keep them small, typed and accessible. The toolchain, workspace shape, catalog discipline, task graph and session hook are copied from the owner's app repos (the Gardeneria / Website foundation) so a component authored here compiles identically in the app that consumes it; the three places the two deliberately differ are commented where they occur (`playwright`'s pin, the browser-mode test suite, and the absence of a stage/deploy graph).
+| Package | Directory | Boundary |
+| --- | --- | --- |
+| `@thomasfosterau/components` | `packages/components` | The core library. Peers: `svelte`; optional `@thomasfosterau/effect-forms-svelte`, reached only from `/entity-form`. Rules in [its CLAUDE.md](packages/components/CLAUDE.md). |
+| `@thomasfosterau/components-maps` | `packages/maps` | Maps and the plan editor. Required peer `mapbox-gl`; consumes the core through its published `/canvas` entry. Rules in [its CLAUDE.md](packages/maps/CLAUDE.md). |
 
 ## Common pitfalls
 
-- **Never edit a version in a `package.json`.** Every external version lives in [`pnpm-workspace.yaml`](pnpm-workspace.yaml) under `catalog:`; package.json files carry only `catalog:` or `workspace:*`, and `catalogMode: strict` rejects anything else at install. After editing the catalog, run `pnpm install` and commit the regenerated `pnpm-lock.yaml` — a stale lockfile fails every CI job at once with `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH`.
-- **`dist/` is the product; `src/routes` does not exist.** Both packages are `svelte-package` libraries, not SvelteKit apps. There is no demo app, no adapter and no `app.html`. Nothing under either `src/lib/` may import `$app/*`, `$env/*` or anything else SvelteKit only resolves inside an app — SvelteKit is here to run `svelte-kit sync` and `svelte-package`, nothing more. `packages/maps` consumes its sibling the way a consumer does, through `@thomasfosterau/components`' published `exports` and therefore its built `dist/` — never a relative path into the other package's `src/`, which is why its `check` and `test:unit` take a `{ task: 'build', from: 'dependencies' }` edge.
+- **Never edit a version in a `package.json`.** Every external version lives in [`pnpm-workspace.yaml`](pnpm-workspace.yaml) under `catalog:`; package.json files carry only `catalog:` or `workspace:*`, except the published `svelte` peer range (`^5.30.1`), which is literal (#46). `catalogMode: strict` rejects anything else at install. After editing the catalog, run `pnpm install` and commit the regenerated `pnpm-lock.yaml` — a stale lockfile fails every CI job at once with `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH`.
+- **`dist/` is the product; `src/routes` does not exist.** Both packages are `svelte-package` libraries, not SvelteKit apps: no demo app, no adapter, no `app.html`. Nothing under either `src/lib/` may import `$app/*`, `$env/*` or anything else SvelteKit only resolves inside an app — SvelteKit is here to run `svelte-kit sync` and `svelte-package`, nothing more.
 - **`"sideEffects": false` is a claim about `dist/`, and it is load-bearing.** Every emitted `.js` must be pure declarations: no bare imports, no top-level `await`, no top-level statements. A `<script module>` block may only declare. It is what lets a consumer's bundler drop the components they don't use.
 - **Accessibility regresses silently.** Type errors don't catch a lost accessible name, a broken focus order or a dropped `aria-*` relationship. That is the whole reason the suite drives a real browser.
 
@@ -31,11 +34,12 @@ This repo is a **publishable npm library** — two of them, in fact — not an a
 
 - **Every string is a prop with an English default.** There is no message catalogue and the context carries no copy: `dismissLabel = 'Dismiss'`, `previousLabel = 'Previous'`. Accessible-name props end in `Label`. An i18n app passes its own messages at the call site.
 - **Links and locale go through the context.** `getComponentsContext()` supplies `href(path)`, `navigate(url)`, `isCurrent(href)` and `locale()`; a component never imports `$app/*` and never reads `window.location` itself. Every `Intl` formatter takes a `locales` prop and falls back to `locale()`.
-- **No Effect.** Async callbacks are `(…, signal: AbortSignal) => Promise<T>`; optional values are `T | undefined`. Effect adapters live in the consuming apps. The one exception is the `@thomasfosterau/components/entity-form` entry: it renders `@thomasfosterau/effect-forms-svelte` definitions, so that library, and `effect` through it, is an optional peer reached only from that entry. Nothing else may import either.
+- **No Effect outside `/entity-form`.** Async callbacks are `(…, signal: AbortSignal) => Promise<T>`; optional values are `T | undefined`. Effect adapters live in the consuming apps. The one exception is the `@thomasfosterau/components/entity-form` entry: it renders `@thomasfosterau/effect-forms-svelte` definitions, so that library, and `effect` through it, is an optional peer reached only from that entry (see [§ Effect](#effect)).
 - **Ids are minted with `$props.id()`** and overridable by an `id` prop.
-- **Optional props are declared `T | undefined`, never bare `prop?: T`.** The workspace compiles with `exactOptionalPropertyTypes`, under which `prop?: T` rejects an explicitly forwarded `undefined`, so `<Button {tone}>` from a caller whose own `tone` is optional would not compile. Parenthesise function types: `onSelect?: (() => void) | undefined`.
+- **Optional props are declared `T | undefined`, never bare `prop?: T`.** The workspace compiles with `exactOptionalPropertyTypes`, under which `prop?: T` rejects an explicitly forwarded `undefined`, so `<Button {tone}>` from a caller whose own `tone` is optional would not compile. Parenthesise function types: `onSelect?: (() => void) | undefined`. Older components still break this rule (#45); don't copy them.
+- **Document every component and prop for the hover.** Open each component with a one-sentence `<!-- @component … -->` comment (svelte2tsx copies only a comment starting with `@component` into the `.d.ts`; a plain `<!-- … -->` header stays maintainer-only). Give each non-obvious prop a `/** … */` line, with `@defaultValue` wherever the destructuring sets one.
+- **`.svelte` files are formatted by hand** — oxfmt skips them, `vp staged` only lints them and the PostToolUse format hook ignores them: two-space indent, single quotes, semicolons.
 - **In a `.ts` test, `render(Component, props)` cannot take a prop named `anchor`, `target`, `props`, `events`, `context` or `intro`** — those are Svelte's mount options; nest such props under `props:`.
-
 - **daisyUI classes come from a literal lookup table, never a template string.** Tailwind 4 extracts classes by scanning source text, so ``class={`btn-${variant}`}`` emits nothing at all:
 
   ```ts
@@ -53,67 +57,62 @@ This repo is a **publishable npm library** — two of them, in fact — not an a
 - **Every component ships with a story and a browser test.** One `*.stories.svelte` / `*.stories.ts` per component under `src/stories/<family>/` and one `tests/<family>/<Component>.test.ts`, both mirroring `src/lib/<family>/` (in `packages/maps`, which is one family, the `<family>/` level is dropped) — not beside the component, because `svelte-package` copies every `src/lib/` file into `dist/` and stories must not ship. Snippet-taking components use Svelte CSF (`defineMeta` + `<Story>`), prop-only ones plain CSF.
 - **Families, entry points, and when a family becomes a package.** Core families (`ui`, `feedback`, `layout`, `fields`, `forms`, `data`, `infobox`, `formatting`, `links`, `media`, `hotkeys`, `search`) are re-exported from `@thomasfosterau/components`' root barrel; `citations`, `canvas`, `charts`, `tips` and `seo` are separate `exports` entries (`@thomasfosterau/components/<family>`), as is `entity-form` (the `forms` family's `EntityForm`, kept out of the barrel because of its optional peer) so a consumer that never uses them never loads them. A new family gets a barrel, an `exports` entry if heavy, and a README section.
 
-  **A component whose behaviour needs a specific third-party dependency lives in its own package adjacent to `packages/components`, so the core stays free of it** — the dependency becomes that package's REQUIRED peer, and installing the package is the decision to take it on. `maps` is the worked example: `@thomasfosterau/components-maps`, `mapbox-gl` required. An "optional peer" of the core library is the shape this rule replaces; nothing in this workspace could check it, so it was a fiction. `canvas`, `charts`, `citations` and `tips` need no such dependency and stay where they are.
+  **A component whose behaviour needs a specific third-party dependency lives in its own package adjacent to `packages/components`, so the core stays free of it** — the dependency becomes that package's required peer, and installing the package is the decision to take it on. `maps` is the worked example: `@thomasfosterau/components-maps`, `mapbox-gl` required. An "optional peer" of the core library is the shape this rule replaces; nothing in this workspace could check it. `canvas`, `charts`, `citations` and `tips` need no such dependency and stay where they are.
 
 - **Prefer vertical slices per component** over horizontal sweeps: component → barrel export → story → test → README row, finished, before starting the next.
 
-## Documentation surfaces
-
-Durable knowledge has one home each: a **decision, findings report, or invariant** discovered while working an issue is recorded **as a comment on that issue** (later comments override the body); a **rule that must be visible when touching certain files** goes in `.claude/rules/`; a **term** goes in the nearest package `CLAUDE.md`. The surviving docs are `README.md`, `AGENTS.md`, the package `README.md` and `CLAUDE.md`, and `LICENSE`. There is no `docs/` tree.
-
 ## Commands
 
-- `pnpm install` — dependencies, plus the Vite+ git hooks (pre-commit runs `vp staged`: format + lint on staged files). There is **no pre-push hook** — run the gates yourself before pushing.
-- `vp check` — format + lint (oxfmt + oxlint) over the workspace. Distinct from `vp run check`.
-- `vp run check` — the type-check gate: the root aggregate over every package's `check` (`svelte-kit sync` + `svelte-check`).
+Invoke everything through `vp` — `vp run <script>`, `vp exec <bin>` (instead of `npx`). The sanctioned non-`vp` invocations: `pnpm install` (`pnpm install --frozen-lockfile` in CI), `pnpm changeset`, the release path (`pnpm run release`: `pnpm pack` + `npm publish`), and `pnpm exec playwright install` in CI.
+
+- `pnpm install` — dependencies, plus the Vite+ git hooks (pre-commit runs `vp staged`: format + lint on staged files). There is no pre-push hook.
+- `vp check` — format + lint (Oxfmt + Oxlint). `vp run check` — the type gate: every package's `check` (`svelte-kit sync` + `svelte-check`). They are different commands.
 - `vp run -r test:unit` — both packages' suites, in headless Chromium under Vitest browser mode.
 - `vp run -r build` — `svelte-package` → `packages/components/dist` and `packages/maps/dist`.
-- `vp run --filter ./packages/components storybook` — the dev loop on port 6006; `storybook:build` for the static build. **One Storybook for the workspace**: its `stories` glob reaches across into `packages/maps/src/stories`, so there is no `.storybook/` in that package.
-
-`vp check`, `vp run check` and `vp run -r test:unit` are the meaningful pre-push gates.
-
-## Publishing
-
-Changesets. Any PR that changes published behaviour adds one (`pnpm changeset`); `.github/workflows/release.yml` opens a "Version Packages" PR while unreleased changesets exist and publishes once it merges (provenance is left to npm, never forced). The default branch is `main` — that is what `.changeset/config.json`'s `baseBranch` must say.
-
-Publishing is **npm Trusted Publishing (OIDC)** from the protected `release` environment — there is no `NPM_TOKEN` anywhere. `pnpm publish` cannot do OIDC, so the publish step is [`scripts/publish.mjs`](scripts/publish.mjs): `pnpm pack` per package (which rewrites `catalog:` / `workspace:*`) and `npm publish <tarball>`. Never switch it back to `pnpm publish -r` or `changeset publish`. The one-time owner setup — the `release` environment and a trusted publisher per package — is in [README.md](README.md#releasing).
-
-## Worktree workflow
-
-Agent work uses git worktrees under `.claude/worktrees/`, one per feature branch. The model is `main` plus short-lived feature branches off it. Branch off `main`, PR against `main`, squash-merge. Name branches `issue-<n>-<slug>` for issue-linked work, or a plain descriptive slug otherwise.
-
-The shell's cwd silently resets to the primary checkout between tool calls (container restarts, background tasks), so relative commands can hit the wrong tree: start every command that targets a worktree with an explicit `cd` into it, and run `git log -1` to confirm you're on the intended branch before committing.
-
-The linked `vp` at `~/.local/bin/vp` re-execs the nearest project-local `node_modules/vite-plus/bin/vp` walking up from cwd, so running it from inside a worktree after `pnpm install` there uses that worktree's own vitest instead of the primary checkout's — if you still see a `describe()` throw `Cannot read properties of undefined (reading 'config')`, the worktree likely hasn't had `pnpm install` run in it yet.
-
-Before opening a PR from a worktree, **rebase onto `main`**:
-
-```sh
-git fetch origin main
-git rebase origin/main
-```
-
-Don't merge `main` into the worktree branch. Merging lets git silently auto-resolve convergent edits between parallel worktrees; rebasing forces them to surface as real conflicts. GitHub's Update-branch button and auto-merge both violate this rule, so avoid them in favour of manual rebasing.
-
-## Claude Code conventions
-
-- The toolchain is **Vite+** (the `vp` CLI) on **Node + pnpm**. Invoke everything through `vp` — `vp run <script>`, `vp exec <bin>`; use `vp exec` instead of `npx`, and reach for `vp` rather than bare `pnpm`/`npm`/`yarn`. The sanctioned non-`vp` invocations: `pnpm install` (and `pnpm install --frozen-lockfile` in CI), `pnpm changeset` and `scripts/publish.mjs` (`pnpm pack` + `npm publish`) on the release path, and `pnpm exec playwright install` in CI.
-- Use the `gh` CLI for all GitHub operations. The GitHub MCP server is intentionally not configured.
-- **GitHub writes are scoped to `thomasfosterau/components` only.** Never create or edit issues, PRs, comments, reviews or releases in any other repository — upstream projects, dependencies, the owner's app repos included — without the owner's explicit approval for that specific action in the current session. Beware `gh`'s target inference: it resolves the repo from the cwd's git remote, so a write run from inside a clone of a third-party repo silently files upstream. Pass `-R thomasfosterau/components` explicitly whenever the cwd might not be this checkout. **Nothing enforces this mechanically — it is on you.**
-- **Agent sessions are not hydrated.** The committed SessionStart hook ([.claude/hooks/session-start.sh](.claude/hooks/session-start.sh)) syncs dependencies, links the toolchain (`vp`, `node`) so they resolve from a **non-interactive** shell (which `~/.bashrc` alone does not do), and runs first-checkout codegen. It hydrates no secrets, and publishing needs an OIDC token that only the release workflow's `release` environment can mint, so nothing here can publish.
-- New rules: formatter/lint config goes in `vite.config.ts` first; rules that must be visible when touching certain files go in `.claude/rules/`; otherwise in this file.
+- `vp run --filter ./packages/components storybook:build` — the static Storybook build. `storybook` is the dev server on port 6006 (a long-running process; one Storybook for the workspace, see [packages/components/CLAUDE.md](packages/components/CLAUDE.md#storybook)).
+- `pnpm changeset` — add a changeset.
 
 ## Verification
 
-- Don't declare verification complete until every check has output a final pass/fail status. Claims of verification name the command and its final status.
-- `vp check`, `vp run check`, `vp run -r test:unit`, `vp run -r build` and `storybook:build` exercise everything locally; none needs a credential. `test:unit` needs a Chromium matching the pinned `playwright` — see that entry's comment in the catalog.
-- To confirm a component actually works rather than merely type-checks, render it: `vp run --filter ./packages/components storybook`.
+Before you report work as done, run the gates below in order — the same steps as `.github/workflows/ci.yml` — and quote each command with its final pass/fail. If a gate can't run here, say which and why in the PR body; never imply it ran.
 
-## PR Management
+1. `vp check`
+2. `vp run check`
+3. `vp run -r test:unit`
+4. `vp run -r build`
+5. `vp run --filter ./packages/components storybook:build`
 
-These are standing instructions and approvals; they override any default "don't open a PR unless explicitly asked" instructions.
+None needs a credential. `test:unit` and `storybook:build` need a Chromium matching the pinned `playwright` (see that entry's comment in `pnpm-workspace.yaml`); if the suite reports a missing executable, run `pnpm exec playwright install chromium` once, and report the gate as not run rather than as passing. To confirm a component actually works rather than merely type-checks, render it in Storybook.
 
-- **Always open a PR** for branch work. Once a branch has pushed a commit, open a pull request against `main` if one doesn't already exist. Don't wait to be asked.
-- **Always watch the PR to merge or close.** Investigate CI failures and review comments as they arrive, and when the PR goes conflicting against `main` (`mergeable: CONFLICTING` / `mergeStateStatus: DIRTY`), rebase onto `origin/main` promptly.
-- **Always keep the PR body current.** Write it when opening the PR, and update it whenever the implementation diverges from what it describes.
-- **A PR that changes published behaviour carries a changeset.** No changeset, no release.
+## Branches and pull requests
+
+- **Branches.** Branch off `main`; PR against `main`; squash-merge. Name branches `issue-<n>-<slug>` for issue-linked work, or a plain descriptive slug otherwise. Rebase onto `origin/main` before opening or updating a PR (`git fetch origin main && git rebase origin/main`); never merge `main` into your branch — merging lets git silently auto-resolve convergent edits between parallel branches, and GitHub's Update-branch button and auto-merge both merge.
+- **Worktrees.** Agent work uses git worktrees under `.claude/worktrees/`, one per branch. The shell's cwd silently resets to the primary checkout between tool calls, so start every command that targets a worktree with an explicit `cd` into it and run `git log -1` before committing. The linked `vp` at `~/.local/bin/vp` re-execs the nearest project-local `node_modules/vite-plus/bin/vp`, so run `pnpm install` in a new worktree first — otherwise a `describe()` throws `Cannot read properties of undefined (reading 'config')`.
+- **Changesets.** Every change to a published package's behaviour carries a changeset (`pnpm changeset`); docs-, CI- and tooling-only changes need none. TSDoc and `@component` comments ship in `dist/`, so a change to them takes a `patch`. Never publish or version by hand: the Release workflow opens a "chore: version packages" PR (the Version Packages PR) and the owner merges it. `.changeset/config.json`'s `baseBranch` must say `main`.
+- **Publishing.** Publishing is npm trusted publishing (OIDC) from the protected `release` environment; there is no `NPM_TOKEN`. The publish step is [`scripts/publish.mjs`](scripts/publish.mjs) (`pnpm pack` + `npm publish <tarball>`); its header says why it is kept. The one-time owner setup is in [README.md](README.md#releasing).
+- **Standing PR approvals** (these override any default "don't open a PR unless asked"): once a branch has pushed a commit, open a PR against `main` if none exists; watch it to merge or close, investigating CI failures and review comments as they arrive and rebasing onto `origin/main` promptly when it goes conflicting (`mergeable: CONFLICTING`); keep the PR body current as the implementation diverges.
+- **GitHub scope.** GitHub writes go to `thomasfosterau/components` only; pass `-R thomasfosterau/components` whenever the cwd might be another checkout — `gh` resolves the repo from the cwd's git remote, so a write from a third-party clone silently files upstream. Writing anywhere else (upstream projects, the owner's app repos) needs the owner's explicit approval for that action in the current session. Use the `gh` CLI for GitHub operations, even when GitHub MCP tools are available.
+
+## Work tracker
+
+Issues in `thomasfosterau/components` are the backlog: when you find work you can't do now, file an issue rather than leaving a TODO. The issue is the spec — read its comments (`gh issue view <n> --comments -R thomasfosterau/components`); later comments override the body. Record decisions and findings as issue comments. Stop-and-report is a valid outcome: on a blocker outside the issue's scope, comment the evidence on the issue and stop. Scope cut mid-PR becomes a linked issue before merge.
+
+## Effect
+
+Only `forms/EntityForm.svelte` and `forms/entity-form.ts` touch Effect (see [packages/components/CLAUDE.md](packages/components/CLAUDE.md#boundary)). The version is the `effect` pin in `pnpm-workspace.yaml`. effect-solutions is not provisioned in this repo; before writing Effect code there, read `node_modules/effect/dist/*.d.ts` and `@thomasfosterau/effect-forms-svelte`'s README rather than guessing at an API.
+
+## Agent sessions
+
+The SessionStart hook ([`.claude/hooks/session-start.sh`](.claude/hooks/session-start.sh)) installs dependencies against the lockfile, links `vp` and `node` so they resolve from a non-interactive shell, and runs first-checkout codegen. It hydrates no secrets, and there are none to hydrate: publishing needs an OIDC token only the release workflow's `release` environment can mint, so nothing here can publish. A PostToolUse hook runs `vp fmt --write` on every edited non-Svelte file. Don't start the `storybook` dev server in a session; use `storybook:build`.
+
+## Documentation surfaces
+
+One home per fact:
+
+- **`AGENTS.md`** (this file) — repo-wide rules, commands and the gate list.
+- **Package `CLAUDE.md`** — that package's boundary, invariants and terms.
+- **Package `README.md`** — the API reference consumers read on npm. The root `README.md` is the landing page, the contributor setup and the release pipeline with its owner setup.
+- **Issue comments** — decisions and findings, later comments overriding the body.
+- **`.claude/rules/`** — a rule that must be visible when touching certain files (none exist yet). Formatter and lint config goes in `vite.config.ts` first.
+
+There is no `docs/` tree.
