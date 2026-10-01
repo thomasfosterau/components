@@ -1,10 +1,10 @@
 # @thomasfosterau/components-maps
 
-Maps for [`@thomasfosterau/components`](../components/README.md): a static raster, the interactive [Mapbox GL](https://docs.mapbox.com/mapbox-gl-js/) surface, the one that upgrades from the first to the second, a plan editor, and the seam between the editor's shapes and a stored GeoJSON geometry.
+Maps for [`@thomasfosterau/components`](https://www.npmjs.com/package/@thomasfosterau/components): a static raster, the interactive [Mapbox GL](https://docs.mapbox.com/mapbox-gl-js/) surface, the one that upgrades from the first to the second, a plan editor, and the seam between the editor's shapes and a stored GeoJSON geometry.
 
-**Why this is a package and not a family.** A component whose behaviour needs a specific third-party dependency lives in its own package adjacent to `packages/components`, so the core library stays free of it. Here that dependency is `mapbox-gl` — ~800 kB of WebGL — and keeping it out of the core is what lets an application that renders no map never hear about it. The same rules hold as everywhere else in this library: daisyUI semantic classes and never raw colour, every user-facing string a prop with an English default, no Effect, native attributes spread and the caller's `class` merged last.
+It is a separate package so that an application that renders no map never installs `mapbox-gl` (~800 kB of WebGL). The same rules hold as in the core library: daisyUI semantic classes and never raw colour, every user-facing string a prop with an English default, no Effect, native attributes spread and the caller's `class` merged last.
 
-## Installation
+## Install
 
 ```sh
 pnpm add @thomasfosterau/components-maps @thomasfosterau/components mapbox-gl
@@ -14,9 +14,9 @@ pnpm add @thomasfosterau/components-maps @thomasfosterau/components mapbox-gl
 
 | Package | Range | Why |
 | --- | --- | --- |
-| `mapbox-gl` | `^3.0.0`, **required** | The engine `DynamicMap` (and therefore `Map`) renders with. Required, not optional: installing this package is the decision to render a map. It is still reached only through a dynamic `import()` inside `DynamicMap`'s mount effect, so it lands in the chunk for the route that renders a live map and nowhere else. |
+| `mapbox-gl` | `^3.31.0`, **required** | The engine `DynamicMap` (and therefore `Map`) renders with. Required, not optional: installing this package is the decision to render a map. It is still reached only through a dynamic `import()` inside `DynamicMap`'s mount effect, so it lands in the chunk for the route that renders a live map and nowhere else. |
 | `svelte` | `^5.30.1` | A declared peer. The components are compiled by your build, not pre-compiled. |
-| `@thomasfosterau/components` | `workspace:*` / same release line | A runtime dependency, not a peer — `MapEditor` is built on its `/canvas` entry point. |
+| `@thomasfosterau/components` | the same release line | A runtime dependency, not a peer (installed with this package) — `MapEditor` is built on its `/canvas` entry point. |
 | `tailwindcss` | `^4.0.0` | Not a declared peer, but **required**: the components emit Tailwind classes and ship none. |
 | `daisyui` | `^5.0.0` | Same — the class vocabulary is daisyUI's (`bg-neutral`, `text-base-content`, `rounded-box`). |
 
