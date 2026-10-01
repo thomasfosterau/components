@@ -1,3 +1,6 @@
+<!-- @component
+The `FormField` frame — legend, hint, errors — for a group of controls rather than one.
+-->
 <!--
   Fieldset — the same frame as `FormField`, for a GROUP of controls rather
   than one.
@@ -23,11 +26,21 @@
   interface Props extends Omit<HTMLAttributes<HTMLFieldSetElement>, 'children'> {
     /** The group's `<legend>`; names every control inside it. */
     legend: string;
+    /** Guidance rendered under the legend. */
     hint?: string | undefined;
+    /**
+     * Validation messages; any at all marks the group invalid.
+     * @defaultValue `[]`
+     */
     errors?: readonly string[] | undefined;
+    /** Marks the group required and reads `requiredLabel` after the legend. */
     required?: boolean | undefined;
-    /** Read out after the legend when `required`. */
+    /**
+     * Read out after the legend when `required`.
+     * @defaultValue `'(required)'`
+     */
     requiredLabel?: string | undefined;
+    /** The grouped controls. */
     children: Snippet<[]>;
   }
 

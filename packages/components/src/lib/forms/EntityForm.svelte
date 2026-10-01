@@ -1,3 +1,6 @@
+<!-- @component
+Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition through this library’s field primitives.
+-->
 <!--
   EntityForm — the generic renderer for an `@thomasfosterau/effect-forms-svelte`
   `defineEntityForm` definition: it walks `definition.entriesFor(mode)` and
@@ -57,24 +60,53 @@
   type Store = ReturnType<typeof createForm>;
 
   interface Props extends Omit<HTMLFormAttributes, 'action' | 'method' | 'children'> {
+    /** The form definition from `defineEntityForm`. */
     definition: EntityFormDefinition;
+    /** Which of the definition’s entry sets to render. */
     mode: 'create' | 'update';
     /** Where Cancel goes. Omitted renders no cancel link. */
     cancelHref?: string | undefined;
     /** A named action (`?/addItem`). Omitted posts to the page's default action. */
     action?: string | undefined;
-    /** All-string initial values: an edit page's current values, or a create page's pre-filled FK. */
+    /**
+     * All-string initial values: an edit page's current values, or a create page's pre-filled FK.
+     * @defaultValue `{}`
+     */
     initial?: Readonly<Record<string, string>> | undefined;
-    /** Initial rows per `rows` widget key (a contributor list's current credits). */
+    /**
+     * Initial rows per `rows` widget key (a contributor list's current credits).
+     * @defaultValue `{}`
+     */
     initialRows?: Readonly<Record<string, readonly unknown[]>> | undefined;
-    /** Render-time extra props per widget key (a picker's load-resolved `options`). */
+    /**
+     * Render-time extra props per widget key (a picker's load-resolved `options`).
+     * @defaultValue `{}`
+     */
     fieldProps?: Readonly<Record<string, Readonly<Record<string, unknown>>>> | undefined;
-    /** The spreadable `<form>` attributes for this store. Default: the store's own `form.props`. */
+    /**
+     * The spreadable `<form>` attributes for this store.
+     * @defaultValue the store's own `form.props`
+     */
     enhance?: ((form: Store) => Record<string | symbol, unknown>) | undefined;
+    /**
+     * Text of the cancel link.
+     * @defaultValue `'Cancel'`
+     */
     cancelLabel?: string | undefined;
+    /**
+     * Submit button text while the form is submitting.
+     * @defaultValue `'Saving…'`
+     */
     pendingLabel?: string | undefined;
-    /** The empty option of a select entry. */
+    /**
+     * The empty option of a select entry.
+     * @defaultValue `'Choose…'`
+     */
     selectPlaceholder?: string | undefined;
+    /**
+     * Read out after a required field’s label.
+     * @defaultValue `'(required)'` (from `FormField`)
+     */
     requiredLabel?: string | undefined;
   }
 

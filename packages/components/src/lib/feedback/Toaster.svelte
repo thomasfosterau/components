@@ -1,3 +1,6 @@
+<!-- @component
+The notification region, plus the context that lets any descendant push a toast into it (`getToaster().add({ title: 'Saved' })`).
+-->
 <!--
   Toaster — the notification region, plus the context that lets any descendant
   push into it (`getToaster().add({ title: 'Saved' })`).
@@ -26,13 +29,25 @@
   import { setToaster, type Toast, type ToasterApi } from './toaster.ts';
 
   interface Props {
-    /** Which corner the stack grows from. */
+    /**
+     * Which corner the stack grows from.
+     * @defaultValue `'bottom-end'`
+     */
     position?: ToastPosition | undefined;
-    /** Accessible name of the live region. */
+    /**
+     * Accessible name of the live region.
+     * @defaultValue `'Notifications'`
+     */
     regionLabel?: string | undefined;
-    /** Accessible name of every toast's dismiss button. */
+    /**
+     * Accessible name of every toast's dismiss button.
+     * @defaultValue `'Dismiss'`
+     */
     dismissLabel?: string | undefined;
-    /** How long a toast lives when `add` is given no duration. `0` = sticky. */
+    /**
+     * How long a toast lives when `add` is given no duration. `0` = sticky.
+     * @defaultValue `6_000`
+     */
     durationMs?: number | undefined;
     /** Extra classes on the region. */
     class?: string | undefined;

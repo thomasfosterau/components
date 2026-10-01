@@ -1,3 +1,6 @@
+<!-- @component
+The site banner: brand, primary links and account controls, with a disclosure for what does not fit on a narrow viewport.
+-->
 <!--
   Navbar — the site's banner: the brand, the primary links, the account
   controls, and on a narrow viewport the disclosure that holds whatever did
@@ -35,9 +38,15 @@
   import VisuallyHidden from '../ui/VisuallyHidden.svelte';
 
   interface Props extends HTMLAttributes<HTMLElement> {
-    /** Accessible name of the `<nav>` landmark. */
+    /**
+     * Accessible name of the `<nav>` landmark.
+     * @defaultValue `'Primary'`
+     */
     label?: string | undefined;
-    /** Accessible name of the responsive menu toggle. */
+    /**
+     * Accessible name of the responsive menu toggle.
+     * @defaultValue `'Menu'`
+     */
     menuLabel?: string | undefined;
     /** Whether the responsive panel is open. Bindable. */
     menuOpen?: boolean | undefined;

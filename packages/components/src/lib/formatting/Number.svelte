@@ -1,3 +1,6 @@
+<!-- @component
+A `<data>` element whose text is the `Intl.NumberFormat` rendering and whose `value` attribute keeps the raw number.
+-->
 <!--
   NumberFormat — a `<data>` element whose text is `Intl.NumberFormat`'s
   rendering and whose `value` attribute is the raw number/bigint, so the
@@ -13,16 +16,39 @@
   import { getComponentsContext } from '../context.svelte.ts';
 
   interface Props extends Omit<HTMLDataAttributes, 'value'> {
+    /** The number to format; the raw value also goes in the `value` attribute. */
     value: number | bigint;
+    /**
+     * Locale(s) for `Intl` formatting.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
+    /**
+     * `Intl.NumberFormat` `style`.
+     * @defaultValue `'decimal'`
+     */
     style?: Intl.NumberFormatOptions['style'];
+    /** The unit when `style` is `unit` (`kilometer`, `percent`). */
     unit?: string | undefined;
+    /**
+     * `Intl.NumberFormat` `unitDisplay`.
+     * @defaultValue `'short'`
+     */
     unitDisplay?: Intl.NumberFormatOptions['unitDisplay'];
+    /** ISO 4217 code when `style` is `currency`. */
     currency?: string | undefined;
+    /**
+     * `Intl.NumberFormat` `currencyDisplay`.
+     * @defaultValue `'symbol'`
+     */
     currencyDisplay?: Intl.NumberFormatOptions['currencyDisplay'];
+    /** `Intl.NumberFormat` `maximumFractionDigits`. */
     maximumFractionDigits?: number;
+    /** `Intl.NumberFormat` `minimumFractionDigits`. */
     minimumFractionDigits?: number;
+    /** `Intl.NumberFormat` `signDisplay`. */
     signDisplay?: Intl.NumberFormatOptions['signDisplay'];
+    /** `Intl.NumberFormat` `notation`. */
     notation?: Intl.NumberFormatOptions['notation'];
     /** Raw `Intl.NumberFormatOptions`; wins over the individual style props when given. */
     options?: Intl.NumberFormatOptions | undefined;

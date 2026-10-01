@@ -1,3 +1,6 @@
+<!-- @component
+One label/value pair inside an `InfoboxSection`.
+-->
 <!--
   InfoboxRow — one label/value pair inside an `InfoboxSection`.
 
@@ -21,6 +24,7 @@
   import Link from '../ui/Link.svelte';
 
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+    /** The term, rendered as the `<dt>`. */
     label: string;
     /** Plain text or number; `children` wins where both are supplied. */
     value?: string | number | undefined;
@@ -30,7 +34,10 @@
     href?: string | undefined;
     /** Passed through to `Link` — an off-site destination. */
     external?: boolean | undefined;
-    /** Stands in for the value, captioned by `aria-label`, when `showEmpty` and the row has nothing. */
+    /**
+     * Stands in for the value, captioned by `aria-label`, when `showEmpty` and the row has nothing.
+     * @defaultValue `'unrecorded'`
+     */
     emptyLabel?: string;
     /** Render the row even when empty, showing `emptyLabel` instead of nothing. */
     showEmpty?: boolean | undefined;

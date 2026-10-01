@@ -1,3 +1,6 @@
+<!-- @component
+A native file input in daisyUI `file-input` styling, with the chosen `File` bindable and a client-side size cap.
+-->
 <!--
   FileInput — a native `<input type="file">` in daisyUI `file-input` styling,
   with the chosen `File` exposed as a bindable prop and a client-side size cap.
@@ -30,12 +33,24 @@
     accept?: string | undefined;
     /** Largest file to accept, in bytes. Omitted, there is no cap. */
     maxBytes?: number | undefined;
-    /** Shown when the chosen file exceeds `maxBytes`. */
+    /**
+     * Shown when the chosen file exceeds `maxBytes`.
+     * @defaultValue `'That file is too large.'`
+     */
     tooLargeMessage?: string | undefined;
     /** Called with the accepted file, or `undefined` when the choice cleared it. */
     onSelect?: ((file: File | undefined) => void) | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: FieldSize | undefined;
+    /** `FieldControl`: the field is in error — sets `aria-invalid` and the error style. */
     invalid?: boolean | undefined;
+    /**
+     * `FieldControl`: space-separated ids for `aria-describedby`.
+     * @defaultValue `''`
+     */
     describedBy?: string | undefined;
   }
 

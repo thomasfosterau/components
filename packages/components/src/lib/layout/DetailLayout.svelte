@@ -1,3 +1,6 @@
+<!-- @component
+The two-column detail-page shell: a header across the top, a body column and a summary aside.
+-->
 <!--
   DetailLayout — the two-column detail-page shell: a header across the top, a
   body column, and a summary aside beside it.
@@ -34,7 +37,10 @@
     body: Snippet<[]>;
     /** The summary column — an infobox, a fact list, a map. */
     aside?: Snippet<[]> | undefined;
-    /** Accessible name of the `<aside>` landmark. */
+    /**
+     * Accessible name of the `<aside>` landmark.
+     * @defaultValue `'Summary'`
+     */
     asideLabel?: string | undefined;
   }
 

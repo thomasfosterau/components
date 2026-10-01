@@ -1,3 +1,6 @@
+<!-- @component
+A responsive `<img>` from a URL or an uploaded image id, optionally wrapped in `<picture>`. `decoding` defaults to `'async'`.
+-->
 <!--
   Image — a responsive `<img>`, optionally wrapped in `<picture>`.
 
@@ -33,20 +36,32 @@
   const DEFAULT_WIDTHS = [320, 640, 960, 1280, 1920] as const;
 
   interface Props extends HTMLImgAttributes {
+    /** Alternative text; `''` only where the image is decoration. */
     alt: string;
     /** A plain image URL. Mutually exclusive with `id`; `src` wins if both are given. */
     src?: string | undefined;
     /** An uploaded image's id — combined with `base`/`widths` into a bucketed `srcset`. */
     id?: string | undefined;
-    /** Route prefix the bucketed rendition lives under. */
+    /**
+     * Route prefix the bucketed rendition lives under.
+     * @defaultValue `'/images'`
+     */
     base?: string;
-    /** The width buckets the transform route serves. Must match its own list. */
+    /**
+     * The width buckets the transform route serves. Must match its own list.
+     * @defaultValue `[320, 640, 960, 1280, 1920]`
+     */
     widths?: readonly number[];
     /** Extra `<source>` elements (art direction / format negotiation) ahead of the `<img>` fallback. Wraps everything in `<picture>`. */
     sources?: readonly ImageSource[] | undefined;
+    /** Intrinsic width; reserves the box against layout shift. */
     width?: number | string | undefined;
+    /** Intrinsic height; reserves the box against layout shift. */
     height?: number | string | undefined;
-    /** The `sizes` hint; defaults to the full viewport width. */
+    /**
+     * The `sizes` hint.
+     * @defaultValue `'100vw'`
+     */
     sizes?: string;
     /** Eager-load this image. Use for the one image above the fold; everything else stays lazy. */
     eager?: boolean;

@@ -1,3 +1,6 @@
+<!-- @component
+The validation messages under one control: one `<p>` per message inside a single container.
+-->
 <!--
   FieldErrors — the validation messages under one control: one `<p>` per
   message inside a single container.

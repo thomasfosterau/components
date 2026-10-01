@@ -47,6 +47,7 @@ export function toFieldOptions(options: readonly FieldOptionInput[]): readonly F
   );
 }
 
+/** Literal daisyUI class per `FieldSize` for `TextInput`; a lookup table so Tailwind's scanner sees every class. */
 export const inputSize: Record<FieldSize, string> = {
   xs: 'input-xs',
   sm: 'input-sm',
@@ -54,6 +55,7 @@ export const inputSize: Record<FieldSize, string> = {
   lg: 'input-lg',
 };
 
+/** Literal daisyUI class per `FieldSize` for `Textarea`; a lookup table so Tailwind's scanner sees every class. */
 export const textareaSize: Record<FieldSize, string> = {
   xs: 'textarea-xs',
   sm: 'textarea-sm',
@@ -61,6 +63,7 @@ export const textareaSize: Record<FieldSize, string> = {
   lg: 'textarea-lg',
 };
 
+/** Literal daisyUI class per `FieldSize` for `Select`; a lookup table so Tailwind's scanner sees every class. */
 export const selectSize: Record<FieldSize, string> = {
   xs: 'select-xs',
   sm: 'select-sm',
@@ -68,6 +71,7 @@ export const selectSize: Record<FieldSize, string> = {
   lg: 'select-lg',
 };
 
+/** Literal daisyUI class per `FieldSize` for `Checkbox`; a lookup table so Tailwind's scanner sees every class. */
 export const checkboxSize: Record<FieldSize, string> = {
   xs: 'checkbox-xs',
   sm: 'checkbox-sm',
@@ -75,6 +79,7 @@ export const checkboxSize: Record<FieldSize, string> = {
   lg: 'checkbox-lg',
 };
 
+/** Literal daisyUI class per `FieldSize` for `Toggle`; a lookup table so Tailwind's scanner sees every class. */
 export const toggleSize: Record<FieldSize, string> = {
   xs: 'toggle-xs',
   sm: 'toggle-sm',
@@ -82,6 +87,7 @@ export const toggleSize: Record<FieldSize, string> = {
   lg: 'toggle-lg',
 };
 
+/** Literal daisyUI class per `FieldSize` for `FileInput`; a lookup table so Tailwind's scanner sees every class. */
 export const fileInputSize: Record<FieldSize, string> = {
   xs: 'file-input-xs',
   sm: 'file-input-sm',

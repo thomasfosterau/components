@@ -1,3 +1,6 @@
+<!-- @component
+Best-effort client-side highlighting of query tokens in a search result.
+-->
 <!--
   Highlight — best-effort client-side token highlight for search results.
 

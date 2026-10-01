@@ -1,3 +1,6 @@
+<!-- @component
+A colour swatch beside a short code, for legends, result rows and filter lists.
+-->
 <!--
   Chip — a colour swatch beside a short code: the unit that appears in a
   legend, a result row, a filter list. Denser than a `Badge` and always
@@ -27,6 +30,10 @@
     href?: string | undefined;
     /** A CSS custom-property name the app's theme declares (`--party-alp`). */
     colourToken?: string | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: ChipSize | undefined;
   }
 

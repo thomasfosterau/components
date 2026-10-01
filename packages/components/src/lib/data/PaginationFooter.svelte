@@ -1,3 +1,6 @@
+<!-- @component
+The count line and the pager that sit under a paginated index page.
+-->
 <!--
   PaginationFooter — what sits under a paginated index page: the count, and
   the pager.
@@ -32,16 +35,44 @@
     href?: ((offset: number) => string) | undefined;
     /** Page without navigating. Ignored when `href` is given. */
     onPage?: ((offset: number) => void) | undefined;
+    /**
+     * `window` renders numbered page links with gaps; `prevNext` a bare Previous/Next pair.
+     * @defaultValue `'window'`
+     */
     variant?: 'window' | 'prevNext' | undefined;
+    /**
+     * Pages rendered either side of the current one.
+     * @defaultValue `1`
+     */
     siblings?: number | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'sm'`
+     */
     size?: Size | undefined;
-    /** The pager landmark's accessible name. */
+    /**
+     * The pager landmark's accessible name.
+     * @defaultValue `'Pagination'`
+     */
     label?: string | undefined;
+    /**
+     * Text of the previous-page control.
+     * @defaultValue `'Previous'`
+     */
     previousLabel?: string | undefined;
+    /**
+     * Text of the next-page control.
+     * @defaultValue `'Next'`
+     */
     nextLabel?: string | undefined;
+    /** How a numbered control is named; see `Pagination`. */
     pageLabel?: ((page: number) => string) | undefined;
     /** The count line, when "Showing x of y" is not the sentence wanted. */
     countLabel?: ((shown: number, total: number) => string) | undefined;
+    /**
+     * Locale(s) for `Intl` formatting.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
   }
 

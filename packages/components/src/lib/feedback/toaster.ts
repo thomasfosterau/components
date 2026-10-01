@@ -15,6 +15,7 @@ import type { StatusTone } from '../ui/tones.ts';
 /** The colour a toast is drawn in; the same four states an `Alert` has. */
 export type ToastTone = StatusTone;
 
+/** One notification as the `Toaster` holds it, after it has been given an id. */
 export interface Toast {
   /** Assigned by the toaster; unique for the life of the page. */
   readonly id: number;
@@ -28,6 +29,7 @@ export interface Toast {
 /** What a toast looks like before the toaster has given it an id. */
 export type NewToast = Omit<Toast, 'id' | 'tone'> & { readonly tone?: ToastTone | undefined };
 
+/** What `getToaster()` returns: push a toast or dismiss one. */
 export interface ToasterApi {
   /**
    * Push a toast and return its id. It dismisses itself after `durationMs`

@@ -109,6 +109,7 @@ export function matchChord(
   )?.action;
 }
 
+/** The result of `matchSequence`: the action a key buffer completes, and whether it could still grow into another. */
 export interface SequenceMatch {
   /** The action whose sequence the buffer completes, if any. */
   exact: CommandAction | undefined;
@@ -116,13 +117,13 @@ export interface SequenceMatch {
   isPrefix: boolean;
 }
 
+// A single-pass scan that classifies every trigger as exact-match / prefix /
+// miss in one loop; splitting it into separate passes would be simpler per
+// function but iterate the registrations three times per keystroke.
 /**
  * Match a candidate key buffer against the active plain-key triggers.
  * `actions` must already be in precedence order.
  */
-// A single-pass scan that classifies every trigger as exact-match / prefix /
-// miss in one loop; splitting it into separate passes would be simpler per
-// function but iterate the registrations three times per keystroke.
 export function matchSequence(
   buffer: readonly string[],
   actions: readonly RegisteredAction[],
@@ -147,6 +148,7 @@ export function matchSequence(
   );
 }
 
+/** A trigger split into the keys a `HotkeyBadge` renders, and whether they are pressed in turn or together. */
 export interface TriggerDisplay {
   /**
    * Keys to render as `<kbd>` chips, in order. `'$mod'` is left un-resolved

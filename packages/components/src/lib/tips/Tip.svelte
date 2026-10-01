@@ -1,3 +1,6 @@
+<!-- @component
+One piece of inline guidance that shows only when its store allows and closes for good once dismissed or acted on.
+-->
 <!--
   Tip — one piece of inline guidance: a title, an optional sentence, and the
   actions it offers. Shows itself only if the store says it may, records that
@@ -25,13 +28,21 @@
   import type { TipAction, TipConfig } from './types.ts';
 
   interface Props {
+    /** The tip’s id, copy and actions. */
     config: TipConfig;
     /** The store that decides whether this shows and remembers that it did. */
     store: TipStore;
-    /** Shared with the page's other tips so Escape closes only the top one. */
+    /**
+     * Shared with the page's other tips so Escape closes only the top one.
+     * @defaultValue `soloTipStack` (shares Escape with no other tip)
+     */
     stack?: TipStack;
-    /** Accessible name of the dismiss button. */
+    /**
+     * Accessible name of the dismiss button.
+     * @defaultValue `'Dismiss'`
+     */
     dismissLabel?: string;
+    /** Extra classes, merged last. */
     class?: string;
   }
 

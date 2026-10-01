@@ -1,3 +1,6 @@
+<!-- @component
+A modal on bits-ui’s `Dialog`, wearing daisyUI’s `modal-box`.
+-->
 <!--
   Dialog — a modal on bits-ui's `Dialog`, wearing daisyUI's `modal-box`.
 
@@ -34,9 +37,15 @@
     title: string;
     /** Supporting line under the heading — the accessible description. */
     description?: string | undefined;
-    /** Accessible name of the corner close button. */
+    /**
+     * Accessible name of the corner close button.
+     * @defaultValue `'Close'`
+     */
     closeLabel?: string | undefined;
-    /** Width step of the `modal-box`. */
+    /**
+     * Width step of the `modal-box`.
+     * @defaultValue `'md'`
+     */
     size?: DialogSize | undefined;
     /** Extra classes on the `modal-box`. */
     class?: string | undefined;
@@ -44,6 +53,7 @@
     trigger?: Snippet<[{ props: Record<string, unknown> }]> | undefined;
     /** Buttons for the `modal-action` row. */
     actions?: Snippet<[{ close: () => void }]> | undefined;
+    /** The dialog body, under the title and description. */
     children: Snippet<[]>;
   }
 

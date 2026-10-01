@@ -1,3 +1,6 @@
+<!-- @component
+The site search box: a `<search>` landmark around a GET form that works without JavaScript.
+-->
 <!--
   SearchForm — the site search box: a `<search>` landmark around a GET form
   that works with no JavaScript at all.
@@ -23,13 +26,32 @@
   interface Props extends Omit<HTMLFormAttributes, 'action' | 'method'> {
     /** Where the search submits — an app path, resolved through the context. */
     action: string;
-    /** The query parameter's name. */
+    /**
+     * The query parameter's name.
+     * @defaultValue `'q'`
+     */
     name?: string | undefined;
+    /**
+     * The query. Bindable.
+     * @defaultValue `''`
+     */
     value?: string;
-    /** Accessible name of the field. */
+    /**
+     * Accessible name of the field.
+     * @defaultValue `'Search'`
+     */
     label?: string | undefined;
+    /**
+     * Text of the submit button.
+     * @defaultValue `'Search'`
+     */
     submitLabel?: string | undefined;
+    /** Placeholder in the field. */
     placeholder?: string | undefined;
+    /**
+     * Refuse to submit an empty query.
+     * @defaultValue `true`
+     */
     required?: boolean | undefined;
   }
 

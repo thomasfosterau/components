@@ -1,3 +1,6 @@
+<!-- @component
+A thesis as "Author, <cite>Title</cite> (2019) PhD thesis, University of Sydney", with Schema.org `Thesis` microdata.
+-->
 <!--
   ThesisCitation — a thesis as "Author, <cite>Title</cite> (2019) PhD thesis,
   University of Sydney", with Schema.org Thesis microdata. Website's
@@ -15,11 +18,27 @@
   import type { ThesisRecord } from './csl.ts';
 
   interface Props {
+    /** The thesis record; absent fields are left out of the rendering. */
     thesis: ThesisRecord;
+    /**
+     * Rendered in place of a missing title.
+     * @defaultValue `'Untitled thesis'`
+     */
     untitledLabel?: string | undefined;
-    /** Degree → its label. Default `"<degree> thesis"`, or `"thesis"` with no degree. */
+    /**
+     * Degree → its label.
+     * @defaultValue `"<degree> thesis"`, or `"thesis"` without a degree
+     */
     degreeLabel?: ((degree: string | undefined) => string) | undefined;
+    /**
+     * Lead-in before the record’s URL.
+     * @defaultValue `'available online at'`
+     */
     availableOnlineLabel?: string | undefined;
+    /**
+     * Locale(s) for the joined name lists.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
   }
 

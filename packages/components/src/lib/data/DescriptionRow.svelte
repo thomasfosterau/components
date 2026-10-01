@@ -1,3 +1,6 @@
+<!-- @component
+One label and its value inside a `DescriptionList`.
+-->
 <!--
   DescriptionRow — one label and its value inside a `DescriptionList`.
 
@@ -22,6 +25,7 @@
   import { getDescriptionListStyle } from './description-context.ts';
 
   interface Props {
+    /** The term, rendered as the `<dt>`. */
     label: string;
     /** The value as text. Ignored when `children` is given. */
     value?: string | number | undefined;

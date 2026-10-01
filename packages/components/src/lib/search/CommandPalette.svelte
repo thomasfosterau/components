@@ -1,3 +1,6 @@
+<!-- @component
+The ⌘K / Ctrl+K command palette: bits-ui’s `Command` inside this library’s `Dialog`.
+-->
 <!--
   CommandPalette — the ⌘K / Ctrl+K palette: bits-ui's `Command` inside this
   library's `Dialog`.
@@ -54,16 +57,35 @@
      * registry's `paletteOpen` when a registry is mounted above.
      */
     open?: boolean | undefined;
-    /** Names the command menu, and titles the dialog. */
+    /**
+     * Names the command menu, and titles the dialog.
+     * @defaultValue `'Command palette'`
+     */
     label?: string | undefined;
+    /**
+     * Placeholder in the search field.
+     * @defaultValue `'Type a command or search…'`
+     */
     placeholder?: string | undefined;
-    /** Announced while an `onSearch` request is in flight. */
+    /**
+     * Announced while an `onSearch` request is in flight.
+     * @defaultValue `'Searching…'`
+     */
     loadingLabel?: string | undefined;
-    /** Shown when a settled query matched nothing. */
+    /**
+     * Shown when a settled query matched nothing.
+     * @defaultValue `'No results'`
+     */
     emptyLabel?: string | undefined;
-    /** Accessible name of the dialog's close button. */
+    /**
+     * Accessible name of the dialog's close button.
+     * @defaultValue `'Close'`
+     */
     closeLabel?: string | undefined;
-    /** The sections, in render order. Rows name one by `id`. */
+    /**
+     * The sections, in render order. Rows name one by `id`.
+     * @defaultValue the exported `defaultCommandGroups`
+     */
     groups?: readonly CommandGroup[] | undefined;
     /** Rows that are always available, registry or no registry. */
     items?: readonly CommandItem[] | undefined;
@@ -72,7 +94,10 @@
      * a newer query supersedes this one, so pass it to `fetch`.
      */
     onSearch?: ((query: string, signal: AbortSignal) => Promise<readonly CommandItem[]>) | undefined;
-    /** Quiet period before a search starts, in milliseconds. */
+    /**
+     * Quiet period before a search starts, in milliseconds.
+     * @defaultValue `150`
+     */
     debounceMs?: number | undefined;
     /** Called when a row is activated, before its own `run` / `href`. */
     onSelect?: ((item: CommandItem) => void) | undefined;

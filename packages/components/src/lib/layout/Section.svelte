@@ -1,3 +1,6 @@
+<!-- @component
+A titled block of a page: a heading, an optional count, optional actions, and either the rows or an empty state.
+-->
 <!--
   Section — a titled block of a page: a heading, an optional count beside it,
   optional actions opposite, and either the rows or an honest empty state.
@@ -31,6 +34,10 @@
   interface Props extends HTMLAttributes<HTMLElement> {
     /** The section's heading. */
     title: string;
+    /**
+     * The heading level, so the page outline stays intact.
+     * @defaultValue `2`
+     */
     headingLevel?: HeadingLevel | undefined;
     /**
      * Explicit heading id. Defaults to a slug of `title`, so the section is
@@ -43,7 +50,10 @@
     description?: string | undefined;
     /** Whether there is anything to show. Drives the empty state. */
     empty?: boolean | undefined;
-    /** The default empty state's text. */
+    /**
+     * The default empty state's text.
+     * @defaultValue `'Nothing here yet.'`
+     */
     emptyMessage?: string | undefined;
     /** `Intl` locales for `count`; falls back to the context's. */
     locales?: string | readonly string[] | undefined;
@@ -51,6 +61,7 @@
     actions?: Snippet<[]> | undefined;
     /** Replaces the default empty paragraph — usually an `EmptyState`. */
     emptyState?: Snippet<[]> | undefined;
+    /** The section's rows; replaced by the empty state when `empty`. */
     children: Snippet<[]>;
   }
 

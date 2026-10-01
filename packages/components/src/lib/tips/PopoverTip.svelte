@@ -1,3 +1,6 @@
+<!-- @component
+A `Tip` anchored beside the trigger it is about, which renders inside it.
+-->
 <!--
   PopoverTip — a `Tip` anchored to the thing it is talking about: the
   caller's own trigger renders inside, and the bubble floats beside it.
@@ -44,15 +47,28 @@
   import type { TipConfig, TipPlacement } from './types.ts';
 
   interface Props {
+    /** The tip’s id, copy and actions. */
     config: TipConfig;
+    /** The store that decides whether this shows and remembers that it did. */
     store: TipStore;
+    /**
+     * Shared with the page’s other tips so Escape closes only the top one.
+     * @defaultValue `soloTipStack` (shares Escape with no other tip)
+     */
     stack?: TipStack;
-    /** Which side of the trigger the bubble sits on. */
+    /**
+     * Which side of the trigger the bubble sits on.
+     * @defaultValue `'top'`
+     */
     placement?: TipPlacement;
     /** The trigger — a button, a field, whatever the tip is about. */
     children: Snippet<[]>;
-    /** Accessible name of the tip's dismiss button. */
+    /**
+     * Accessible name of the tip's dismiss button.
+     * @defaultValue `'Dismiss'`
+     */
     dismissLabel?: string;
+    /** Extra classes, merged last. */
     class?: string;
   }
 

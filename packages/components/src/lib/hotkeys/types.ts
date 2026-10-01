@@ -32,6 +32,7 @@ export type HotkeyChord = string;
  */
 export type HotkeySequence = readonly string[];
 
+/** A hotkey trigger: a chord pressed together (`'$mod+k'`) or a sequence pressed in turn (`['g', 'p']`). */
 export type HotkeyTrigger = HotkeyChord | HotkeySequence;
 
 /** Palette grouping. Drives section headings and ordering. */
@@ -44,6 +45,7 @@ export type CommandActionGroup = 'actions' | 'navigation';
  */
 export type HotkeyScope = 'global' | 'page';
 
+/** One action the hotkey registry and the command palette offer: an id, a label, what it runs and, optionally, its trigger. */
 export interface CommandAction {
   /** Stable unique id, e.g. `'nav.posts'`, `'posts.create'`. */
   id: string;

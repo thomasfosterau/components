@@ -53,12 +53,14 @@ export type TabsMode = 'panels' | 'links';
 /** The three daisyUI tab treatments. */
 export type TabsVariant = 'border' | 'box' | 'lift';
 
+/** Literal daisyUI class per `TabsVariant` for `Tabs`; a lookup table so Tailwind's scanner sees every class. */
 export const tabsVariant: Record<TabsVariant, string> = {
   border: 'tabs-border',
   box: 'tabs-box',
   lift: 'tabs-lift',
 };
 
+/** Literal daisyUI class per `Size` for `Tabs`; a lookup table so Tailwind's scanner sees every class. */
 export const tabsSize: Record<Size, string> = {
   xs: 'tabs-xs',
   sm: 'tabs-sm',

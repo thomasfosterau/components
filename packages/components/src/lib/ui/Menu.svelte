@@ -1,3 +1,6 @@
+<!-- @component
+A daisyUI `menu` as either a labelled navigation list (`mode="nav"`) or a bits-ui dropdown (`mode="dropdown"`).
+-->
 <!--
   Menu — one component over the two things daisyUI calls a `menu`, because a
   call site writes the same `<MenuItem>` list for both.
@@ -25,17 +28,30 @@
   import { setMenuMode } from './menu-context.ts';
 
   interface Props {
+    /**
+     * `nav` renders a navigation list; `dropdown` a menu behind `trigger`.
+     * @defaultValue `'nav'`
+     */
     mode?: 'dropdown' | 'nav' | undefined;
     /** Accessible name of the navigation landmark / the open menu. */
     label: string;
     /** Whether the dropdown is open. Bindable; ignored in `nav` mode. */
     open?: boolean | undefined;
+    /**
+     * Which side of the trigger the dropdown opens on.
+     * @defaultValue `'bottom'`
+     */
     side?: 'top' | 'right' | 'bottom' | 'left' | undefined;
+    /**
+     * Alignment against the trigger.
+     * @defaultValue `'end'`
+     */
     align?: 'start' | 'center' | 'end' | undefined;
     /** Extra classes on the `<ul class="menu">`. */
     class?: string | undefined;
     /** The dropdown's trigger — the caller's own element, spreading `props`. */
     trigger?: Snippet<[{ props: Record<string, unknown> }]> | undefined;
+    /** The `MenuItem`s. */
     children: Snippet<[]>;
   }
 

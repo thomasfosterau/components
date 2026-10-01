@@ -1,3 +1,6 @@
+<!-- @component
+The light/dark switch: sets `data-theme` on the document element and remembers the choice in `localStorage`.
+-->
 <!--
   ThemeToggle — the light / dark switch: a daisyUI `swap` label around a
   checkbox, which writes the chosen theme name to
@@ -41,12 +44,19 @@
     lightTheme: string;
     /** The theme name applied when the switch is on. */
     darkTheme: string;
-    /** `localStorage` key the choice is remembered under. */
+    /**
+     * `localStorage` key the choice is remembered under.
+     * @defaultValue `'theme'`
+     */
     storageKey?: string | undefined;
-    /** Accessible name of the switch. */
+    /**
+     * Accessible name of the switch.
+     * @defaultValue `'Toggle dark mode'`
+     */
     label?: string | undefined;
     /** The active theme name. Bindable; defaults to `lightTheme`. */
     value?: string | undefined;
+    /** Extra classes, merged last. */
     class?: string | undefined;
   }
 

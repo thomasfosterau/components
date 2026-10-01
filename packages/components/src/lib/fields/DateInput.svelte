@@ -1,3 +1,6 @@
+<!-- @component
+A native `<input type="date">` in daisyUI `input` styling, with `FieldControl` wiring.
+-->
 <!--
   DateInput — the native `<input type="date">` in daisyUI `input` styling.
 
@@ -17,14 +20,26 @@
   import { inputSize, type FieldSize } from './field-types.ts';
 
   interface Props extends Omit<HTMLInputAttributes, 'type' | 'value' | 'size' | 'min' | 'max'> {
-    /** ISO calendar date, `YYYY-MM-DD`; empty when unset. */
+    /**
+     * ISO calendar date, `YYYY-MM-DD`; empty when unset.
+     * @defaultValue `''`
+     */
     value?: string;
     /** Earliest selectable date, ISO. */
     min?: string | undefined;
     /** Latest selectable date, ISO. */
     max?: string | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: FieldSize | undefined;
+    /** `FieldControl`: the field is in error — sets `aria-invalid` and the error style. */
     invalid?: boolean | undefined;
+    /**
+     * `FieldControl`: space-separated ids for `aria-describedby`.
+     * @defaultValue `''`
+     */
     describedBy?: string | undefined;
   }
 

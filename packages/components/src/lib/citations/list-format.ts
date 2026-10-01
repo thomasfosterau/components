@@ -17,6 +17,7 @@ export type ListFormatPart<T> =
   | { readonly kind: 'item'; readonly value: T }
   | { readonly kind: 'separator'; readonly value: string };
 
+/** The `Intl.ListFormat` options `formatListParts` takes; omitted fields use the runtime defaults. */
 export interface ListFormatOptions {
   readonly locales?: string | readonly string[] | undefined;
   readonly style?: Intl.ListFormatOptions['style'] | undefined;

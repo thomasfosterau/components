@@ -1,3 +1,6 @@
+<!-- @component
+One choice from a short, known list, on bits-ui’s `RadioGroup`.
+-->
 <!--
   RadioGroup — one choice from a short, known list, on bits-ui's `RadioGroup`.
 
@@ -32,15 +35,33 @@
     legend: string;
     /** Full options, or bare strings when value and label are the same. */
     options: readonly FieldOptionInput[];
-    /** The chosen value; empty string when nothing is chosen. */
+    /**
+     * The chosen value; empty string when nothing is chosen.
+     * @defaultValue `''`
+     */
     value?: string;
+    /**
+     * Lay the options out in a column or a row.
+     * @defaultValue `'vertical'`
+     */
     orientation?: 'vertical' | 'horizontal' | undefined;
     /** Posted field name — bits-ui renders the hidden input when it is set. */
     name?: string | undefined;
+    /** Guidance rendered under the legend. */
     hint?: string | undefined;
+    /**
+     * Validation messages; any at all marks the group invalid.
+     * @defaultValue `[]`
+     */
     errors?: readonly string[] | undefined;
+    /** Marks the group required and reads `requiredLabel` after the legend. */
     required?: boolean | undefined;
+    /**
+     * Read out after the legend when `required`.
+     * @defaultValue `'(required)'`
+     */
     requiredLabel?: string | undefined;
+    /** Disables every option. */
     disabled?: boolean | undefined;
   }
 

@@ -1,3 +1,6 @@
+<!-- @component
+The loading and error chrome around one read.
+-->
 <!--
   LoadingBoundary — the loading and error chrome around one read.
 
@@ -29,12 +32,22 @@
   interface Props {
     /** Where the read has got to. */
     state: 'loading' | 'refreshing' | 'error' | 'ready';
-    /** Announced, and shown, while the first read is in flight. */
+    /**
+     * Announced, and shown, while the first read is in flight.
+     * @defaultValue `'Loading…'`
+     */
     loadingLabel?: string | undefined;
-    /** The message for a failed read. Every call site has a specific one. */
+    /**
+     * The message for a failed read. Every call site has a specific one.
+     * @defaultValue `'That didn’t load. Try again.'`
+     */
     errorLabel?: string | undefined;
-    /** Which of the two established treatments to render. */
+    /**
+     * Which of the two established treatments to render.
+     * @defaultValue `'page'`
+     */
     tone?: 'page' | 'section' | undefined;
+    /** Extra classes, merged last. */
     class?: string | undefined;
     /** Replaces the default loading chrome. */
     loading?: Snippet<[]> | undefined;

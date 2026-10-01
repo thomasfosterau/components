@@ -1,3 +1,6 @@
+<!-- @component
+A map as one raster image from the Mapbox Static Images API.
+-->
 <!--
   StaticMap — a map as one raster from the Mapbox Static Images API.
 
@@ -26,10 +29,13 @@
       HTMLImgAttributes,
       'src' | 'srcset' | 'alt' | 'width' | 'height' | 'class' | 'style'
     > {
+    /** The Mapbox style: its account (`mapbox` for the stock styles) and id. */
     style: MapStyle;
+    /** A camera, a bounding box to fit, or `auto` to frame the overlay. */
     view: StaticView;
     /** CSS pixels; also the intrinsic size, so the box is reserved up front. */
     width: number;
+    /** CSS pixels; also the intrinsic height. */
     height: number;
     /** A public-scope Mapbox token — safe in a URL by design. */
     accessToken: string;
@@ -37,6 +43,7 @@
     alt: string;
     /** A GeoJSON overlay drawn onto the raster. */
     overlay?: unknown;
+    /** Extra classes, merged last. */
     class?: string | undefined;
   }
 

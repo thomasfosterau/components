@@ -1,3 +1,6 @@
+<!-- @component
+A `FileInput` plus the progress readout for an upload the caller performs.
+-->
 <!--
   VideoInput — a `FileInput` plus the progress readout for an upload the
   CALLER performs.
@@ -22,17 +25,35 @@
   interface Props extends Omit<HTMLInputAttributes, 'type' | 'value' | 'files' | 'size'> {
     /** The chosen file. */
     file?: File | undefined;
-    /** Transfer progress, 0–100. The caller writes this as its upload advances. */
+    /**
+     * Transfer progress, 0–100. The caller writes this as its upload advances.
+     * @defaultValue `0`
+     */
     progress?: number;
-    /** Accessible name of the progress bar. */
+    /**
+     * Accessible name of the progress bar.
+     * @defaultValue `'Upload progress'`
+     */
     progressLabel?: string | undefined;
+    /**
+     * The `accept` filter passed to the file input.
+     * @defaultValue `'video/*'`
+     */
     accept?: string | undefined;
+    /** Largest accepted file, in bytes; a larger file is rejected with `tooLargeMessage`. */
     maxBytes?: number | undefined;
+    /**
+     * Shown when the chosen file exceeds `maxBytes`.
+     * @defaultValue `'That file is too large.'` (from `FileInput`)
+     */
     tooLargeMessage?: string | undefined;
     /** Called with the accepted file — the caller starts the transfer here. */
     onSelect?: ((file: File | undefined) => void) | undefined;
+    /** daisyUI size step. */
     size?: FieldSize | undefined;
+    /** `FieldControl`: the field is in error — sets `aria-invalid` and the error style. */
     invalid?: boolean | undefined;
+    /** `FieldControl`: space-separated ids for `aria-describedby`. */
     describedBy?: string | undefined;
   }
 

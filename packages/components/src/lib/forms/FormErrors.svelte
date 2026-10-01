@@ -1,3 +1,6 @@
+<!-- @component
+The whole-form messages that belong to the submission rather than to any one field.
+-->
 <!--
   FormErrors — the whole-form messages: the ones that belong to the
   submission rather than to any one field ("That name is already taken",
@@ -16,7 +19,12 @@
   interface Props {
     /** Whole-form messages. */
     messages?: readonly string[] | undefined;
+    /**
+     * Colour of the alert.
+     * @defaultValue `'error'`
+     */
     tone?: StatusTone | undefined;
+    /** Extra classes, merged last. */
     class?: string | undefined;
   }
 

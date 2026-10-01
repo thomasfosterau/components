@@ -1,3 +1,6 @@
+<!-- @component
+The numbered bibliography a page’s `<Citation>` markers accumulated, in citation order.
+-->
 <!--
   ReferenceList — the numbered bibliography a page's `<Citation>` markers
   accumulated, rendered in citation order.
@@ -16,11 +19,20 @@
   import { formatCitation } from './citation.ts';
 
   interface Props {
-    /** Heading text. */
+    /**
+     * Heading text.
+     * @defaultValue `'References'`
+     */
     title?: string;
-    /** Render the heading. Off when the page supplies its own. */
+    /**
+     * Render the heading. Off when the page supplies its own.
+     * @defaultValue `true`
+     */
     showTitle?: boolean;
-    /** Heading level, for a page whose outline this list sits deeper in. */
+    /**
+     * Heading level, for a page whose outline this list sits deeper in.
+     * @defaultValue `2`
+     */
     headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   }
 

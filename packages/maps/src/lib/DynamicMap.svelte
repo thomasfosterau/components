@@ -1,3 +1,6 @@
+<!-- @component
+The interactive Mapbox GL map, panned and zoomed, with a fallback when WebGL is unavailable.
+-->
 <!--
   DynamicMap — the interactive, WebGL half: Mapbox GL, panned and zoomed.
 
@@ -40,16 +43,31 @@
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'style'> {
     /** A public-scope Mapbox token — safe in the client by design. */
     accessToken: string;
+    /** The Mapbox style: its account (`mapbox` for the stock styles) and id. */
     style: MapStyle;
+    /** The initial centre, zoom, bearing and pitch. */
     camera: MapCamera;
-    /** Rendered height; the width fills the container. */
+    /**
+     * Rendered height; the width fills the container.
+     * @defaultValue `400`
+     */
     height?: number;
-    /** Names the map for assistive tech. */
+    /**
+     * Names the map for assistive tech.
+     * @defaultValue `'Map'`
+     */
     label?: string;
-    /** The one-off hint that two fingers, not one, move the map. */
+    /**
+     * The one-off hint that two fingers, not one, move the map.
+     * @defaultValue `'Use two fingers to move the map'`
+     */
     panHintLabel?: string;
-    /** Shown instead of the map when Mapbox GL or WebGL is unavailable. */
+    /**
+     * Shown instead of the map when Mapbox GL or WebGL is unavailable.
+     * @defaultValue `'Map unavailable'`
+     */
     unavailableLabel?: string;
+    /** Extra classes, merged last. */
     class?: string | undefined;
   }
 

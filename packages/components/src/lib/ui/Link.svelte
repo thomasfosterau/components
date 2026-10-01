@@ -1,3 +1,6 @@
+<!-- @component
+An in-text anchor in one of three weights; the plain link of the library.
+-->
 <!--
   Link — an in-text anchor in one of three weights. The plain `<a>` of the
   library: everything that is a link and not an action goes through it, so
@@ -20,10 +23,16 @@
   import { linkVariant, type LinkVariant } from './tones.ts';
 
   interface Props extends Omit<HTMLAnchorAttributes, 'href'> {
+    /** The target; an app path is resolved through the components context. */
     href: string;
+    /**
+     * The link weight.
+     * @defaultValue `'primary'`
+     */
     variant?: LinkVariant | undefined;
     /** Open in a new tab with the safe `rel`. */
     external?: boolean | undefined;
+    /** The link text; the anchor's accessible name. */
     children: Snippet<[]>;
   }
 

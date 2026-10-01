@@ -1,3 +1,6 @@
+<!-- @component
+A heading at any level with a stable `id`, optionally with a copyable anchor link.
+-->
 <!--
   Heading — a section heading at any level, with a stable `id` so the section
   is addressable: a table of contents, a "copy link to this section" anchor,
@@ -26,13 +29,18 @@
   import VisuallyHidden from './VisuallyHidden.svelte';
 
   interface Props extends Omit<HTMLAttributes<HTMLHeadingElement>, 'children'> {
+    /** The heading level (`h1`–`h6`); choose it from the outline, not the size. */
     level: HeadingLevel;
     /** Explicit anchor id; derived from `children` when it is a string. */
     id?: string | undefined;
     /** Render a permalink beside the heading. Needs an id. */
     anchor?: boolean | undefined;
-    /** Accessible name of the permalink. */
+    /**
+     * Accessible name of the permalink.
+     * @defaultValue `'Link to this section'`
+     */
     anchorLabel?: string | undefined;
+    /** The heading text, as a string or a snippet. */
     children: Snippet<[]> | string;
   }
 

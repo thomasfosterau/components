@@ -1,3 +1,6 @@
+<!-- @component
+The ancestor trail above a page title, as daisyUI `breadcrumbs` inside a labelled navigation landmark.
+-->
 <!--
   Breadcrumbs — the ancestor trail above a page title, as daisyUI's
   `breadcrumbs` inside a labelled navigation landmark.
@@ -27,7 +30,10 @@
   interface Props extends HTMLAttributes<HTMLElement> {
     /** Ordered ancestors, ending with the current page. */
     items: readonly Crumb[];
-    /** Accessible name of the navigation landmark. */
+    /**
+     * Accessible name of the navigation landmark.
+     * @defaultValue `'Breadcrumb'`
+     */
     label?: string | undefined;
     /** Render one crumb's contents. The `<li>` wrapper is still this component's. */
     item?: Snippet<[Crumb, number]> | undefined;

@@ -17,6 +17,7 @@
 
 import { getContext, setContext } from 'svelte';
 
+/** Which of the two things daisyUI calls a `menu` a `Menu` renders: a dropdown or a navigation list. */
 export type MenuMode = 'dropdown' | 'nav';
 
 const MENU_MODE_KEY = Symbol('@thomasfosterau/components:menu-mode');

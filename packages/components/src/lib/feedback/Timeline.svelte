@@ -1,3 +1,6 @@
+<!-- @component
+A vertical daisyUI `timeline` of dated entries.
+-->
 <!--
   Timeline — a vertical daisyUI `timeline` of dated entries: offices held,
   releases shipped, a plant's life in a bed.
@@ -51,14 +54,27 @@
   }
 
   interface Props extends Omit<HTMLOlAttributes, 'children'> {
+    /** The entries, in display order. */
     items: readonly TimelineEntry[];
-    /** Shown in place of a missing `end`. */
+    /**
+     * Shown in place of a missing `end`.
+     * @defaultValue `'present'`
+     */
     presentLabel?: string | undefined;
-    /** Read between the two dates of a span. */
+    /**
+     * Read between the two dates of a span.
+     * @defaultValue `'to'`
+     */
     toLabel?: string | undefined;
-    /** Introduces an open-ended entry. */
+    /**
+     * Introduces an open-ended entry.
+     * @defaultValue `'Current'`
+     */
     currentLabel?: string | undefined;
-    /** Accessible name of the list. */
+    /**
+     * Accessible name of the list.
+     * @defaultValue `'Timeline'`
+     */
     label?: string | undefined;
     /** Replaces the default box body. */
     item?: Snippet<[TimelineEntry]> | undefined;

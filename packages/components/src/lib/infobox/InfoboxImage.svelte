@@ -1,3 +1,6 @@
+<!-- @component
+The picture at the top of an `Infobox`, with its caption.
+-->
 <!--
   InfoboxImage — the picture at the top of an `Infobox`, with its caption.
 
@@ -17,13 +20,19 @@
 
   interface Props
     extends Omit<HTMLImgAttributes, 'src' | 'alt' | 'width' | 'height' | 'loading' | 'class'> {
+    /** Image URL. */
     src: string;
+    /** Alternative text; `''` only where the image is decoration. */
     alt: string;
+    /** Rendered as the `<figcaption>`. */
     caption?: string | undefined;
+    /** Intrinsic width in pixels; reserves the box. */
     width?: number | undefined;
+    /** Intrinsic height in pixels; reserves the box. */
     height?: number | undefined;
     /** Eager-loads at high `fetchpriority` — for the page's LCP candidate. */
     eager?: boolean | undefined;
+    /** Extra classes, merged last. */
     class?: string | undefined;
   }
 

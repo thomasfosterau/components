@@ -1,3 +1,6 @@
+<!-- @component
+A daisyUI `checkbox` with its label in the same `<label>`, so the whole row is the hit target.
+-->
 <!--
   Checkbox — daisyUI `checkbox` with its label in the same `<label>`, so the
   whole row is the hit target and the input is named without an `id`/`for`
@@ -20,9 +23,19 @@
   interface Props extends Omit<HTMLInputAttributes, 'type' | 'checked' | 'size'> {
     /** Text beside the box; becomes the input's accessible name. */
     label: string;
+    /** Whether the box is ticked. Bindable. */
     checked?: boolean;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: FieldSize | undefined;
+    /** `FieldControl`: the field is in error — sets `aria-invalid` and the error style. */
     invalid?: boolean | undefined;
+    /**
+     * `FieldControl`: space-separated ids for `aria-describedby`.
+     * @defaultValue `''`
+     */
     describedBy?: string | undefined;
   }
 

@@ -1,3 +1,6 @@
+<!-- @component
+One book as a compact author–date reference with Schema.org `Book` microdata.
+-->
 <!--
   BookCitation — one book as a compact author–date reference with Schema.org
   microdata: "Le Guin, <cite>The Left Hand of Darkness</cite> (3rd edition:
@@ -18,14 +21,39 @@
   import type { BookRecord } from './csl.ts';
 
   interface Props {
+    /** The book record; absent fields are left out of the rendering. */
     book: BookRecord;
     /** Microdata `itemprop` on the root, when this book is itself a property (a chapter's `isPartOf`). */
     itemprop?: string | undefined;
+    /**
+     * Rendered in place of a missing title.
+     * @defaultValue `'Untitled book'`
+     */
     untitledLabel?: string | undefined;
+    /**
+     * Rendered in place of a missing date.
+     * @defaultValue `'no date'`
+     */
     noDateLabel?: string | undefined;
+    /**
+     * How an edition is named.
+     * @defaultValue `"<edition> edition"`
+     */
     editionLabel?: ((edition: string) => string) | undefined;
+    /**
+     * Abbreviation after a page count.
+     * @defaultValue `'pp'`
+     */
     pageCountLabel?: string | undefined;
+    /**
+     * Lead-in before the record’s URL.
+     * @defaultValue `'available online at'`
+     */
     availableOnlineLabel?: string | undefined;
+    /**
+     * Locale(s) for the joined name lists.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
   }
 

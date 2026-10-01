@@ -1,3 +1,6 @@
+<!-- @component
+A single-select typeahead over a static list or an asynchronous search, on bits-ui’s `Combobox`.
+-->
 <!--
   Combobox — a single-select typeahead over a static list OR an asynchronous
   search, on bits-ui's `Combobox`.
@@ -62,7 +65,10 @@
      * when a newer query supersedes this one, so pass it to `fetch`.
      */
     onSearch?: ((query: string, signal: AbortSignal) => Promise<readonly T[]>) | undefined;
-    /** Quiet period before a search starts, in milliseconds. */
+    /**
+     * Quiet period before a search starts, in milliseconds.
+     * @defaultValue `150`
+     */
     debounceMs?: number | undefined;
     /** The item's stable id — what `value` holds and what the hidden input posts. */
     getId: (item: T) => string;
@@ -72,25 +78,41 @@
     getBadge?: ((item: T) => string | undefined) | undefined;
     /** Visible label; names the input. */
     label: string;
+    /** Placeholder in the input. */
     placeholder?: string | undefined;
     /** Posted field name. Set it to render a hidden input carrying the id. */
     name?: string | undefined;
-    /** Shown when a settled search returned nothing. */
+    /**
+     * Shown when a settled search returned nothing.
+     * @defaultValue `'No matches'`
+     */
     emptyLabel?: string | undefined;
-    /** Shown while the first search for a query is in flight. */
+    /**
+     * Shown while the first search for a query is in flight.
+     * @defaultValue `'Searching…'`
+     */
     pendingLabel?: string | undefined;
     /** A caller-owned failure, rendered as an alert under the input. */
     errorMessage?: string | undefined;
     /** `FieldControl`: the input's id. */
     id?: string | undefined;
-    /** `FieldControl`: ids for `aria-describedby`. */
+    /**
+     * `FieldControl`: ids for `aria-describedby`.
+     * @defaultValue `''`
+     */
     describedBy?: string | undefined;
     /** `FieldControl`: the field is in error. */
     invalid?: boolean | undefined;
     /** `FieldControl`: the field must be filled. */
     required?: boolean | undefined;
+    /** Disables the input. */
     disabled?: boolean | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: FieldSize | undefined;
+    /** Extra classes, merged last. */
     class?: string | undefined;
     /** Replace a row's contents. */
     item?: Snippet<[T]> | undefined;

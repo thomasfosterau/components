@@ -1,3 +1,6 @@
+<!-- @component
+A word-level diff rendered inline: inserted runs in `<ins>`, deleted runs in `<del>`, unchanged runs plain.
+-->
 <!--
   DiffText — a word-level diff rendered inline: inserted runs in `<ins>`,
   deleted runs in `<del>`, unchanged runs plain.
@@ -23,8 +26,12 @@
   import type { DiffSegment } from './diff.ts';
 
   interface Props extends Omit<HTMLAttributes<HTMLParagraphElement>, 'children'> {
+    /** The diff, in reading order. */
     segments: readonly DiffSegment[];
-    /** Rendered between segments — a space for a word-level diff. */
+    /**
+     * Rendered between segments — a space for a word-level diff.
+     * @defaultValue `' '`
+     */
     separator?: string | undefined;
     /** A visually hidden word before each inserted run. */
     insertLabel?: string | undefined;

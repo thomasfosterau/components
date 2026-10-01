@@ -1,3 +1,6 @@
+<!-- @component
+The daisyUI `stats` wrapper a row of `StatTile`s sits in, drawing the dividers between them.
+-->
 <!--
   Stats — the daisyUI `stats` wrapper a row of `StatTile`s sits in. It is what
   draws the dividers between tiles, so a lone tile still wants one.
@@ -12,8 +15,12 @@
   import { statsOrientation, type StatsOrientation } from './sizes.ts';
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
-    /** Row, column, or stacked-then-row from the `sm` breakpoint up. */
+    /**
+     * Row, column, or stacked-then-row from the `sm` breakpoint up.
+     * @defaultValue `'responsive'`
+     */
     orientation?: StatsOrientation | undefined;
+    /** The `StatTile`s. */
     children: Snippet<[]>;
   }
 

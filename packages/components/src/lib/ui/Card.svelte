@@ -1,3 +1,6 @@
+<!-- @component
+The bordered `base-100` surface: a padded body with an optional heading, a figure above and an actions row below.
+-->
 <!--
   Card — the surface. One bordered box on `base-100` with a padded body, an
   optional heading, an optional figure above it and an optional actions row
@@ -29,15 +32,32 @@
   } from './tones.ts';
 
   interface Props extends HTMLAttributes<HTMLElement> {
-    /** The element that carries the semantics. */
+    /**
+     * The element that carries the semantics.
+     * @defaultValue `'article'`
+     */
     as?: 'article' | 'section' | 'div' | undefined;
     /** Heading rendered as `card-title` at the top of the body. */
     title?: string | undefined;
-    /** Heading level for `title`. */
+    /**
+     * Heading level for `title`.
+     * @defaultValue `2`
+     */
     headingLevel?: HeadingLevel | undefined;
+    /**
+     * daisyUI card style.
+     * @defaultValue `'border'`
+     */
     variant?: CardVariant | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: Size | undefined;
-    /** Drop the body padding — for a card whose content is edge to edge. */
+    /**
+     * Drop the body padding — for a card whose content is edge to edge.
+     * @defaultValue `true`
+     */
     padded?: boolean | undefined;
     /** Extra classes on the `card-body`, for layout the caller owns. */
     bodyClass?: string | undefined;
@@ -45,6 +65,7 @@
     figure?: Snippet<[]> | undefined;
     /** Buttons or links rendered in the `card-actions` row. */
     actions?: Snippet<[]> | undefined;
+    /** The body, inside the padded `card-body`, under the heading. */
     children: Snippet<[]>;
   }
 

@@ -1,3 +1,6 @@
+<!-- @component
+A `<time>` element with the ISO instant in `datetime` and the `Intl.DateTimeFormat` rendering as its text.
+-->
 <!--
   DateTime — a `<time>` element carrying the ISO instant in `datetime` and
   `Intl.DateTimeFormat`'s locale rendering as its text.
@@ -18,9 +21,19 @@
   import { getComponentsContext } from '../context.svelte.ts';
 
   interface Props extends HTMLTimeAttributes {
+    /** The instant: a `Date`, epoch milliseconds or an ISO string. */
     value: Date | number | string;
+    /**
+     * Locale(s) for `Intl` formatting.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
+    /**
+     * `Intl.DateTimeFormat` `dateStyle`.
+     * @defaultValue `'medium'`
+     */
     dateStyle?: Intl.DateTimeFormatOptions['dateStyle'];
+    /** `Intl.DateTimeFormat` `timeStyle`; omitted, no time is shown. */
     timeStyle?: Intl.DateTimeFormatOptions['timeStyle'];
     /** Raw `Intl.DateTimeFormatOptions`; wins over `dateStyle`/`timeStyle` when given. */
     options?: Intl.DateTimeFormatOptions | undefined;

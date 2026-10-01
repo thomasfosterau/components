@@ -1,3 +1,6 @@
+<!-- @component
+A fixed value posted with the form and never edited.
+-->
 <!--
   HiddenField — a fixed value posted with the form and never edited: the
   parent id a create form hangs its row off, a command discriminator, a

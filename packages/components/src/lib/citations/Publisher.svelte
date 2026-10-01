@@ -1,3 +1,6 @@
+<!-- @component
+A publisher or awarding institution as Schema.org microdata: "Oxford, Oxfordshire, UK: Oxford University Press".
+-->
 <!--
   Publisher — a publisher (or awarding institution) as Schema.org microdata:
   "Oxford, Oxfordshire, UK: Oxford University Press". The place is a
@@ -12,7 +15,12 @@
   import type { PublisherRecord } from './csl.ts';
 
   interface Props {
+    /** The publisher to render; its place is omitted when it has none. */
     publisher: PublisherRecord;
+    /**
+     * Schema.org `itemprop` on the root.
+     * @defaultValue `'publisher'`
+     */
     itemprop?: string | undefined;
   }
 

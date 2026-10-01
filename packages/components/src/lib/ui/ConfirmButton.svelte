@@ -1,3 +1,6 @@
+<!-- @component
+A destructive action behind a two-step inline confirmation.
+-->
 <!--
   ConfirmButton — a destructive action behind a two-step inline confirm.
 
@@ -28,22 +31,44 @@
   interface Props {
     /** The destructive action itself. */
     action: () => Promise<unknown>;
-    /** The resting button's text. */
+    /**
+     * The resting button's text.
+     * @defaultValue `'Delete'`
+     */
     idleLabel?: string | undefined;
-    /** The confirm button's text. */
+    /**
+     * The confirm button's text.
+     * @defaultValue `'Confirm'`
+     */
     confirmLabel?: string | undefined;
-    /** The cancel button's text. */
+    /**
+     * The cancel button's text.
+     * @defaultValue `'Cancel'`
+     */
     cancelLabel?: string | undefined;
-    /** The confirm button's text while the action is in flight. */
+    /**
+     * The confirm button's text while the action is in flight.
+     * @defaultValue `'Working…'`
+     */
     pendingLabel?: string | undefined;
-    /** The question shown beside the confirm and cancel buttons. */
+    /**
+     * The question shown beside the confirm and cancel buttons.
+     * @defaultValue `'Are you sure? This cannot be undone.'`
+     */
     confirmMessage?: string | undefined;
-    /** Shown when the action rejects with something that is not an `Error`. */
+    /**
+     * Shown when the action rejects with something that is not an `Error`.
+     * @defaultValue `'That didn’t work. Try again.'`
+     */
     failureMessage?: string | undefined;
-    /** Tone of the idle and confirm buttons. */
+    /**
+     * Tone of the idle and confirm buttons.
+     * @defaultValue `'error'`
+     */
     tone?: Tone | undefined;
     /** Navigated to through the components context once `action` resolves. */
     redirectTo?: string | undefined;
+    /** Extra classes, merged last. */
     class?: string | undefined;
   }
 

@@ -1,3 +1,6 @@
+<!-- @component
+Offset-based page navigation: numbered links with gaps or a bare Previous/Next pair, as links (`href`) or callbacks (`onPage`).
+-->
 <!--
   Pagination — one component for the five pagers the four apps had grown:
   numbered page links with gaps, a bare Previous/Next pair, the link form and
@@ -40,6 +43,10 @@
     limit: number;
     /** The unpaged total across every page. */
     total: number;
+    /**
+     * `window` renders numbered page links with gaps; `prevNext` a bare Previous/Next pair.
+     * @defaultValue `'window'`
+     */
     variant?: 'window' | 'prevNext' | undefined;
     /**
      * Build the link for a target offset. Preserving the page's own query
@@ -49,20 +56,49 @@
     href?: ((offset: number) => string) | undefined;
     /** Page without navigating. Ignored when `href` is given. */
     onPage?: ((offset: number) => void) | undefined;
-    /** Pages rendered either side of the current one. */
+    /**
+     * Pages rendered either side of the current one.
+     * @defaultValue `1`
+     */
     siblings?: number | undefined;
-    /** The navigation landmark's accessible name. */
+    /**
+     * The navigation landmark's accessible name.
+     * @defaultValue `'Pagination'`
+     */
     label?: string | undefined;
+    /**
+     * Text of the previous-page control.
+     * @defaultValue `'Previous'`
+     */
     previousLabel?: string | undefined;
+    /**
+     * Text of the next-page control.
+     * @defaultValue `'Next'`
+     */
     nextLabel?: string | undefined;
-    /** How a numbered control is named — its digit alone is not a name. */
+    /**
+     * How a numbered control is named — its digit alone is not a name.
+     * @defaultValue `"Page <page>"`
+     */
     pageLabel?: ((page: number) => string) | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'sm'`
+     */
     size?: Size | undefined;
     /** Print the range line ("Showing 41–60 of 151"). */
     showRange?: boolean | undefined;
+    /**
+     * The range line when `showRange`.
+     * @defaultValue `"Showing <start>–<end> of <total>"`
+     */
     rangeLabel?: ((start: number, end: number, total: number) => string) | undefined;
     /** Text between the two arms in `prevNext` mode ("Page 2 of 8"). */
     statusLabel?: ((page: number, pages: number) => string) | undefined;
+    /**
+     * Locale(s) for `Intl` formatting.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
   }
 

@@ -1,3 +1,6 @@
+<!-- @component
+The daisyUI `btn` with tone, variant and size; `loading` disables it and sets `aria-busy` without changing its name. `type` defaults to `button`, not the native `submit`.
+-->
 <!--
   Button — the daisyUI `btn`, with tone / variant / size chosen from literal
   lookup tables and a `loading` state that is a real busy state rather than a
@@ -28,7 +31,15 @@
   interface Props extends HTMLButtonAttributes {
     /** Semantic colour. Omitted, the button is daisyUI's neutral `btn`. */
     tone?: Tone | undefined;
+    /**
+     * daisyUI button style.
+     * @defaultValue `'solid'`
+     */
     variant?: ButtonVariant | undefined;
+    /**
+     * daisyUI size step.
+     * @defaultValue `'md'`
+     */
     size?: Size | undefined;
     /** Disables the button, marks it busy and shows a spinner. */
     loading?: boolean | undefined;
@@ -36,6 +47,7 @@
     block?: boolean | undefined;
     /** Leading icon, replaced by the spinner while `loading`. */
     icon?: Snippet<[]> | undefined;
+    /** The button text; its accessible name. */
     children: Snippet<[]>;
   }
 

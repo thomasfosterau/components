@@ -1,3 +1,6 @@
+<!-- @component
+A line, area or bar chart drawn as plain SVG from a declarative series spec, with an always-present `sr-only` data table.
+-->
 <!--
   Chart — a line, area or bar chart drawn as plain SVG from a declarative
   series spec.
@@ -46,23 +49,46 @@
   interface Props {
     /** One entry per series, sharing the first series' categories. */
     series: readonly ChartSeries[];
+    /**
+     * The chart form.
+     * @defaultValue `'line'`
+     */
     kind?: ChartKind;
     /** Names the figure; rendered as its caption and its accessible name. */
     title: string;
-    /** A sentence of context under the title. */
+    /**
+     * A sentence of context under the title.
+     * @defaultValue `''`
+     */
     description?: string;
-    /** Plot height in CSS pixels; the width is fluid. */
+    /**
+     * Plot height in CSS pixels; the width is fluid.
+     * @defaultValue `240`
+     */
     height?: number;
     /** Reveal the data table rather than leaving it to assistive tech. */
     showTable?: boolean;
-    /** Names the series legend; only rendered when there are two or more. */
+    /**
+     * Names the series legend; only rendered when there are two or more.
+     * @defaultValue `'Series'`
+     */
     legendLabel?: string;
-    /** Captions the data table. Empty means "use `title`". */
+    /**
+     * Captions the data table. Empty means "use `title`".
+     * @defaultValue `''` (use `title`)
+     */
     tableLabel?: string;
-    /** Heads the table's category column. */
+    /**
+     * Heads the table's category column.
+     * @defaultValue `''`
+     */
     categoryLabel?: string;
-    /** Rendered value text — a unit, a locale-formatted number. */
+    /**
+     * Rendered value text — a unit, a locale-formatted number.
+     * @defaultValue `String(value)`
+     */
     formatValue?: (value: number) => string;
+    /** Extra classes, merged last. */
     class?: string | undefined;
   }
 

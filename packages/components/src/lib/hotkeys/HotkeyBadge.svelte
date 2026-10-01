@@ -1,3 +1,6 @@
+<!-- @component
+A hotkey trigger as daisyUI `kbd` chips: ⌘ K for `'$mod+k'`, G then P for `['g', 'p']`.
+-->
 <!--
   HotkeyBadge — a hotkey trigger rendered as daisyUI `kbd` chips: ⌘ K for
   `'$mod+k'`, G then P for `['g', 'p']`. Used by the command palette's rows
@@ -23,11 +26,20 @@
   interface Props extends HTMLAttributes<HTMLSpanElement> {
     /** The trigger to render — a chord (`'$mod+k'`) or a sequence (`['g','p']`). */
     trigger: HotkeyTrigger;
-    /** What `$mod` reads as on Apple platforms. */
+    /**
+     * What `$mod` reads as on Apple platforms.
+     * @defaultValue `'⌘'`
+     */
     commandLabel?: string | undefined;
-    /** What `$mod` reads as everywhere else, and during server rendering. */
+    /**
+     * What `$mod` reads as everywhere else, and during server rendering.
+     * @defaultValue `'Ctrl'`
+     */
     controlLabel?: string | undefined;
-    /** Read between the keys of a sequence. */
+    /**
+     * Read between the keys of a sequence.
+     * @defaultValue `'then'`
+     */
     thenLabel?: string | undefined;
   }
 

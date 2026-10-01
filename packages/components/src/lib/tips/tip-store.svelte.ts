@@ -36,6 +36,7 @@ export interface TipStorage {
   removeItem: (key: string) => void;
 }
 
+/** What `createTipStore` returns: registers tips, decides whether each may show, and records what the reader did with it. */
 export interface TipStore {
   /** Declare a tip. Re-registering the same id replaces its configuration. */
   register: (config: TipConfig) => void;

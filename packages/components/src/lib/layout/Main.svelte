@@ -1,3 +1,6 @@
+<!-- @component
+The page’s content column and the `<main>` landmark.
+-->
 <!--
   Main — the page's content column, and the `<main>` landmark that names it.
 
@@ -20,8 +23,12 @@
   import type { HTMLAttributes } from 'svelte/elements';
 
   interface Props extends HTMLAttributes<HTMLElement> {
-    /** `main` (the default) or `section` when a `<main>` is already open. */
+    /**
+     * `main`, or `section` when a `<main>` is already open.
+     * @defaultValue `'main'`
+     */
     as?: 'main' | 'section' | undefined;
+    /** The page content, inside the landmark and the content column. */
     children: Snippet<[]>;
   }
 

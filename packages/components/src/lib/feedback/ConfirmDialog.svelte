@@ -1,3 +1,6 @@
+<!-- @component
+A destructive action behind a modal confirmation, run either as a callback (`onConfirm`) or as a progressive-enhancement POST (`form`).
+-->
 <!--
   ConfirmDialog — a destructive action behind a modal confirmation, in the two
   shapes the app repos actually needed.
@@ -61,15 +64,40 @@
     title: string;
     /** What confirming does, in the reader's terms. */
     description?: string | undefined;
+    /**
+     * Text of the confirm button.
+     * @defaultValue `'Delete'`
+     */
     confirmLabel?: string | undefined;
+    /**
+     * Text of the cancel button.
+     * @defaultValue `'Cancel'`
+     */
     cancelLabel?: string | undefined;
-    /** The confirm button's text while the callback is in flight. */
+    /**
+     * The confirm button's text while the callback is in flight.
+     * @defaultValue `'Working…'`
+     */
     pendingLabel?: string | undefined;
-    /** Shown when the callback rejects with something that is not an `Error`. */
+    /**
+     * Shown when the callback rejects with something that is not an `Error`.
+     * @defaultValue `'That didn’t work. Try again.'`
+     */
     failureMessage?: string | undefined;
-    /** Accessible name of the corner close button. */
+    /**
+     * Accessible name of the corner close button.
+     * @defaultValue `'Close'`
+     */
     closeLabel?: string | undefined;
+    /**
+     * Colour of the confirm button.
+     * @defaultValue `'error'`
+     */
     tone?: Tone | undefined;
+    /**
+     * Width of the dialog.
+     * @defaultValue `'md'`
+     */
     size?: DialogSize | undefined;
     /** Client-side confirmation. Mutually exclusive with `form`. */
     onConfirm?: (() => Promise<unknown>) | undefined;
@@ -77,6 +105,7 @@
     form?: ConfirmForm | undefined;
     /** Navigated to through the components context once `onConfirm` resolves. */
     redirectTo?: string | undefined;
+    /** Extra classes, merged last. */
     class?: string | undefined;
     /** The opening control — the caller's own element, spreading `props`. */
     trigger?: Snippet<[{ props: Record<string, unknown> }]> | undefined;
