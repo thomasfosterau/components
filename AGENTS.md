@@ -74,7 +74,7 @@ Durable knowledge has one home each: a **decision, findings report, or invariant
 
 ## Publishing
 
-Changesets. Any PR that changes published behaviour adds one (`pnpm changeset`); `.github/workflows/release.yml` opens a "Version Packages" PR while unreleased changesets exist and publishes with provenance once it merges. The default branch is `main` — that is what `.changeset/config.json`'s `baseBranch` must say.
+Changesets. Any PR that changes published behaviour adds one (`pnpm changeset`); `.github/workflows/release.yml` opens a "Version Packages" PR while unreleased changesets exist and publishes once it merges (provenance is left to npm, never forced). The default branch is `main` — that is what `.changeset/config.json`'s `baseBranch` must say.
 
 Publishing is **npm Trusted Publishing (OIDC)** from the protected `release` environment — there is no `NPM_TOKEN` anywhere. `pnpm publish` cannot do OIDC, so the publish step is [`scripts/publish.mjs`](scripts/publish.mjs): `pnpm pack` per package (which rewrites `catalog:` / `workspace:*`) and `npm publish <tarball>`. Never switch it back to `pnpm publish -r` or `changeset publish`. The one-time owner setup — the `release` environment and a trusted publisher per package — is in [README.md](README.md#releasing).
 
