@@ -107,11 +107,6 @@ export default defineConfig({
       headless: true,
       provider: playwright(),
       instances: [{ browser: 'chromium' }],
-      // Vitest 5 flipped `browser.locators.exact` to `true`, so `getByText('(ed)')`
-      // stopped matching "Harden, G. J. (ed)" and every negative assertion
-      // (`.not.toBeInTheDocument()`) would pass vacuously. Keep the substring,
-      // case-insensitive matching these suites were written against.
-      locators: { exact: false },
       screenshotFailures: false,
     },
   },

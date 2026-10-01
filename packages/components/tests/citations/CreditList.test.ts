@@ -4,7 +4,7 @@ import CreditList from '../../src/lib/citations/CreditList.svelte';
 
 test('renders nothing for an empty list', async () => {
   const screen = await render(CreditList, { credits: [], role: 'editor' });
-  await expect.element(screen.getByText('(ed)')).not.toBeInTheDocument();
+  await expect.element(screen.getByText('(ed)', { exact: false })).not.toBeInTheDocument();
 });
 
 test('joins two authors with the locale conjunction and no role label', async () => {
@@ -15,18 +15,18 @@ test('joins two authors with the locale conjunction and no role label', async ()
   await expect.element(screen.getByText('Smith, J.')).toBeInTheDocument();
   await expect.element(screen.getByText('and', { exact: false })).toBeInTheDocument();
   await expect.element(screen.getByText('Jones, A.')).toBeInTheDocument();
-  await expect.element(screen.getByText('(ed)')).not.toBeInTheDocument();
+  await expect.element(screen.getByText('(ed)', { exact: false })).not.toBeInTheDocument();
 });
 
 test('prints "(ed)" after a single editor, "(eds)" after several', async () => {
   const one = await render(CreditList, { credits: [{ name: 'Harden, G. J.' }], role: 'editor' });
-  await expect.element(one.getByText('(ed)')).toBeInTheDocument();
+  await expect.element(one.getByText('(ed)', { exact: false })).toBeInTheDocument();
 
   const many = await render(CreditList, {
     credits: [{ name: 'Harden, G. J.' }, { name: 'Second, E.' }],
     role: 'editor',
   });
-  await expect.element(many.getByText('(eds)')).toBeInTheDocument();
+  await expect.element(many.getByText('(eds)', { exact: false })).toBeInTheDocument();
 });
 
 test('prints "trans." before the translator names', async () => {
@@ -63,5 +63,5 @@ test('a caller-supplied roleLabel and position override the built-in defaults', 
     roleLabel: () => '(illus.)',
     roleLabelPosition: 'after',
   });
-  await expect.element(screen.getByText('(illus.)')).toBeInTheDocument();
+  await expect.element(screen.getByText('(illus.)', { exact: false })).toBeInTheDocument();
 });
