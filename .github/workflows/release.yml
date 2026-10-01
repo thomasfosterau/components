@@ -55,9 +55,11 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      # Trusted Publishing needs npm >= 11.5.1; Node 22 bundles npm 10.
+      # Trusted Publishing needs npm >= 11.5.1; Node 22 bundles npm 10. Pinned
+      # to a major rather than `@latest`: this job holds `id-token: write`, so
+      # a new npm major should arrive by a reviewed change (#44).
       - name: Upgrade npm for trusted publishing
-        run: npm install -g npm@latest
+        run: npm install -g npm@11
 
       # `--ignore-scripts`: the root `prepare` only installs the Vite+ git
       # hooks, and nothing on the build path needs an install script.
