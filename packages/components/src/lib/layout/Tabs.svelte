@@ -35,7 +35,7 @@ A tab strip that is either a tab widget over panels (`mode="panels"`) or navigat
   import { tabsSize, tabsVariant, type TabItem, type TabsMode, type TabsVariant } from './types.ts';
 
   interface Props {
-    /** The tabs, in order. */
+    /** The tabs, in order: `value` and `label`, plus `href` in `links` mode. */
     items: readonly TabItem[];
     /**
      * `panels` for a tab widget; `links` for navigation between routes.

@@ -18,7 +18,7 @@ A thesis as "Author, <cite>Title</cite> (2019) PhD thesis, University of Sydney"
   import type { ThesisRecord } from './csl.ts';
 
   interface Props {
-    /** The thesis to cite. */
+    /** The thesis record; absent fields are left out of the rendering. */
     thesis: ThesisRecord;
     /**
      * Rendered in place of a missing title.
@@ -35,7 +35,10 @@ A thesis as "Author, <cite>Title</cite> (2019) PhD thesis, University of Sydney"
      * @defaultValue `'available online at'`
      */
     availableOnlineLabel?: string | undefined;
-    /** Locale(s) for the joined name lists; omitted, the components context's `locale()`. */
+    /**
+     * Locale(s) for the joined name lists.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
   }
 

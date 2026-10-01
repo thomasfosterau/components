@@ -43,7 +43,10 @@ A chapter as "Author, ‘Chapter title’, in <book> ch 4 (pp 101–130)", with 
      * @defaultValue `'pp'`
      */
     pagesLabel?: string | undefined;
-    /** Locale(s) for the joined name lists; omitted, the components context's `locale()`. */
+    /**
+     * Locale(s) for the joined name lists.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
     /**
      * Forwarded to the nested `BookCitation`.

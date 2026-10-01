@@ -15,7 +15,7 @@ A `<figure>` with an optional `<figcaption>`, for media that needs a caption.
   interface Props extends HTMLAttributes<HTMLElement> {
     /** Rendered as `<figcaption>`; a plain string or a snippet for richer markup. */
     caption?: string | Snippet<[]> | undefined;
-    /** The media. */
+    /** The image, video or diagram the caption describes. */
     children: Snippet<[]>;
   }
 

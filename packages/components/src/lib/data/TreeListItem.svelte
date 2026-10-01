@@ -18,7 +18,7 @@ One leaf under a `TreeList`, drawn with the connector rule that makes the nestin
   import type { HTMLAttributes } from 'svelte/elements';
 
   interface Props extends Omit<HTMLAttributes<HTMLLIElement>, 'children'> {
-    /** The content. */
+    /** The leaf's content, beside the connector rule. */
     children?: Snippet<[]> | undefined;
   }
 

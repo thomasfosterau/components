@@ -14,7 +14,7 @@ Renders `items` through `Intl.ListFormat`, with each item drawn by the `children
   import { getComponentsContext } from '../context.svelte.ts';
 
   interface Props {
-    /** The items to join. */
+    /** The items to join, each rendered by `children`. */
     items: readonly T[];
     /**
      * `Intl.ListFormat` style.
@@ -27,7 +27,7 @@ Renders `items` through `Intl.ListFormat`, with each item drawn by the `children
      */
     type?: Intl.ListFormatOptions['type'];
     /**
-     * Locale(s) for `Intl` formatting; omitted, the components context's `locale()`.
+     * Locale(s) for `Intl` formatting.
      * @defaultValue the components context's `locale()`
      */
     locales?: string | readonly string[] | undefined;

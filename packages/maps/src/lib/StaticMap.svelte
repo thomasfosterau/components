@@ -29,7 +29,7 @@ A map as one raster image from the Mapbox Static Images API.
       HTMLImgAttributes,
       'src' | 'srcset' | 'alt' | 'width' | 'height' | 'class' | 'style'
     > {
-    /** The Mapbox style to render. */
+    /** The Mapbox style: its account (`mapbox` for the stock styles) and id. */
     style: MapStyle;
     /** A camera, a bounding box to fit, or `auto` to frame the overlay. */
     view: StaticView;

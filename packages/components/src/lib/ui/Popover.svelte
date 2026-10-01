@@ -57,7 +57,7 @@ A small floating panel anchored to a trigger, on bits-ui’s `Popover`.
     class?: string | undefined;
     /** The trigger — the caller's own element, spreading `props` onto it. */
     trigger: Snippet<[{ props: Record<string, unknown> }]>;
-    /** The panel content. */
+    /** The panel body, under `title` when one is given. */
     children: Snippet<[]>;
   }
 

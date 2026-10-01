@@ -69,7 +69,10 @@ The count line and the pager that sit under a paginated index page.
     pageLabel?: ((page: number) => string) | undefined;
     /** The count line, when "Showing x of y" is not the sentence wanted. */
     countLabel?: ((shown: number, total: number) => string) | undefined;
-    /** Locale(s) for `Intl` formatting; omitted, the components context's `locale()`. */
+    /**
+     * Locale(s) for `Intl` formatting.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
   }
 

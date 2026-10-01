@@ -26,7 +26,7 @@ A `<time>` element carrying just a year, for dates whose precision really is a y
     /** A calendar year, or an instant (its UTC year is used). */
     value: Date | number | string;
     /**
-     * Locale(s) for `Intl` formatting; omitted, the components context's `locale()`.
+     * Locale(s) for `Intl` formatting.
      * @defaultValue the components context's `locale()`
      */
     locales?: string | readonly string[] | undefined;

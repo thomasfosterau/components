@@ -1,5 +1,5 @@
 <!-- @component
-A daisyUI `textarea` with a bindable `value` and `FieldControl` wiring.
+A daisyUI `textarea` with a bindable `value` and `FieldControl` wiring. `rows` defaults to `4`.
 -->
 <!--
   Textarea — daisyUI `textarea` with a bindable `value` and the same

@@ -32,7 +32,7 @@ An in-text anchor in one of three weights; the plain link of the library.
     variant?: LinkVariant | undefined;
     /** Open in a new tab with the safe `rel`. */
     external?: boolean | undefined;
-    /** The link text. */
+    /** The link text; the anchor's accessible name. */
     children: Snippet<[]>;
   }
 

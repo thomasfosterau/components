@@ -21,7 +21,7 @@ One book as a compact author–date reference with Schema.org `Book` microdata.
   import type { BookRecord } from './csl.ts';
 
   interface Props {
-    /** The book to cite. */
+    /** The book record; absent fields are left out of the rendering. */
     book: BookRecord;
     /** Microdata `itemprop` on the root, when this book is itself a property (a chapter's `isPartOf`). */
     itemprop?: string | undefined;
@@ -50,7 +50,10 @@ One book as a compact author–date reference with Schema.org `Book` microdata.
      * @defaultValue `'available online at'`
      */
     availableOnlineLabel?: string | undefined;
-    /** Locale(s) for the joined name lists; omitted, the components context's `locale()`. */
+    /**
+     * Locale(s) for the joined name lists.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
   }
 

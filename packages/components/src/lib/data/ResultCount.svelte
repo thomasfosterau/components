@@ -26,7 +26,7 @@ The "Showing 24 of 310" line under a list.
     /** The whole line, when "Showing x of y" is not the sentence wanted. */
     label?: ((shown: number, total: number) => string) | undefined;
     /**
-     * Locale(s) for `Intl` formatting; omitted, the components context's `locale()`.
+     * Locale(s) for `Intl` formatting.
      * @defaultValue the components context's `locale()`
      */
     locales?: string | readonly string[] | undefined;

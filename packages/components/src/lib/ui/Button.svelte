@@ -1,5 +1,5 @@
 <!-- @component
-The daisyUI `btn` with tone, variant and size; `loading` disables it and sets `aria-busy` without changing its name.
+The daisyUI `btn` with tone, variant and size; `loading` disables it and sets `aria-busy` without changing its name. `type` defaults to `button`, not the native `submit`.
 -->
 <!--
   Button — the daisyUI `btn`, with tone / variant / size chosen from literal

@@ -29,7 +29,7 @@ A heading at any level with a stable `id`, optionally with a copyable anchor lin
   import VisuallyHidden from './VisuallyHidden.svelte';
 
   interface Props extends Omit<HTMLAttributes<HTMLHeadingElement>, 'children'> {
-    /** The heading level. */
+    /** The heading level (`h1`–`h6`); choose it from the outline, not the size. */
     level: HeadingLevel;
     /** Explicit anchor id; derived from `children` when it is a string. */
     id?: string | undefined;

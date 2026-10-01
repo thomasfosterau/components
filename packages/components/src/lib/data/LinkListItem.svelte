@@ -27,7 +27,7 @@ The row body most lists want: a linked title, a line of context under it, and sh
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
     /** Where the title links to; resolved through the components context. */
     href: string;
-    /** The link text. */
+    /** The linked title; rendered as a heading when `headingLevel` is set. */
     title: string;
     /** A line of context under the title — an owner, a parent, a date. */
     subtitle?: string | undefined;

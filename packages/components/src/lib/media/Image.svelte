@@ -1,5 +1,5 @@
 <!-- @component
-A responsive `<img>` from a URL or an uploaded image id, optionally wrapped in `<picture>`.
+A responsive `<img>` from a URL or an uploaded image id, optionally wrapped in `<picture>`. `decoding` defaults to `'async'`.
 -->
 <!--
   Image — a responsive `<img>`, optionally wrapped in `<picture>`.

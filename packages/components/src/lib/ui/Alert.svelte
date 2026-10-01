@@ -57,7 +57,7 @@ The daisyUI `alert`: a tone-coloured notice with an icon, an optional lead-in an
      * @defaultValue `'Dismiss'`
      */
     dismissLabel?: string | undefined;
-    /** The message. */
+    /** The message, after the optional bold lead-in. */
     children: Snippet<[]>;
   }
 

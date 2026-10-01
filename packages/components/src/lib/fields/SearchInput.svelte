@@ -1,5 +1,5 @@
 <!-- @component
-A `type="search"` field with a leading icon, a clear button while there is text, and a spinner while `pending`.
+A `type="search"` field with a leading icon, a clear button while there is text, and a spinner while `pending`. `name` defaults to `'q'` and `placeholder` to `'Search'`.
 -->
 <!--
   SearchInput — a `type="search"` field in daisyUI's composite `input`

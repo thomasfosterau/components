@@ -17,7 +17,7 @@ A report as "Authors, <cite>Title</cite> (2021) Canberra: Department of X pp 88"
   import type { ReportRecord } from './csl.ts';
 
   interface Props {
-    /** The report to cite. */
+    /** The report record; absent fields are left out of the rendering. */
     report: ReportRecord;
     /** Schema.org `itemid` on the root. */
     itemid?: string | undefined;
@@ -41,7 +41,10 @@ A report as "Authors, <cite>Title</cite> (2021) Canberra: Department of X pp 88"
      * @defaultValue `'available online at'`
      */
     availableOnlineLabel?: string | undefined;
-    /** Locale(s) for the joined name lists; omitted, the components context's `locale()`. */
+    /**
+     * Locale(s) for the joined name lists.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
   }
 

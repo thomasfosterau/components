@@ -21,7 +21,7 @@ Content for assistive technology only: in the DOM and the accessibility tree, cl
   import type { HTMLAttributes } from 'svelte/elements';
 
   interface Props extends HTMLAttributes<HTMLSpanElement> {
-    /** The content. */
+    /** What assistive technology reads; any inline markup. */
     children: Snippet<[]>;
   }
 

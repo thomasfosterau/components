@@ -55,7 +55,7 @@ An `<a>` styled as a daisyUI `btn`, for navigation that reads as an action; it k
     external?: boolean | undefined;
     /** Leading icon. */
     icon?: Snippet<[]> | undefined;
-    /** The link text. */
+    /** The button text; the anchor's accessible name. */
     children: Snippet<[]>;
   }
 

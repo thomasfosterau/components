@@ -20,7 +20,7 @@
     /** The instant "now" is measured from; defaults to the current wall clock at render. */
     now?: Date | number | undefined;
     /**
-     * Locale(s) for `Intl` formatting; omitted, the components context's `locale()`.
+     * Locale(s) for `Intl` formatting.
      * @defaultValue the components context's `locale()`
      */
     locales?: string | readonly string[] | undefined;

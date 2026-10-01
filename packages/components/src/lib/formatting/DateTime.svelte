@@ -24,7 +24,7 @@ A `<time>` element with the ISO instant in `datetime` and the `Intl.DateTimeForm
     /** The instant: a `Date`, epoch milliseconds or an ISO string. */
     value: Date | number | string;
     /**
-     * Locale(s) for `Intl` formatting; omitted, the components context's `locale()`.
+     * Locale(s) for `Intl` formatting.
      * @defaultValue the components context's `locale()`
      */
     locales?: string | readonly string[] | undefined;

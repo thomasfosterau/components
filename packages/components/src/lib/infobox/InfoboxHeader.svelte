@@ -14,7 +14,7 @@ The title block at the top of an `Infobox`.
   import type { HTMLAttributes } from 'svelte/elements';
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
-    /** The heading. */
+    /** The infobox heading text. */
     title: string;
     /** A line under the heading. */
     subtitle?: string | undefined;

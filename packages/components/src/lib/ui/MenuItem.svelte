@@ -43,7 +43,7 @@ One entry of a `Menu`, in whichever mode the enclosing `Menu` declared.
     icon?: Snippet<[]> | undefined;
     /** Extra classes on the `<li>`. */
     class?: string | undefined;
-    /** The item text. */
+    /** The item's content: a link or button in `nav` mode, the label in `dropdown` mode. */
     children: Snippet<[]>;
   }
 

@@ -77,7 +77,10 @@ A `Toggle` that subscribes this browser to Web Push, or unsubscribes it, through
      * @defaultValue `"This browser can't receive push notifications."`
      */
     unsupportedMessage?: string | undefined;
-    /** Shown when the browser’s notification permission is denied. */
+    /**
+     * Shown when the browser’s notification permission is denied.
+     * @defaultValue `'This browser is blocking notifications. Allow them in your browser settings to turn this on.'`
+     */
     deniedMessage?: string | undefined;
     /** Extra classes, merged last. */
     class?: string | undefined;

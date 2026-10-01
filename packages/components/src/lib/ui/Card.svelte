@@ -65,7 +65,7 @@ The bordered `base-100` surface: a padded body with an optional heading, a figur
     figure?: Snippet<[]> | undefined;
     /** Buttons or links rendered in the `card-actions` row. */
     actions?: Snippet<[]> | undefined;
-    /** The card body. */
+    /** The body, inside the padded `card-body`, under the heading. */
     children: Snippet<[]>;
   }
 

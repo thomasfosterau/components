@@ -50,7 +50,7 @@ A link off the site that opens in a new tab with the right `rel`, and says so to
      * @defaultValue `'(opens in a new tab)'`
      */
     newTabLabel?: string | undefined;
-    /** The link text. */
+    /** The link text; the new-tab notice is appended for assistive technology. */
     children: Snippet<[]>;
   }
 

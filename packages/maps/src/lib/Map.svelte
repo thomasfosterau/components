@@ -34,7 +34,7 @@ A static raster map first, upgraded to the interactive map once the page has hyd
   interface Props {
     /** A public-scope Mapbox token — safe in the client by design. */
     accessToken: string;
-    /** The Mapbox style to render. */
+    /** The Mapbox style: its account (`mapbox` for the stock styles) and id. */
     style: MapStyle;
     /** The centre, zoom, bearing and pitch. */
     camera: MapCamera;

@@ -96,7 +96,7 @@ Offset-based page navigation: numbered links with gaps or a bare Previous/Next p
     /** Text between the two arms in `prevNext` mode ("Page 2 of 8"). */
     statusLabel?: ((page: number, pages: number) => string) | undefined;
     /**
-     * Locale(s) for `Intl` formatting; omitted, the components context's `locale()`.
+     * Locale(s) for `Intl` formatting.
      * @defaultValue the components context's `locale()`
      */
     locales?: string | readonly string[] | undefined;

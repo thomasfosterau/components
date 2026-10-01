@@ -13,7 +13,7 @@ A `mailto:` link whose subject, body, cc and bcc are correctly encoded.
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
   interface Props extends HTMLAnchorAttributes {
-    /** The address. */
+    /** The address; also the link text unless `children` replaces it. */
     email: string;
     /** Pre-filled subject line. */
     subject?: string | undefined;

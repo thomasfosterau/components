@@ -18,7 +18,7 @@ A journal article as "Authors, ‘Title’ (2019) <cite>Periodical</cite> 12 (3)
   import type { ScholarlyArticleRecord } from './csl.ts';
 
   interface Props {
-    /** The article to cite. */
+    /** The article record, with its periodical, volume and issue; absent fields are left out. */
     article: ScholarlyArticleRecord;
     /** Microdata `itemid` — the article's canonical URL. */
     itemid?: string | undefined;
@@ -47,7 +47,10 @@ A journal article as "Authors, ‘Title’ (2019) <cite>Periodical</cite> 12 (3)
      * @defaultValue `'available online at'`
      */
     availableOnlineLabel?: string | undefined;
-    /** Locale(s) for the joined name lists; omitted, the components context's `locale()`. */
+    /**
+     * Locale(s) for the joined name lists.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
   }
 

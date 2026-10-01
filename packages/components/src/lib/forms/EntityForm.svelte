@@ -105,7 +105,7 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     selectPlaceholder?: string | undefined;
     /**
      * Read out after a required field’s label.
-     * @defaultValue `FormField`'s
+     * @defaultValue `'(required)'` (from `FormField`)
      */
     requiredLabel?: string | undefined;
   }

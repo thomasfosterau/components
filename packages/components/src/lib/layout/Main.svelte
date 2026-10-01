@@ -28,7 +28,7 @@ The page’s content column and the `<main>` landmark.
      * @defaultValue `'main'`
      */
     as?: 'main' | 'section' | undefined;
-    /** The content. */
+    /** The page content, inside the landmark and the content column. */
     children: Snippet<[]>;
   }
 

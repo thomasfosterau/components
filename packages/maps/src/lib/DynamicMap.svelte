@@ -43,7 +43,7 @@ The interactive Mapbox GL map, panned and zoomed, with a fallback when WebGL is 
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'style'> {
     /** A public-scope Mapbox token — safe in the client by design. */
     accessToken: string;
-    /** The Mapbox style to render. */
+    /** The Mapbox style: its account (`mapbox` for the stock styles) and id. */
     style: MapStyle;
     /** The initial centre, zoom, bearing and pitch. */
     camera: MapCamera;

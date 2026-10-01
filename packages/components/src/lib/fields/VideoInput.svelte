@@ -44,7 +44,7 @@ A `FileInput` plus the progress readout for an upload the caller performs.
     maxBytes?: number | undefined;
     /**
      * Shown when the chosen file exceeds `maxBytes`.
-     * @defaultValue `FileInput`'s
+     * @defaultValue `'That file is too large.'` (from `FileInput`)
      */
     tooLargeMessage?: string | undefined;
     /** Called with the accepted file — the caller starts the transfer here. */

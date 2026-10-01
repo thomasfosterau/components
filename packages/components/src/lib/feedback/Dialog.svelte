@@ -53,7 +53,7 @@ A modal on bits-ui’s `Dialog`, wearing daisyUI’s `modal-box`.
     trigger?: Snippet<[{ props: Record<string, unknown> }]> | undefined;
     /** Buttons for the `modal-action` row. */
     actions?: Snippet<[{ close: () => void }]> | undefined;
-    /** The dialog body. */
+    /** The dialog body, under the title and description. */
     children: Snippet<[]>;
   }
 

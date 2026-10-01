@@ -53,7 +53,7 @@ The daisyUI `badge`: a short inline label for a status, a count or a category.
      * colour when the token is undeclared.
      */
     colourToken?: string | undefined;
-    /** The label. */
+    /** The badge text; keep it to a word or a count. */
     children: Snippet<[]>;
   }
 

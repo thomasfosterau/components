@@ -51,7 +51,10 @@ A locale-joined byline for one credited role (authors, editors, translators), ea
     roleLabelPosition?: 'before' | 'after' | undefined;
     /** Overrides `role` as the Schema.org property each credit carries. */
     itemprop?: string | undefined;
-    /** Locale(s) for `Intl` formatting; omitted, the components context's `locale()`. */
+    /**
+     * Locale(s) for `Intl` formatting.
+     * @defaultValue the components context's `locale()`
+     */
     locales?: string | readonly string[] | undefined;
     /**
      * `Intl.ListFormat` style.

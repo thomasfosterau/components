@@ -61,7 +61,7 @@ A titled block of a page: a heading, an optional count, optional actions, and ei
     actions?: Snippet<[]> | undefined;
     /** Replaces the default empty paragraph — usually an `EmptyState`. */
     emptyState?: Snippet<[]> | undefined;
-    /** The rows. */
+    /** The section's rows; replaced by the empty state when `empty`. */
     children: Snippet<[]>;
   }
 

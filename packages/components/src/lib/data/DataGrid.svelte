@@ -118,7 +118,7 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
     /** How a sortable column’s button is named; see `Table`. */
     sortLabel?: ((column: TableColumn<T>) => string) | undefined;
     /**
-     * Locale(s) for `Intl` formatting; omitted, the components context's `locale()`.
+     * Locale(s) for `Intl` formatting.
      * @defaultValue the components context's `locale()`
      */
     locales?: string | readonly string[] | undefined;

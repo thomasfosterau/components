@@ -16,10 +16,10 @@ A `<data>` element whose text is the `Intl.NumberFormat` rendering and whose `va
   import { getComponentsContext } from '../context.svelte.ts';
 
   interface Props extends Omit<HTMLDataAttributes, 'value'> {
-    /** The number to format. */
+    /** The number to format; the raw value also goes in the `value` attribute. */
     value: number | bigint;
     /**
-     * Locale(s) for `Intl` formatting; omitted, the components context's `locale()`.
+     * Locale(s) for `Intl` formatting.
      * @defaultValue the components context's `locale()`
      */
     locales?: string | readonly string[] | undefined;

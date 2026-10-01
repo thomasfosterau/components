@@ -28,7 +28,7 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
    *
    * Every string is a prop: `siteName` has no default (a library cannot know
    * the site), `feed.title` defaults to `'Latest changes'`, and the share
-   * card's alt text defaults to `"<title> — <siteName>"` via `shareCardAlt`.
+   * card's alt text defaults to `"<title> — <siteName>"` (the title alone without a `siteName`) via `shareCardAlt`.
    *
    * Renders only into `<svelte:head>`; there is no markup in the body.
    */
@@ -97,7 +97,7 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
     shareCardPath?: string | undefined;
     /**
      * The share card's alt text.
-     * @defaultValue `"<card title> — <siteName>"`
+     * @defaultValue `"<card title> — <siteName>"`, or the card title alone when `siteName` is unset or empty
      */
     shareCardAlt?: ((card: OgImageCard) => string) | undefined;
     /** The share image when neither `image` nor `shareCard` gives one. */
