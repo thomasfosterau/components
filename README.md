@@ -40,7 +40,7 @@ vp run --filter ./packages/components storybook:build
 
 `.github/workflows/release.yml` runs [`changesets/action`](https://github.com/changesets/action) on every push to `main`: while unreleased changesets exist it opens (or updates) a **"chore: version packages"** pull request; merging that pull request publishes every package whose version is not yet on npm, then tags the release and creates a GitHub release per package.
 
-Publishing is **npm [Trusted Publishing](https://docs.npmjs.com/trusted-publishers) (OIDC)** with provenance. There is no `NPM_TOKEN` secret: the job's `id-token: write` permission is exchanged by the npm CLI for a short-lived publish credential. `pnpm publish` cannot make that exchange, so [`scripts/publish.mjs`](./scripts/publish.mjs) packs each package with `pnpm pack` (rewriting `catalog:` and `workspace:*` to real ranges) and publishes the tarball with `npm publish`, dependencies first.
+Publishing is **npm [Trusted Publishing](https://docs.npmjs.com/trusted-publishers) (OIDC)**. Provenance is left to npm, which attaches it only when allowed and is never forced (an explicit request fails from a private repository). There is no `NPM_TOKEN` secret: the job's `id-token: write` permission is exchanged by the npm CLI for a short-lived publish credential. `pnpm publish` cannot make that exchange, so [`scripts/publish.mjs`](./scripts/publish.mjs) packs each package with `pnpm pack` (rewriting `catalog:` and `workspace:*` to real ranges) and publishes the tarball with `npm publish`, dependencies first.
 
 One-time owner setup:
 

@@ -10,8 +10,8 @@
  * `catalog:` and `workspace:*` specifiers, and would ship them verbatim. So
  * each package is split into the half each tool is good at: `pnpm pack`
  * rewrites the specifiers into the tarball, and `npm publish <tarball>`
- * authenticates via OIDC and attaches provenance (`NPM_CONFIG_PROVENANCE`,
- * set by the workflow).
+ * authenticates via OIDC (provenance is left to npm, never forced: an explicit
+ * request fails from a private repository).
  *
  * `changesets/action` creates the git tags and GitHub releases, but only for
  * what this script reports: one `{"type":"git-tag",…}` line per published

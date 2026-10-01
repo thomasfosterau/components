@@ -9,8 +9,8 @@ name: Release
 # and none is read here. The job's `id-token: write` lets the npm CLI exchange
 # a GitHub-minted token for a short-lived publish credential, scoped to this
 # repository, this workflow file and the `release` environment, which is what
-# each package's trusted publisher on npmjs.com names. Provenance is attached
-# by the same exchange (`NPM_CONFIG_PROVENANCE`).
+# each package's trusted publisher on npmjs.com names. Provenance is left to npm
+# (never forced: an explicit request fails from a private repository).
 #
 # The publish step is `scripts/publish.mjs`, not `changeset publish`: pnpm's
 # publish path cannot do OIDC, so the script packs with pnpm (which rewrites
@@ -40,7 +40,7 @@ jobs:
       contents: write
       # Open / update the "Version Packages" pull request.
       pull-requests: write
-      # npm Trusted Publishing (OIDC) and provenance.
+      # npm Trusted Publishing (OIDC).
       id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -83,5 +83,6 @@ jobs:
           publish-script: pnpm run release
           commit-message: 'chore: version packages'
           pr-title: 'chore: version packages'
-        env:
-          NPM_CONFIG_PROVENANCE: 'true'
+        # No `env:` block on purpose: don't force provenance (NPM_CONFIG_PROVENANCE).
+        # npm attaches it itself when allowed, and an explicit request fails
+        # from a private repository.
