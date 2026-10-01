@@ -1,7 +1,7 @@
 name: Release
 
 # Changesets release flow: on every push to `main`, changesets/action either
-# opens/updates the "Version Packages" pull request (while unreleased
+# opens/updates the "chore: version packages" pull request (while unreleased
 # changesets exist) or, once that pull request has merged, publishes every
 # package whose version is not yet on npm and tags the release.
 #
@@ -9,13 +9,11 @@ name: Release
 # and none is read here. The job's `id-token: write` lets the npm CLI exchange
 # a GitHub-minted token for a short-lived publish credential, scoped to this
 # repository, this workflow file and the `release` environment, which is what
-# each package's trusted publisher on npmjs.com names. Provenance is left to npm
-# (never forced: an explicit request fails from a private repository).
+# each package's trusted publisher on npmjs.com names. Nothing requests
+# provenance (an explicit request fails from a private repository).
 #
-# The publish step is `scripts/publish.mjs`, not `changeset publish`: pnpm's
-# publish path cannot do OIDC, so the script packs with pnpm (which rewrites
-# `catalog:` / `workspace:*`) and publishes the tarball with npm. See its
-# header for the details.
+# The publish step is `scripts/publish.mjs` (`pnpm pack` + `npm publish
+# <tarball>`), not `changeset publish`; its header says why it is kept.
 
 on:
   push:
@@ -38,7 +36,7 @@ jobs:
     permissions:
       # Commit the version bump, push tags, create GitHub releases.
       contents: write
-      # Open / update the "Version Packages" pull request.
+      # Open / update the "chore: version packages" pull request.
       pull-requests: write
       # npm Trusted Publishing (OIDC).
       id-token: write

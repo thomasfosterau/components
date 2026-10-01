@@ -1,5 +1,5 @@
-# pnpm workspace — one publishable package today (`packages/components`), and
-# room for the siblings a component library eventually grows (icons, presets).
+# pnpm workspace — two publishable packages (`packages/components`,
+# `packages/maps`).
 #
 # The `catalog:` protocol pins versions that MUST be singletons across the
 # workspace. `svelte` especially: two copies break the compiler's runtime
@@ -7,7 +7,8 @@
 # show up at render time.
 #
 # EVERY external dependency version lives here — package.json files reference
-# only `catalog:` (or `workspace:*` for internal packages). `catalogMode:
+# only `catalog:` (or `workspace:*` for internal packages), except the literal
+# published `svelte` peer range (#46). `catalogMode:
 # strict` makes `pnpm add` enforce this at add time and `pnpm install` reject
 # non-catalog specifiers.
 # After editing this catalog, ALWAYS run `pnpm install` and commit the
@@ -71,7 +72,7 @@ catalog:
   '@types/node': ^26.6.3
   # Vitest browser mode: the Playwright provider is its own package as of
   # v4 and pins `vitest` EXACTLY, so it must track the `vitest` entry below
-  # (which itself must match vite-plus's exact pin — see that entry).
+  # (see that entry for how it relates to vite-plus's own pin).
   # `@vitest/browser` itself arrives through vite-plus, so it is not
   # catalogued separately.
   '@vitest/browser-playwright': 5.0.2
@@ -107,10 +108,11 @@ catalog:
   # there is no pure-TS surface here worth a second compiler, so this is the
   # only one.
   typescript: 'npm:@typescript/typescript6@6.0.2'
-  # vite-plus pins `oxlint`, `oxfmt` and `vitest` to exact versions, so
-  # `vitest` below must match vite-plus's own pin (1.0.0 -> 5.0.1) — the
-  # `vitest: "catalog:"` override forces every resolution to the catalog
-  # singleton, and a mismatch there breaks the browser provider's exact peer.
+  # vite-plus pins `oxlint`, `oxfmt` and the `@vitest/*` packages to exact
+  # versions. `vitest` and `@vitest/browser-playwright` are 5.0.2, one patch
+  # ahead of vite-plus 1.0.0's 5.0.1 pin; the `vitest: "catalog:"` override
+  # and `peerDependencyRules.allowAny` force the catalog singleton through.
+  # Whether to keep that gap is #47.
   # `vite` is the same release published under its aliased core package.
   vite-plus: 1.0.0
   vite: npm:@voidzero-dev/vite-plus-core@1.0.0
@@ -124,8 +126,8 @@ catalog:
 overrides:
   # Singletons. See the `catalog:` note at the top: `svelte` and `vite` are
   # the two whose duplication is invisible to every gate and fatal at
-  # runtime, and `vitest` must stay on vite-plus's exact pin so the browser
-  # provider's `vitest: "5.0.2"` peer resolves.
+  # runtime, and `vitest` is forced to the catalog singleton so the browser
+  # provider's exact `vitest: "5.0.2"` peer resolves.
   svelte: 'catalog:'
   vite: 'catalog:'
   vitest: 'catalog:'
