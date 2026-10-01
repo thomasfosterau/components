@@ -1,6 +1,6 @@
 # @thomasfosterau/components-maps
 
-Maps for [`@thomasfosterau/components`](https://www.npmjs.com/package/@thomasfosterau/components): a static raster, the interactive [Mapbox GL](https://docs.mapbox.com/mapbox-gl-js/) surface, the one that upgrades from the first to the second, a plan editor, and the seam between the editor's shapes and a stored GeoJSON geometry.
+Maps for [`@thomasfosterau/components`](../components/README.md): a static raster, the interactive [Mapbox GL](https://docs.mapbox.com/mapbox-gl-js/) surface, the one that upgrades from the first to the second, a plan editor, and the seam between the editor's shapes and a stored GeoJSON geometry.
 
 It is a separate package so that an application that renders no map never installs `mapbox-gl` (~800 kB of WebGL). The same rules hold as in the core library: daisyUI semantic classes and never raw colour, every user-facing string a prop with an English default, no Effect, native attributes spread and the caller's `class` merged last.
 
