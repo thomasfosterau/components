@@ -1,17 +1,17 @@
 # @thomasfosterau/components
 
-Accessible Svelte 5 UI primitives, styled with [Tailwind CSS 4](https://tailwindcss.com) + [daisyUI 5](https://daisyui.com) and built on [bits-ui](https://bits-ui.com). 114 components across 17 families: 12 in the core barrel, 5 behind their own entry points (plus `EntityForm`, the `forms` family's one component with an optional peer, behind its own). The five maps components live in the sibling package [`@thomasfosterau/components-maps`](../maps/README.md).
+Accessible Svelte 5 UI primitives, styled with [Tailwind CSS 4](https://tailwindcss.com) + [daisyUI 5](https://daisyui.com) and built on [bits-ui](https://bits-ui.com). The core families are in the root barrel and the heavier ones behind their own [entry points](#entry-points). The maps components live in the sibling package [`@thomasfosterau/components-maps`](../maps/README.md).
 
 Four rules hold across all of them:
 
-- **daisyUI semantic classes, never raw colour.** `bg-base-200`, `text-error`, `btn-primary` — never a hex, an `oklch()` or `bg-green-700`. Variant classes come from a literal `Record<K, string>` lookup table, never a template string (Tailwind only emits classes it can see spelled out).
+- **daisyUI semantic classes, never raw colour.** `bg-base-200`, `text-error`, `btn-primary` — never a hex, an `oklch()` or `bg-green-700`.
 - **bits-ui owns interaction.** Anything with focus management, keyboard semantics, a popover or an ARIA relationship between elements is built on a bits-ui primitive. Native elements are used where they already give the semantics (`<details>`, `<progress>`, `<time>`, `<data>`, `<dl>`).
 - **Every user-facing string is a prop with an English default.** There is no message catalogue — `dismissLabel = 'Dismiss'`, `previousLabel = 'Previous'`. Accessible-name props end in `Label`. An i18n app passes its own messages at the call site.
-- **No Effect.** Async callbacks are `(…, signal: AbortSignal) => Promise<T>`; optional values are `T | undefined`. Effect adapters stay in the consuming app.
+- **No Effect outside `/entity-form`.** Async callbacks are `(…, signal: AbortSignal) => Promise<T>`; optional values are `T | undefined`. Effect adapters stay in the consuming app.
 
 Every component spreads the native attributes of the element it renders and merges the caller's `class` last, so nothing here ever swallows an `id`, an `aria-*` attribute or a `data-*` hook.
 
-## Installation
+## Install
 
 ```sh
 pnpm add @thomasfosterau/components
@@ -97,11 +97,11 @@ Heavier families are separate `exports` entries so a consumer that never uses th
 | `@thomasfosterau/components/tips` | tips | `Tip`, `PopoverTip`, `createTipStore`, `createTipStack`. |
 | `@thomasfosterau/components/entity-form` | forms | `EntityForm` — needs the optional peer `@thomasfosterau/effect-forms-svelte` (see [entity-form](#entity-form)). |
 | `@thomasfosterau/components/seo` | seo | `Head`, `JsonLd`, `serializeJsonLd`, `ogImageUrl` and the share-card constants. |
-| `@thomasfosterau/components/theme.css` | — | The daisyUI theme skeleton (see [Installation](#installation)). |
+| `@thomasfosterau/components/theme.css` | — | The daisyUI theme skeleton (see [Install](#install)). |
 
 ---
 
-# ui
+## ui
 
 Buttons, badges and surfaces — the family every other family builds on: `Alert` is what a form's errors surface in, `Card` is the surface a section is drawn on, `Button` is what a dialog's actions are.
 
@@ -186,7 +186,7 @@ Buttons, badges and surfaces — the family every other family builds on: `Alert
 <ThemeToggle lightTheme="garden-light" darkTheme="garden-dark" storageKey="garden:theme" />
 ```
 
-# layout
+## layout
 
 The landmarks a page is assembled from, and the blocks that sit inside them. Structure only, never copy: every component takes the app's content as snippets and owns just the element that carries the semantics.
 
@@ -246,7 +246,7 @@ The landmarks a page is assembled from, and the blocks that sit inside them. Str
 </Sidebar>
 ```
 
-# feedback
+## feedback
 
 Dialogs, toasts, progress — chrome around something that just happened, or is happening now. What these share is the live region and the announcement order, not the markup.
 
@@ -305,7 +305,7 @@ Dialogs, toasts, progress — chrome around something that just happened, or is 
 </Stats>
 ```
 
-# fields
+## fields
 
 Form controls wired through the `FormField` + `FieldControl` contract. `FormField` (one control) or `Fieldset` (a group) owns the label, hint and errors; it derives `hintId`/`errorId` from a single `id` and hands `children` a `FieldControl`:
 
@@ -369,7 +369,7 @@ Every primitive accepts it by spread — `<TextInput {...control} bind:value />`
 />
 ```
 
-# forms
+## forms
 
 The parts of a form that are not one control. The split from `fields` is by who owns the message: a `FormErrors` message has no field to attach to, and a `FormActions` row belongs to the form rather than anything in it.
 
@@ -398,7 +398,7 @@ The parts of a form that are not one control. The split from `fields` is by who 
 <SearchForm action="/search" name="query" label="Search the site" placeholder="Scientific or common name" />
 ```
 
-# data
+## data
 
 The tables, lists and pagers an index page and a detail page are built from. Two shapes run through it: **`Table` and `ItemList` present a window the caller already chose** (they never decide which rows exist, so a server-paged 40,000 rows is as easy as four). **`DataGrid` sorts, filters and pages a bounded set the page already holds, on the client**, composing the other two rather than duplicating them.
 
@@ -449,7 +449,7 @@ The tables, lists and pagers an index page and a detail page are built from. Two
 </DescriptionList>
 ```
 
-# infobox
+## infobox
 
 One family, two ways to fill it. Composed primitives (`InfoboxHeader`, `InfoboxImage`, `InfoboxSection`, `InfoboxRow`) let a page build bespoke markup; a typed `rows` convenience on `Infobox` itself lets a page instead hand over a `$derived<InfoboxRowSpec[]>` built from sparse entity attributes — both render through the same primitives, so a fix to row layout lands once.
 
@@ -489,7 +489,7 @@ One family, two ways to fill it. Composed primitives (`InfoboxHeader`, `InfoboxI
 <Infobox title={taxon.name} {rows} />
 ```
 
-# formatting
+## formatting
 
 Locale-aware rendering of dates, numbers, lists, relative time and search-result highlighting. Every `Intl` constructor reads `locales`, then falls back to `getComponentsContext().locale()`.
 
@@ -511,7 +511,7 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 <p><Highlight text={result.title} query={searchQuery} /></p>
 ```
 
-# links
+## links
 
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
@@ -525,7 +525,7 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 <ContextLinks links={[{ href: `/taxa/${taxon.id}`, label: taxon.name }]} />
 ```
 
-# media
+## media
 
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
@@ -541,7 +541,7 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 
 `imageDimensions(file: Blob): Promise<{ width, height }>` reads an image file's intrinsic pixel size with `createImageBitmap`, in the browser, so an upload form can submit `width` / `height` with the binary (it is what `ImageInput` measures with). It rejects with `ImageDimensionsUnavailable` where there is no `createImageBitmap` (on a server), and with the browser's own error for a file that does not decode.
 
-# hotkeys
+## hotkeys
 
 One registry answers "what can the viewer do right now"; `HotkeyProvider` matches keystrokes against it, `HotkeyHelpDialog` lists what carries a trigger, and `search`'s `CommandPalette` lists what is palette-visible. An app creates the registry in its root layout, renders `HotkeyProvider` once, and registers actions from anywhere below — global ones from the layout, page ones from the page, torn down on unmount.
 
@@ -583,7 +583,7 @@ One registry answers "what can the viewer do right now"; `HotkeyProvider` matche
 </script>
 ```
 
-# search
+## search
 
 One component, because a palette is one thing: a dialog, a query box, and rows from wherever the app has them. It composes this library's `Dialog` with bits-ui's `Command`, taking rows from up to three places at once — a mounted hotkey registry's `paletteActions`, a static `items` prop, and an asynchronous `onSearch` — none required.
 
@@ -614,7 +614,7 @@ One component, because a palette is one thing: a dialog, a query box, and rows f
 <CommandPalette bind:open {items} {onSearch} />
 ```
 
-# citations
+## citations
 
 `@thomasfosterau/components/citations`. A page's `Citation` and `Footnote` markers register into a shared `BibliographyManager` (provided by `setupBibliography`); `ReferenceList` and `FootnoteList` render what accumulated. `CreditList` renders a locale-joined byline for one role.
 
@@ -656,7 +656,7 @@ One component, because a palette is one thing: a dialog, a query box, and rows f
 
 A `Citation` or `Footnote` rendered with no `setupBibliography()` provider above it still works — `getBibliographyContext()` falls back to a fresh, standalone manager rather than throwing.
 
-# entity-form
+## entity-form
 
 `@thomasfosterau/components/entity-form`. The renderer for [`@thomasfosterau/effect-forms-svelte`](https://github.com/thomasfosterau/effect-forms)'s `defineEntityForm` definitions. It is the only entry point that reaches Effect, so it is kept separate and its form library is an optional peer: `pnpm add @thomasfosterau/effect-forms-svelte effect` if you use it.
 
@@ -682,7 +682,7 @@ Field labels, submit labels and option labels come from the definition's own mes
 <EntityForm definition={bookForm} mode="update" initial={data.initial} cancelHref={`/books/${data.id}`} enhance={enhanceForm} />
 ```
 
-# seo
+## seo
 
 `@thomasfosterau/components/seo`. Per-page `<head>` metadata and structured data. Both components render only into `<svelte:head>` — nothing in the body.
 
@@ -720,7 +720,7 @@ Field labels, submit labels and option labels come from the definition's own mes
 <JsonLd data={buildBlogPostingJsonLd(post)} />
 ```
 
-# tips
+## tips
 
 `@thomasfosterau/components/tips`. TipKit — contextual, dismissible guidance: an inline tip, a tip anchored to its trigger, the store that decides when either may show, and the stack that decides which one Escape closes.
 
@@ -759,7 +759,7 @@ store.register({
 
 `open` on `PopoverTip` is derived purely from the store's own state; the trigger never toggles it by clicking. Escape is arbitrated by a shared `TipStack` (`createTipStack()`), so two `PopoverTip`s on one page close in "last shown, first closed" order — pass the same `stack` to both.
 
-# charts
+## charts
 
 `@thomasfosterau/components/charts`. One component, over a declarative series spec, drawn as plain SVG — no charting dependency.
 
@@ -784,7 +784,7 @@ Rules it enforces rather than leaving to the caller: one y axis (two measures of
 
 Series colours come from four validated theme slots, `--color-chart-1…4`, assigned by series order and never cycled — a fifth series draws in `--color-neutral` and the legend says which one it is. See [`theme.css`](src/lib/theme.css) for the measured separations, and `packages/components/CLAUDE.md`'s Terms section for the rules those measurements exist to keep.
 
-# canvas
+## canvas
 
 `@thomasfosterau/components/canvas`. A low-level toolkit for vector-editing surfaces: pan, zoom, a grid, and pointer gestures reported in canvas coordinates. The application defines its element types, its tools and its renderer — nothing here knows what the elements mean.
 
@@ -809,14 +809,10 @@ Series colours come from four validated theme slots, `--color-chart-1…4`, assi
 
 `oninteract` reports `{ phase: 'down'|'move'|'up', tool, point, detail, native }` in CANVAS coordinates, already snapped when `doc.grid.snap` is set. `canvas/history.ts` gives pure undo/redo over `Transform`s rather than document snapshots (`emptyHistory`, `applyTransform`, `invertTransform`, `diffTransform`, `recordEdit`, `undo`, `redo`, `HISTORY_LIMIT = 100`) — a history of edits is bounded by the size of the edits, not the size of the plan. `canvas/utils.ts` gives the geometry underneath it: `screenToCanvas`/`canvasToScreen`, `snapToGrid`, `distance`, `pointInRect`, `pointNearLine`, `sortByZIndex`, `boundingBox`, `rotatePoint`, `panBy`, `zoomAbout`, `generateId`.
 
-# maps — moved
+## maps — moved
 
-Maps live in a package of their own: **[`@thomasfosterau/components-maps`](../maps/README.md)** — `StaticMap`, `DynamicMap`, `Map`, `MapEditor`, `MapShapeView`, plus `staticMapUrl` and the GeoJSON ↔ canvas seam.
+Maps live in their own package, [`@thomasfosterau/components-maps`](../maps/README.md) (`pnpm add @thomasfosterau/components-maps mapbox-gl`), because they need `mapbox-gl`; nothing in this package imports it, and `@thomasfosterau/components/maps` is no longer an entry point.
 
-They were split out because their behaviour needs a specific third-party engine, `mapbox-gl`. A component that needs one lives in its own package adjacent to this one, so this one stays free of it: nothing here imports `mapbox-gl`, it is no longer a peer of this package at any level, and `@thomasfosterau/components/maps` is no longer an entry point. In the maps package `mapbox-gl` is a **required** peer — installing that package is the decision to render a map.
+## License
 
-```sh
-pnpm add @thomasfosterau/components-maps mapbox-gl
-```
-
-`MapEditor` is still built on `@thomasfosterau/components/canvas`, which the maps package takes as a `workspace:*` dependency; see [Canvas](#canvas) for the toolkit underneath it.
+MIT © Thomas Foster

@@ -2,16 +2,21 @@
  * The release workflow's publish step: every public workspace package whose
  * current version is not yet on npm is packed by pnpm and published by npm.
  *
- * Why not `changeset publish` or `pnpm publish -r`: npm Trusted Publishing
- * (OIDC) is implemented in the npm CLI only, and a workspace publish routed
- * through pnpm never exchanges the GitHub `id-token` for an npm credential —
- * it falls back to token auth and fails with ENEEDAUTH. And why not bare
- * `npm publish` in the package directory: npm does not understand pnpm's
- * `catalog:` and `workspace:*` specifiers, and would ship them verbatim. So
- * each package is split into the half each tool is good at: `pnpm pack`
- * rewrites the specifiers into the tarball, and `npm publish <tarball>`
- * authenticates via OIDC (provenance is left to npm, never forced: an explicit
- * request fails from a private repository).
+ * Why this script rather than `changeset publish` or `pnpm publish -r`: it
+ * was written under pnpm 10, whose publish path could not do npm trusted
+ * publishing (OIDC). pnpm 11 — which this repo pins in `packageManager` — can:
+ * effect-jsonapi 0.16.1 was published by `pnpm publish` through trusted
+ * publishing. The script is kept because it works and matches
+ * prosekit-utilities' release path. Replacing it with `changeset publish` is
+ * a behaviour change for its own PR, and that PR must keep the tags and
+ * GitHub releases this script reports (below).
+ *
+ * Why not bare `npm publish` in the package directory: npm does not
+ * understand pnpm's `catalog:` and `workspace:*` specifiers and would ship
+ * them verbatim. So `pnpm pack` rewrites the specifiers into the tarball and
+ * `npm publish <tarball>` authenticates via OIDC. Nothing requests
+ * provenance: an explicit request fails from a private repository, and npm
+ * attaches it by itself only where it is allowed.
  *
  * `changesets/action` creates the git tags and GitHub releases, but only for
  * what this script reports: one `{"type":"git-tag",…}` line per published

@@ -2,12 +2,7 @@
 #
 # Provision a checkout for NON-INTERACTIVE use.
 #
-# One file, two callers — the Claude Code SessionStart hook and (should this
-# repo grow one) a devcontainer's `postCreateCommand`, which invokes this file
-# directly — so a container shell and an agent session are provisioned
-# identically. The two used to be separate pieces of code in the repos this is
-# copied from, and the drift between them stayed invisible until a task failed
-# halfway through.
+# Run by the Claude Code SessionStart hook (`.claude/settings.json`).
 #
 # ## The problem it solves
 #
@@ -46,9 +41,9 @@
 #
 # ## Secrets, and the browser
 #
-# This hook hydrates NO secrets. The only credential this repo has is
-# `NPM_TOKEN`, which exists solely inside the release workflow — nothing in a
-# session can publish, by construction.
+# This hook hydrates NO secrets, and the repo has none: publishing is npm
+# trusted publishing (OIDC) from the release workflow's `release` environment,
+# so nothing in a session can publish.
 #
 # It also does NOT install a Playwright browser. `vp run -r test:unit` drives
 # real Chromium, and the image is expected to provide one under
@@ -153,7 +148,7 @@ fi
 # ── 2. Dependencies ──────────────────────────────────────────────────────────
 # Unconditional, not only when node_modules is absent: a prebaked container can
 # carry a tree built from an OLDER lockfile, and stale dependencies masquerade
-# as trunk breakage. `--frozen-lockfile` is a sub-second no-op when in sync.
+# as `main` breakage. `--frozen-lockfile` is a sub-second no-op when in sync.
 if [ -f "$PROJECT_DIR/pnpm-lock.yaml" ]; then
   log "syncing dependencies against the lockfile…"
   (cd "$PROJECT_DIR" && pnpm install --frozen-lockfile >/dev/null 2>&1) \

@@ -3,10 +3,10 @@
  * statically by `vp fmt` / `vp lint` / `vp staged`) and the one aggregate
  * task — `check`, the type-check gate over every package.
  *
- * The Svelte plugin, the browser test suite, the `svelte-package` build and
- * the Storybook tasks all live in packages/components/vite.config.ts: this
- * file deliberately compiles nothing, so adding a second package never means
- * editing it.
+ * The Svelte plugin, the browser test suite and the `svelte-package` build
+ * live in each package's `vite.config.ts` (Storybook in packages/components
+ * only): this file deliberately compiles nothing, so adding a package never
+ * means editing it.
  */
 
 import { defineConfig } from 'vite-plus';
@@ -24,8 +24,7 @@ export default defineConfig({
     tasks: {
       // The type-check gate, as one task: every package's `check` pipeline
       // (`svelte-kit sync` + svelte-check). A pure graph node — the root
-      // takes `@thomasfosterau/components` as a dependency purely so this
-      // edge reaches it.
+      // depends on both packages purely so this edge reaches them.
       check: {
         command: "echo 'check: all type gates green'",
         dependsOn: [{ from: 'dependencies', task: 'check' }],
