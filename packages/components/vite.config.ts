@@ -33,7 +33,9 @@ export default defineConfig({
       build: {
         command: 'svelte-package',
         dependsOn: ['sync'],
-        output: ['dist/**'],
+        cache: {
+          output: ['dist/**'],
+        },
       },
       // Type-checks `src/` (stories included — they live under `src/stories/`,
       // outside the `src/lib/` tree `svelte-package` ships, and the tsconfig
@@ -41,8 +43,10 @@ export default defineConfig({
       check: {
         command: 'svelte-check --tsconfig ./tsconfig.json',
         dependsOn: [{ task: 'check', from: 'dependencies' }, 'sync'],
-        input: cacheInputs,
-        output: [],
+        cache: {
+          input: cacheInputs,
+          output: [],
+        },
       },
       // Browser mode, so `test:unit` never needs `PLAYWRIGHT_BROWSERS_PATH`
       // spelled out here: Playwright reads it from the environment (the agent
@@ -51,9 +55,11 @@ export default defineConfig({
       'test:unit': {
         command: 'vp test run tests',
         dependsOn: ['sync'],
-        env: ['VITEST_MAX_WORKERS', 'NODE_OPTIONS', 'PLAYWRIGHT_BROWSERS_PATH'],
-        input: cacheInputs,
-        output: [],
+        cache: {
+          env: ['VITEST_MAX_WORKERS', 'NODE_OPTIONS', 'PLAYWRIGHT_BROWSERS_PATH'],
+          input: cacheInputs,
+          output: [],
+        },
       },
       // Storybook — a human-facing dev loop and a static build, deliberately
       // OUTSIDE the `check` graph: the stories are type-checked by `check`
@@ -71,7 +77,9 @@ export default defineConfig({
       'storybook:build': {
         command: 'storybook build',
         dependsOn: ['sync', 'build'],
-        output: ['storybook-static/**'],
+        cache: {
+          output: ['storybook-static/**'],
+        },
       },
     },
   },
@@ -116,6 +124,11 @@ export default defineConfig({
       headless: true,
       provider: playwright(),
       instances: [{ browser: 'chromium' }],
+      // Vitest 5 flipped `browser.locators.exact` to `true`, so `getByText('(ed)')`
+      // stopped matching "Harden, G. J. (ed)" and every negative assertion
+      // (`.not.toBeInTheDocument()`) would pass vacuously. Keep the substring,
+      // case-insensitive matching these suites were written against.
+      locators: { exact: false },
       screenshotFailures: false,
     },
   },
