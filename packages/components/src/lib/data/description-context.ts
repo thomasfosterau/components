@@ -29,6 +29,7 @@ export interface DescriptionListStyle {
   readonly emptyLabel: string;
 }
 
+/** The presentation a `DescriptionRow` uses outside any `DescriptionList`: the `grid` variant, proportional text, empty rows hidden. */
 export const defaultDescriptionListStyle: DescriptionListStyle = {
   variant: 'grid',
   mono: false,

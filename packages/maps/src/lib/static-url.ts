@@ -23,6 +23,7 @@ export type StaticView =
   /** Let the endpoint frame the overlay; meaningless without one. */
   | { readonly kind: 'auto' };
 
+/** Everything `staticMapUrl` needs to build one Static Images API URL. */
 export interface StaticMapRequest {
   readonly style: MapStyle;
   readonly view: StaticView;

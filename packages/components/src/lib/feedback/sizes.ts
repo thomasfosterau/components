@@ -13,6 +13,7 @@
 /** Width steps of a `Dialog`'s `modal-box`. */
 export type DialogSize = 'sm' | 'md' | 'lg' | 'xl';
 
+/** Literal `max-w-*` class per `DialogSize`; a lookup table so Tailwind's scanner sees every class. */
 export const dialogSize: Record<DialogSize, string> = {
   sm: 'max-w-sm',
   md: 'max-w-lg',
@@ -29,6 +30,7 @@ export type ToastPosition =
   | 'bottom-center'
   | 'bottom-end';
 
+/** Literal daisyUI class per `ToastPosition` for `Toaster`; a lookup table so Tailwind's scanner sees every class. */
 export const toastPosition: Record<ToastPosition, string> = {
   'top-start': 'toast-top toast-start',
   'top-center': 'toast-top toast-center',
@@ -41,6 +43,7 @@ export const toastPosition: Record<ToastPosition, string> = {
 /** Height steps of a `SegmentBar`. */
 export type BarSize = 'sm' | 'md' | 'lg';
 
+/** Literal height class per `BarSize`; a lookup table so Tailwind's scanner sees every class. */
 export const barSize: Record<BarSize, string> = {
   sm: 'h-2',
   md: 'h-4',
@@ -50,6 +53,7 @@ export const barSize: Record<BarSize, string> = {
 /** How a `Stats` row lays its tiles out. */
 export type StatsOrientation = 'horizontal' | 'vertical' | 'responsive';
 
+/** Literal daisyUI class per `StatsOrientation` for `Stats`; a lookup table so Tailwind's scanner sees every class. */
 export const statsOrientation: Record<StatsOrientation, string> = {
   horizontal: 'stats-horizontal',
   vertical: 'stats-vertical',

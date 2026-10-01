@@ -20,6 +20,7 @@
 
 import { getContext, setContext } from 'svelte';
 
+/** What an app supplies through `setComponentsContext`: link resolution, navigation, the current-page check and the formatting locale. */
 export interface ComponentsContext {
   /**
    * The locale(s) `Intl` formatters use when a component is given none.

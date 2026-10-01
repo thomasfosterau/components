@@ -28,10 +28,14 @@ export type StatusTone = 'info' | 'success' | 'warning' | 'error';
 /** daisyUI size steps. */
 export type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
+/** The daisyUI `btn` styles. */
 export type ButtonVariant = 'solid' | 'outline' | 'soft' | 'dash' | 'ghost' | 'link';
+/** The daisyUI `badge` styles. */
 export type BadgeVariant = 'solid' | 'outline' | 'soft' | 'dash' | 'ghost';
+/** The daisyUI `alert` styles. */
 export type AlertVariant = 'solid' | 'soft' | 'outline' | 'dash';
 
+/** Literal daisyUI class per `Tone` for `Button`; a lookup table so Tailwind's scanner sees every class. */
 export const buttonTone: Record<Tone, string> = {
   neutral: 'btn-neutral',
   primary: 'btn-primary',
@@ -43,6 +47,7 @@ export const buttonTone: Record<Tone, string> = {
   error: 'btn-error',
 };
 
+/** Literal daisyUI class per `ButtonVariant` for `Button`; a lookup table so Tailwind's scanner sees every class. */
 export const buttonVariant: Record<ButtonVariant, string> = {
   solid: '',
   outline: 'btn-outline',
@@ -52,6 +57,7 @@ export const buttonVariant: Record<ButtonVariant, string> = {
   link: 'btn-link',
 };
 
+/** Literal daisyUI class per `Size` for `Button`; a lookup table so Tailwind's scanner sees every class. */
 export const buttonSize: Record<Size, string> = {
   xs: 'btn-xs',
   sm: 'btn-sm',
@@ -60,6 +66,7 @@ export const buttonSize: Record<Size, string> = {
   xl: 'btn-xl',
 };
 
+/** Literal daisyUI class per `Tone` for `Badge`; a lookup table so Tailwind's scanner sees every class. */
 export const badgeTone: Record<Tone, string> = {
   neutral: 'badge-neutral',
   primary: 'badge-primary',
@@ -71,6 +78,7 @@ export const badgeTone: Record<Tone, string> = {
   error: 'badge-error',
 };
 
+/** Literal daisyUI class per `BadgeVariant` for `Badge`; a lookup table so Tailwind's scanner sees every class. */
 export const badgeVariant: Record<BadgeVariant, string> = {
   solid: '',
   outline: 'badge-outline',
@@ -79,6 +87,7 @@ export const badgeVariant: Record<BadgeVariant, string> = {
   ghost: 'badge-ghost',
 };
 
+/** Literal daisyUI class per `Size` for `Badge`; a lookup table so Tailwind's scanner sees every class. */
 export const badgeSize: Record<Size, string> = {
   xs: 'badge-xs',
   sm: 'badge-sm',
@@ -87,6 +96,7 @@ export const badgeSize: Record<Size, string> = {
   xl: 'badge-xl',
 };
 
+/** Literal daisyUI class per `StatusTone` for `Alert`; a lookup table so Tailwind's scanner sees every class. */
 export const alertTone: Record<StatusTone, string> = {
   info: 'alert-info',
   success: 'alert-success',
@@ -94,6 +104,7 @@ export const alertTone: Record<StatusTone, string> = {
   error: 'alert-error',
 };
 
+/** Literal daisyUI class per `AlertVariant` for `Alert`; a lookup table so Tailwind's scanner sees every class. */
 export const alertVariant: Record<AlertVariant, string> = {
   solid: '',
   soft: 'alert-soft',
@@ -101,6 +112,7 @@ export const alertVariant: Record<AlertVariant, string> = {
   dash: 'alert-dash',
 };
 
+/** Literal daisyUI class per `Tone` for `ProgressBar`; a lookup table so Tailwind's scanner sees every class. */
 export const progressTone: Record<Tone, string> = {
   neutral: 'progress-neutral',
   primary: 'progress-primary',
@@ -139,22 +151,27 @@ export const textTone: Record<Tone, string> = {
 /** Heading levels, for any component that renders a caller-chosen heading. */
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
+/** The three link weights: `primary` (coloured), `muted` and `plain` (dimmed text). */
 export type LinkVariant = 'primary' | 'muted' | 'plain';
 
+/** Literal daisyUI class per `LinkVariant` for `Link`; a lookup table so Tailwind's scanner sees every class. */
 export const linkVariant: Record<LinkVariant, string> = {
   primary: 'link link-primary link-hover',
   muted: 'link link-hover',
   plain: 'link link-hover text-base-content/70',
 };
 
+/** The daisyUI `card` border styles. */
 export type CardVariant = 'border' | 'dash' | 'plain';
 
+/** Literal daisyUI class per `CardVariant` for `Card`; a lookup table so Tailwind's scanner sees every class. */
 export const cardVariant: Record<CardVariant, string> = {
   border: 'card-border',
   dash: 'card-dash',
   plain: '',
 };
 
+/** Literal daisyUI class per `Size` for `Card`; a lookup table so Tailwind's scanner sees every class. */
 export const cardSize: Record<Size, string> = {
   xs: 'card-xs',
   sm: 'card-sm',
@@ -163,6 +180,7 @@ export const cardSize: Record<Size, string> = {
   xl: 'card-xl',
 };
 
+/** The `Disclosure` expand marker: an arrow, a plus, or none. */
 export type DisclosureVariant = 'arrow' | 'plus' | 'plain';
 
 /** daisyUI `collapse` markers — the affordance on a native `<details>`. */
@@ -175,6 +193,7 @@ export const collapseVariant: Record<DisclosureVariant, string> = {
 /** The two chip steps. A chip is a dense inline unit, so it stops at `md`. */
 export type ChipSize = 'sm' | 'md';
 
+/** Literal gap and text-size classes per `ChipSize`; a lookup table so Tailwind's scanner sees every class. */
 export const chipSize: Record<ChipSize, string> = {
   sm: 'gap-1 text-xs',
   md: 'gap-1.5 text-sm',

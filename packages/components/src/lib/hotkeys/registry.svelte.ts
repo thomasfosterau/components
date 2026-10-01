@@ -19,6 +19,7 @@
 
 import type { CommandAction, HotkeyScope, HotkeyTrigger, RegisteredAction } from './types.ts';
 
+/** What `createHotkeyRegistry` needs from the app: the admin check and the dev flag. */
 export interface HotkeyRegistryOptions {
   /** Whether the current viewer is an administrator. Read lazily so it can be reactive. */
   isAdmin: () => boolean;
@@ -90,6 +91,7 @@ const byMatchPrecedence = (a: Registration, b: Registration): number =>
 /** Ascending registration order (earlier registrations first). */
 const byOrder = (a: Registration, b: Registration): number => a.order - b.order;
 
+/** The reactive set of registered hotkey actions that `HotkeyProvider`, `CommandPalette` and `HotkeyHelpDialog` read; page registrations win over global ones. */
 export class HotkeyRegistry {
   #registrations = $state<Registration[]>([]);
   #nextOrder = 0;

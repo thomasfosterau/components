@@ -28,10 +28,12 @@ export const OG_VERSION_PARAM = 'v';
  * should re-apply them defensively; here they keep the emitted URL short.
  */
 export const OG_TITLE_MAX_LENGTH = 120;
+/** Longest description, in characters, carried in a share-card URL; see `OG_TITLE_MAX_LENGTH`. */
 export const OG_SUBTITLE_MAX_LENGTH = 200;
 
 /** The rendered card's size — the 1.91:1 Open Graph standard. */
 export const OG_IMAGE_WIDTH = 1200;
+/** Share-card height in pixels; see `OG_IMAGE_WIDTH`. */
 export const OG_IMAGE_HEIGHT = 630;
 
 /** What a per-page share card is built from. */
@@ -53,6 +55,7 @@ export interface OgImageCard {
   readonly updatedAt?: Date | string | number | null | undefined;
 }
 
+/** How `ogImageUrl` turns a card into an absolute URL: the href resolver and the renderer's mount path. */
 export interface OgImageUrlOptions {
   /**
    * Resolves the card's path to the href emitted — the production origin, so
