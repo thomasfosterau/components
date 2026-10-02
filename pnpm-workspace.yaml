@@ -127,11 +127,14 @@ overrides:
   # Singletons. See the `catalog:` note at the top: `svelte` and `vite` are
   # the two whose duplication is invisible to every gate and fatal at
   # runtime, and `vitest` is forced to the catalog singleton so the browser
-  # provider's exact `vitest: "5.0.2"` peer resolves.
+  # provider's exact `vitest: "5.0.2"` peer resolves. `effect` is a fourth
+  # whose duplication no gate notices: two copies break `Context` / `Layer` /
+  # `Schema` identity at runtime. Only one resolves today; this is insurance.
   svelte: 'catalog:'
   vite: 'catalog:'
   vitest: 'catalog:'
   '@sveltejs/kit': 'catalog:'
+  effect: 'catalog:'
 
 nodeLinker: hoisted
 

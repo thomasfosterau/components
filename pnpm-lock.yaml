@@ -51,9 +51,6 @@ catalogs:
     daisyui:
       specifier: ^5.7.46
       version: 5.7.46
-    effect:
-      specifier: 4.0.0
-      version: 4.0.0
     mapbox-gl:
       specifier: ^3.31.0
       version: 3.31.0
@@ -84,6 +81,7 @@ overrides:
   vite: npm:@voidzero-dev/vite-plus-core@1.0.0
   vitest: 5.0.2
   '@sveltejs/kit': 3.0.0-next.29
+  effect: 4.0.0
 
 importers:
 
@@ -164,7 +162,7 @@ importers:
         specifier: 'catalog:'
         version: 5.7.46
       effect:
-        specifier: 'catalog:'
+        specifier: 4.0.0
         version: 4.0.0
       playwright:
         specifier: 'catalog:'
@@ -1300,14 +1298,14 @@ packages:
     resolution: {integrity: sha512-knY2SOFUF4C3dbLH9gPgCFsapj85eVcFTru46ouAiH0+VzF+AV2h2Qy3eZFG1XhlXUNEC8oMQ1y8IP80nyGq3Q==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
-      effect: ^4.0.0-beta.102
+      effect: 4.0.0
       svelte: ^5.57.1
 
   '@thomasfosterau/effect-forms@0.1.0':
     resolution: {integrity: sha512-/wa9JzL9PsDRrrNmmr1pOq7VZ08mLp3ZNVhNlY1aJgPS84GWn4Fw1Y8cY9AScqojAy8fDXiH0h5iP+c8bwXElw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
-      effect: ^4.0.0-beta.102
+      effect: 4.0.0
 
   '@tybys/wasm-util@0.10.4':
     resolution: {integrity: sha512-W3c4gRigFS0T/Ma4qIYF3GDAc5AQdHb1yL5znJT1Zv1YaD9Kitx656wBjvr19qbiosmZT8lWDM5BEMynUqX65A==}
