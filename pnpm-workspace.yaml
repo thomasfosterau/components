@@ -46,7 +46,7 @@ catalog:
   # the app catalog's (preferenceflow's) exact release so the store here is
   # the one the apps run. Nothing else in this workspace touches Effect.
   '@thomasfosterau/effect-forms-svelte': ^0.1.0
-  effect: 4.0.0-rc.118
+  effect: 4.0.0
   # Lucide icon set as Svelte 5 components. Catalogued and installed ahead of
   # its first consumer: the real components land on top of this scaffold and
   # every one that needs an affordance icon reaches for this rather than
