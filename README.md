@@ -38,15 +38,15 @@ The pre-push gates, in CI's order, are listed in [AGENTS.md § Verification](./A
 
 ## Releasing
 
-`.github/workflows/release.yml` runs [`changesets/action`](https://github.com/changesets/action) on every push to `main`: while unreleased changesets exist it opens (or updates) a **"chore: version packages"** pull request; merging that pull request publishes every package whose version is not yet on npm, then tags the release and creates a GitHub release per package.
+`.github/workflows/release.yml` runs [`changesets/action`](https://github.com/changesets/action) on every push to `trunk`: while unreleased changesets exist it opens (or updates) a **"chore: version packages"** pull request; merging that pull request publishes every package whose version is not yet on npm, then tags the release and creates a GitHub release per package.
 
 Publishing is **npm [trusted publishing](https://docs.npmjs.com/trusted-publishers) (OIDC)** from the protected `release` environment. There is no `NPM_TOKEN` secret: the job's `id-token: write` permission is exchanged by the npm CLI for a short-lived publish credential. Nothing requests provenance (an explicit request fails from a private repository). [`scripts/publish.mjs`](./scripts/publish.mjs) packs each package with `pnpm pack` (rewriting `catalog:` and `workspace:*` to real ranges) and publishes the tarball with `npm publish`, dependencies first; its header says why the script is kept now that pnpm 11 can publish through OIDC itself.
 
 One-time owner setup:
 
-1. **The `release` environment.** _Settings → Environments → New environment_ `release`, with _Deployment branches and tags_ restricted to `main`. The workflow's job runs in it, and the trusted publishers below name it.
+1. **The `release` environment.** _Settings → Environments → New environment_ `release`, with _Deployment branches and tags_ restricted to `trunk`. The workflow's job runs in it, and the trusted publishers below name it.
 2. **Let Actions open the version PR.** _Settings → Actions → General → Workflow permissions →_ **Allow GitHub Actions to create and approve pull requests**.
-3. **A trusted publisher per package** on npmjs.com — for both `@thomasfosterau/components` and `@thomasfosterau/components-maps`, _Settings → Trusted Publisher → GitHub Actions_: user `thomasfosterau`, repository `components`, workflow `release.yml`, environment `release`. npm only accepts a trusted publisher on a package that already exists, so if a package has never been published, bootstrap its first version once by hand (merge the version PR first so `main` carries the real version, then `vp run -r build` and `pnpm publish --access public` in that package's directory with a short-lived granular token), then add the trusted publisher. Remove any `NPM_TOKEN` repository secret once OIDC is in place.
+3. **A trusted publisher per package** on npmjs.com — for both `@thomasfosterau/components` and `@thomasfosterau/components-maps`, _Settings → Trusted Publisher → GitHub Actions_: user `thomasfosterau`, repository `components`, workflow `release.yml`, environment `release`. npm only accepts a trusted publisher on a package that already exists, so if a package has never been published, bootstrap its first version once by hand (merge the version PR first so `trunk` carries the real version, then `vp run -r build` and `pnpm publish --access public` in that package's directory with a short-lived granular token), then add the trusted publisher. Remove any `NPM_TOKEN` repository secret once OIDC is in place.
 
 ## License
 
