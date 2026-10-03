@@ -49,6 +49,29 @@ export default defineConfig({
       typeAware: false,
       typeCheck: false,
     },
+    // Nothing that ships may import a module SvelteKit only resolves inside an
+    // app (AGENTS.md § Common pitfalls). The package tsconfigs extend
+    // `$app/tsconfig`, whose `$app/types` declares `$app/*` ambiently, so
+    // `svelte-check` no longer rejects such an import; this rule does (#55).
+    overrides: [
+      {
+        files: ['packages/*/src/lib/**'],
+        rules: {
+          'no-restricted-imports': [
+            'error',
+            {
+              patterns: [
+                {
+                  group: ['$app/**', '$env/**', '$service-worker'],
+                  message:
+                    'SvelteKit resolves this only inside an app; take it as a prop or from getComponentsContext() instead.',
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
   },
 
   // Oxfmt — formatter of record for the workspace. `.svelte` files are outside

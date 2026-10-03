@@ -160,14 +160,16 @@ fi
 write_vp_shim
 
 # ── 3. First-checkout codegen ────────────────────────────────────────────────
-# `svelte-kit sync` writes the package's ambient types under `.svelte-kit/`.
-# Without it, `svelte-check` and `svelte-package` both fail on a fresh checkout
-# or worktree with errors that name a missing generated file rather than the
-# missing codegen step. Cheap and idempotent, so it runs unconditionally.
+# `svelte-kit sync` writes each package's ambient types under `.svelte-kit/`
+# and the `node_modules/$app/tsconfig.json` its tsconfig extends (#55).
+# Without it, `svelte-check`, `svelte-package` and an editor's TypeScript
+# server all fail on a fresh checkout or worktree with errors that name a
+# missing generated file rather than the missing codegen step. Cheap and
+# idempotent, so it runs unconditionally, in every package.
 if [ -d "$PROJECT_DIR/node_modules" ]; then
   log "running svelte-kit sync…"
-  (cd "$PROJECT_DIR" && "$LOCAL_BIN/vp" run --filter ./packages/components sync >/dev/null 2>&1) \
-    || log "codegen failed; run \`vp run --filter ./packages/components sync\` by hand"
+  (cd "$PROJECT_DIR" && "$LOCAL_BIN/vp" run -r sync >/dev/null 2>&1) \
+    || log "codegen failed; run \`vp run -r sync\` by hand"
 fi
 
 exit 0

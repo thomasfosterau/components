@@ -69,14 +69,16 @@ export default defineConfig({
       // `build` is a dependency of both, not just `sync`: the `stories` glob
       // reaches into the sibling packages/maps, whose components import
       // `@thomasfosterau/components/canvas` — this package's own built `dist/`.
+      // The sibling's `sync` too: its stories are compiled here, and its
+      // tsconfig extends the `$app/tsconfig` that its own `sync` writes (#55).
       storybook: {
         command: 'storybook dev -p 6006 --no-open',
-        dependsOn: ['sync', 'build'],
+        dependsOn: ['sync', 'build', '@thomasfosterau/components-maps#sync'],
         cache: false,
       },
       'storybook:build': {
         command: 'storybook build',
-        dependsOn: ['sync', 'build'],
+        dependsOn: ['sync', 'build', '@thomasfosterau/components-maps#sync'],
         cache: {
           output: ['storybook-static/**'],
         },
