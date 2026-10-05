@@ -51,7 +51,7 @@ catalog:
   # its first consumer: the real components land on top of this scaffold and
   # every one that needs an affordance icon reaches for this rather than
   # inlining an `<svg>`.
-  '@lucide/svelte': ^1.48.0
+  '@lucide/svelte': ^1.51.0
   # Storybook 10 over the SvelteKit framework preset — the Svelte 5 + Vite
   # pipeline a `svelte-package` library uses too — plus the Svelte CSF addon
   # so snippet-taking components can be storied in `.svelte`, and the a11y
