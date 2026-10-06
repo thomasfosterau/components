@@ -52,8 +52,8 @@ catalogs:
       specifier: ^5.7.47
       version: 5.7.47
     mapbox-gl:
-      specifier: ^3.31.0
-      version: 3.31.0
+      specifier: ^3.32.0
+      version: 3.32.0
     playwright:
       specifier: 1.56.1
       version: 1.56.1
@@ -212,7 +212,7 @@ importers:
         version: 5.0.2(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.6.3)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(playwright@1.56.1)(vitest@5.0.2)
       mapbox-gl:
         specifier: 'catalog:'
-        version: 3.31.0
+        version: 3.32.0
       playwright:
         specifier: 'catalog:'
         version: 1.56.1
@@ -2121,8 +2121,8 @@ packages:
   magic-string@1.4.1:
     resolution: {integrity: sha512-8lyCu36ErXR0J9uaGKlKQoiLZKmtI63YGLE8G2o9jyRPdr4X47LusSOwgOJOzcVtp81fTAAjxR7BwKz682Jhow==}
 
-  mapbox-gl@3.31.0:
-    resolution: {integrity: sha512-7i25NyCPW5jnqsqJq3irgBBEoVTJgfZqTJJS446Q3ZuxyAb5Om75UIcxYIo38oz9eDswnBXr0riz+M/C8V7g3Q==}
+  mapbox-gl@3.32.0:
+    resolution: {integrity: sha512-+P4qrlyejQYLyz1Bfzoe+d5Ff5vAghH54RNHm1q2VeAZqkSjQ5e1XlovQoSHlf4xqpRJtJG58kn8nkLwPMQung==}
 
   min-indent@1.0.1:
     resolution: {integrity: sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==}
@@ -3988,7 +3988,7 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  mapbox-gl@3.31.0: {}
+  mapbox-gl@3.32.0: {}
 
   min-indent@1.0.1: {}
 
