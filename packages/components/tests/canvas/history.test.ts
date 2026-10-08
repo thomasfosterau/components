@@ -65,6 +65,23 @@ describe('applying a transform', () => {
     expect(ids(deleted)).toEqual(['b']);
   });
 
+  it('reads a transform member forwarded as `undefined` as absent (#76)', () => {
+    // A caller building a transform from its own optional fields forwards them
+    // unconditionally; under `exactOptionalPropertyTypes` this only
+    // type-checks while `Transform` declares them `T | undefined`.
+    const change: {
+      readonly elements?: readonly CanvasElement[] | undefined;
+      readonly previousElements?: readonly CanvasElement[] | undefined;
+    } = {};
+    const transform: Transform = {
+      type: 'delete',
+      elementIds: ['a'],
+      elements: change.elements,
+      previousElements: change.previousElements,
+    };
+    expect(ids(applyTransform(docOf(a, b), transform))).toEqual(['b']);
+  });
+
   it('covers a mixed batch — one id gone, one arrived, one changed', () => {
     const c = element('c', 20);
     const next = applyTransform(docOf(a, b), {

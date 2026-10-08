@@ -9,7 +9,7 @@
  */
 
 import { describe, expect, it } from 'vite-plus/test';
-import { staticMapUrl } from '../src/lib/static-url.ts';
+import { staticMapUrl, type StaticMapRequest } from '../src/lib/static-url.ts';
 
 describe('staticMapUrl', () => {
   const style = { username: 'mapbox', styleId: 'outdoors-v12' };
@@ -60,6 +60,30 @@ describe('staticMapUrl', () => {
       },
     });
     expect(decodeURIComponent(url)).toContain('/static/[1,2,3,4]/640x360');
+  });
+
+  it('reads options forwarded as `undefined` as absent (#76)', () => {
+    // A wrapper forwarding its own optional settings unconditionally. Under
+    // `exactOptionalPropertyTypes` this only type-checks while
+    // `StaticMapRequest` and `MapCamera` declare them `T | undefined`.
+    const settings: {
+      readonly bearing?: number | undefined;
+      readonly pitch?: number | undefined;
+      readonly retina?: boolean | undefined;
+    } = {};
+    const centre = { longitude: 1, latitude: 2 };
+    const forwarded: StaticMapRequest = {
+      ...base,
+      view: {
+        kind: 'camera',
+        camera: { centre, zoom: 3, bearing: settings.bearing, pitch: settings.pitch },
+      },
+      retina: settings.retina,
+    };
+    expect(staticMapUrl(forwarded)).toBe(
+      staticMapUrl({ ...base, view: { kind: 'camera', camera: { centre, zoom: 3 } } }),
+    );
+    expect(staticMapUrl(forwarded)).toContain('/static/1,2,3,0,0/640x360?');
   });
 
   it('asks for the 2× raster only when told to', () => {

@@ -37,10 +37,10 @@ export interface CanvasElement {
   readonly opacity: number;
   /** Whether edits are refused; the view still renders it. */
   readonly locked: boolean;
-  readonly visible?: boolean;
-  readonly label?: string;
+  readonly visible?: boolean | undefined;
+  readonly label?: string | undefined;
   /** The application's own per-element data. */
-  readonly metadata?: Readonly<Record<string, unknown>>;
+  readonly metadata?: Readonly<Record<string, unknown>> | undefined;
 }
 
 /** Pan and zoom — where the document sits under the viewport. */
@@ -79,8 +79,8 @@ export interface VectorDocument<T extends CanvasElement = CanvasElement> {
 export interface Transform<T extends CanvasElement = CanvasElement> {
   readonly type: 'add' | 'update' | 'delete' | 'batch';
   readonly elementIds: readonly ElementId[];
-  readonly elements?: readonly T[];
-  readonly previousElements?: readonly T[];
+  readonly elements?: readonly T[] | undefined;
+  readonly previousElements?: readonly T[] | undefined;
 }
 
 /** One entry of an undo stack. */
@@ -88,7 +88,7 @@ export interface HistoryEntry<T extends CanvasElement = CanvasElement> {
   readonly transform: Transform<T>;
   /** Epoch milliseconds. */
   readonly timestamp: number;
-  readonly description?: string;
+  readonly description?: string | undefined;
 }
 
 /** An axis-aligned box in canvas coordinates. */

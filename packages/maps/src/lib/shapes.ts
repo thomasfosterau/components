@@ -45,9 +45,9 @@ import {
 export interface MapShape extends CanvasElement {
   readonly type: 'polygon' | 'line' | 'marker';
   /** A polygon's or line's vertices, relative to `position`, in order. */
-  readonly points?: readonly Point[];
+  readonly points?: readonly Point[] | undefined;
   /** A marker's radius in canvas units. */
-  readonly radius?: number;
+  readonly radius?: number | undefined;
 }
 
 /**

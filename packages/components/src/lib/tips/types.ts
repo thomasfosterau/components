@@ -31,14 +31,14 @@ export interface TipAction {
 export interface TipConfig {
   readonly id: string;
   readonly title: string;
-  readonly message?: string;
-  readonly actions?: readonly TipAction[];
+  readonly message?: string | undefined;
+  readonly actions?: readonly TipAction[] | undefined;
   /** Every rule must hold. */
-  readonly rules?: readonly TipRule[];
+  readonly rules?: readonly TipRule[] | undefined;
   /** Defaults to `immediate` — shown every time the page is visited. */
-  readonly frequency?: TipFrequency;
+  readonly frequency?: TipFrequency | undefined;
   /** Never shown more than this many times, whatever the frequency says. */
-  readonly maxDisplayCount?: number;
+  readonly maxDisplayCount?: number | undefined;
 }
 
 /** What is remembered about a tip between visits. */
@@ -47,7 +47,7 @@ export interface TipState {
   readonly status: TipStatus;
   readonly displayCount: number;
   /** ISO 8601; absent until the tip has been shown once. */
-  readonly lastShown?: string;
-  readonly dismissedAt?: string;
-  readonly completedAt?: string;
+  readonly lastShown?: string | undefined;
+  readonly dismissedAt?: string | undefined;
+  readonly completedAt?: string | undefined;
 }

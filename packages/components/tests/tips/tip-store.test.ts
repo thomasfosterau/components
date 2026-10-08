@@ -146,6 +146,29 @@ describe('createTipStore', () => {
     expect(storage.entries.has('tips:welcome')).toBe(true);
   });
 
+  test('falls back to the defaults when options and config are forwarded as `undefined` (#76)', () => {
+    // An app wrapping the store forwards its own optional settings
+    // unconditionally; under `exactOptionalPropertyTypes` this only
+    // type-checks while `TipStoreOptions` and `TipConfig` declare them
+    // `T | undefined`.
+    const settings: {
+      readonly prefix?: string | undefined;
+      readonly frequency?: TipConfig['frequency'] | undefined;
+      readonly maxDisplayCount?: number | undefined;
+    } = {};
+    const storage = memoryStorage();
+    const store = createTipStore({ storage, prefix: settings.prefix });
+    store.register({
+      id: 'welcome',
+      title: 'Welcome',
+      frequency: settings.frequency,
+      maxDisplayCount: settings.maxDisplayCount,
+    });
+    store.markShown('welcome');
+    expect(storage.entries.has('tips:welcome')).toBe(true);
+    expect(store.shouldDisplay('welcome')).toBe(true);
+  });
+
   test('writes under a caller-supplied prefix instead', () => {
     const storage = memoryStorage();
     const store = createTipStore({ storage, prefix: 'myapp:tips:' });
