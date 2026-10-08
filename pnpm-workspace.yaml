@@ -7,10 +7,9 @@
 # show up at render time.
 #
 # EVERY external dependency version lives here — package.json files reference
-# only `catalog:` (or `workspace:*` for internal packages), except the literal
-# published `svelte` peer range (#46). `catalogMode:
-# strict` makes `pnpm add` enforce this at add time and `pnpm install` reject
-# non-catalog specifiers.
+# only `catalog:` / `catalog:peers` (or `workspace:*` for internal packages).
+# `catalogMode: strict` makes `pnpm add` enforce this at add time and
+# `pnpm install` reject non-catalog specifiers.
 # After editing this catalog, ALWAYS run `pnpm install` and commit the
 # regenerated pnpm-lock.yaml — a stale lockfile fails every CI job at once
 # with ERR_PNPM_LOCKFILE_CONFIG_MISMATCH.
@@ -122,6 +121,17 @@ catalog:
   # runs the real browser, and this is the renderer Vitest browser mode
   # documents for Svelte.
   vitest-browser-svelte: ^3.1.0
+
+# Published peer ranges, kept apart from the default catalog because a peer
+# range is a promise to consumers, not the version this workspace builds and
+# tests against: `svelte` above is the dev pin (^5.57.1), `svelte` here is
+# the floor both published manifests declare. `pnpm pack` (the release path,
+# scripts/publish.mjs) rewrites `catalog:peers` to this literal range, so the
+# packed package.json files carry `"svelte": "^5.30.1"`. Raising the floor is
+# a published-behaviour change and takes a changeset.
+catalogs:
+  peers:
+    svelte: ^5.30.1
 
 overrides:
   # Singletons. See the `catalog:` note at the top: `svelte` and `vite` are

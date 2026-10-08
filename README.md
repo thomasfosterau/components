@@ -27,7 +27,7 @@ The pre-push gates, in CI's order, are listed in [AGENTS.md § Verification](./A
 
 ### Toolchain notes
 
-- **Versions are catalogued.** Every external version lives in [`pnpm-workspace.yaml`](./pnpm-workspace.yaml) under `catalog:`; package.json files carry only `catalog:` or `workspace:*` (the published `svelte` peer range is the one literal exception), and `catalogMode: strict` enforces it. Edit the catalog, then `pnpm install`, then commit the regenerated `pnpm-lock.yaml`.
+- **Versions are catalogued.** Every external version lives in [`pnpm-workspace.yaml`](./pnpm-workspace.yaml) under `catalog:` (published peer ranges under `catalogs.peers`); package.json files carry only `catalog:`, `catalog:peers` or `workspace:*`, and `catalogMode: strict` enforces it. Edit the catalog, then `pnpm install`, then commit the regenerated `pnpm-lock.yaml`.
 - **The tests drive a real browser.** Vitest browser mode over Playwright Chromium, headless everywhere. Locally that needs a Chromium matching the pinned `playwright` (`pnpm exec playwright install chromium`, or an image that pre-installs one under `PLAYWRIGHT_BROWSERS_PATH`); CI installs it in a step of its own.
 - **`.svelte` files are outside oxfmt's remit** and are kept in style by hand (rule in [AGENTS.md § Conventions](./AGENTS.md#conventions)). Everything else is formatted by `vp fmt`.
 - **TypeScript is the TS6 JS compiler**, aliased in the catalog: `svelte-check` drives TypeScript through its JS API, which TypeScript 7 does not ship until 7.1.
