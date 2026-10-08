@@ -14,7 +14,7 @@ pnpm add @thomasfosterau/components-maps @thomasfosterau/components mapbox-gl
 
 | Package | Range | Why |
 | --- | --- | --- |
-| `mapbox-gl` | `^3.31.0`, **required** | The engine `DynamicMap` (and therefore `Map`) renders with. Required, not optional: installing this package is the decision to render a map. It is still reached only through a dynamic `import()` inside `DynamicMap`'s mount effect, so it lands in the chunk for the route that renders a live map and nowhere else. |
+| `mapbox-gl` | `^3.32.0`, **required** | The engine `DynamicMap` (and therefore `Map`) renders with. Required, not optional: installing this package is the decision to render a map. It is still reached only through a dynamic `import()` inside `DynamicMap`'s mount effect, so it lands in the chunk for the route that renders a live map and nowhere else. |
 | `svelte` | `^5.40.0` | A declared peer. The components are compiled by your build, not pre-compiled. |
 | `@thomasfosterau/components` | the exact version released alongside it | A runtime dependency, not a peer (installed with this package) — `MapEditor` is built on its `/canvas` entry point. |
 | `tailwindcss` | `^4.0.0` | Not a declared peer, but **required**: the components emit Tailwind classes and ship none. |
