@@ -21,6 +21,38 @@ const article: Citation = {
   doi: '10.1071/SB97021',
 };
 
+/**
+ * A consumer's own record, whose optional fields are themselves
+ * `T | undefined`, mapped field-for-field into a `Citation`. Under
+ * `exactOptionalPropertyTypes` this only type-checks while `Citation` declares
+ * those fields `T | undefined` (#76); `vp run check` is that assertion.
+ */
+interface StoredReference {
+  readonly id: string;
+  readonly title: string;
+  readonly authors?: readonly string[] | undefined;
+  readonly year?: number | undefined;
+  readonly container?: string | undefined;
+  readonly doi?: string | undefined;
+}
+
+const toCitation = (reference: StoredReference): Citation => ({
+  id: reference.id,
+  kind: 'article',
+  title: reference.title,
+  authors: reference.authors,
+  year: reference.year,
+  container: reference.container,
+  doi: reference.doi,
+});
+
+test('reads a field forwarded as `undefined` as absent', () => {
+  const bare: Citation = { id: article.id, kind: 'article', title: article.title };
+  expect(formatCitation(toCitation({ id: article.id, title: article.title }))).toBe(
+    formatCitation(bare),
+  );
+});
+
 test('renders an article with its serial, volume, issue, pages and DOI', () => {
   expect(formatCitation(article)).toBe(
     'Smith, J. & Jones, A.. (1998). “A revision of Rosa section Caninae”. ' +

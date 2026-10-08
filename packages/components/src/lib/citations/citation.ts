@@ -51,21 +51,21 @@ export interface Citation {
   readonly kind: CitationKind;
   readonly title: string;
   /** Author display names, already ordered by the byline's own ordinal. */
-  readonly authors?: readonly string[];
+  readonly authors?: readonly string[] | undefined;
   /** Publication year, as printed. */
-  readonly year?: number;
+  readonly year?: number | undefined;
   /** The serial an article appeared in, or the book a chapter is from. */
-  readonly container?: string;
-  readonly volume?: string;
-  readonly issue?: string;
+  readonly container?: string | undefined;
+  readonly volume?: string | undefined;
+  readonly issue?: string | undefined;
   /** Page span, already assembled (`"12–34"`). */
-  readonly pages?: string;
-  readonly publisher?: string;
-  readonly place?: string;
-  readonly url?: string;
-  readonly doi?: string;
+  readonly pages?: string | undefined;
+  readonly publisher?: string | undefined;
+  readonly place?: string | undefined;
+  readonly url?: string | undefined;
+  readonly doi?: string | undefined;
   /** When the citing author read a web source. */
-  readonly accessed?: Date;
+  readonly accessed?: Date | undefined;
 }
 
 /** A footnote — tracked separately from citations. */
@@ -73,7 +73,7 @@ export interface Footnote {
   /** The note's text. */
   readonly content: string;
   /** A custom marker (`*`, `†`) instead of the auto-assigned number. */
-  readonly symbol?: string;
+  readonly symbol?: string | undefined;
 }
 
 // Absence is the empty string throughout the helpers below, not `T | undefined`.

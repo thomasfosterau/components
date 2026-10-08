@@ -101,9 +101,9 @@ export const browserTipStorage = (): TipStorage => {
 /** Options for {@link createTipStore}. */
 export interface TipStoreOptions {
   /** Defaults to {@link browserTipStorage}. */
-  readonly storage?: TipStorage;
+  readonly storage?: TipStorage | undefined;
   /** The storage key prefix each tip's entry is written under. */
-  readonly prefix?: string;
+  readonly prefix?: string | undefined;
 }
 
 /**

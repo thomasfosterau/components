@@ -55,10 +55,12 @@ const CONTEXT_KEY = Symbol('@thomasfosterau/components:context');
 
 /**
  * Provide the app-integration context. Call once, high in the tree (the root
- * layout). Omitted members fall back to {@link defaultComponentsContext}
- * individually.
+ * layout). Omitted members — or members passed as `undefined` — fall back to
+ * {@link defaultComponentsContext} individually.
  */
-export function setComponentsContext(context: Partial<ComponentsContext>): void {
+export function setComponentsContext(context: {
+  readonly [K in keyof ComponentsContext]?: ComponentsContext[K] | undefined;
+}): void {
   setContext<ComponentsContext>(CONTEXT_KEY, {
     locale: context.locale ?? defaultComponentsContext.locale,
     href: context.href ?? defaultComponentsContext.href,
