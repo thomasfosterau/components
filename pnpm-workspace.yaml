@@ -74,7 +74,7 @@ catalog:
   # (see that entry for how it relates to vite-plus's own pin).
   # `@vitest/browser` itself arrives through vite-plus, so it is not
   # catalogued separately.
-  '@vitest/browser-playwright': 5.0.2
+  '@vitest/browser-playwright': 5.0.3
   # Headless Svelte 5 primitives. Every component whose behaviour is more
   # than "render these attributes" — menus, dialogs, comboboxes, tooltips —
   # is built on a bits-ui primitive rather than on hand-rolled keyboard and
@@ -115,7 +115,7 @@ catalog:
   # `vite` is the same release published under its aliased core package.
   vite-plus: 1.0.0
   vite: npm:@voidzero-dev/vite-plus-core@1.0.0
-  vitest: 5.0.2
+  vitest: 5.0.3
   # `render` + locators for Svelte components under Vitest browser mode. The
   # app repos use @testing-library/svelte under happy-dom instead; this repo
   # runs the real browser, and this is the renderer Vitest browser mode
@@ -137,7 +137,7 @@ overrides:
   # Singletons. See the `catalog:` note at the top: `svelte` and `vite` are
   # the two whose duplication is invisible to every gate and fatal at
   # runtime, and `vitest` is forced to the catalog singleton so the browser
-  # provider's exact `vitest: "5.0.2"` peer resolves. `effect` is a fourth
+  # provider's exact `vitest: "5.0.3"` peer resolves. `effect` is a fourth
   # whose duplication no gate notices: two copies break `Context` / `Layer` /
   # `Schema` identity at runtime. Only one resolves today; this is insurance.
   svelte: 'catalog:'
