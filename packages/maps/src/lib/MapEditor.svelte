@@ -82,27 +82,27 @@ A plan-drawing surface for areas, paths and points on a snapping grid: select, d
      * Which shapes are selected; the caller owns the set.
      * @defaultValue an empty set
      */
-    selected?: ReadonlySet<string>;
+    selected?: ReadonlySet<string> | undefined;
     /**
      * The active tool.
      * @defaultValue `'select'`
      */
-    tool?: MapTool;
+    tool?: MapTool | undefined;
     /**
      * Viewport width in CSS pixels.
      * @defaultValue `800`
      */
-    width?: number;
+    width?: number | undefined;
     /**
      * Viewport height in CSS pixels.
      * @defaultValue `600`
      */
-    height?: number;
+    height?: number | undefined;
     /**
      * Names the surface for assistive tech.
      * @defaultValue `'Plan editor'`
      */
-    label?: string;
+    label?: string | undefined;
     /**
      * The document after an edit, and the edit itself for an undo stack.
      *

@@ -12,7 +12,7 @@ A `mailto:` link whose subject, body, cc and bcc are correctly encoded.
   import type { Snippet } from 'svelte';
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
-  interface Props extends HTMLAnchorAttributes {
+  interface Props extends Omit<HTMLAnchorAttributes, 'children'> {
     /** The address; also the link text unless `children` replaces it. */
     email: string;
     /** Pre-filled subject line. */
@@ -24,7 +24,7 @@ A `mailto:` link whose subject, body, cc and bcc are correctly encoded.
     /** Address to blind-copy. */
     bcc?: string | undefined;
     /** Replaces the link text; defaults to the address itself. */
-    children?: Snippet<[]>;
+    children?: Snippet<[]> | undefined;
   }
 
   let { email, subject, body, cc, bcc, children, class: className, ...rest }: Props = $props();

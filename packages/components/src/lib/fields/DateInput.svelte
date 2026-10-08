@@ -24,7 +24,7 @@ A native `<input type="date">` in daisyUI `input` styling, with `FieldControl` w
      * ISO calendar date, `YYYY-MM-DD`; empty when unset.
      * @defaultValue `''`
      */
-    value?: string;
+    value?: string | undefined;
     /** Earliest selectable date, ISO. */
     min?: string | undefined;
     /** Latest selectable date, ISO. */

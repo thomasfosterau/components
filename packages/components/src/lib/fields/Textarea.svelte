@@ -17,7 +17,7 @@ A daisyUI `textarea` with a bindable `value` and `FieldControl` wiring. `rows` d
      * The text. Bindable.
      * @defaultValue `''`
      */
-    value?: string;
+    value?: string | undefined;
     /**
      * daisyUI size step.
      * @defaultValue `'md'`

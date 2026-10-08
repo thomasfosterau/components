@@ -29,7 +29,7 @@ Several checkboxes answering one question, inside one `Fieldset`.
      * The ticked values.
      * @defaultValue `[]`
      */
-    values?: string[];
+    values?: string[] | undefined;
     /** Posted field name; every box shares it, as a multi-value field. */
     name?: string | undefined;
     /** Guidance rendered under the legend. */

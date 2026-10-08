@@ -19,6 +19,7 @@
 import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import DynamicMap from '../src/lib/DynamicMap.svelte';
+import DynamicMapForwarder from './fixtures/DynamicMapForwarder.svelte';
 
 vi.mock('mapbox-gl', () => ({
   // A constructor that throws is the WebGL-unavailable case exactly: the
@@ -75,4 +76,13 @@ test('names the map region and its hint from props, before the peer’s absence 
   const [region] = screen.getByRole('application').elements();
   expect(region?.getAttribute('aria-label')).toBe('The site’s location');
   expect(screen.container.textContent).toContain('Use two fingers to move the map');
+});
+
+test('a wrapper forwarding its own unset optional props gets the defaults', async () => {
+  // The fixture passes `height`, `label`, `panHintLabel` and
+  // `unavailableLabel` through as explicit `undefined`; that it compiles at
+  // all is the type-level half of this test (#45).
+  const screen = await render(DynamicMapForwarder, props);
+
+  await expect.element(screen.getByText('Map unavailable')).toBeInTheDocument();
 });

@@ -51,22 +51,22 @@ The interactive Mapbox GL map, panned and zoomed, with a fallback when WebGL is 
      * Rendered height; the width fills the container.
      * @defaultValue `400`
      */
-    height?: number;
+    height?: number | undefined;
     /**
      * Names the map for assistive tech.
      * @defaultValue `'Map'`
      */
-    label?: string;
+    label?: string | undefined;
     /**
      * The one-off hint that two fingers, not one, move the map.
      * @defaultValue `'Use two fingers to move the map'`
      */
-    panHintLabel?: string;
+    panHintLabel?: string | undefined;
     /**
      * Shown instead of the map when Mapbox GL or WebGL is unavailable.
      * @defaultValue `'Map unavailable'`
      */
-    unavailableLabel?: string;
+    unavailableLabel?: string | undefined;
     /** Extra classes, merged last. */
     class?: string | undefined;
   }

@@ -24,7 +24,7 @@ A daisyUI `checkbox` with its label in the same `<label>`, so the whole row is t
     /** Text beside the box; becomes the input's accessible name. */
     label: string;
     /** Whether the box is ticked. Bindable. */
-    checked?: boolean;
+    checked?: boolean | undefined;
     /**
      * daisyUI size step.
      * @defaultValue `'md'`

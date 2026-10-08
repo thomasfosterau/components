@@ -31,7 +31,7 @@ A `<time>` element carrying just a year, for dates whose precision really is a y
      */
     locales?: string | readonly string[] | undefined;
     /** Append the era: `1925 AD`. */
-    era?: Intl.DateTimeFormatOptions['era'];
+    era?: Intl.DateTimeFormatOptions['era'] | undefined;
     /**
      * Four digits or two.
      * @defaultValue `'numeric'`
