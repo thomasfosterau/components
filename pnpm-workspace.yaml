@@ -70,11 +70,12 @@ catalog:
   '@testing-library/jest-dom': ^7.0.1
   '@types/node': ^26.6.4
   # Vitest browser mode: the Playwright provider is its own package as of
-  # v4 and pins `vitest` EXACTLY, so it must track the `vitest` entry below
-  # (see that entry for how it relates to vite-plus's own pin).
+  # v4 and pins `vitest` EXACTLY, so it must track the `vitest` entry below,
+  # which in turn tracks vite-plus's own pin (vite-plus also peers this
+  # package at that exact version).
   # `@vitest/browser` itself arrives through vite-plus, so it is not
   # catalogued separately.
-  '@vitest/browser-playwright': 5.0.2
+  '@vitest/browser-playwright': 5.0.3
   # Headless Svelte 5 primitives. Every component whose behaviour is more
   # than "render these attributes" — menus, dialogs, comboboxes, tooltips —
   # is built on a bits-ui primitive rather than on hand-rolled keyboard and
@@ -107,15 +108,15 @@ catalog:
   # there is no pure-TS surface here worth a second compiler, so this is the
   # only one.
   typescript: 'npm:@typescript/typescript6@6.0.2'
-  # vite-plus pins `oxlint`, `oxfmt` and the `@vitest/*` packages to exact
-  # versions. `vitest` and `@vitest/browser-playwright` are 5.0.2, one patch
-  # ahead of vite-plus 1.0.0's 5.0.1 pin; the `vitest: "catalog:"` override
-  # and `peerDependencyRules.allowAny` force the catalog singleton through.
-  # Whether to keep that gap is #47.
+  # vite-plus pins `oxlint`, `oxfmt`, `vitest` and the `@vitest/*` packages
+  # to exact versions. `vitest` and `@vitest/browser-playwright` FOLLOW that
+  # pin (vite-plus 1.1.0 -> 5.0.3) rather than running ahead of it (#47):
+  # bump them in the same change as `vite-plus`, to the version its
+  # `dependencies` name, and never on their own.
   # `vite` is the same release published under its aliased core package.
-  vite-plus: 1.0.0
-  vite: npm:@voidzero-dev/vite-plus-core@1.0.0
-  vitest: 5.0.2
+  vite-plus: 1.1.0
+  vite: npm:@voidzero-dev/vite-plus-core@1.1.0
+  vitest: 5.0.3
   # `render` + locators for Svelte components under Vitest browser mode. The
   # app repos use @testing-library/svelte under happy-dom instead; this repo
   # runs the real browser, and this is the renderer Vitest browser mode
@@ -136,10 +137,11 @@ catalogs:
 overrides:
   # Singletons. See the `catalog:` note at the top: `svelte` and `vite` are
   # the two whose duplication is invisible to every gate and fatal at
-  # runtime, and `vitest` is forced to the catalog singleton so the browser
-  # provider's exact `vitest: "5.0.2"` peer resolves. `effect` is a fourth
-  # whose duplication no gate notices: two copies break `Context` / `Layer` /
-  # `Schema` identity at runtime. Only one resolves today; this is insurance.
+  # runtime, and `vitest` is forced to the catalog singleton so vite-plus,
+  # the browser provider (exact `vitest` peer) and the packages share one
+  # copy. `effect` is a fourth whose duplication no gate notices: two copies
+  # break `Context` / `Layer` / `Schema` identity at runtime. Only one
+  # resolves today; this is insurance.
   svelte: 'catalog:'
   vite: 'catalog:'
   vitest: 'catalog:'
@@ -156,7 +158,7 @@ allowBuilds:
   esbuild: true
 
 # Storybook 10.6 declares `vite-plus: "^0.1.15 || ^0.2.0"` and this workspace
-# is on 1.0.0 — the toolchain is deliberately ahead of what the addon ecosystem
+# is on 1.1.0 — the toolchain is deliberately ahead of what the addon ecosystem
 # has caught up to, and the same goes for `vite` / `vitest` / `@sveltejs/kit`,
 # all of which are forced to one catalog singleton by the overrides above.
 peerDependencyRules:
