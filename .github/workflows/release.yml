@@ -53,7 +53,7 @@ jobs:
       #
       # The job publishes with the npm this Node bundles; there is no npm
       # upgrade step (#84). Trusted Publishing needs npm >= 11.5.1, which
-      # Node `latest` already ships (npm 11.20.0 with Node 26.11.1).
+      # every Node release since 24.5.0 bundles.
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: latest
