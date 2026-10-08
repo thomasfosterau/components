@@ -24,7 +24,7 @@ pnpm add @thomasfosterau/components
 | `svelte` | `^5.40.0` | A declared peer. The components are compiled by your build, not pre-compiled. |
 | `tailwindcss` | `^4.0.0` | Not a declared peer, but **required**: the components emit Tailwind classes and ship none. |
 | `daisyui` | `^5.0.0` | Same — the class vocabulary is daisyUI's (`btn`, `input`, `bg-base-200`, `text-error`). |
-| `@thomasfosterau/effect-forms-svelte` | `^0.1.0` | An **optional** declared peer, needed only by the `/entity-form` entry (and bringing its own required peer, `effect` 4). Nothing else in the package imports it. |
+| `@thomasfosterau/effect-forms-svelte` | `^0.2.0` | An **optional** declared peer, needed only by the `/entity-form` entry (and bringing its own required peer, `effect` 4). Nothing else in the package imports it. |
 
 Tailwind 4 has no `tailwind.config.js`, so wire it up from your CSS entry. Two lines matter: `@source`, which is what makes Tailwind scan this package's `dist/` and emit the classes it uses, and the `theme.css` import (or your own themes), which supplies the daisyUI tokens the components are designed against.
 
