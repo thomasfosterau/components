@@ -50,18 +50,14 @@ jobs:
       # No `registry-url`: that writes an `.npmrc` whose `_authToken` reads
       # `NODE_AUTH_TOKEN`, and a configured token — even an empty placeholder
       # — is what npm tries instead of OIDC.
+      #
+      # The job publishes with the npm this Node bundles; there is no npm
+      # upgrade step (#84). Trusted Publishing needs npm >= 11.5.1, which
+      # Node `latest` already ships (npm 11.20.0 with Node 26.11.1).
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: latest
           cache: pnpm
-
-      # Trusted Publishing needs npm >= 11.5.1. Node `latest` bundles npm 11
-      # today, but `node-version: latest` moves on its own; this step keeps
-      # the job's npm on a known major whatever Node ships. Pinned to a major
-      # rather than `@latest`: this job holds `id-token: write`, so a new npm
-      # major should arrive by a reviewed change (#44).
-      - name: Upgrade npm for trusted publishing
-        run: npm install -g npm@11
 
       # `--ignore-scripts`: the root `prepare` only installs the Vite+ git
       # hooks, and nothing on the build path needs an install script.
