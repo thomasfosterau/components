@@ -27,29 +27,29 @@ A `<data>` element whose text is the `Intl.NumberFormat` rendering and whose `va
      * `Intl.NumberFormat` `style`.
      * @defaultValue `'decimal'`
      */
-    style?: Intl.NumberFormatOptions['style'];
+    style?: Intl.NumberFormatOptions['style'] | undefined;
     /** The unit when `style` is `unit` (`kilometer`, `percent`). */
     unit?: string | undefined;
     /**
      * `Intl.NumberFormat` `unitDisplay`.
      * @defaultValue `'short'`
      */
-    unitDisplay?: Intl.NumberFormatOptions['unitDisplay'];
+    unitDisplay?: Intl.NumberFormatOptions['unitDisplay'] | undefined;
     /** ISO 4217 code when `style` is `currency`. */
     currency?: string | undefined;
     /**
      * `Intl.NumberFormat` `currencyDisplay`.
      * @defaultValue `'symbol'`
      */
-    currencyDisplay?: Intl.NumberFormatOptions['currencyDisplay'];
+    currencyDisplay?: Intl.NumberFormatOptions['currencyDisplay'] | undefined;
     /** `Intl.NumberFormat` `maximumFractionDigits`. */
-    maximumFractionDigits?: number;
+    maximumFractionDigits?: number | undefined;
     /** `Intl.NumberFormat` `minimumFractionDigits`. */
-    minimumFractionDigits?: number;
+    minimumFractionDigits?: number | undefined;
     /** `Intl.NumberFormat` `signDisplay`. */
-    signDisplay?: Intl.NumberFormatOptions['signDisplay'];
+    signDisplay?: Intl.NumberFormatOptions['signDisplay'] | undefined;
     /** `Intl.NumberFormat` `notation`. */
-    notation?: Intl.NumberFormatOptions['notation'];
+    notation?: Intl.NumberFormatOptions['notation'] | undefined;
     /** Raw `Intl.NumberFormatOptions`; wins over the individual style props when given. */
     options?: Intl.NumberFormatOptions | undefined;
   }

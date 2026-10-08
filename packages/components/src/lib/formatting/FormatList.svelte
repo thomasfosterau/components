@@ -20,12 +20,12 @@ Renders `items` through `Intl.ListFormat`, with each item drawn by the `children
      * `Intl.ListFormat` style.
      * @defaultValue `'long'`
      */
-    style?: Intl.ListFormatOptions['style'];
+    style?: Intl.ListFormatOptions['style'] | undefined;
     /**
      * `Intl.ListFormat` type.
      * @defaultValue `'conjunction'`
      */
-    type?: Intl.ListFormatOptions['type'];
+    type?: Intl.ListFormatOptions['type'] | undefined;
     /**
      * Locale(s) for `Intl` formatting.
      * @defaultValue the components context's `locale()`

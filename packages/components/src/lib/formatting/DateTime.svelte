@@ -20,7 +20,7 @@ A `<time>` element with the ISO instant in `datetime` and the `Intl.DateTimeForm
   import type { HTMLTimeAttributes } from 'svelte/elements';
   import { getComponentsContext } from '../context.svelte.ts';
 
-  interface Props extends HTMLTimeAttributes {
+  interface Props extends Omit<HTMLTimeAttributes, 'children'> {
     /** The instant: a `Date`, epoch milliseconds or an ISO string. */
     value: Date | number | string;
     /**
@@ -32,13 +32,13 @@ A `<time>` element with the ISO instant in `datetime` and the `Intl.DateTimeForm
      * `Intl.DateTimeFormat` `dateStyle`.
      * @defaultValue `'medium'`
      */
-    dateStyle?: Intl.DateTimeFormatOptions['dateStyle'];
+    dateStyle?: Intl.DateTimeFormatOptions['dateStyle'] | undefined;
     /** `Intl.DateTimeFormat` `timeStyle`; omitted, no time is shown. */
-    timeStyle?: Intl.DateTimeFormatOptions['timeStyle'];
+    timeStyle?: Intl.DateTimeFormatOptions['timeStyle'] | undefined;
     /** Raw `Intl.DateTimeFormatOptions`; wins over `dateStyle`/`timeStyle` when given. */
     options?: Intl.DateTimeFormatOptions | undefined;
     /** Replaces the formatted text; the `datetime` attribute stays machine-readable. */
-    children?: Snippet<[]>;
+    children?: Snippet<[]> | undefined;
   }
 
   let {

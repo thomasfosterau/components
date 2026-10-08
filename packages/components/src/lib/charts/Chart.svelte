@@ -53,41 +53,41 @@ A line, area or bar chart drawn as plain SVG from a declarative series spec, wit
      * The chart form.
      * @defaultValue `'line'`
      */
-    kind?: ChartKind;
+    kind?: ChartKind | undefined;
     /** Names the figure; rendered as its caption and its accessible name. */
     title: string;
     /**
      * A sentence of context under the title.
      * @defaultValue `''`
      */
-    description?: string;
+    description?: string | undefined;
     /**
      * Plot height in CSS pixels; the width is fluid.
      * @defaultValue `240`
      */
-    height?: number;
+    height?: number | undefined;
     /** Reveal the data table rather than leaving it to assistive tech. */
-    showTable?: boolean;
+    showTable?: boolean | undefined;
     /**
      * Names the series legend; only rendered when there are two or more.
      * @defaultValue `'Series'`
      */
-    legendLabel?: string;
+    legendLabel?: string | undefined;
     /**
      * Captions the data table. Empty means "use `title`".
      * @defaultValue `''` (use `title`)
      */
-    tableLabel?: string;
+    tableLabel?: string | undefined;
     /**
      * Heads the table's category column.
      * @defaultValue `''`
      */
-    categoryLabel?: string;
+    categoryLabel?: string | undefined;
     /**
      * Rendered value text — a unit, a locale-formatted number.
      * @defaultValue `String(value)`
      */
-    formatValue?: (value: number) => string;
+    formatValue?: ((value: number) => string) | undefined;
     /** Extra classes, merged last. */
     class?: string | undefined;
   }

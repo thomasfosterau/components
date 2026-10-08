@@ -28,7 +28,7 @@ A switch for an on/off setting that takes effect immediately, rather than a chec
 
   interface Props extends Omit<HTMLInputAttributes, 'type' | 'checked' | 'size' | 'onchange'> {
     /** Whether the switch is on. Bindable. */
-    checked?: boolean;
+    checked?: boolean | undefined;
     /** Text beside the switch; becomes its accessible name. */
     label: string;
     /** Explanation under the switch, reached through `aria-describedby`. */

@@ -29,7 +29,7 @@ A `FileInput` plus the progress readout for an upload the caller performs.
      * Transfer progress, 0–100. The caller writes this as its upload advances.
      * @defaultValue `0`
      */
-    progress?: number;
+    progress?: number | undefined;
     /**
      * Accessible name of the progress bar.
      * @defaultValue `'Upload progress'`

@@ -21,7 +21,7 @@ A daisyUI `input` over a native `<input>`, with a bindable `value` and `FieldCon
      * The text. Bindable.
      * @defaultValue `''`
      */
-    value?: string;
+    value?: string | undefined;
     /**
      * The text-ish `type`s. Dates have `DateInput`, files have `FileInput`.
      * @defaultValue `'text'`

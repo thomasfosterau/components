@@ -14,18 +14,18 @@ An ISSN rendered as a WorldCat lookup link that opens in a new tab.
   import type { Snippet } from 'svelte';
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
-  interface Props extends HTMLAnchorAttributes {
+  interface Props extends Omit<HTMLAnchorAttributes, 'children'> {
     /** The ISSN, without a prefix. */
     issn: string;
     /**
      * Schema.org `itemprop` on the link, when the identifier is a property of an enclosing item.
      */
-    itemprop?: string;
+    itemprop?: string | undefined;
     /**
      * Replaces the link text.
      * @defaultValue the bare ISSN
      */
-    children?: Snippet<[]>;
+    children?: Snippet<[]> | undefined;
   }
 
   let { issn, itemprop, children, class: className, ...rest }: Props = $props();

@@ -35,7 +35,7 @@ The site search box: a `<search>` landmark around a GET form that works without 
      * The query. Bindable.
      * @defaultValue `''`
      */
-    value?: string;
+    value?: string | undefined;
     /**
      * Accessible name of the field.
      * @defaultValue `'Search'`

@@ -14,18 +14,18 @@ A DOI rendered as a `https://doi.org/<doi>` link that opens in a new tab.
   import type { Snippet } from 'svelte';
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
-  interface Props extends HTMLAnchorAttributes {
+  interface Props extends Omit<HTMLAnchorAttributes, 'children'> {
     /** The DOI, without a prefix. */
     doi: string;
     /**
      * Schema.org `itemprop` on the link, when the identifier is a property of an enclosing item.
      */
-    itemprop?: string;
+    itemprop?: string | undefined;
     /**
      * Replaces the link text.
      * @defaultValue the bare DOI
      */
-    children?: Snippet<[]>;
+    children?: Snippet<[]> | undefined;
   }
 
   let { doi, itemprop, children, class: className, ...rest }: Props = $props();

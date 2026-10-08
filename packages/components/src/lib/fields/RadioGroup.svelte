@@ -39,7 +39,7 @@ One choice from a short, known list, on bits-ui’s `RadioGroup`.
      * The chosen value; empty string when nothing is chosen.
      * @defaultValue `''`
      */
-    value?: string;
+    value?: string | undefined;
     /**
      * Lay the options out in a column or a row.
      * @defaultValue `'vertical'`

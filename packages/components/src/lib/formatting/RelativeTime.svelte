@@ -28,12 +28,12 @@
      * `Intl.RelativeTimeFormat` `numeric`; `auto` allows "yesterday".
      * @defaultValue `'auto'`
      */
-    numeric?: Intl.RelativeTimeFormatOptions['numeric'];
+    numeric?: Intl.RelativeTimeFormatOptions['numeric'] | undefined;
     /**
      * `Intl.RelativeTimeFormat` `style`.
      * @defaultValue `'long'`
      */
-    style?: Intl.RelativeTimeFormatOptions['style'];
+    style?: Intl.RelativeTimeFormatOptions['style'] | undefined;
   }
 
   let {

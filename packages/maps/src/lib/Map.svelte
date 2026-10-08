@@ -48,11 +48,11 @@ A static raster map first, upgraded to the interactive map once the page has hyd
      * Whether to upgrade to the pannable map at all.
      * @defaultValue `true`
      */
-    interactive?: boolean;
+    interactive?: boolean | undefined;
     /** Passed to `DynamicMap`; the one-off two-finger hint. */
-    panHintLabel?: string;
+    panHintLabel?: string | undefined;
     /** Passed to `DynamicMap`; shown when Mapbox GL or WebGL is unavailable. */
-    unavailableLabel?: string;
+    unavailableLabel?: string | undefined;
     /** Extra classes, merged last. */
     class?: string | undefined;
   }
