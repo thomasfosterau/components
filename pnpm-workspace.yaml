@@ -114,9 +114,13 @@ catalog:
   typescript: 'npm:@typescript/typescript6@6.0.2'
   # vite-plus pins `oxlint`, `oxfmt`, `vitest` and the `@vitest/*` packages
   # to exact versions. `vitest` and `@vitest/browser-playwright` FOLLOW that
-  # pin (vite-plus 1.1.0 -> 5.0.3) rather than running ahead of it (#47):
-  # bump them in the same change as `vite-plus`, to the version its
-  # `dependencies` name, and never on their own.
+  # pin (vite-plus 1.1.0 -> 5.0.3) rather than running ahead of it (#47).
+  # Dependabot's `vite-plus-toolchain` group (.github/dependabot.yml) bumps
+  # `vite-plus`, `vitest` and `@vitest/*` together in one PR (#88). Before
+  # merging that PR, push by hand: `vite` (ignored by Dependabot) to
+  # `npm:@voidzero-dev/vite-plus-core@` the new vite-plus version, and
+  # `vitest` / `@vitest/browser-playwright` to the version the new vite-plus's
+  # `dependencies` name if the group took them past it.
   # `vite` is the same release published under its aliased core package.
   vite-plus: 1.1.0
   vite: npm:@voidzero-dev/vite-plus-core@1.1.0
