@@ -46,12 +46,12 @@
 # so nothing in a session can publish.
 #
 # It also does NOT install a Playwright browser. `vp run -r test:unit` drives
-# real Chromium, and the image is expected to provide one under
-# `PLAYWRIGHT_BROWSERS_PATH` matching the `playwright` version the catalog pins
-# (see that entry in pnpm-workspace.yaml). Downloading one here would be a
-# multi-hundred-megabyte fetch on every session start; when the browser is
-# genuinely missing, `pnpm exec playwright install chromium` is the one command
-# to run, once.
+# real Chromium at the exact revision the catalog's `playwright` expects (see
+# that entry in pnpm-workspace.yaml), which the image may or may not carry
+# under `PLAYWRIGHT_BROWSERS_PATH`: the pin is not tied to the image. Downloading
+# one here would be a multi-hundred-megabyte fetch on every session start; when
+# the revision is missing, `pnpm exec playwright install chromium` is the one
+# command to run, once — or report the browser gates as not run.
 #
 # ## Contract
 #

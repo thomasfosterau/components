@@ -1,6 +1,6 @@
 # AGENTS.md
 
-`CLAUDE.md` is a symlink to this file. This repo publishes two Svelte 5 component libraries consumed by the owner's apps (website, gardeneria, preferenceflow, in-the-dark); the artifacts that matter are `packages/components/dist` and `packages/maps/dist`, and everything below exists to keep them small, typed and accessible. The toolchain, workspace shape, catalog discipline and session hook are copied from the app repos so a component authored here compiles identically in the app that consumes it; the places the two deliberately differ are commented where they occur (`playwright`'s pin, the browser-mode test suite, the absence of a stage/deploy graph).
+`CLAUDE.md` is a symlink to this file. This repo publishes two Svelte 5 component libraries consumed by the owner's apps (website, gardeneria, preferenceflow, in-the-dark); the artifacts that matter are `packages/components/dist` and `packages/maps/dist`, and everything below exists to keep them small, typed and accessible. The toolchain, workspace shape, catalog discipline and session hook are copied from the app repos so a component authored here compiles identically in the app that consumes it; the places the two deliberately differ are commented where they occur (the browser-mode test suite and its `playwright` provider, the absence of a stage/deploy graph).
 
 | Package | Directory | Boundary |
 | --- | --- | --- |
@@ -63,7 +63,7 @@
 
 ## Commands
 
-Invoke everything through `vp` — `vp run <script>`, `vp exec <bin>` (instead of `npx`). The sanctioned non-`vp` invocations: `pnpm install` (`pnpm install --frozen-lockfile` in CI), `pnpm changeset`, the release path (`pnpm run release`: `pnpm pack` + `npm publish`), and `pnpm exec playwright install` in CI.
+Invoke everything through `vp` — `vp run <script>`, `vp exec <bin>` (instead of `npx`). The sanctioned non-`vp` invocations: `pnpm install` (`pnpm install --frozen-lockfile` in CI), `pnpm changeset`, the release path (`pnpm run release`: `pnpm pack` + `npm publish`), and `pnpm exec playwright install` (in CI, and in a session whose image lacks the pinned Chromium revision).
 
 - `pnpm install` — dependencies, plus the Vite+ git hooks (pre-commit runs `vp staged`: format + lint on staged files). There is no pre-push hook.
 - `vp check` — format + lint (Oxfmt + Oxlint). `vp run check` — the type gate: every package's `check` (`svelte-kit sync` + `svelte-check`). They are different commands.
@@ -82,7 +82,7 @@ Before you report work as done, run the gates below in order — the same steps 
 4. `vp run -r build`
 5. `vp run --filter ./packages/components storybook:build`
 
-None needs a credential. `test:unit` and `storybook:build` need a Chromium matching the pinned `playwright` (see that entry's comment in `pnpm-workspace.yaml`); if the suite reports a missing executable, run `pnpm exec playwright install chromium` once and re-run the gate; if it still can't run, report it as not run rather than as passing. A human confirms rendering in Storybook (the `storybook` dev server); in a session, `storybook:build` is the check.
+None needs a credential. `test:unit` and `storybook:build` need the exact Chromium revision the pinned `playwright` expects (see that entry's comment in `pnpm-workspace.yaml`). CI installs its own; a session image's pre-installed browser is not kept in step with the pin. If the suite reports a missing executable, run `pnpm exec playwright install chromium` once and re-run the gate; if that can't run, report the browser gates as not run rather than as passing. A human confirms rendering in Storybook (the `storybook` dev server); in a session, `storybook:build` is the check.
 
 ## Branches and pull requests
 

@@ -10,8 +10,8 @@
 # - `vite` and `typescript` are npm aliases (`npm:@voidzero-dev/vite-plus-core`,
 #   `npm:@typescript/typescript6`); the alias target moves with vite-plus and
 #   the TypeScript 7.1 migration respectively, by hand.
-# - `playwright` is pinned to the Chromium revision the agent-session image
-#   pre-installs, and moves with that image, not with npm.
+# `playwright` is NOT ignored: CI installs the Chromium revision each release
+# expects, so its bumps are ordinary updates (see its catalog entry).
 # Each ignore is scoped to the `version-update:semver-*` update types, so
 # SECURITY updates stay enabled (a bare `dependency-name` ignore would block
 # those too).
@@ -61,13 +61,6 @@ updates:
             'version-update:semver-patch',
           ]
       - dependency-name: 'typescript'
-        update-types:
-          [
-            'version-update:semver-major',
-            'version-update:semver-minor',
-            'version-update:semver-patch',
-          ]
-      - dependency-name: 'playwright'
         update-types:
           [
             'version-update:semver-major',

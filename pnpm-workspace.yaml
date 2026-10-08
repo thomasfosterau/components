@@ -87,16 +87,20 @@ catalog:
   # peer); this repo has no Playwright test suite of its own, which is why it
   # takes `playwright` rather than the app repos' `@playwright/test`.
   #
-  # PINNED EXACT, and one minor behind the app repos' 1.63.0 on purpose:
-  # 1.56.x is the release whose Chromium revision is 1194, which is what the
-  # agent-session image pre-installs under `PLAYWRIGHT_BROWSERS_PATH`
-  # (/opt/pw-browsers/chromium-1194). Matching it is what lets `vp run -r
-  # test:unit` launch a real browser in a session with no download and no
-  # `executablePath` override. CI installs the matching revision itself
-  # (`pnpm exec playwright install --with-deps chromium`), so bumping this
-  # only costs the session, not the pipeline — but bump it together with the
-  # image, or the session silently loses its browser.
-  playwright: 1.56.1
+  # PINNED EXACT, because each release expects one exact Chromium revision
+  # (1.63.0 -> 1243, `browsers.json` in playwright-core) and refuses any
+  # other. It is NOT tied to a session image: CI installs its own browser
+  # (`pnpm exec playwright install --with-deps chromium`) on every run, so a
+  # bump is an ordinary catalog change. A session whose image pre-installs a
+  # different revision under `PLAYWRIGHT_BROWSERS_PATH` runs `pnpm exec
+  # playwright install chromium` once, or reports the browser gates as not
+  # run (AGENTS.md § Verification).
+  #
+  # Floor 1.60.0: 1.56.1-1.59.x extract the browser zip with a yauzl stream
+  # that marks itself destroyed before its buffered tail drains, and Node
+  # >= 26.1.0 no longer resumes a destroyed stream (nodejs/node#62557), so
+  # `playwright install` hangs forever on Node `latest` (#81).
+  playwright: 1.63.0
   storybook: ^10.6.0
   svelte-check: ^4.7.6
   svelte: ^5.57.1
@@ -151,8 +155,8 @@ overrides:
 nodeLinker: hoisted
 
 # Install scripts are opt-in. `playwright` is deliberately ABSENT: its
-# postinstall downloads a browser bundle, which the session image already
-# provides and CI installs explicitly in its own step.
+# postinstall downloads a browser bundle, which CI installs explicitly in its
+# own step and a session installs on demand (AGENTS.md § Verification).
 allowBuilds:
   '@tailwindcss/oxide': true
   esbuild: true
