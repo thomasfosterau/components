@@ -41,7 +41,7 @@ jobs:
 
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version: latest
           cache: pnpm
 
       # `--ignore-scripts`: the root `prepare` only installs the Vite+ git
@@ -59,8 +59,21 @@ jobs:
       # Chromium + its apt system libraries, at exactly the revision the pinned
       # `playwright` expects. CI-only: everywhere else the browser is already
       # present under PLAYWRIGHT_BROWSERS_PATH.
+      #
+      # On Node 24, not `latest`: playwright < 1.60 extracts the browser zip
+      # with a yauzl stream that marks itself destroyed before its buffered
+      # tail is drained, and Node 26 no longer resumes a destroyed stream
+      # (nodejs/node#62557), so the install hangs until the job times out.
+      # The second setup-node puts `latest` back first on PATH for every gate.
+      # Both go when `playwright` moves past 1.59 with the session image (#81).
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
       - name: Install Chromium for the browser suite
         run: pnpm exec playwright install --with-deps chromium
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: latest
 
       - name: Format and lint
         run: vp check
