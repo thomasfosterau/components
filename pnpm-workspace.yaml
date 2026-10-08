@@ -100,7 +100,7 @@ catalog:
   # that marks itself destroyed before its buffered tail drains, and Node
   # >= 26.1.0 no longer resumes a destroyed stream (nodejs/node#62557), so
   # `playwright install` hangs forever on Node `latest` (#81).
-  playwright: 1.63.0
+  playwright: 1.64.0
   storybook: ^10.6.0
   svelte-check: ^4.7.6
   svelte: ^5.57.1
