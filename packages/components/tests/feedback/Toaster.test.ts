@@ -4,12 +4,15 @@
  * produces is the bug this component exists to have fixed, so its absence is
  * asserted rather than assumed.
  *
- * Auto-dismissal is driven by a short REAL duration rather than fake timers:
- * `userEvent` drives a real Chromium through Playwright, and replacing the
- * page's clock underneath it is how a browser-mode suite deadlocks.
+ * Auto-dismissal is driven by fake timers, not by a short real duration: the
+ * dismiss timer starts inside the click, so a real duration races the
+ * `userEvent` round trip and the first poll under suite load (#75). Only
+ * `setTimeout`/`clearTimeout` are faked — the pair `Toaster` uses — so the
+ * page's other clocks keep running underneath Playwright and `expect.element`
+ * (whose retry loop uses timers Vitest captured before any faking).
  */
 
-import { expect, test } from 'vite-plus/test';
+import { afterEach, expect, test, vi } from 'vite-plus/test';
 import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import ToasterFixture from './fixtures/ToasterFixture.svelte';
@@ -68,13 +71,22 @@ test('the dismiss button is a labelled control and removes its toast', async () 
   expect(screen.getByText('Bed 1 saved').elements()).toHaveLength(0);
 });
 
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 test('a toast dismisses itself after its duration', async () => {
-  const screen = await render(ToasterFixture, { toastDurationMs: 80 });
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+  const screen = await render(ToasterFixture, { toastDurationMs: 5_000 });
 
   await userEvent.click(screen.getByRole('button', { name: 'Push a toast' }));
+  // The clock is held, so presence no longer races the timer.
   await expect.element(screen.getByText('Bed 1 saved')).toBeInTheDocument();
 
-  // `expect.element` retries, so this waits for the timer rather than sleeping.
+  await vi.advanceTimersByTimeAsync(4_999);
+  await expect.element(screen.getByText('Bed 1 saved')).toBeInTheDocument();
+
+  await vi.advanceTimersByTimeAsync(1);
   await expect.element(screen.getByText('Bed 1 saved')).not.toBeInTheDocument();
 });
 
