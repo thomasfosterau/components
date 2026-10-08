@@ -21,7 +21,7 @@ pnpm add @thomasfosterau/components
 
 | Package | Range | Why |
 | --- | --- | --- |
-| `svelte` | `^5.30.1` | A declared peer. The components are compiled by your build, not pre-compiled. |
+| `svelte` | `^5.40.0` | A declared peer. The components are compiled by your build, not pre-compiled. |
 | `tailwindcss` | `^4.0.0` | Not a declared peer, but **required**: the components emit Tailwind classes and ship none. |
 | `daisyui` | `^5.0.0` | Same — the class vocabulary is daisyUI's (`btn`, `input`, `bg-base-200`, `text-error`). |
 | `@thomasfosterau/effect-forms-svelte` | `^0.1.0` | An **optional** declared peer, needed only by the `/entity-form` entry (and bringing its own required peer, `effect` 4). Nothing else in the package imports it. |

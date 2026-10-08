@@ -132,11 +132,14 @@ catalog:
 # tests against: `svelte` above is the dev pin (^5.57.1), `svelte` here is
 # the floor both published manifests declare. `pnpm pack` (the release path,
 # scripts/publish.mjs) rewrites `catalog:peers` to this literal range, so the
-# packed package.json files carry `"svelte": "^5.30.1"`. Raising the floor is
-# a published-behaviour change and takes a changeset.
+# packed package.json files carry `"svelte": "^5.40.0"`. The floor is
+# 5.40.0 because that is the `svelte` peer of
+# `@thomasfosterau/effect-forms-svelte@0.2.0`, the optional peer behind the
+# `/entity-form` entry (#85). Raising the floor is a published-behaviour change
+# and takes a changeset.
 catalogs:
   peers:
-    svelte: ^5.30.1
+    svelte: ^5.40.0
 
 overrides:
   # Singletons. See the `catalog:` note at the top: `svelte` and `vite` are
