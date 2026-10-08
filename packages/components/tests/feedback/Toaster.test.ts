@@ -4,15 +4,26 @@
  * produces is the bug this component exists to have fixed, so its absence is
  * asserted rather than assumed.
  *
- * Auto-dismissal is driven by a short REAL duration rather than fake timers:
- * `userEvent` drives a real Chromium through Playwright, and replacing the
- * page's clock underneath it is how a browser-mode suite deadlocks.
+ * Auto-dismissal is driven by fake timers, not by a short real duration: the
+ * dismiss timer starts inside the click, so a real duration races the
+ * `userEvent` round trip and the first poll under suite load (#75). Only
+ * `setTimeout`/`clearTimeout` are faked — the pair `Toaster` uses — so
+ * Playwright's clock keeps running underneath. The auto-dismiss checks are
+ * synchronous (`flushSync` + `.elements()`), never `expect.element`: while fake
+ * timers are on, Vitest's poll loop calls `vi.advanceTimersByTime(interval)`
+ * after every failed retry, so a retrying assertion would move the clock
+ * itself and let a late (or early) timer pass.
  */
 
-import { expect, test } from 'vite-plus/test';
+import { afterEach, expect, test, vi } from 'vite-plus/test';
+import { flushSync } from 'svelte';
 import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import ToasterFixture from './fixtures/ToasterFixture.svelte';
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 test('the region is in the document from mount, polite and named', async () => {
   const screen = await render(ToasterFixture);
@@ -69,13 +80,22 @@ test('the dismiss button is a labelled control and removes its toast', async () 
 });
 
 test('a toast dismisses itself after its duration', async () => {
-  const screen = await render(ToasterFixture, { toastDurationMs: 80 });
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+  const screen = await render(ToasterFixture, { toastDurationMs: 5_000 });
+  const toast = () => screen.getByText('Bed 1 saved').elements();
 
   await userEvent.click(screen.getByRole('button', { name: 'Push a toast' }));
-  await expect.element(screen.getByText('Bed 1 saved')).toBeInTheDocument();
+  flushSync();
+  // The clock is held, so presence no longer races the timer.
+  expect(toast()).toHaveLength(1);
 
-  // `expect.element` retries, so this waits for the timer rather than sleeping.
-  await expect.element(screen.getByText('Bed 1 saved')).not.toBeInTheDocument();
+  await vi.advanceTimersByTimeAsync(4_999);
+  flushSync();
+  expect(toast()).toHaveLength(1);
+
+  await vi.advanceTimersByTimeAsync(1);
+  flushSync();
+  expect(toast()).toHaveLength(0);
 });
 
 test('a duration of 0 makes a toast sticky', async () => {
