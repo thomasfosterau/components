@@ -10,8 +10,8 @@
 # `vitest` and `@vitest/*` (here, `@vitest/browser-playwright`), so they never
 # arrive in separate PRs (#47, #88; see the `vite-plus` entry in
 # pnpm-workspace.yaml). Grouping only batches whatever each member's latest
-# release is, so EVERY PR from this group needs two hand-pushed fixes before
-# merge:
+# release is, so EVERY group PR that bumps `vite-plus` needs two hand-pushed
+# fixes before merge:
 # - bump the `vite` alias to `npm:@voidzero-dev/vite-plus-core@<the new
 #   vite-plus version>` (Dependabot cannot, see `ignore` below);
 # - set `vitest` / `@vitest/browser-playwright` to the version the new
@@ -19,9 +19,10 @@
 #   vitest release vite-plus has not adopted yet, or one still in `cooldown`,
 #   lands out of step).
 # A group PR that does NOT bump `vite-plus` (vitest or `@vitest/*` released
-# alone) has no vite-plus version to follow: close it unmerged. The same holds
-# for a standalone vitest security update; groups apply only to version
-# updates, so it arrives as its own PR and gets the same check.
+# alone) has no vite-plus version to follow: close it unmerged. The same check
+# applies to a vitest security update: this file's groups apply only to
+# version updates, so it arrives outside the group (as its own PR, unless
+# grouped security updates is on in the repository settings).
 # `vitest-browser-svelte` is deliberately outside the group: vite-plus does
 # not pin it, so its bumps need no alias step.
 #
