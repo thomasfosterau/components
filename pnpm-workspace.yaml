@@ -120,7 +120,8 @@ catalog:
   # merging that PR, push by hand: `vite` (ignored by Dependabot) to
   # `npm:@voidzero-dev/vite-plus-core@` the new vite-plus version, and
   # `vitest` / `@vitest/browser-playwright` to the version the new vite-plus's
-  # `dependencies` name if the group took them past it.
+  # `dependencies` / `peerDependencies` name if the group took them past it.
+  # A group PR that doesn't bump vite-plus itself is closed unmerged.
   # `vite` is the same release published under its aliased core package.
   vite-plus: 1.1.0
   vite: npm:@voidzero-dev/vite-plus-core@1.1.0
