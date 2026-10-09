@@ -15,8 +15,13 @@
 # - bump the `vite` alias to `npm:@voidzero-dev/vite-plus-core@<the new
 #   vite-plus version>` (Dependabot cannot, see `ignore` below);
 # - set `vitest` / `@vitest/browser-playwright` to the version the new
-#   vite-plus's `dependencies` name, not past it (a vitest release vite-plus
-#   has not adopted yet, or one still in `cooldown`, lands out of step).
+#   vite-plus's `dependencies` / `peerDependencies` name, not past it (a
+#   vitest release vite-plus has not adopted yet, or one still in `cooldown`,
+#   lands out of step).
+# A group PR that does NOT bump `vite-plus` (vitest or `@vitest/*` released
+# alone) has no vite-plus version to follow: close it unmerged. The same holds
+# for a standalone vitest security update; groups apply only to version
+# updates, so it arrives as its own PR and gets the same check.
 # `vitest-browser-svelte` is deliberately outside the group: vite-plus does
 # not pin it, so its bumps need no alias step.
 #
@@ -35,8 +40,9 @@
 # `cooldown` mirrors pnpm-workspace.yaml's `minimumReleaseAge` (1 day), and
 # its `minimumReleaseAgeExclude`: first-party `@thomasfosterau/*` releases are
 # not held.
-# Cooldown is applied per dependency, inside a group too: a member whose
-# release is still inside it is left out of that group PR, not the whole PR.
+# Per the docs, cooldown is applied per dependency (inferred to hold inside a
+# group too): a member whose release is still inside it is left out of that
+# group PR, not the whole PR.
 version: 2
 updates:
   - package-ecosystem: 'npm'
