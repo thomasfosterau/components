@@ -8,8 +8,12 @@
 #
 # EVERY external dependency version lives here — package.json files reference
 # only `catalog:` / `catalog:peers` (or `workspace:*` for internal packages).
-# `catalogMode: strict` makes `pnpm add` enforce this at add time and
-# `pnpm install` reject non-catalog specifiers.
+# `catalogMode: strict` enforces this only in commands that write a specifier:
+# `pnpm add` writes `catalog:` (creating the entry if there is none), and
+# `pnpm add` / `pnpm update <pkg>@<range>` fail with
+# ERR_PNPM_CATALOG_VERSION_MISMATCH on a version outside the catalog's range.
+# `pnpm install` accepts a literal hand-edited into a package.json, so review
+# is what keeps literals out.
 # After editing this catalog, ALWAYS run `pnpm install` and commit the
 # regenerated pnpm-lock.yaml — a stale lockfile fails every CI job at once
 # with ERR_PNPM_LOCKFILE_CONFIG_MISMATCH.
