@@ -31,7 +31,7 @@ A `type="search"` field with a leading icon, a clear button while there is text,
      * The query. Bindable.
      * @defaultValue `''`
      */
-    value?: string;
+    value?: string | undefined;
     /** Fires on every change with the current text. */
     onInput?: ((query: string) => void) | undefined;
     /** Fires on Enter with the current text. */

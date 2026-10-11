@@ -50,34 +50,34 @@ A pan-and-zoom SVG surface over a `VectorDocument`, with each element drawn by a
      * Which elements the application considers selected.
      * @defaultValue an empty set
      */
-    selected?: ReadonlySet<string>;
+    selected?: ReadonlySet<string> | undefined;
     /**
      * The application's active tool; `pan` is the one this component handles.
      * @defaultValue `'select'`
      */
-    tool?: string;
+    tool?: string | undefined;
     /**
      * Viewport size in CSS pixels.
      * @defaultValue `800`
      */
-    width?: number;
+    width?: number | undefined;
     /**
      * Viewport height in CSS pixels.
      * @defaultValue `600`
      */
-    height?: number;
+    height?: number | undefined;
     /** Draws one element, told whether it is selected. */
-    element?: Snippet<[T, boolean]>;
+    element?: Snippet<[T, boolean]> | undefined;
     /**
      * Whether pointer input is accepted at all.
      * @defaultValue `true`
      */
-    interactive?: boolean;
+    interactive?: boolean | undefined;
     /**
      * Names the surface for assistive tech.
      * @defaultValue `'Vector editing canvas'`
      */
-    label?: string;
+    label?: string | undefined;
     /**
      * The viewport after a pan or a zoom.
      *

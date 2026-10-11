@@ -36,14 +36,14 @@ One piece of inline guidance that shows only when its store allows and closes fo
      * Shared with the page's other tips so Escape closes only the top one.
      * @defaultValue `soloTipStack` (shares Escape with no other tip)
      */
-    stack?: TipStack;
+    stack?: TipStack | undefined;
     /**
      * Accessible name of the dismiss button.
      * @defaultValue `'Dismiss'`
      */
-    dismissLabel?: string;
+    dismissLabel?: string | undefined;
     /** Extra classes, merged last. */
-    class?: string;
+    class?: string | undefined;
   }
 
   let {

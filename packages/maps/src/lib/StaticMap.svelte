@@ -42,7 +42,7 @@ A map as one raster image from the Mapbox Static Images API.
     /** What this map tells the reader; `''` only where it is decoration. */
     alt: string;
     /** A GeoJSON overlay drawn onto the raster. */
-    overlay?: unknown;
+    overlay?: unknown | undefined;
     /** Extra classes, merged last. */
     class?: string | undefined;
   }

@@ -38,7 +38,7 @@ One label/value pair inside an `InfoboxSection`.
      * Stands in for the value, captioned by `aria-label`, when `showEmpty` and the row has nothing.
      * @defaultValue `'unrecorded'`
      */
-    emptyLabel?: string;
+    emptyLabel?: string | undefined;
     /** Render the row even when empty, showing `emptyLabel` instead of nothing. */
     showEmpty?: boolean | undefined;
   }

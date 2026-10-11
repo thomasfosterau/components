@@ -22,12 +22,12 @@ An inline note marker that registers its note with the surrounding footnote list
     /** The note's text. */
     content: string;
     /** A custom marker (`*`, `†`) instead of the auto-assigned number. */
-    symbol?: string;
+    symbol?: string | undefined;
     /**
      * The marker's accessible name — a bare number or symbol announces nothing on its own.
      * @defaultValue `"Footnote <marker>: <content>"`
      */
-    footnoteLabel?: (marker: string, content: string) => string;
+    footnoteLabel?: ((marker: string, content: string) => string) | undefined;
   }
 
   let {

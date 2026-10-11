@@ -15,17 +15,17 @@ The notes a page’s `<Footnote>` markers registered, in registration order.
      * Heading text.
      * @defaultValue `'Notes'`
      */
-    title?: string;
+    title?: string | undefined;
     /**
      * Render the heading. Off when the page supplies its own.
      * @defaultValue `true`
      */
-    showTitle?: boolean;
+    showTitle?: boolean | undefined;
     /**
      * Heading level, for a page whose outline this list sits deeper in.
      * @defaultValue `2`
      */
-    headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
+    headingLevel?: 1 | 2 | 3 | 4 | 5 | 6 | undefined;
   }
 
   let { title = 'Notes', showTitle = true, headingLevel = 2 }: Props = $props();

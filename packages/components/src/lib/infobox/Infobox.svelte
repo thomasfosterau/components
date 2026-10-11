@@ -49,7 +49,7 @@ The summary rail beside an entity page’s prose: an optional header and image a
      * Accessible name for the region when there is no `title`.
      * @defaultValue `'Key facts'`
      */
-    label?: string;
+    label?: string | undefined;
     /** Renders an `InfoboxImage` above the body. */
     image?: InfoboxImageSpec | undefined;
     /** Rendered through the primitives below, inside one `InfoboxSection`. */

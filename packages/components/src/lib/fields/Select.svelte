@@ -26,7 +26,7 @@ A native `<select>` in daisyUI styling over a list of options, with an optional 
      * The selected option’s value; `''` selects the placeholder. Bindable.
      * @defaultValue `''`
      */
-    value?: string;
+    value?: string | undefined;
     /** Disabled first option, shown while nothing is selected. */
     placeholder?: string | undefined;
     /**

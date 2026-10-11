@@ -60,9 +60,9 @@ Draws one area, path or point of a plan, with grips or indicators when selected.
     /** The shape to draw, in canvas coordinates. */
     shape: MapShape;
     /** Draw the selection highlight and vertex markers. */
-    selected?: boolean;
+    selected?: boolean | undefined;
     /** Whether this shape's vertices can be dragged; grips instead of indicators. */
-    editable?: boolean;
+    editable?: boolean | undefined;
   }
 
   let { shape, selected = false, editable = false }: Props = $props();

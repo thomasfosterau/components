@@ -53,7 +53,7 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
      * Between the title and `siteName`.
      * @defaultValue `' | '`
      */
-    titleSeparator?: string;
+    titleSeparator?: string | undefined;
     /** Meta and Open Graph description. */
     description?: string | null | undefined;
     /** Meta keywords. */
@@ -114,7 +114,7 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
      * The Twitter / X card type.
      * @defaultValue `'summary_large_image'`
      */
-    twitterCard?: TwitterCard;
+    twitterCard?: TwitterCard | undefined;
     /** The site’s Twitter / X handle. */
     twitterSite?: string | undefined;
     /** The author’s Twitter / X handle. */

@@ -55,21 +55,21 @@ A `Tip` anchored beside the trigger it is about, which renders inside it.
      * Shared with the page’s other tips so Escape closes only the top one.
      * @defaultValue `soloTipStack` (shares Escape with no other tip)
      */
-    stack?: TipStack;
+    stack?: TipStack | undefined;
     /**
      * Which side of the trigger the bubble sits on.
      * @defaultValue `'top'`
      */
-    placement?: TipPlacement;
+    placement?: TipPlacement | undefined;
     /** The trigger — a button, a field, whatever the tip is about. */
     children: Snippet<[]>;
     /**
      * Accessible name of the tip's dismiss button.
      * @defaultValue `'Dismiss'`
      */
-    dismissLabel?: string;
+    dismissLabel?: string | undefined;
     /** Extra classes, merged last. */
-    class?: string;
+    class?: string | undefined;
   }
 
   let {

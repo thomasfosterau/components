@@ -29,8 +29,8 @@ A responsive `<img>` from a URL or an uploaded image id, optionally wrapped in `
 
   interface ImageSource {
     srcset: string;
-    type?: string;
-    media?: string;
+    type?: string | undefined;
+    media?: string | undefined;
   }
 
   const DEFAULT_WIDTHS = [320, 640, 960, 1280, 1920] as const;
@@ -46,12 +46,12 @@ A responsive `<img>` from a URL or an uploaded image id, optionally wrapped in `
      * Route prefix the bucketed rendition lives under.
      * @defaultValue `'/images'`
      */
-    base?: string;
+    base?: string | undefined;
     /**
      * The width buckets the transform route serves. Must match its own list.
      * @defaultValue `[320, 640, 960, 1280, 1920]`
      */
-    widths?: readonly number[];
+    widths?: readonly number[] | undefined;
     /** Extra `<source>` elements (art direction / format negotiation) ahead of the `<img>` fallback. Wraps everything in `<picture>`. */
     sources?: readonly ImageSource[] | undefined;
     /** Intrinsic width; reserves the box against layout shift. */
@@ -62,9 +62,9 @@ A responsive `<img>` from a URL or an uploaded image id, optionally wrapped in `
      * The `sizes` hint.
      * @defaultValue `'100vw'`
      */
-    sizes?: string;
+    sizes?: string | undefined;
     /** Eager-load this image. Use for the one image above the fold; everything else stays lazy. */
-    eager?: boolean;
+    eager?: boolean | undefined;
   }
 
   let {

@@ -32,7 +32,7 @@ export interface MapCamera {
   /** 0…22; fractional levels are rounded to two places by the static API. */
   readonly zoom: number;
   /** Degrees clockwise from north. */
-  readonly bearing?: number;
+  readonly bearing?: number | undefined;
   /** Degrees of tilt, 0…60. */
-  readonly pitch?: number;
+  readonly pitch?: number | undefined;
 }

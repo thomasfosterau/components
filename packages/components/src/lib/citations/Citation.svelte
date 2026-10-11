@@ -28,17 +28,17 @@ An inline reference marker that registers its source with the surrounding biblio
      * `superscript` renders `[1]` raised; `inline` renders `(1)` on the line.
      * @defaultValue `'superscript'`
      */
-    format?: 'inline' | 'superscript';
+    format?: 'inline' | 'superscript' | undefined;
     /**
      * Link to the `<ReferenceList>` entry. Off when there is no list on the page.
      * @defaultValue `true`
      */
-    linkToReference?: boolean;
+    linkToReference?: boolean | undefined;
     /**
      * The marker's accessible name — a bare "1" announces nothing on its own.
      * @defaultValue `"Reference <n>: <title>"`
      */
-    referenceLabel?: (n: number, title: string) => string;
+    referenceLabel?: ((n: number, title: string) => string) | undefined;
   }
 
   let {

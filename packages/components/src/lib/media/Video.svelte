@@ -38,7 +38,7 @@ An HLS video player (Cloudflare Stream shape) with a placeholder while the uploa
      * Where the upload is in its lifecycle.
      * @defaultValue `'ready'`
      */
-    uploadState?: 'pending' | 'processing' | 'ready' | 'failed';
+    uploadState?: 'pending' | 'processing' | 'ready' | 'failed' | undefined;
     /** Copy for the non-playable placeholder state, supplied by the app (this package holds no messages). */
     statusLabel?: string | undefined;
     /** Called with the mounted `<video>` element once it is playable, for a caller attaching an MSE shim. */
