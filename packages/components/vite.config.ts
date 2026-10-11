@@ -73,12 +73,12 @@ export default defineConfig({
       // tsconfig extends the `$app/tsconfig` that its own `sync` writes (#55).
       storybook: {
         command: 'storybook dev -p 6006 --no-open',
-        dependsOn: ['sync', 'build', '@thomasfosterau/components-maps#sync'],
+        dependsOn: ['sync', 'build', '@thomasfosterau/components-mapbox#sync'],
         cache: false,
       },
       'storybook:build': {
         command: 'storybook build',
-        dependsOn: ['sync', 'build', '@thomasfosterau/components-maps#sync'],
+        dependsOn: ['sync', 'build', '@thomasfosterau/components-mapbox#sync'],
         cache: {
           output: ['storybook-static/**'],
         },

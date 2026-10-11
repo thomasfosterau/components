@@ -54,7 +54,7 @@
  * could not take and the page decides; the same goes for a position carrying an
  * altitude, which the editor has no third axis for.
  *
- * @module @thomasfosterau/components-maps/geojson
+ * @module @thomasfosterau/components-mapbox/geojson
  */
 
 import { generateId, type Point } from '@thomasfosterau/components/canvas';

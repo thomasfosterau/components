@@ -32,7 +32,7 @@ catalog:
   # to peer resolution, because a consumer should not have to know bits-ui's
   # peer list to use a Dialog.
   '@internationalized/date': ^3.8.1
-  # The REQUIRED peer of `@thomasfosterau/components-maps` — and the reason
+  # The REQUIRED peer of `@thomasfosterau/components-mapbox` — and the reason
   # that package exists at all, adjacent to `packages/components` rather than
   # inside it: a component whose behaviour needs a specific third-party engine
   # lives in its own package, so the core library stays free of it. Installed

@@ -15,7 +15,7 @@
  * `EntityForm` (`@thomasfosterau/components/entity-form`, which needs the
  * optional peer `@thomasfosterau/effect-forms-svelte`); none is re-exported
  * here. The maps family lives one package over, in
- * `@thomasfosterau/components-maps`: its behaviour needs a specific
+ * `@thomasfosterau/components-mapbox`: its behaviour needs a specific
  * third-party engine (`mapbox-gl`), and a component that needs one lives in
  * its own package so this one stays free of it.
  *

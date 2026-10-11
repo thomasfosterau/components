@@ -1,7 +1,7 @@
 /**
  * The shapes the map components share.
  *
- * @module @thomasfosterau/components-maps/types
+ * @module @thomasfosterau/components-mapbox/types
  */
 
 /** A WGS 84 position. */

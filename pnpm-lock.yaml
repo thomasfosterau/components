@@ -90,9 +90,9 @@ importers:
       '@thomasfosterau/components':
         specifier: workspace:*
         version: link:packages/components
-      '@thomasfosterau/components-maps':
+      '@thomasfosterau/components-mapbox':
         specifier: workspace:*
-        version: link:packages/maps
+        version: link:packages/mapbox
     devDependencies:
       '@changesets/cli':
         specifier: 'catalog:'
@@ -183,7 +183,7 @@ importers:
         specifier: 'catalog:'
         version: 3.1.0(svelte@5.57.2)(vitest@5.0.3)
 
-  packages/maps:
+  packages/mapbox:
     dependencies:
       '@thomasfosterau/components':
         specifier: workspace:*

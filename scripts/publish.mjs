@@ -48,7 +48,7 @@ const packages = readdirSync(packagesDir, { withFileTypes: true })
   .filter(({ manifest }) => !manifest.private);
 
 // Dependencies first, so a consumer never resolves a sibling version that is
-// not on the registry yet (`@thomasfosterau/components-maps` depends on
+// not on the registry yet (`@thomasfosterau/components-mapbox` depends on
 // `@thomasfosterau/components`).
 const names = new Set(packages.map(({ manifest }) => manifest.name));
 /** @param {Manifest} manifest */

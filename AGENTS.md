@@ -5,7 +5,7 @@
 | Package | Directory | Boundary |
 | --- | --- | --- |
 | `@thomasfosterau/components` | `packages/components` | The core library. Peers: `svelte`; optional `@thomasfosterau/effect-forms-svelte`, reached only from `/entity-form`. Rules in [its CLAUDE.md](packages/components/CLAUDE.md). |
-| `@thomasfosterau/components-maps` | `packages/maps` | Maps and the plan editor. Required peer `mapbox-gl`; consumes the core through its published `/canvas` entry. Rules in [its CLAUDE.md](packages/maps/CLAUDE.md). |
+| `@thomasfosterau/components-mapbox` | `packages/maps` | Maps and the plan editor. Required peer `mapbox-gl`; consumes the core through its published `/canvas` entry. Rules in [its CLAUDE.md](packages/maps/CLAUDE.md). |
 
 ## Common pitfalls
 
@@ -57,7 +57,7 @@
 - **Every component ships with a story and a browser test.** One `*.stories.svelte` / `*.stories.ts` per component under `src/stories/<family>/` and one `tests/<family>/<Component>.test.ts`, both mirroring `src/lib/<family>/` (in `packages/maps`, which is one family, the `<family>/` level is dropped) — not beside the component, because `svelte-package` copies every `src/lib/` file into `dist/` and stories must not ship. Snippet-taking components use Svelte CSF (`defineMeta` + `<Story>`), prop-only ones plain CSF.
 - **Families, entry points, and when a family becomes a package.** Core families (`ui`, `feedback`, `layout`, `fields`, `forms`, `data`, `infobox`, `formatting`, `links`, `media`, `hotkeys`, `search`) are re-exported from `@thomasfosterau/components`' root barrel; `citations`, `canvas`, `charts`, `tips` and `seo` are separate `exports` entries (`@thomasfosterau/components/<family>`), as is `entity-form` (the `forms` family's `EntityForm`, kept out of the barrel because of its optional peer) so a consumer that never uses them never loads them. A new family gets a barrel, an `exports` entry if heavy, and a README section.
 
-  **A component whose behaviour needs a specific third-party dependency lives in its own package adjacent to `packages/components`, so the core stays free of it** — the dependency becomes that package's required peer, and installing the package is the decision to take it on. `maps` is the worked example: `@thomasfosterau/components-maps`, `mapbox-gl` required. An "optional peer" of the core library is the shape this rule replaces; nothing in this workspace could check it. `canvas`, `charts`, `citations` and `tips` need no such dependency and stay where they are.
+  **A component whose behaviour needs a specific third-party dependency lives in its own package adjacent to `packages/components`, so the core stays free of it** — the dependency becomes that package's required peer, and installing the package is the decision to take it on. `maps` is the worked example: `@thomasfosterau/components-mapbox`, `mapbox-gl` required. An "optional peer" of the core library is the shape this rule replaces; nothing in this workspace could check it. `canvas`, `charts`, `citations` and `tips` need no such dependency and stay where they are.
 
 - **Prefer vertical slices per component** over horizontal sweeps: component → barrel export → story → test → README row, finished, before starting the next.
 

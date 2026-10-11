@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@thomasfosterau/components": "workspace:*",
-    "@thomasfosterau/components-maps": "workspace:*"
+    "@thomasfosterau/components-mapbox": "workspace:*"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",

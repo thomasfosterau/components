@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.schemastore.org/package",
-  "name": "@thomasfosterau/components-maps",
-  "version": "0.1.0",
+  "name": "@thomasfosterau/components-mapbox",
+  "version": "0.0.0",
   "description": "Mapbox GL maps and a plan editor for @thomasfosterau/components — a static raster, the interactive surface, and the GeoJSON seam",
   "keywords": [
     "accessibility",
