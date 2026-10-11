@@ -6,19 +6,14 @@ The summary rail beside an entity page’s prose: an optional header and image a
   header, an optional image, and a body of labelled facts.
 
   Two ways to fill it, both live at once. The composable path — `children`
-  taking `InfoboxSection`/`InfoboxRow` (or anything else) — is gardeneria's:
+  taking `InfoboxSection`/`InfoboxRow` (or anything else):
   a page builds bespoke markup, one piece of markup per concern, and a fix
-  to row layout lands once because there is only one row layout. The `rows`
-  convenience is website's and preferenceflow's: ~30 call sites across both
-  apps build a `$derived<InfoboxRow[]>` straight off sparse entity
-  attributes and hand it a typed array, trusting the primitive to drop what
-  nobody recorded. `rows` renders through the SAME `InfoboxSection`/
+  to row layout lands once because there is only one row layout. `rows` renders through the SAME `InfoboxSection`/
   `InfoboxRow`/`InfoboxImage` primitives `children` would use — never a
   second copy of the markup — so both paths stay in lock step. Both are
   accepted together: `rows` first, then `children` below them.
 
-  `float`: gardeneria floats the box to the right of the article's prose;
-  website and preferenceflow instead give it its own grid column in the
+  `float`: floats the box to the right of the article's prose; instead give it its own grid column in the
   page layout and never float it. Off by default, since a grid-column aside
   is the more common shape here, and opt-in per page with `float`.
 
@@ -54,7 +49,7 @@ The summary rail beside an entity page’s prose: an optional header and image a
     image?: InfoboxImageSpec | undefined;
     /** Rendered through the primitives below, inside one `InfoboxSection`. */
     rows?: readonly Row[] | undefined;
-    /** gardeneria's float-right rail; off renders in normal flow (a grid column). */
+    /** float-right rail; off renders in normal flow (a grid column). */
     float?: boolean | undefined;
     /** Extra composed markup — `InfoboxSection`/`InfoboxRow`, or anything else. Rendered after `rows`. */
     children?: Snippet<[]> | undefined;

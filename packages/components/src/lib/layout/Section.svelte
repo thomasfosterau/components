@@ -5,8 +5,7 @@ A titled block of a page: a heading, an optional count, optional actions, and ei
   Section — a titled block of a page: a heading, an optional count beside it,
   optional actions opposite, and either the rows or an honest empty state.
 
-  Every detail page is a stack of these ("Editions of this book", "The taxa
-  recorded with this organ"), and website and gardeneria had one each —
+  Every detail page is a stack of these —
   `InboundSection` and `DetailSection` — that differed only in which optional
   parts they carried. The eight lines were copied per section in the apps,
   and eight copies is eight places to forget the empty state, which renders as

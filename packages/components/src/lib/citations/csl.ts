@@ -4,8 +4,7 @@
  * `ReportCitation`, `Publisher`) take.
  *
  * Defined HERE, locally, because the bibliographic model they will align with
- * — `@thomasfosterau/biblio`, website's `packages/biblio` moving to
- * `reference-manager` — is not published yet. When it is, these types are
+ * — `@thomasfosterau/biblio`. When it is, these types are
  * expected to become structural subsets of its records (or re-exports of
  * them), so an app maps once, at the seam, from its resource to these shapes.
  * Until then they are deliberately plain: every contributor arm is already
@@ -31,12 +30,12 @@ export interface PublisherRecord {
   readonly itemtype?: 'Person' | 'Organization' | undefined;
   /** Rendered as a PostalAddress before the name ("Oxford, UK: …"); only present parts. */
   readonly address?:
-    | {
-        readonly locality?: string | undefined;
-        readonly region?: string | undefined;
-        readonly country?: string | undefined;
-      }
-    | undefined;
+  | {
+    readonly locality?: string | undefined;
+    readonly region?: string | undefined;
+    readonly country?: string | undefined;
+  }
+  | undefined;
 }
 
 /** The credited contributors a record carries, in credit order. Order is meaning; the renderers never re-sort. */
@@ -78,8 +77,8 @@ export interface ScholarlyArticleRecord {
   /** Usually the issue's publication year. */
   readonly datePublished?: CitationDate | undefined;
   readonly periodical?:
-    | { readonly title?: string | undefined; readonly issn?: string | undefined }
-    | undefined;
+  | { readonly title?: string | undefined; readonly issn?: string | undefined }
+  | undefined;
   readonly volumeNumber?: string | number | undefined;
   readonly issueNumber?: string | number | undefined;
   readonly pageStart?: string | number | undefined;

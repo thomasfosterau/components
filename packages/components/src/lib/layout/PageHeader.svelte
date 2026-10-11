@@ -5,13 +5,6 @@ The block at the top of a page: its heading, supporting facts and actions.
   PageHeader — the block at the top of a page: what the page is about, and
   what you can do to it.
 
-  One component replacing three near-identical ones (preferenceflow's
-  `PageHeader`, website's and gardeneria's `PageHeading`). The three differed
-  only in which optional regions they had: website had `top`/`bottom`/
-  `actions`, gardeneria added a round `icon` frame, preferenceflow added a
-  typed `subtitle`. All of them are optional here, so the union costs a call
-  site nothing it does not use.
-
   `title` takes a string OR a snippet because a page title is sometimes
   marked up — a species name in italics, a title with a `<Badge>` after it —
   and an app should not have to choose between the component and its own

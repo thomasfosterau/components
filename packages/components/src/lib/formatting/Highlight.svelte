@@ -7,8 +7,7 @@ Best-effort client-side highlighting of query tokens in a search result.
   Splits `query` on whitespace, escapes regex metacharacters, and wraps
   case-insensitive matches in `<mark>`. Intentionally naive: no stemming, no
   FTS-aware tokenisation, no diacritic folding — the authoritative match is
-  whatever server-side search produced (#243 on Website, where this component
-  originated); this is a UX nicety, and its highlights should not be read as
+  whatever server-side search produced; this is a UX nicety, and its highlights should not be read as
   "this is exactly what full-text search matched".
 -->
 <script lang="ts" module>

@@ -2,7 +2,7 @@
 '@thomasfosterau/components': minor
 ---
 
-The generic components that still lived in the apps (website, gardeneria, preferenceflow). Each ships with a story and a browser test.
+The generic components that still lived in the apps. Each ships with a story and a browser test.
 
 - **Added `@thomasfosterau/components/seo`**, a new entry point with:
   - `Head`: title with site-name suffix, canonical on the production origin through `canonicalHref` (defaults to the context `href`), `hreflang` alternates, feed link, Open Graph and Twitter / X tags, share image, `article:*` and `prev` / `next`.

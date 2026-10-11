@@ -24,13 +24,13 @@
 <Story name="Brand, links and account">
   <Navbar>
     {#snippet start()}
-      <a href="/" rel="home" class="text-primary text-xl font-bold">Gardeneria</a>
+      <a href="/" rel="home" class="text-primary text-xl font-bold">Blog</a>
     {/snippet}
     {#snippet center()}
       <Menu label="Sections" class="menu-horizontal">
-        <MenuItem href="/gardens">Gardens</MenuItem>
-        <MenuItem href="/taxa">Taxa</MenuItem>
         <MenuItem href="/posts">Posts</MenuItem>
+        <MenuItem href="/tags">Tags</MenuItem>
+        <MenuItem href="/authors">Authors</MenuItem>
       </Menu>
     {/snippet}
     {#snippet end()}
@@ -55,13 +55,13 @@
 <Story name="With the responsive panel">
   <Navbar menuLabel="Open the site menu">
     {#snippet start()}
-      <a href="/" rel="home" class="text-primary text-xl font-bold">Gardeneria</a>
+      <a href="/" rel="home" class="text-primary text-xl font-bold">Blog</a>
     {/snippet}
     {#snippet menu()}
       <Menu label="Sections">
-        <MenuItem href="/gardens">Gardens</MenuItem>
-        <MenuItem href="/taxa">Taxa</MenuItem>
         <MenuItem href="/posts">Posts</MenuItem>
+        <MenuItem href="/tags">Tags</MenuItem>
+        <MenuItem href="/authors">Authors</MenuItem>
       </Menu>
     {/snippet}
   </Navbar>

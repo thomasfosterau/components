@@ -2,7 +2,7 @@
 '@thomasfosterau/components': minor
 ---
 
-First full release of the shared component library (the maps components ship as `@thomasfosterau/components-maps`), rebuilt on Tailwind CSS 4 + daisyUI 5 + bits-ui 2, consolidated out of the owner's four apps (website, gardeneria, preferenceflow, in-the-dark).
+First full release of the shared component library (the maps components ship as `@thomasfosterau/components-maps`), rebuilt on Tailwind CSS 4 + daisyUI 5 + bits-ui 2.
 
 The package has never been published, so this is the shape the first real release takes rather than a migration. A minor bump because the package is pre-1.0 (`0.1.0` → `0.2.0`).
 

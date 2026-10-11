@@ -3,19 +3,16 @@ A thesis as "Author, <cite>Title</cite> (2019) PhD thesis, University of Sydney"
 -->
 <!--
   ThesisCitation — a thesis as "Author, <cite>Title</cite> (2019) PhD thesis,
-  University of Sydney", with Schema.org Thesis microdata. Website's
-  renderer emitted only the title; the author, year, degree and awarding
-  institution are the rest of what CSL's `thesis` type prints, each
-  independently optional.
+  University of Sydney", with Schema.org Thesis microdata.
 
   The record type is local — see `./csl.ts`. Every string is a prop with an
   English default.
 -->
 <script lang="ts">
-  import Year from '../formatting/Year.svelte';
-  import CreditList from './CreditList.svelte';
-  import Publisher from './Publisher.svelte';
-  import type { ThesisRecord } from './csl.ts';
+  import Year from "../formatting/Year.svelte";
+  import CreditList from "./CreditList.svelte";
+  import Publisher from "./Publisher.svelte";
+  import type { ThesisRecord } from "./csl.ts";
 
   interface Props {
     /** The thesis record; absent fields are left out of the rendering. */
@@ -44,9 +41,10 @@ A thesis as "Author, <cite>Title</cite> (2019) PhD thesis, University of Sydney"
 
   let {
     thesis,
-    untitledLabel = 'Untitled thesis',
-    degreeLabel = (degree) => (degree === undefined ? 'thesis' : `${degree} thesis`),
-    availableOnlineLabel = 'available online at',
+    untitledLabel = "Untitled thesis",
+    degreeLabel = (degree) =>
+      degree === undefined ? "thesis" : `${degree} thesis`,
+    availableOnlineLabel = "available online at",
     locales,
   }: Props = $props();
 
@@ -62,7 +60,8 @@ A thesis as "Author, <cite>Title</cite> (2019) PhD thesis, University of Sydney"
     (<Year value={thesis.datePublished} itemprop="datePublished" {locales} />)
   {/if}
   {#if thesis.degree !== undefined || thesis.institution !== undefined}
-    <span itemprop="inSupportOf">{degreeLabel(thesis.degree)}</span>{#if thesis.institution !== undefined},
+    <span itemprop="inSupportOf">{degreeLabel(thesis.degree)}</span
+    >{#if thesis.institution !== undefined},
       <Publisher publisher={thesis.institution} itemprop="sourceOrganization" />
     {/if}
   {/if}

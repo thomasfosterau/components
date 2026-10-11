@@ -23,8 +23,7 @@ The two-column detail-page shell: a header across the top, a body column and a s
 
   This renders no `<main>`. It is placed INSIDE `Main` by the page, because a
   page that is two columns of a wider shell must not open a second landmark.
-  `data-testid="detail-body"` / `"detail-infobox"` are carried over from
-  website's original so its route tests keep working after adoption.
+  `data-testid="detail-body"` / `"detail-infobox"` are carried over.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
