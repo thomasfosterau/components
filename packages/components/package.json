@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.schemastore.org/package",
   "name": "@thomasfosterau/components",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "private": false,
   "description": "Accessible Svelte 5 UI primitives — Tailwind CSS 4 and daisyUI 5 for styling, bits-ui for interaction, every string a prop",
   "keywords": [
