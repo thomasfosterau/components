@@ -80,12 +80,12 @@ export type GeoCoordinates =
  */
 export interface GeoGeometry {
   readonly type:
-  | 'Point'
-  | 'MultiPoint'
-  | 'LineString'
-  | 'MultiLineString'
-  | 'Polygon'
-  | 'MultiPolygon';
+    | 'Point'
+    | 'MultiPoint'
+    | 'LineString'
+    | 'MultiLineString'
+    | 'Polygon'
+    | 'MultiPolygon';
   readonly coordinates: GeoCoordinates;
 }
 
