@@ -7,7 +7,7 @@ A collection of Svelte 5 components built on Tailwind, DaisyUI and Bits UI, whic
 | Package | Description |
 | --- | --- |
 | [`@thomasfosterau/components`](./packages/components) | Accessible Svelte 5 UI primitives — Tailwind CSS 4 and daisyUI 5 for styling, bits-ui for interaction, every string a prop |
-| [`@thomasfosterau/components-maps`](./packages/maps) | Mapbox GL maps and a plan editor for `@thomasfosterau/components` — a static raster, the interactive surface, and the GeoJSON seam |
+| [`@thomasfosterau/components-mapbox`](./packages/maps) | Mapbox GL maps and a plan editor for `@thomasfosterau/components` — a static raster, the interactive surface, and the GeoJSON seam |
 
 This is a publishable-library workspace, not an application: the build artifacts are `packages/components/dist` and `packages/maps/dist`. The component reference — installation, app integration, and every family's props table — lives in [`packages/components/README.md`](./packages/components/README.md) and [`packages/maps/README.md`](./packages/maps/README.md). This file covers the workspace itself.
 
@@ -48,7 +48,7 @@ One-time owner setup:
 
 1. **The `release` environment.** _Settings → Environments → New environment_ `release`, with _Deployment branches and tags_ restricted to `trunk`. The workflow's job runs in it, and the trusted publishers below name it.
 2. **Let Actions open the version PR.** _Settings → Actions → General → Workflow permissions →_ **Allow GitHub Actions to create and approve pull requests**.
-3. **A trusted publisher per package** on npmjs.com — for both `@thomasfosterau/components` and `@thomasfosterau/components-maps`, _Settings → Trusted Publisher → GitHub Actions_: user `thomasfosterau`, repository `components`, workflow `release.yml`, environment `release`. npm only accepts a trusted publisher on a package that already exists, so if a package has never been published, bootstrap its first version once by hand (merge the version PR first so `trunk` carries the real version, then `vp run -r build` and `pnpm publish --access public` in that package's directory with a short-lived granular token), then add the trusted publisher. Remove any `NPM_TOKEN` repository secret once OIDC is in place.
+3. **A trusted publisher per package** on npmjs.com — for both `@thomasfosterau/components` and `@thomasfosterau/components-mapbox`, _Settings → Trusted Publisher → GitHub Actions_: user `thomasfosterau`, repository `components`, workflow `release.yml`, environment `release`. npm only accepts a trusted publisher on a package that already exists, so if a package has never been published, bootstrap its first version once by hand (merge the version PR first so `trunk` carries the real version, then `vp run -r build` and `pnpm publish --access public` in that package's directory with a short-lived granular token), then add the trusted publisher. Remove any `NPM_TOKEN` repository secret once OIDC is in place.
 
 ## License
 

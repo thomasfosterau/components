@@ -7,7 +7,7 @@
  * every request is a 401), and writing `max.longitude` twice where the fourth
  * term of a bounding box is `max.latitude`.
  *
- * @module @thomasfosterau/components-maps/static-url
+ * @module @thomasfosterau/components-mapbox/static-url
  */
 
 import type { BoundingBox, MapCamera, MapStyle } from './types.ts';

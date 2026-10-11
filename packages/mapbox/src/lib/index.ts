@@ -1,5 +1,5 @@
 /**
- * `@thomasfosterau/components-maps` — a static raster, the interactive Mapbox
+ * `@thomasfosterau/components-mapbox` — a static raster, the interactive Mapbox
  * GL surface, the one that upgrades from the first to the second, the plan
  * editor, and the seam between the editor's shapes and a stored GeoJSON
  * geometry.

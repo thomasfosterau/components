@@ -1,5 +1,5 @@
 /**
- * Vite config for `@thomasfosterau/components-maps`: the browser unit suite
+ * Vite config for `@thomasfosterau/components-mapbox`: the browser unit suite
  * (the Svelte compiler + a real Chromium under Vitest browser mode) and the
  * `svelte-package` build that produces `dist/`.
  *

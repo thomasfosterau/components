@@ -17,7 +17,7 @@
  * (a pointer gesture) never converts, and the conversion is in one place
  * rather than at every call site.
  *
- * @module @thomasfosterau/components-maps/shapes
+ * @module @thomasfosterau/components-mapbox/shapes
  */
 
 import {

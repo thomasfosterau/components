@@ -1,4 +1,4 @@
-# @thomasfosterau/components-maps
+# @thomasfosterau/components-mapbox
 
 The maps package: components that draw a map, plus the seam between a plan editor's shapes and a stored GeoJSON geometry. It exists because of AGENTS.md's third-party-dependency rule: `mapbox-gl` is its required peer. It is built exactly like the sibling (`svelte-kit sync`, then `svelte-package` copying `src/lib/` into `dist/`); repo-wide authoring rules are in the root [AGENTS.md](../../AGENTS.md), the sibling's package notes in [packages/components/CLAUDE.md](../components/CLAUDE.md).
 
@@ -11,7 +11,7 @@ The maps package: components that draw a map, plus the seam between a plan edito
 ## Invariants
 
 - **The engine is reached once, from one place.** `DynamicMap`'s mount effect is the only `import('mapbox-gl')` in the package, and the only side-effecting import (`mapbox-gl/dist/mapbox-gl.css`) sits with it.
-- **`src/lib/index.ts` is the single entry point** — `@thomasfosterau/components-maps` has no subpath exports.
+- **`src/lib/index.ts` is the single entry point** — `@thomasfosterau/components-mapbox` has no subpath exports.
 - **`tests/pointer.ts` is a copy of the sibling's `tests/canvas/pointer.ts`.** Test helpers are not published, so there is nothing to import it from; change both together.
 
 ## Testing

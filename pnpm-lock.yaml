@@ -90,7 +90,7 @@ importers:
       '@thomasfosterau/components':
         specifier: workspace:*
         version: link:packages/components
-      '@thomasfosterau/components-maps':
+      '@thomasfosterau/components-mapbox':
         specifier: workspace:*
         version: link:packages/maps
     devDependencies:

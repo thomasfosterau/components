@@ -1,6 +1,6 @@
 # @thomasfosterau/components
 
-Accessible Svelte 5 UI primitives, styled with [Tailwind CSS 4](https://tailwindcss.com) + [daisyUI 5](https://daisyui.com) and built on [bits-ui](https://bits-ui.com). The core families are in the root barrel and the heavier ones behind their own [entry points](#entry-points). The maps components live in the sibling package [`@thomasfosterau/components-maps`](../maps/README.md).
+Accessible Svelte 5 UI primitives, styled with [Tailwind CSS 4](https://tailwindcss.com) + [daisyUI 5](https://daisyui.com) and built on [bits-ui](https://bits-ui.com). The core families are in the root barrel and the heavier ones behind their own [entry points](#entry-points). The maps components live in the sibling package [`@thomasfosterau/components-mapbox`](../maps/README.md).
 
 Four rules hold across all of them:
 
@@ -811,7 +811,7 @@ Series colours come from four validated theme slots, `--color-chart-1…4`, assi
 
 ## maps — moved
 
-Maps live in their own package, [`@thomasfosterau/components-maps`](../maps/README.md) (`pnpm add @thomasfosterau/components-maps mapbox-gl`), because they need `mapbox-gl`; nothing in this package imports it, and `@thomasfosterau/components/maps` is no longer an entry point.
+Maps live in their own package, [`@thomasfosterau/components-mapbox`](../maps/README.md) (`pnpm add @thomasfosterau/components-mapbox mapbox-gl`), because they need `mapbox-gl`; nothing in this package imports it, and `@thomasfosterau/components/maps` is no longer an entry point.
 
 ## License
 

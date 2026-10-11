@@ -1,4 +1,4 @@
-# @thomasfosterau/components-maps
+# @thomasfosterau/components-mapbox
 
 Maps for [`@thomasfosterau/components`](../components/README.md): a static raster, the interactive [Mapbox GL](https://docs.mapbox.com/mapbox-gl-js/) surface, the one that upgrades from the first to the second, a plan editor, and the seam between the editor's shapes and a stored GeoJSON geometry.
 
@@ -7,7 +7,7 @@ It is a separate package so that an application that renders no map never instal
 ## Install
 
 ```sh
-pnpm add @thomasfosterau/components-maps @thomasfosterau/components mapbox-gl
+pnpm add @thomasfosterau/components-mapbox @thomasfosterau/components mapbox-gl
 ```
 
 ### Peer requirements
@@ -25,7 +25,7 @@ Add this package's `dist/` to Tailwind's sources alongside the core library's, o
 ```css
 @import 'tailwindcss';
 @source '../node_modules/@thomasfosterau/components/dist';
-@source '../node_modules/@thomasfosterau/components-maps/dist';
+@source '../node_modules/@thomasfosterau/components-mapbox/dist';
 @plugin "daisyui" {
   themes: false;
 }
@@ -36,7 +36,7 @@ Mapbox GL's own stylesheet is imported by `DynamicMap` for its side effect, insi
 
 ## Components
 
-Everything is exported from the package root: `import { Map, MapEditor, blankShape } from '@thomasfosterau/components-maps'`.
+Everything is exported from the package root: `import { Map, MapEditor, blankShape } from '@thomasfosterau/components-mapbox'`.
 
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
@@ -48,7 +48,7 @@ Everything is exported from the package root: `import { Map, MapEditor, blankSha
 
 ```svelte
 <script lang="ts">
-  import { Map, MapEditor, blankShape, type MapEdit } from '@thomasfosterau/components-maps';
+  import { Map, MapEditor, blankShape, type MapEdit } from '@thomasfosterau/components-mapbox';
 </script>
 
 <!-- Raster first, live map after hydration; interactive={false} pins the raster. -->

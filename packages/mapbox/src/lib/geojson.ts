@@ -54,7 +54,7 @@
  * could not take and the page decides; the same goes for a position carrying an
  * altitude, which the editor has no third axis for.
  *
- * @module @thomasfosterau/components-maps/geojson
+ * @module @thomasfosterau/components-mapbox/geojson
  */
 
 import { generateId, type Point } from '@thomasfosterau/components/canvas';
@@ -80,12 +80,12 @@ export type GeoCoordinates =
  */
 export interface GeoGeometry {
   readonly type:
-    | 'Point'
-    | 'MultiPoint'
-    | 'LineString'
-    | 'MultiLineString'
-    | 'Polygon'
-    | 'MultiPolygon';
+  | 'Point'
+  | 'MultiPoint'
+  | 'LineString'
+  | 'MultiLineString'
+  | 'Polygon'
+  | 'MultiPolygon';
   readonly coordinates: GeoCoordinates;
 }
 
