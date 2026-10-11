@@ -1,6 +1,8 @@
 # @thomasfosterau/components
 
-Accessible Svelte 5 UI primitives — [Tailwind CSS 4](https://tailwindcss.com) and [daisyUI 5](https://daisyui.com) for styling, [bits-ui](https://bits-ui.com) for interaction — in a [Vite+](https://viteplus.dev) workspace. Consolidated out of the owner's four Svelte 5 apps into two publishable packages.
+A collection of Svelte 5 components built on Tailwind, DaisyUI and Bits UI, which I use in my own apps (mostly private repos). Open sourced here to share them, get more GitHub Actions minutes, and keep them in sync across various projects.
+
+**Disclaimer:** These components (and therefore this repository) have been extracted from several private repositories using Claude Code. Most of the components I wrote myself, but aren't particularly original. Claude has generalised the API in many cases.
 
 | Package | Description |
 | --- | --- |
