@@ -3,11 +3,10 @@
  * at once.
  *
  * Composed primitives (`InfoboxHeader`, `InfoboxImage`, `InfoboxSection`,
- * `InfoboxRow`) let a page build bespoke markup, gardeneria's style. A
+ * `InfoboxRow`) let a page build bespoke markup. A
  * typed `rows` convenience on `Infobox` itself — the `InfoboxRowSpec` union
  * and `infoboxRowIsPresent` — lets a page instead hand over a
- * `$derived<InfoboxRowSpec[]>` built from sparse entity attributes,
- * website's and preferenceflow's style; `rows` renders through the very
+ * `$derived<InfoboxRowSpec[]>` built from sparse entity attributes; `rows` renders through the very
  * same primitives, so a fix to row layout lands in one place regardless of
  * which API a caller used to reach it.
  *

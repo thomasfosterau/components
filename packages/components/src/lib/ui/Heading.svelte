@@ -15,7 +15,7 @@ A heading at any level with a stable `id`, optionally with a copyable anchor lin
 
   The id is derived from `children` AT RENDER when `children` is a string —
   not measured from the mounted element in an `$effect`, which is how the
-  gardeneria original did it and which means the server renders a heading with
+  original did it and which means the server renders a heading with
   no id at all and every in-page link is dead until hydration. A snippet's
   text is not knowable before render, so a snippet heading that wants an
   anchor must be given an explicit `id`; without one the anchor is omitted

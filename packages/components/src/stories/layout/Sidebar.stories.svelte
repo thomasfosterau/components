@@ -23,21 +23,21 @@
   <div class="flex h-96">
     <Sidebar>
       {#snippet brand()}
-        <a href="/" rel="home" class="text-primary text-2xl font-bold">Gardeneria</a>
+        <a href="/" rel="home" class="text-primary text-2xl font-bold">Blog</a>
       {/snippet}
-      <MenuItem href="/gardens" current>
+      <MenuItem href="/posts" current>
         {#snippet icon()}<Sprout class="size-5" />{/snippet}
-        Gardens
+        Posts
       </MenuItem>
-      <MenuItem href="/organisms">
+      <MenuItem href="/tags">
         {#snippet icon()}<Leaf class="size-5" />{/snippet}
-        Organisms
+        Tags
       </MenuItem>
-      <MenuItem href="/taxa">Taxa</MenuItem>
+      <MenuItem href="/authors">Authors</MenuItem>
       <MenuItem href="/posts">Posts</MenuItem>
       {#snippet footer()}
-        <Menu label="Account">
-          <MenuItem href="/account">Ada Lovelace</MenuItem>
+        <Menu label="tags">
+          <MenuItem href="/tags">All Tags</MenuItem>
         </Menu>
       {/snippet}
     </Sidebar>

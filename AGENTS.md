@@ -1,6 +1,6 @@
 # AGENTS.md
 
-`CLAUDE.md` is a symlink to this file. This repo publishes two Svelte 5 component libraries consumed by the owner's apps (website, gardeneria, preferenceflow, in-the-dark); the artifacts that matter are `packages/components/dist` and `packages/maps/dist`, and everything below exists to keep them small, typed and accessible. The toolchain, workspace shape, catalog discipline and session hook are copied from the app repos so a component authored here compiles identically in the app that consumes it; the places the two deliberately differ are commented where they occur (the browser-mode test suite and its `playwright` provider, the absence of a stage/deploy graph).
+`CLAUDE.md` is a symlink to this file. This repo publishes two Svelte 5 component libraries; the artifacts that matter are `packages/components/dist` and `packages/maps/dist`, and everything below exists to keep them small, typed and accessible. The toolchain, workspace shape, catalog discipline and session hook are copied from the app repos so a component authored here compiles identically in the app that consumes it; the places the two deliberately differ are commented where they occur (the browser-mode test suite and its `playwright` provider, the absence of a stage/deploy graph).
 
 | Package | Directory | Boundary |
 | --- | --- | --- |

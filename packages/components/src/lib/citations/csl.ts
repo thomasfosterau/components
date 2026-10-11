@@ -4,8 +4,7 @@
  * `ReportCitation`, `Publisher`) take.
  *
  * Defined HERE, locally, because the bibliographic model they will align with
- * — `@thomasfosterau/biblio`, website's `packages/biblio` moving to
- * `reference-manager` — is not published yet. When it is, these types are
+ * — `@thomasfosterau/biblio`. When it is, these types are
  * expected to become structural subsets of its records (or re-exports of
  * them), so an app maps once, at the seam, from its resource to these shapes.
  * Until then they are deliberately plain: every contributor arm is already

@@ -3,15 +3,13 @@ A locale-joined byline for one credited role (authors, editors, translators), ea
 -->
 <!--
   CreditList — a locale-joined byline for one role: the authors, the editors,
-  the translators, or any other credited role a citation carries. Generalises
-  website's `Authors` / `Editors` / `Translators`, which were the same
+  the translators, or any other credited role a citation carries. Generalises `Authors` / `Editors` / `Translators`, which were the same
   component three times over (a `FormatList` of names, each wrapped in
   Schema.org microdata, plus one role's own punctuation) into one.
 
   Each credit renders as a `Person` or `Organization` microdata item when it
   carries an `itemtype` — a name with a known Agent behind it — and as plain
-  (`itemprop`-only) text otherwise, matching website's fallback for a credit
-  whose Agent did not resolve but whose name survived.
+  (`itemprop`-only) text otherwise.
 
   `roleLabel` / `roleLabelPosition` generalise the label each of the three
   source components hard-coded: `Editors` printed "(ed)"/"(eds)" AFTER the

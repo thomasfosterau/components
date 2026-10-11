@@ -15,10 +15,6 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   never imports this entry never installs the form library or `effect`. The
   renderer itself imports only the store (`createForm`) and types.
 
-  Ported from the three apps' renderers with preferenceflow's (the newest, and
-  already on this library's field API) as the reference, plus website's
-  `rows` bridge and `action` prop.
-
   **Seeding.** `definition`, `mode`, `initial` and `initialRows` configure the
   store ONCE, at mount: a form never changes entity or mode mid-flight, and an
   edit page's values must land in the SSR HTML. There is no `$effect`

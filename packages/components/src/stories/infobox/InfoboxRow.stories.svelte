@@ -1,16 +1,16 @@
 <script module lang="ts">
-  import { defineMeta } from '@storybook/addon-svelte-csf';
-  import InfoboxRow from '../../lib/infobox/InfoboxRow.svelte';
+  import { defineMeta } from "@storybook/addon-svelte-csf";
+  import InfoboxRow from "../../lib/infobox/InfoboxRow.svelte";
 
   const { Story } = defineMeta({
-    title: 'Infobox/InfoboxRow',
+    title: "Infobox/InfoboxRow",
     component: InfoboxRow,
-    tags: ['autodocs'],
+    tags: ["autodocs"],
     parameters: {
       docs: {
         description: {
           component:
-            'One label/value pair inside an `InfoboxSection`. Empty by default — set `showEmpty` for gardeneria’s older "say so" behaviour, an em dash captioned by `emptyLabel`.',
+            'One label/value pair inside an `InfoboxSection`. Empty by default — set `showEmpty` for "say so" behaviour, an em dash captioned by `emptyLabel`.',
         },
       },
     },

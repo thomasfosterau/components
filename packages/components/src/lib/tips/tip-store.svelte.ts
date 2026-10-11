@@ -2,11 +2,6 @@
  * The tip store: which tips exist, which have been seen, and whether one may
  * show right now.
  *
- * Ported from gardeneria's `tip-store.svelte.ts` with one change: the storage
- * key prefix (`'tips:'` by default there was `'gardeneria:tips:'`, baked in)
- * is now a `createTipStore` option, since this package has no app name to
- * bake in — a consumer that wants namespacing passes its own `prefix`.
- *
  * This is a plain object with `$state` inside it, so a tip re-renders when
  * its state changes rather than when a promise resolves. Rules are
  * synchronous for the same reason a network round-trip would show a tip a

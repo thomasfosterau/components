@@ -240,9 +240,9 @@ The landmarks a page is assembled from, and the blocks that sit inside them. Str
 <Tabs items={views} mode="links" label="Results views" />
 
 <Sidebar title="Browse">
-  {#snippet brand()}<a href="/" rel="home">Gardeneria</a>{/snippet}
-  <MenuItem href="/gardens">Gardens</MenuItem>
-  <MenuItem href="/taxa">Taxa</MenuItem>
+  {#snippet brand()}<a href="/" rel="home">Home</a>{/snippet}
+  <MenuItem href="/posts">Posts</MenuItem>
+  <MenuItem href="/tags">Tags</MenuItem>
 </Sidebar>
 ```
 
@@ -455,7 +455,7 @@ One family, two ways to fill it. Composed primitives (`InfoboxHeader`, `InfoboxI
 
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
-| `Infobox` | The summary rail frame | `title?`, `subtitle?`, `label='Key facts'`, `image?: InfoboxImageSpec`, `rows?: readonly InfoboxRowSpec[]`, `float?` (grid-column aside by default; off is gardeneria's float-right rail) + `HTMLAttributes<HTMLElement>` | `children?` (extra composed markup, rendered after `rows`) | `<aside aria-label={title ?? label}>` |
+| `Infobox` | The summary rail frame | `title?`, `subtitle?`, `label='Key facts'`, `image?: InfoboxImageSpec`, `rows?: readonly InfoboxRowSpec[]`, `float?` + `HTMLAttributes<HTMLElement>` | `children?` (extra composed markup, rendered after `rows`) | `<aside aria-label={title ?? label}>` |
 | `InfoboxHeader` | The title block | `title`, `subtitle?` + `HTMLAttributes<HTMLDivElement>` | — | `<h3>`, deliberately outside the document outline |
 | `InfoboxImage` | The identifying picture | `src`, `alt`, `caption?`, `width?`, `height?`, `eager?` | — | `<figure>`/`<img>`/`<figcaption>`; default lazy |
 | `InfoboxSection` | A titled group of rows | `title?` + `HTMLAttributes<HTMLDListElement>` | `children` (the rows) | owns the `<dl>` |
@@ -635,7 +635,7 @@ One component, because a palette is one thing: a dialog, a query box, and rows f
 | `ReportCitation` | "Authors, _Title_ editors translators (2021) Place: Publisher pp 88" | `report: ReportRecord`, `itemid?`, `untitledLabel? = 'Untitled report'`, `noDateLabel?`, `pageCountLabel?`, `availableOnlineLabel?`, `locales?` | — | Schema.org `Report` microdata |
 | `Publisher` | "Place: Name" — a publisher or awarding institution | `publisher: PublisherRecord` (`{ name, itemtype? = 'Organization', address?: { locality?, region?, country? } }`), `itemprop? = 'publisher'` | — | `Person` / `Organization` with a `PostalAddress` of the present parts |
 
-**The CSL-type records are local.** `BookRecord`, `ChapterRecord`, `ScholarlyArticleRecord`, `ThesisRecord`, `ReportRecord`, `PublisherRecord` and `CitationDate` are defined in this package for now, because the bibliographic model they will align with, `@thomasfosterau/biblio`, is not published yet. Contributors are resolved `Credit`s in credit order, not linkage. An app maps its resources onto these shapes at its own seam. The JSON:API `included` resolver (website's `citations/hydrate.ts`) belongs to effect-jsonapi's client helpers, not here.
+**The CSL-type records are local.** `BookRecord`, `ChapterRecord`, `ScholarlyArticleRecord`, `ThesisRecord`, `ReportRecord`, `PublisherRecord` and `CitationDate` are defined in this package for now, because the bibliographic model they will align with, `@thomasfosterau/biblio`, is not published yet. Contributors are resolved `Credit`s in credit order, not linkage. An app maps its resources onto these shapes at its own seam. The JSON:API `included` resolver belongs to effect-jsonapi's client helpers, not here.
 
 `formatCitation`, `BibliographyManager`, `setupBibliography`, `getBibliographyContext`, and the `CitationData`/`CitationKind`/`FootnoteData`/`Credit` types are also exported. (`Citation` and `Footnote` name the components; the data shapes are `CitationData`/`FootnoteData` to avoid a value/type collision.)
 

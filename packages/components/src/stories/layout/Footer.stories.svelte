@@ -36,7 +36,6 @@
   <Footer>
     {#snippet aside()}
       <p class="max-w-xs text-sm leading-6">
-        Gardeneria — a shared record of what grows where.<br />
         Occurrence data under CC BY 4.0.
       </p>
     {/snippet}

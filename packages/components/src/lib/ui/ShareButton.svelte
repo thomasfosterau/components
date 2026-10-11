@@ -13,7 +13,7 @@ Hands a title, a URL and some text to the platform share sheet.
   shift on every page that carries one.
 
   `canShare`, where the browser has it, is consulted with the SAME payload
-  that will be shared — the original in-the-dark implementation tested one
+  that will be shared — the original implementation tested one
   object and shared another. Where it is missing the only way to find out is
   to try, and the rejection path handles "no". A share sheet the reader
   dismisses also rejects; `onError` sees both, because the API does not

@@ -120,7 +120,7 @@ test('is unfloated by default', async () => {
   await expect.element(screen.getByTestId('infobox')).not.toHaveClass('float-right');
 });
 
-test('float adds gardeneria’s float-right rail classes', async () => {
+test('float adds float-right rail classes', async () => {
   const screen = await render(Infobox, { title: 'Bed 3', float: true });
   await expect.element(screen.getByTestId('infobox')).toHaveClass('float-right');
 });

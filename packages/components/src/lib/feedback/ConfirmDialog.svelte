@@ -12,9 +12,7 @@ A destructive action behind a modal confirmation, run either as a callback (`onC
 
   **Form mode** (`form`) is the progressive-enhancement one: the confirm
   button is a real `type="submit"` inside a real `<form method="POST">`, so
-  the action posts and the server redirects even with scripting off — the
-  reason gardeneria's delete section and website's report dialog are forms
-  rather than fetch calls. The SvelteKit `enhance` action is passed IN by the
+  the action posts and the server redirects even with scripting off. The SvelteKit `enhance` action is passed IN by the
   app (`enhance: (node) => enhance(node)`); importing `$app/forms` here would
   tie this package to SvelteKit. It is applied as an attachment, so a caller
   that omits it simply gets the unenhanced form.

@@ -11,9 +11,7 @@ The picture at the top of an `Infobox`, with its caption.
 
   `eager` (default off: an infobox usually sits beside the prose rather than
   above it, so its picture is rarely the first thing painted) sets
-  `loading="eager"` and `fetchpriority="high"` together — website's and
-  preferenceflow's LCP handling for the case where this IS the identifying,
-  above-the-fold picture.
+  `loading="eager"` and `fetchpriority="high"` together.
 -->
 <script lang="ts">
   import type { HTMLImgAttributes } from 'svelte/elements';

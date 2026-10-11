@@ -21,7 +21,7 @@
 </script>
 
 {#snippet brand()}
-  <a href="/" rel="home" data-testid="sidebar-brand">Gardeneria</a>
+  <a href="/" rel="home" data-testid="sidebar-brand">Blog</a>
 {/snippet}
 {#snippet footer()}
   <Menu label="Account">

@@ -47,5 +47,5 @@
   end={withRegions ? end : undefined}
   menu={withMenu ? menu : undefined}
 >
-  {#snippet start()}<a href="/" rel="home" data-testid="nav-start">Gardeneria</a>{/snippet}
+  {#snippet start()}<a href="/" rel="home" data-testid="nav-start">Blog</a>{/snippet}
 </Navbar>

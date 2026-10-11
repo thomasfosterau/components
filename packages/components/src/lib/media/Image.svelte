@@ -6,8 +6,7 @@ A responsive `<img>` from a URL or an uploaded image id, optionally wrapped in `
 
   Two ways to get a `srcset`: pass `src` directly for a plain image, or pass
   `id` (+ optionally `base`/`widths`) for a width-bucketed rendition served
-  by an image-transform route (`${base}/${id}?w=${w}`) — the pattern
-  gardeneria's `/images/<id>` binding uses. Requesting an arbitrary width
+  by an image-transform route (`${base}/${id}?w=${w}`). Requesting an arbitrary width
   would defeat that bucketing (every distinct width is a distinct transform
   and a distinct cache entry), so `widths` is a fixed list, not a free number.
 

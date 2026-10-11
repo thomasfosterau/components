@@ -8,7 +8,7 @@ One label/value pair inside an `InfoboxSection`.
   DOM at all, so a page can build a run of rows straight off sparse resource
   attributes without guarding each one — the same "has something to show"
   contract `infoboxRowIsPresent` gives the typed `rows` convenience on
-  `Infobox`. `showEmpty` opts back into gardeneria's older behaviour: an em
+  `Infobox`. `showEmpty` opts back: an em
   dash captioned by `emptyLabel`, which says "asked, and there is no answer"
   rather than "nobody asked" — for a section that always lists the same
   facts, where a gap is itself informative.

@@ -9,8 +9,7 @@ The app shell’s navigation column: a brand mark, the primary links and an acco
   inside a `Menu mode="nav"`, which already owns the whole navigation
   contract — the `<nav aria-label>` landmark, the `<ul class="menu">`, and
   `aria-current="page"` on the item the reader is on. This adds only what a
-  sidebar has and a menu does not: the column, and the two regions above and
-  below the links that gardeneria's `SidebarNav` kept there.
+  sidebar has and a menu does not.
 
   What it deliberately does NOT do is wrap the column in an `<aside>`, which
   is what that original did. `<aside>` is the `complementary` landmark — "content

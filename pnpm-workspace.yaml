@@ -18,8 +18,7 @@
 # regenerated pnpm-lock.yaml — a stale lockfile fails every CI job at once
 # with ERR_PNPM_LOCKFILE_CONFIG_MISMATCH.
 #
-# Versions are kept in lockstep with the owner's app repos (the Gardeneria /
-# Website foundation catalog) wherever the two overlap, so a component
+# Versions are kept in lockstep with the owner's app repos wherever the two overlap, so a component
 # authored here compiles identically in the app that consumes it. The three
 # entries that deliberately differ are commented below.
 packages:
@@ -46,7 +45,7 @@ catalog:
   # devDependency so that entry's browser suite and story run the real store.
   # Only that entry imports it: a consumer that never renders an
   # `EntityForm` never installs it. `effect` is ITS required peer, pinned to
-  # the app catalog's (preferenceflow's) exact release so the store here is
+  # the app catalog's exact release so the store here is
   # the one the apps run. Nothing else in this workspace touches Effect.
   '@thomasfosterau/effect-forms-svelte': ^0.2.0
   effect: 4.0.2
