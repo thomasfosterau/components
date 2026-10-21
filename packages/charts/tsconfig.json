@@ -1,0 +1,12 @@
+{
+  // The whole package: every entry, the tests and the schema script. The
+  // interpreters (`react`, `vue`, `prosemirror`) legitimately touch the DOM,
+  // so this config keeps the base's `dom` libs; `tsconfig.pure.json` re-checks
+  // `spec` and `core` without them.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "types": ["node"]
+  },
+  "include": ["src", "tests", "scripts", "vite.config.ts"]
+}

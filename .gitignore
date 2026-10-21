@@ -31,3 +31,7 @@ vite.config.*.timestamp*
 *.log
 npm-debug.log*
 pnpm-debug.log*
+
+# Swift Package Manager (packages/charts/swift/ChartSpecKit)
+.build/
+.swiftpm/

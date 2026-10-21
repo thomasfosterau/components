@@ -18,6 +18,7 @@
     "release": "vp run -r build && node scripts/publish.mjs"
   },
   "dependencies": {
+    "@thomasfosterau/charts": "workspace:*",
     "@thomasfosterau/components": "workspace:*",
     "@thomasfosterau/components-mapbox": "workspace:*"
   },

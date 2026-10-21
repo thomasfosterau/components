@@ -23,8 +23,8 @@ export default defineConfig({
   run: {
     tasks: {
       // The type-check gate, as one task: every package's `check` pipeline
-      // (`svelte-kit sync` + svelte-check). A pure graph node — the root
-      // depends on both packages purely so this edge reaches them.
+      // (`svelte-kit sync` + svelte-check; `tsc` in packages/charts). A pure graph node — the root
+      // depends on every package purely so this edge reaches them.
       check: {
         command: "echo 'check: all type gates green'",
         dependsOn: [{ from: 'dependencies', task: 'check' }],
@@ -44,6 +44,7 @@ export default defineConfig({
       '**/.svelte-kit/**',
       '**/storybook-static/**',
       '**/coverage/**',
+      'packages/charts/schema/**',
     ],
     options: {
       typeAware: false,
@@ -79,8 +80,16 @@ export default defineConfig({
   // because this is a Tailwind library: class order is a diff-noise source
   // otherwise, and a literal lookup table (see AGENTS.md) is exactly the shape
   // it can sort.
+  // `packages/charts/schema/` is generated: its formatting is owned by that
+  // package's `emit-schema` task, and a test compares it to the emitter's
+  // output, so the formatter must not touch it.
   fmt: {
-    ignorePatterns: ['**/dist/**', '**/.svelte-kit/**', '**/storybook-static/**'],
+    ignorePatterns: [
+      '**/dist/**',
+      '**/.svelte-kit/**',
+      '**/storybook-static/**',
+      'packages/charts/schema/**',
+    ],
     singleQuote: true,
     semi: true,
     sortTailwindcss: {},

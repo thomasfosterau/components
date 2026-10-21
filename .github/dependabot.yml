@@ -2,8 +2,9 @@
 # the groups this workspace needs.
 #
 # `groups` collect dependencies that MUST move together: Svelte and its kit /
-# plugin / checker; the vite-plus toolchain; and Storybook, whose addons are
-# versioned in lockstep with the core. A dependency joins only the FIRST group
+# plugin / checker; the vite-plus toolchain; Storybook, whose addons are
+# versioned in lockstep with the core; and, for packages/charts, React with
+# React DOM and Vega with Vega-Lite. A dependency joins only the FIRST group
 # it matches, and no other group's patterns match a member of another.
 #
 # `vite-plus-toolchain` is `vite-plus` plus the packages it pins exactly:
@@ -76,6 +77,18 @@ updates:
         patterns:
           - 'storybook'
           - '@storybook/*'
+      # packages/charts: `react-dom` peers its own `react` release exactly.
+      react:
+        patterns:
+          - 'react'
+          - 'react-dom'
+          - '@types/react'
+          - '@types/react-dom'
+      # packages/charts: the `/vega` suite compiles through both.
+      vega:
+        patterns:
+          - 'vega'
+          - 'vega-lite'
     ignore:
       - dependency-name: 'vite'
         update-types:
