@@ -78,7 +78,7 @@ catalog:
   # package at that exact version).
   # `@vitest/browser` itself arrives through vite-plus, so it is not
   # catalogued separately.
-  '@vitest/browser-playwright': 5.0.3
+  '@vitest/browser-playwright': 5.0.5
   # Headless Svelte 5 primitives. Every component whose behaviour is more
   # than "render these attributes" — menus, dialogs, comboboxes, tooltips —
   # is built on a bits-ui primitive rather than on hand-rolled keyboard and
@@ -117,7 +117,7 @@ catalog:
   typescript: 'npm:@typescript/typescript6@6.0.2'
   # vite-plus pins `oxlint`, `oxfmt`, `vitest` and the `@vitest/*` packages
   # to exact versions. `vitest` and `@vitest/browser-playwright` FOLLOW that
-  # pin (vite-plus 1.1.0 -> 5.0.3) rather than running ahead of it (#47).
+  # pin (vite-plus 1.3.0 -> 5.0.5) rather than running ahead of it (#47).
   # Dependabot's `vite-plus-toolchain` group (.github/dependabot.yml) bumps
   # `vite-plus`, `vitest` and `@vitest/*` together in one PR (#88). Before
   # merging that PR, push by hand: `vite` (ignored by Dependabot) to
@@ -126,9 +126,9 @@ catalog:
   # `dependencies` / `peerDependencies` name if the group took them past it.
   # A group PR that doesn't bump vite-plus itself is closed unmerged.
   # `vite` is the same release published under its aliased core package.
-  vite-plus: 1.1.0
-  vite: npm:@voidzero-dev/vite-plus-core@1.1.0
-  vitest: 5.0.3
+  vite-plus: 1.3.0
+  vite: npm:@voidzero-dev/vite-plus-core@1.3.0
+  vitest: 5.0.5
   # `render` + locators for Svelte components under Vitest browser mode. The
   # app repos use @testing-library/svelte under happy-dom instead; this repo
   # runs the real browser, and this is the renderer Vitest browser mode
