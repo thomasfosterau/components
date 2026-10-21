@@ -117,7 +117,7 @@ catalog:
   typescript: 'npm:@typescript/typescript6@6.0.2'
   # vite-plus pins `oxlint`, `oxfmt`, `vitest` and the `@vitest/*` packages
   # to exact versions. `vitest` and `@vitest/browser-playwright` FOLLOW that
-  # pin (vite-plus 1.1.0 -> 5.0.3) rather than running ahead of it (#47).
+  # pin (vite-plus 1.3.0 -> 5.0.5) rather than running ahead of it (#47).
   # Dependabot's `vite-plus-toolchain` group (.github/dependabot.yml) bumps
   # `vite-plus`, `vitest` and `@vitest/*` together in one PR (#88). Before
   # merging that PR, push by hand: `vite` (ignored by Dependabot) to
@@ -127,7 +127,7 @@ catalog:
   # A group PR that doesn't bump vite-plus itself is closed unmerged.
   # `vite` is the same release published under its aliased core package.
   vite-plus: 1.3.0
-  vite: npm:@voidzero-dev/vite-plus-core@1.1.0
+  vite: npm:@voidzero-dev/vite-plus-core@1.3.0
   vitest: 5.0.5
   # `render` + locators for Svelte components under Vitest browser mode. The
   # app repos use @testing-library/svelte under happy-dom instead; this repo
