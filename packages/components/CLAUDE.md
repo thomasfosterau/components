@@ -6,7 +6,7 @@ The core library: everything under `src/lib/` ends up in `dist/` and on npm. `sv
 
 - **`effect` and `@thomasfosterau/effect-forms-svelte` are reachable from one file.** `forms/EntityForm.svelte`, through the `./entity-form` entry (`forms/entity-form.ts`), which is not re-exported from `forms/index.ts` or the root barrel. The form library is an optional peer, so importing it anywhere else would make every consumer install it. `EntityForm` imports only `createForm` and types; everything it renders is this package's own field primitives.
 - **Nothing heavy on the always-loaded path.** The root barrel (`src/lib/index.ts`) is imported by every consumer on every page. A dependency it pulls in eagerly needs a better reason than convenience; a component that needs a specific third-party dependency belongs in its own package (AGENTS.md § Conventions, `packages/maps` is the example).
-- **The public surface is `exports`.** The root barrel `src/lib/index.ts` re-exports the core families; the other public entries are `src/lib/<family>/index.ts` (`citations`, `canvas`, `charts`, `tips`, `seo`), `forms/entity-form.ts` and `theme.css`, each listed in `package.json` `exports`. Anything reachable from an `exports` entry is a semver commitment and needs a changeset to change.
+- **The public surface is `exports`.** The root barrel `src/lib/index.ts` re-exports the core families; the other public entries are `src/lib/<family>/index.ts` (`citations`, `canvas`, `charts`, `tips`, `seo`, and `hotkeys`, which the barrel also re-exports so it can be imported lazily), `forms/entity-form.ts` and `theme.css`, each listed in `package.json` `exports`. Anything reachable from an `exports` entry is a semver commitment and needs a changeset to change.
 
 ## Invariants
 

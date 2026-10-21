@@ -167,3 +167,202 @@ test('emptying the field closes the panel and forgets the results', async () => 
 
   await expect.element(input).toHaveAttribute('aria-expanded', 'false');
 });
+
+test('onSelect receives the committed item, from a static list', async () => {
+  const onSelect = vi.fn();
+  const screen = await render(ComboboxFormFixture, { items: TAXA, onSelect });
+
+  await userEvent.fill(screen.getByRole('combobox', { name: 'Taxon' }), 'rugosa');
+  await userEvent.click(screen.getByRole('option', { name: /Rosa rugosa/ }));
+
+  expect(onSelect).toHaveBeenCalledTimes(1);
+  expect(onSelect).toHaveBeenCalledWith(TAXA[1]);
+});
+
+test('onSelect receives the committed item, from an asynchronous search', async () => {
+  const onSelect = vi.fn();
+  const screen = await render(ComboboxFormFixture, {
+    onSearch: slowSearch(0),
+    debounceMs: 10,
+    onSelect,
+  });
+
+  await userEvent.fill(screen.getByRole('combobox', { name: 'Taxon' }), 'rubus');
+  await userEvent.click(screen.getByRole('option', { name: /Rubus fruticosus/ }));
+
+  expect(onSelect).toHaveBeenCalledWith(TAXA[2]);
+});
+
+test('onQueryChange is called with the raw text on every keystroke', async () => {
+  const onQueryChange = vi.fn();
+  const screen = await render(ComboboxFormFixture, { items: TAXA, onQueryChange });
+
+  const input = screen.getByRole('combobox', { name: 'Taxon' });
+  await userEvent.click(input);
+  await userEvent.keyboard('ro');
+
+  expect(onQueryChange.mock.calls).toEqual([['r'], ['ro']]);
+});
+
+test('initialQuery seeds the input text', async () => {
+  const screen = await render(ComboboxFormFixture, { items: TAXA, initialQuery: 'rosa' });
+
+  await expect.element(screen.getByRole('combobox', { name: 'Taxon' })).toHaveValue('rosa');
+});
+
+test("a selected item's label wins over initialQuery", async () => {
+  const screen = await render(ComboboxFormFixture, {
+    items: TAXA,
+    value: 'rubus-fruticosus',
+    initialQuery: 'rosa',
+  });
+
+  await expect
+    .element(screen.getByRole('combobox', { name: 'Taxon' }))
+    .toHaveValue('Rubus fruticosus');
+});
+
+test('inputClass lands on the input, after the defaults', async () => {
+  const screen = await render(ComboboxFormFixture, { items: TAXA, inputClass: 'join-item h-9' });
+
+  const input = screen.getByRole('combobox', { name: 'Taxon' }).element();
+  expect([...input.classList]).toEqual(expect.arrayContaining(['input', 'join-item', 'h-9']));
+  expect(input.className.indexOf('join-item')).toBeGreaterThan(input.className.indexOf('input'));
+});
+
+test('hideLabel keeps the accessible name and hides the label visually', async () => {
+  const screen = await render(ComboboxFormFixture, { items: TAXA, hideLabel: true });
+
+  await expect.element(screen.getByRole('combobox', { name: 'Taxon' })).toBeInTheDocument();
+  expect(screen.container.querySelector('label')?.classList.contains('sr-only')).toBe(true);
+});
+
+test('native attributes such as data-testid reach the root', async () => {
+  const screen = await render(ComboboxFormFixture, { items: TAXA, testId: 'site-search' });
+
+  const root = screen.getByTestId('site-search');
+  await expect.element(root.getByRole('combobox', { name: 'Taxon' })).toBeInTheDocument();
+});
+
+test('the listbox is portalled out of the root by default', async () => {
+  const screen = await render(ComboboxFormFixture, { items: TAXA, testId: 'site-search' });
+
+  await userEvent.fill(screen.getByRole('combobox', { name: 'Taxon' }), 'rosa');
+  await expect.element(screen.getByRole('listbox')).toBeInTheDocument();
+  expect(screen.getByTestId('site-search').getByRole('option').elements()).toHaveLength(0);
+});
+
+test('portal={false} renders the listbox inside the root', async () => {
+  const screen = await render(ComboboxFormFixture, {
+    items: TAXA,
+    testId: 'site-search',
+    portal: false,
+  });
+
+  await userEvent.fill(screen.getByRole('combobox', { name: 'Taxon' }), 'rosa');
+  const root = screen.getByTestId('site-search');
+  await expect.element(root.getByRole('option', { name: /Rosa canina/ })).toBeInTheDocument();
+  expect(root.getByRole('option').elements()).toHaveLength(2);
+});
+
+test('by default the form posts the selected id, not the typed text', async () => {
+  const onSubmitted = vi.fn();
+  const screen = await render(ComboboxFormFixture, { items: TAXA, onSubmitted });
+
+  const input = screen.getByRole('combobox', { name: 'Taxon' });
+  expect(input.element().getAttribute('name')).toBeNull();
+  await userEvent.fill(input, 'rosa');
+  await userEvent.keyboard('{Enter}');
+  await userEvent.click(screen.getByRole('button', { name: 'Search' }));
+
+  expect(onSubmitted).toHaveBeenCalledTimes(1);
+  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
+  expect(data.getAll('taxonId')).toEqual(['rosa-canina']);
+});
+
+test('postedValue="query" puts the name on the visible input and drops the hidden id input', async () => {
+  const screen = await render(ComboboxFormFixture, {
+    items: TAXA,
+    name: 'query',
+    postedValue: 'query',
+    initialQuery: 'rosa',
+  });
+
+  // The server-rendered input itself is the posted control, which is what
+  // keeps a plain GET search form working with JavaScript off.
+  const input = screen.getByRole('combobox', { name: 'Taxon' }).element() as HTMLInputElement;
+  expect(input.name).toBe('query');
+  expect(input.value).toBe('rosa');
+  expect(screen.container.querySelectorAll('input[type="hidden"]')).toHaveLength(0);
+});
+
+test('postedValue="query": Enter submits the typed text even with an auto-highlighted match', async () => {
+  const onSubmitted = vi.fn();
+  const onSelect = vi.fn();
+  const screen = await render(ComboboxFormFixture, {
+    items: TAXA,
+    name: 'query',
+    postedValue: 'query',
+    onSubmitted,
+    onSelect,
+  });
+
+  const input = screen.getByRole('combobox', { name: 'Taxon' });
+  await userEvent.fill(input, 'rosa');
+  // bits-ui has put its cursor on the first match by itself …
+  const first = screen.getByRole('option', { name: /Rosa canina/ }).element();
+  await expect.element(input).toHaveAttribute('aria-activedescendant', first.id);
+
+  // … which in query mode is not a choice: Enter searches for the text.
+  await userEvent.keyboard('{Enter}');
+
+  expect(onSubmitted).toHaveBeenCalledTimes(1);
+  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
+  expect(data.getAll('query')).toEqual(['rosa']);
+  expect(onSelect).not.toHaveBeenCalled();
+  await expect.element(screen.getByTestId('selected')).toHaveTextContent('none');
+});
+
+test('postedValue="query": Enter after arrowing to an option commits it instead', async () => {
+  const onSubmitted = vi.fn();
+  const onSelect = vi.fn();
+  const screen = await render(ComboboxFormFixture, {
+    items: TAXA,
+    name: 'query',
+    postedValue: 'query',
+    onSubmitted,
+    onSelect,
+  });
+
+  const input = screen.getByRole('combobox', { name: 'Taxon' });
+  await userEvent.fill(input, 'rosa');
+  await expect.element(screen.getByRole('option', { name: /Rosa rugosa/ })).toBeInTheDocument();
+
+  await userEvent.keyboard('{ArrowDown}');
+  await userEvent.keyboard('{Enter}');
+
+  expect(onSubmitted).not.toHaveBeenCalled();
+  expect(onSelect).toHaveBeenCalledWith(TAXA[1]);
+  await expect.element(screen.getByTestId('selected')).toHaveTextContent('rosa-rugosa');
+});
+
+test('postedValue="query": typing again after arrowing forgets the navigation', async () => {
+  const onSubmitted = vi.fn();
+  const screen = await render(ComboboxFormFixture, {
+    items: TAXA,
+    name: 'query',
+    postedValue: 'query',
+    onSubmitted,
+  });
+
+  const input = screen.getByRole('combobox', { name: 'Taxon' });
+  await userEvent.fill(input, 'ro');
+  await expect.element(screen.getByRole('option', { name: /Rosa rugosa/ })).toBeInTheDocument();
+  await userEvent.keyboard('{ArrowDown}');
+  await userEvent.keyboard('sa');
+  await userEvent.keyboard('{Enter}');
+
+  expect(onSubmitted).toHaveBeenCalledTimes(1);
+  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
+  expect(data.getAll('query')).toEqual(['rosa']);
+});

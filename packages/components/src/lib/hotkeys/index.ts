@@ -12,6 +12,11 @@
  * registered, and the two components take their own chrome copy
  * (`title`, `closeLabel`, `commandLabel`, …) with English defaults.
  *
+ * The family is re-exported from the root barrel and is also its own entry,
+ * `@thomasfosterau/components/hotkeys`, so a consumer can
+ * `import('@thomasfosterau/components/hotkeys')` to load `HotkeyHelpDialog`
+ * lazily, on the first `?`, instead of in its entry chunk.
+ *
  * @module
  */
 
