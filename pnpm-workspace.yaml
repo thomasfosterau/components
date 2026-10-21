@@ -1,5 +1,5 @@
-# pnpm workspace — two publishable packages (`packages/components`,
-# `packages/maps`).
+# pnpm workspace — three publishable packages (`packages/components`,
+# `packages/mapbox`, `packages/charts`).
 #
 # The `catalog:` protocol pins versions that MUST be singletons across the
 # workspace. `svelte` especially: two copies break the compiler's runtime
@@ -54,6 +54,33 @@ catalog:
   # every one that needs an affordance icon reaches for this rather than
   # inlining an `<svg>`.
   '@lucide/svelte': ^1.59.0
+  # `@thomasfosterau/charts` (packages/charts) — the portable chart spec, its
+  # geometry core and its non-Svelte interpreters, merged in from the former
+  # `thomasfosterau/charts` repo. `d3-scale` / `d3-shape` are the core's
+  # runtime dependencies. The interpreter frameworks (`react`, `vue`,
+  # `prosemirror-*`) are optional peers of their own entries, installed here
+  # as devDependencies so each entry's suite runs the real library; their
+  # published ranges are under `catalogs.peers`. `vega` / `vega-lite` are
+  # dev-only: the `/vega` entry emits a plain Vega-Lite object and its suite
+  # validates that against the real compiler. `happy-dom` is that package's
+  # DOM for the client-side suites, which run under Node rather than browser
+  # mode (packages/charts/CLAUDE.md § Testing). The package's runtime `effect`
+  # is the `effect` entry above.
+  '@types/d3-scale': ^4.0.9
+  '@types/d3-shape': ^3.1.8
+  '@types/react': ^19.2.16
+  '@types/react-dom': ^19.2.3
+  d3-scale: ^4.0.2
+  d3-shape: ^3.2.0
+  happy-dom: ^20.9.0
+  prosemirror-model: ^1.25.7
+  prosemirror-state: ^1.4.4
+  prosemirror-view: ^1.41.8
+  react: ^19.3.1
+  react-dom: ^19.3.1
+  vega: ^6.2.0
+  vega-lite: ^6.4.3
+  vue: ^3.5.35
   # Storybook 10 over the SvelteKit framework preset — the Svelte 5 + Vite
   # pipeline a `svelte-package` library uses too — plus the Svelte CSF addon
   # so snippet-taking components can be storied in `.svelte`, and the a11y
@@ -145,9 +172,17 @@ catalog:
 # `@thomasfosterau/effect-forms-svelte@0.2.0`, the optional peer behind the
 # `/entity-form` entry (#85). Raising the floor is a published-behaviour change
 # and takes a changeset.
+#
+# The `@thomasfosterau/charts` interpreter peers are each optional (only the
+# entry that renders through that framework imports it) and keep the floors
+# the former `thomasfosterau/charts` repo declared.
 catalogs:
   peers:
     svelte: ^5.40.0
+    prosemirror-model: ^1.0.0
+    prosemirror-view: ^1.0.0
+    react: ^18.0.0 || ^19.0.0
+    vue: ^3.3.0
 
 overrides:
   # Singletons. See the `catalog:` note at the top: `svelte` and `vite` are

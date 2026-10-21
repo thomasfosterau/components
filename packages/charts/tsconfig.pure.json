@@ -1,0 +1,12 @@
+{
+  // Layers 1 and 2 must stay DOM-free and Node-free: the spec and the
+  // geometry core run anywhere an interpreter does. With no `dom` lib and no
+  // ambient `@types/*`, any `document`, `window` or `node:` reference in
+  // `src/spec` or `src/core` fails `check`.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["esnext"],
+    "types": []
+  },
+  "include": ["src/spec", "src/core"]
+}

@@ -1,0 +1,99 @@
+{
+  "$schema": "https://www.schemastore.org/package",
+  "name": "@thomasfosterau/charts",
+  "version": "0.0.0",
+  "description": "A portable, renderer-agnostic chart spec — its JSON Schema, a pure TypeScript geometry core, and React, Vue, ProseMirror and Vega-Lite interpreters",
+  "keywords": [
+    "charts",
+    "grammar-of-graphics",
+    "json-schema",
+    "prosemirror",
+    "react",
+    "vega-lite",
+    "visualization",
+    "vue"
+  ],
+  "license": "MIT",
+  "author": "Thomas Foster <me@thomasfoster.au>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thomasfosterau/components.git",
+    "directory": "packages/charts"
+  },
+  "files": [
+    "dist",
+    "schema"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./core": {
+      "types": "./dist/core.d.mts",
+      "default": "./dist/core.mjs"
+    },
+    "./prosemirror": {
+      "types": "./dist/prosemirror.d.mts",
+      "default": "./dist/prosemirror.mjs"
+    },
+    "./react": {
+      "types": "./dist/react.d.mts",
+      "default": "./dist/react.mjs"
+    },
+    "./vega": {
+      "types": "./dist/vega.d.mts",
+      "default": "./dist/vega.mjs"
+    },
+    "./vue": {
+      "types": "./dist/vue.d.mts",
+      "default": "./dist/vue.mjs"
+    },
+    "./schema.json": "./schema/chart-spec.v1.json"
+  },
+  "dependencies": {
+    "d3-scale": "catalog:",
+    "d3-shape": "catalog:",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@types/d3-scale": "catalog:",
+    "@types/d3-shape": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "happy-dom": "catalog:",
+    "prosemirror-model": "catalog:",
+    "prosemirror-state": "catalog:",
+    "prosemirror-view": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "typescript": "catalog:",
+    "vega": "catalog:",
+    "vega-lite": "catalog:",
+    "vue": "catalog:"
+  },
+  "peerDependencies": {
+    "prosemirror-model": "catalog:peers",
+    "prosemirror-view": "catalog:peers",
+    "react": "catalog:peers",
+    "vue": "catalog:peers"
+  },
+  "peerDependenciesMeta": {
+    "prosemirror-model": {
+      "optional": true
+    },
+    "prosemirror-view": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    }
+  }
+}

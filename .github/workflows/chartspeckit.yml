@@ -1,0 +1,47 @@
+name: ChartSpecKit
+
+# The Swift interpreter of the portable chart spec
+# (packages/charts/swift/ChartSpecKit). Its own workflow rather than a step in
+# ci.yml: it needs a macOS runner with a Swift toolchain, which the
+# single-job Node pipeline does not, and it only has to run when the Swift
+# sources or the JSON Schema they mirror change. Not a gate in AGENTS.md §
+# Verification: no session image carries a Swift toolchain.
+
+on:
+  push:
+    branches: [trunk]
+    paths:
+      - 'packages/charts/swift/**'
+      - 'packages/charts/schema/**'
+      - '.github/workflows/chartspeckit.yml'
+  pull_request:
+    paths:
+      - 'packages/charts/swift/**'
+      - 'packages/charts/schema/**'
+      - '.github/workflows/chartspeckit.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Nothing by default; each job grants exactly what it uses.
+permissions: {}
+
+jobs:
+  swift:
+    name: Swift package (ChartSpecKit)
+    runs-on: macos-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Swift version
+        run: swift --version
+
+      - name: Run tests
+        working-directory: packages/charts/swift/ChartSpecKit
+        run: swift test

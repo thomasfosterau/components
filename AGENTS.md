@@ -1,11 +1,12 @@
 # AGENTS.md
 
-`CLAUDE.md` is a symlink to this file. This repo publishes two Svelte 5 component libraries; the artifacts that matter are `packages/components/dist` and `packages/maps/dist`, and everything below exists to keep them small, typed and accessible. The toolchain, workspace shape, catalog discipline and session hook are copied from the app repos so a component authored here compiles identically in the app that consumes it; the places the two deliberately differ are commented where they occur (the browser-mode test suite and its `playwright` provider, the absence of a stage/deploy graph).
+`CLAUDE.md` is a symlink to this file. This repo publishes two Svelte 5 component libraries and one framework-agnostic chart package; the artifacts that matter are `packages/components/dist`, `packages/maps/dist` and `packages/charts/dist`, and everything below exists to keep them small, typed and accessible. The toolchain, workspace shape, catalog discipline and session hook are copied from the app repos so a component authored here compiles identically in the app that consumes it; the places the two deliberately differ are commented where they occur (the browser-mode test suite and its `playwright` provider, the absence of a stage/deploy graph).
 
 | Package | Directory | Boundary |
 | --- | --- | --- |
 | `@thomasfosterau/components` | `packages/components` | The core library. Peers: `svelte`; optional `@thomasfosterau/effect-forms-svelte`, reached only from `/entity-form`. Rules in [its CLAUDE.md](packages/components/CLAUDE.md). |
 | `@thomasfosterau/components-mapbox` | `packages/maps` | Maps and the plan editor. Required peer `mapbox-gl`; consumes the core through its published `/canvas` entry. Rules in [its CLAUDE.md](packages/maps/CLAUDE.md). |
+| `@thomasfosterau/charts` | `packages/charts` | The portable chart spec, its JSON Schema and geometry core, and the React / Vue / ProseMirror / Vega-Lite interpreters (merged in from the former `thomasfosterau/charts` repo). No Svelte: built with `vp pack`, tested under Node, framework peers optional per entry; `effect` is a runtime dependency of its spec entry. Independent of the other two. Rules in [its CLAUDE.md](packages/charts/CLAUDE.md). |
 
 ## Common pitfalls
 
@@ -15,6 +16,8 @@
 - **Accessibility regresses silently.** Type errors don't catch a lost accessible name, a broken focus order or a dropped `aria-*` relationship. That is the whole reason the suite drives a real browser.
 
 ## Conventions
+
+These are the Svelte packages' conventions; `packages/charts` contains no Svelte and follows only the language-level ones (catalog, `T | undefined` optionals, `sideEffects`) — its CLAUDE.md says which.
 
 - **Svelte 5 runes and snippets only.** `$props`, `$state`, `$derived`, `$effect`, `{#snippet}` / `{@render}`. No `export let`, no slots, no stores in component code, no legacy event directives.
 - **Every component spreads the native attributes of the element it renders and merges `class`.**
@@ -67,8 +70,8 @@ Invoke everything through `vp` — `vp run <script>`, `vp exec <bin>` (instead o
 
 - `pnpm install` — dependencies, plus the Vite+ git hooks (pre-commit runs `vp staged`: format + lint on staged files). There is no pre-push hook.
 - `vp check` — format + lint (Oxfmt + Oxlint). `vp run check` — the type gate: every package's `check` (`svelte-kit sync` + `svelte-check`). They are different commands.
-- `vp run -r test:unit` — both packages' suites, in headless Chromium under Vitest browser mode.
-- `vp run -r build` — `svelte-package` → `packages/components/dist` and `packages/maps/dist`.
+- `vp run -r test:unit` — every package's suite: the Svelte packages in headless Chromium under Vitest browser mode, `packages/charts` under Node.
+- `vp run -r build` — `svelte-package` → `packages/components/dist` and `packages/maps/dist`; `vp pack` → `packages/charts/dist`.
 - `vp run --filter ./packages/components storybook:build` — the static Storybook build. `storybook` is the dev server on port 6006 (a long-running process; one Storybook for the workspace, see [packages/components/CLAUDE.md](packages/components/CLAUDE.md#storybook)).
 - `pnpm changeset` — add a changeset.
 
@@ -82,7 +85,7 @@ Before you report work as done, run the gates below in order — the same steps 
 4. `vp run -r build`
 5. `vp run --filter ./packages/components storybook:build`
 
-None needs a credential. `test:unit` and `storybook:build` need the exact Chromium revision the pinned `playwright` expects (see that entry's comment in `pnpm-workspace.yaml`). CI installs its own; a session image's pre-installed browser is not kept in step with the pin. If the suite reports a missing executable, run `pnpm exec playwright install chromium` once and re-run the gate; if that can't run, report the browser gates as not run rather than as passing. A human confirms rendering in Storybook (the `storybook` dev server); in a session, `storybook:build` is the check.
+None needs a credential. `test:unit` and `storybook:build` need the exact Chromium revision the pinned `playwright` expects (see that entry's comment in `pnpm-workspace.yaml`). CI installs its own; a session image's pre-installed browser is not kept in step with the pin. If the suite reports a missing executable, run `pnpm exec playwright install chromium` once and re-run the gate; if that can't run, report the browser gates as not run rather than as passing. A human confirms rendering in Storybook (the `storybook` dev server); in a session, `storybook:build` is the check. `packages/charts/swift/ChartSpecKit` is outside these gates: [`.github/workflows/chartspeckit.yml`](.github/workflows/chartspeckit.yml) runs `swift test` on macOS when it or the schema changes, and no session has a Swift toolchain.
 
 ## Branches and pull requests
 
@@ -99,7 +102,7 @@ Issues in `thomasfosterau/components` are the backlog: when you find work you ca
 
 ## Effect
 
-Only `forms/EntityForm.svelte` and `forms/entity-form.ts` touch Effect (see [packages/components/CLAUDE.md](packages/components/CLAUDE.md#boundary)). The version is the `effect` pin in `pnpm-workspace.yaml`. effect-solutions is not provisioned in this repo; before writing Effect code there, read `node_modules/effect/dist/*.d.ts` and `@thomasfosterau/effect-forms-svelte`'s README rather than guessing at an API.
+In the Svelte packages, only `forms/EntityForm.svelte` and `forms/entity-form.ts` touch Effect (see [packages/components/CLAUDE.md](packages/components/CLAUDE.md#boundary)). `packages/charts` uses Effect Schema inside `src/spec` only, never in a published type ([its CLAUDE.md](packages/charts/CLAUDE.md#boundary)). The version is the `effect` pin in `pnpm-workspace.yaml`. effect-solutions is not provisioned in this repo; before writing Effect code there, read `node_modules/effect/dist/*.d.ts` and `@thomasfosterau/effect-forms-svelte`'s README rather than guessing at an API.
 
 ## Agent sessions
 
