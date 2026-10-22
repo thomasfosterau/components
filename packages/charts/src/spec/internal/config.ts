@@ -1,4 +1,4 @@
-import { Schema } from 'effect';
+import * as Schema from 'effect/Schema';
 
 /** Portable presentation hints honoured (or gracefully ignored) by every interpreter. */
 export const Config = Schema.Struct({
@@ -14,3 +14,6 @@ export const Config = Schema.Struct({
   identifier: 'Config',
   description: 'Portable presentation hints.',
 });
+
+/** The decoded type of {@link Config}; the public mirror is `Config` in `../types.ts`. */
+export type Config = typeof Config.Type;

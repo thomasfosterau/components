@@ -1,4 +1,4 @@
-import { Schema } from 'effect';
+import * as Schema from 'effect/Schema';
 
 /**
  * The declared type of an encoded field (the Vega-Lite model).
@@ -41,3 +41,12 @@ export const Encoding = Schema.Struct({
   identifier: 'Encoding',
   description: 'Field-to-channel mappings describing how data maps to visual channels.',
 });
+
+/** The decoded type of {@link FieldType}; the public mirror is `FieldType` in `../types.ts`. */
+export type FieldType = typeof FieldType.Type;
+
+/** The decoded type of {@link Channel}; the public mirror is `Channel` in `../types.ts`. */
+export type Channel = typeof Channel.Type;
+
+/** The decoded type of {@link Encoding}; the public mirror is `Encoding` in `../types.ts`. */
+export type Encoding = typeof Encoding.Type;

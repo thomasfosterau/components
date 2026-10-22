@@ -1,4 +1,5 @@
-import { Schema } from 'effect';
+import * as Result from 'effect/Result';
+import * as Schema from 'effect/Schema';
 import { ChartSpec as ChartSpecSchema } from './internal/spec.ts';
 import type { ChartSpec } from './types.ts';
 
@@ -17,7 +18,7 @@ import type { ChartSpec } from './types.ts';
  */
 const parseOptions = { onExcessProperty: 'error', errors: 'all' } as const;
 
-const decode = Schema.decodeUnknownSync(ChartSpecSchema, parseOptions);
+const decode = Schema.decodeUnknownResult(ChartSpecSchema, parseOptions);
 const encode = Schema.encodeUnknownSync(ChartSpecSchema, parseOptions);
 
 /** Thrown when a value is not a valid portable chart spec. */
@@ -40,14 +41,7 @@ export type ValidationResult =
  * @throws {SpecValidationError} when the value is not a valid spec.
  */
 export function parseSpec(input: unknown): ChartSpec {
-  try {
-    return decode(input) as ChartSpec;
-  } catch (error) {
-    if (Schema.isSchemaError(error)) {
-      throw new SpecValidationError(error.message);
-    }
-    throw error;
-  }
+  return Result.getOrThrowWith(decode(input), (error) => new SpecValidationError(error.message));
 }
 
 /**
@@ -55,14 +49,10 @@ export function parseSpec(input: unknown): ChartSpec {
  * returning a result instead of throwing.
  */
 export function validateSpec(input: unknown): ValidationResult {
-  try {
-    return { ok: true, value: decode(input) as ChartSpec };
-  } catch (error) {
-    if (Schema.isSchemaError(error)) {
-      return { ok: false, errors: [error.message] };
-    }
-    throw error;
-  }
+  return Result.match(decode(input), {
+    onSuccess: (value): ValidationResult => ({ ok: true, value }),
+    onFailure: (error): ValidationResult => ({ ok: false, errors: [error.message] }),
+  });
 }
 
 /**

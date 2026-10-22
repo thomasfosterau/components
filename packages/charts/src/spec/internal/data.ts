@@ -1,4 +1,4 @@
-import { Schema } from 'effect';
+import * as Schema from 'effect/Schema';
 
 /**
  * A single value inside a datum: a flat JSON primitive.
@@ -60,3 +60,21 @@ export const Data = Schema.Union([InlineData, DataRef], { mode: 'oneOf' }).annot
   identifier: 'Data',
   description: 'The chart data: exactly one of inline values or an external reference.',
 });
+
+/** The decoded type of {@link DatumValue}; the public mirror is `DatumValue` in `../types.ts`. */
+export type DatumValue = typeof DatumValue.Type;
+
+/** The decoded type of {@link Datum}; the public mirror is `Datum` in `../types.ts`. */
+export type Datum = typeof Datum.Type;
+
+/** The decoded type of {@link InlineData}; the public mirror is `InlineData` in `../types.ts`. */
+export type InlineData = typeof InlineData.Type;
+
+/** The decoded type of {@link DataRefKind}; the public mirror is `DataRefKind` in `../types.ts`. */
+export type DataRefKind = typeof DataRefKind.Type;
+
+/** The decoded type of {@link DataRef}; the public mirror is `DataRef` in `../types.ts`. */
+export type DataRef = typeof DataRef.Type;
+
+/** The decoded type of {@link Data}; the public mirror is `Data` in `../types.ts`. */
+export type Data = typeof Data.Type;

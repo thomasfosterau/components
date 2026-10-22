@@ -1,4 +1,4 @@
-import { Schema } from 'effect';
+import * as Schema from 'effect/Schema';
 import { ChartSpec } from './spec.ts';
 
 /**
@@ -11,7 +11,7 @@ import { ChartSpec } from './spec.ts';
  * the artifact closes every object (`additionalProperties: false`) exactly
  * where parsing rejects unknown keys; Effect's default leaves them open.
  */
-export function buildJsonSchema(): Record<string, unknown> {
+export function buildJsonSchema() {
   const document = Schema.toJsonSchemaDocument(ChartSpec, { onExcessProperty: 'error' });
   return {
     $schema: 'https://json-schema.org/draft/2020-12/schema',

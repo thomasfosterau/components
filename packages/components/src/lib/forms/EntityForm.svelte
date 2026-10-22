@@ -41,8 +41,10 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   import {
     createForm,
     type EntityFormDefinition,
-    type EntityFormEntry,
     type FieldHandle,
+    type ScalarEntry,
+    type SelectEntry,
+    type WidgetEntry,
   } from '@thomasfosterau/effect-forms-svelte';
   import type { HTMLFormAttributes } from 'svelte/elements';
   import DateInput from '../fields/DateInput.svelte';
@@ -54,6 +56,8 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   import FormErrors from './FormErrors.svelte';
 
   type Store = ReturnType<typeof createForm>;
+  /** The props a widget entry receives: its definition's `props()` shape, owned by the form library. */
+  type WidgetProps = ReturnType<WidgetEntry['props']>;
 
   interface Props extends Omit<HTMLFormAttributes, 'action' | 'method' | 'children'> {
     /** The form definition from `defineEntityForm`. */
@@ -78,12 +82,12 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
      * Render-time extra props per widget key (a picker's load-resolved `options`).
      * @defaultValue `{}`
      */
-    fieldProps?: Readonly<Record<string, Readonly<Record<string, unknown>>>> | undefined;
+    fieldProps?: Readonly<Record<string, Readonly<WidgetProps>>> | undefined;
     /**
      * The spreadable `<form>` attributes for this store.
      * @defaultValue the store's own `form.props`
      */
-    enhance?: ((form: Store) => Record<string | symbol, unknown>) | undefined;
+    enhance?: ((form: Store) => Store['props']) | undefined;
     /**
      * Text of the cancel link.
      * @defaultValue `'Cancel'`
@@ -132,10 +136,11 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     configured.mode === 'create'
       ? configured.definition.createDefaults
       : configured.definition.updateDefaults;
-  const defaults: Record<string, string> = { ...baseDefaults, ...configured.initial };
-  if (configured.mode === 'create' && configured.definition.clientId) {
-    defaults['id'] = crypto.randomUUID();
-  }
+  const mintedId =
+    configured.mode === 'create' && configured.definition.clientId
+      ? { id: crypto.randomUUID() }
+      : undefined;
+  const defaults = { ...baseDefaults, ...configured.initial, ...mintedId };
 
   const form = createForm({
     schema:
@@ -146,18 +151,15 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   });
   const entries = configured.definition.entriesFor(configured.mode);
 
-  // `defineEntityForm` validated every entry key against the derived
-  // all-string input schema, which the path-typed accessor cannot see.
-  const handle = (key: string): FieldHandle<string | undefined> =>
-    form.field(key as never) as unknown as FieldHandle<string | undefined>;
+  // SAFETY: `defineEntityForm` validated every entry key against the derived
+  // all-string input schema. The definition types that schema `Schema.Top`,
+  // whose path-typed accessor admits no key (`never`), so the key is asserted
+  // into it and the handle typed by this function's own return type.
+  const handle = (key: string): FieldHandle<string | undefined> => form.field(key as never);
   const getField = (key: string): string => handle(key).value ?? '';
   const setField = (key: string, next: string): void => {
     handle(key).value = next;
   };
-
-  type WidgetEntry = Extract<EntityFormEntry, { _tag: 'widget' }>;
-  type SelectEntry = Extract<EntityFormEntry, { _tag: 'select' }>;
-  type ScalarEntry = Extract<EntityFormEntry, { _tag: 'scalar' }>;
 
   let rows: Record<string, unknown[]> = $state(
     Object.fromEntries(
@@ -167,7 +169,7 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     ),
   );
 
-  const bridge = (entry: WidgetEntry): Record<string, unknown> =>
+  const bridge = (entry: WidgetEntry): WidgetProps =>
     entry.bridge === 'rows'
       ? {
           name: entry.key,
@@ -203,7 +205,8 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
       (entry) => entry._tag === 'widget' && entry.options.gate === true && getField(entry.key) === '',
     ),
   );
-  const rootErrors = $derived((form.errors as { readonly _errors?: readonly string[] })._errors ?? []);
+  // The empty path is the form's own (non-field) messages.
+  const rootErrors = $derived(form.errorsAt([]));
   const fieldId = (key: string): string => `entity-form-${key}`;
 </script>
 

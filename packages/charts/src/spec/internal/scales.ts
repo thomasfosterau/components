@@ -1,4 +1,4 @@
-import { Schema } from 'effect';
+import * as Schema from 'effect/Schema';
 
 /** A domain entry: a number (quantitative), ISO string (temporal), or category value. */
 const DomainValue = Schema.Union([Schema.Finite, Schema.String]).annotate({
@@ -34,3 +34,9 @@ export const Scales = Schema.Struct({
   identifier: 'Scales',
   description: 'Per-channel scale hints.',
 });
+
+/** The decoded type of {@link ScaleHint}; the public mirror is `ScaleHint` in `../types.ts`. */
+export type ScaleHint = typeof ScaleHint.Type;
+
+/** The decoded type of {@link Scales}; the public mirror is `Scales` in `../types.ts`. */
+export type Scales = typeof Scales.Type;
