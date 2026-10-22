@@ -33,10 +33,12 @@ import {
 } from '@thomasfosterau/components/canvas';
 
 /**
- * A bed (`polygon`, a closed outline), a path or hedge (`line`, an open one)
- * or a planting (`marker`, a disc). All three sit at `position` in canvas
- * coordinates; a polygon's and a line's `points` are relative to that, so
- * moving the shape does not rewrite its outline.
+ * One shape of a plan: an area (`polygon`, a closed outline), a path (`line`,
+ * an open one) or a point (`marker`, a disc).
+ *
+ * All three sit at `position` in canvas coordinates; a polygon's and a line's
+ * `points` are relative to that, so moving the shape does not rewrite its
+ * outline.
  *
  * `line` is what separates the two outline kinds: the vertices are handled
  * identically and only {@link shapePath} differs, by closing one and not the

@@ -4,7 +4,7 @@ The maps package: components that draw a map, plus the seam between a plan edito
 
 ## Boundary
 
-- **`@thomasfosterau/components` only, and only through its published entry points.** `MapEditor`, `MapShapeView`, `shapes.ts` and `geojson.ts` reach the canvas toolkit as `@thomasfosterau/components/canvas` — never a relative path into the sibling's `src/`. It is a `workspace:*` dependency resolved through its `exports`, which point at its built `dist/`, exactly as a consumer resolves it.
+- **`@thomasfosterau/components` only, and only through its published entry points.** `MapEditor`, `MapShapeView`, `shapes.ts` and `geojson.ts` reach the canvas toolkit as `@thomasfosterau/components/canvas` — never a relative path into the sibling's `src/`. It is a `workspace:*` dependency resolved through its `exports`, which point at its built `dist/`, exactly as a consumer resolves it. `fallow-rules.json` bans its other subpaths and the root `vite.config.ts`'s `no-restricted-imports` bans the bare root import.
 - **That is why `check` and `test:unit` depend on `{ task: 'build', from: 'dependencies' }`** (see [vite.config.ts](vite.config.ts)). Neither the type-check nor the browser suite can resolve the sibling until its `svelte-package` build has run.
 - **No Mapbox token.** `MapEditor` does not read one, which keeps it working on a build with no Mapbox credential at all.
 
@@ -12,7 +12,7 @@ The maps package: components that draw a map, plus the seam between a plan edito
 
 - **The engine is reached once, from one place.** `DynamicMap`'s mount effect is the only `import('mapbox-gl')` in the package, and the only side-effecting import (`mapbox-gl/dist/mapbox-gl.css`) sits with it.
 - **`src/lib/index.ts` is the single entry point** — `@thomasfosterau/components-mapbox` has no subpath exports.
-- **`tests/pointer.ts` is a copy of the sibling's `tests/canvas/pointer.ts`.** Test helpers are not published, so there is nothing to import it from; change both together.
+- **`tests/pointer.ts` is a copy of the sibling's `tests/canvas/pointer.ts`.** Test helpers are not published, so there is nothing to import it from; change both together. `.fallowrc.json` exempts this copy from duplication, and the sibling marks the helpers only this package's suites use.
 
 ## Testing
 

@@ -67,7 +67,6 @@
     "@types/react-dom": "catalog:",
     "happy-dom": "catalog:",
     "prosemirror-model": "catalog:",
-    "prosemirror-state": "catalog:",
     "prosemirror-view": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

@@ -7,7 +7,7 @@
  *   portable chart spec in node attrs (pure JSON, so document round-trips
  *   carry the spec for free)
  * - {@link ChartNodeView} / {@link chartNodeViewFactory} — imperative DOM
- *   NodeView that computes geometry via chart-core and draws SVG
+ *   NodeView that computes geometry via the `/core` entry and draws SVG
  * - {@link renderContextToSvg} — pure ChartContext → SVG string rendering
  */
 

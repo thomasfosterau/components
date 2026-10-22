@@ -1,4 +1,4 @@
-import { Schema } from 'effect';
+import * as Schema from 'effect/Schema';
 import { Config } from './config.ts';
 import { Data } from './data.ts';
 import { Encoding } from './encoding.ts';
@@ -6,8 +6,13 @@ import { Extensions } from './extensions.ts';
 import { Mark } from './mark.ts';
 import { Scales } from './scales.ts';
 
+// The `typeof X.Type` aliases below deliberately share their names with the
+// public mirror types in `../types.ts`: `tests/spec/type-parity.test.ts`
+// asserts each pair equal. Neither barrel re-exports this module.
+// fallow-ignore-file duplicate-export
+
 /** The spec version literal accepted by v1 interpreters. */
-export const SpecVersion = Schema.Literal('1').annotate({
+const SpecVersion = Schema.Literal('1').annotate({
   identifier: 'SpecVersion',
   description: 'The portable chart spec version this document conforms to.',
 });
@@ -33,3 +38,9 @@ export const ChartSpec = Schema.Struct({
     'A renderer-agnostic, framework-agnostic, language-neutral chart description. ' +
     'Grammar-of-graphics level: mark + encodings + declared data types + data reference.',
 });
+
+/** The decoded type of {@link SpecVersion}; the public mirror is `SpecVersion` in `../types.ts`. */
+export type SpecVersion = typeof SpecVersion.Type;
+
+/** The decoded type of {@link ChartSpec}; the public mirror is `ChartSpec` in `../types.ts`. */
+export type ChartSpec = typeof ChartSpec.Type;

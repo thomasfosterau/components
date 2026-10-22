@@ -6,7 +6,17 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "types": ["node"]
+    "types": ["node"],
+    // The Effect Language Service, run by the Effect-patched native `tsc`
+    // (the root `prepare`: `effect-tsgo patch --typescript`). Only `src/spec`
+    // imports Effect, so its diagnostics land there. Warnings stay visible in
+    // the editor and in the `check` output but do not fail the exit code.
+    "plugins": [
+      {
+        "name": "@effect/language-service",
+        "ignoreEffectWarningsInTscExitCode": true
+      }
+    ]
   },
   "include": ["src", "tests", "scripts", "vite.config.ts"]
 }

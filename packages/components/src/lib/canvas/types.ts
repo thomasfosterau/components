@@ -11,7 +11,7 @@
  * @module @thomasfosterau/components/canvas/types
  */
 
-/** Stable identity for an element. */
+/** Stable identity for a canvas element. */
 export type ElementId = string;
 
 /** A point in canvas coordinates — the document's own space, not the screen's. */

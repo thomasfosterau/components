@@ -1,6 +1,6 @@
 import { CATEGORICAL_PALETTE, type ChartContext, type Tick } from '../core/index.ts';
 
-/** Options for SVG rendering. */
+/** Options for {@link renderContextToSvg}. */
 export interface RenderSvgOptions {
   /** Chart title rendered above the plot. */
   readonly title?: string | undefined;

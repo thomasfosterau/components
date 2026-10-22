@@ -1,0 +1,108 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  // Every published entry (each package.json `exports` target, by source
+  // path), plus everything a tool loads by convention: stories (Storybook),
+  // tests and their setup files (Vitest), the Storybook config, the charts
+  // scripts (`build` / `emit-schema`), the release script and the
+  // Vite / Svelte configs.
+  "entry": [
+    "packages/components/src/lib/index.ts",
+    "packages/components/src/lib/citations/index.ts",
+    "packages/components/src/lib/canvas/index.ts",
+    "packages/components/src/lib/charts/index.ts",
+    "packages/components/src/lib/tips/index.ts",
+    "packages/components/src/lib/hotkeys/index.ts",
+    "packages/components/src/lib/seo/index.ts",
+    "packages/components/src/lib/forms/entity-form.ts",
+    "packages/mapbox/src/lib/index.ts",
+    "packages/charts/src/spec/index.ts",
+    "packages/charts/src/core/index.ts",
+    "packages/charts/src/prosemirror/index.ts",
+    "packages/charts/src/react/index.ts",
+    "packages/charts/src/vega/index.ts",
+    "packages/charts/src/vue/index.ts",
+    "packages/*/src/stories/**/*.stories.{ts,svelte}",
+    "packages/*/tests/**/*.test.{ts,tsx}",
+    "packages/*/tests/setup.ts",
+    "packages/components/.storybook/*.ts",
+    "packages/charts/scripts/*.ts",
+    "scripts/publish.mjs",
+    "**/vite.config.ts",
+    "**/svelte.config.js"
+  ],
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/.svelte-kit/**",
+    "**/storybook-static/**",
+    "**/coverage/**",
+    "packages/charts/swift/**"
+  ],
+  "ignoreDependencies": [
+    // The root's `workspace:*` dependencies on the three packages exist for
+    // the task graph, not for an import: they are the edges the root `check`
+    // task's `{ from: 'dependencies' }` follows into every package.
+    "@thomasfosterau/charts",
+    "@thomasfosterau/components",
+    "@thomasfosterau/components-mapbox",
+    // Used for their bins only: `tsc` (packages/charts `check`, TS7) and
+    // `svelte-package` (the Svelte packages' `build`).
+    "@typescript/native",
+    "@sveltejs/package"
+  ],
+  "rulePacks": ["fallow-rules.json"],
+  "rules": {
+    "unused-files": "error",
+    "unused-exports": "error",
+    "unused-types": "error",
+    "unused-dependencies": "error",
+    "unused-dev-dependencies": "warn",
+    "unused-enum-members": "error",
+    "unused-class-members": "warn",
+    "unresolved-imports": "error",
+    "unlisted-dependencies": "error",
+    "duplicate-exports": "error",
+    "circular-dependencies": "error",
+    "boundary-violation": "error",
+    "policy-violation": "error",
+    "stale-suppressions": "warn"
+  },
+  // Relative imports between packages, and packages/charts' layering (spec <-
+  // core <- each interpreter, never interpreter to interpreter). Package-name
+  // and external specifiers (`$app/*`, `effect`, `@thomasfosterau/*`) resolve
+  // outside these zones, so fallow-rules.json bans those.
+  "boundaries": {
+    "zones": [
+      { "name": "components", "patterns": ["packages/components/src/lib/**"] },
+      { "name": "mapbox", "patterns": ["packages/mapbox/src/lib/**"] },
+      { "name": "charts-spec", "patterns": ["packages/charts/src/spec/**"] },
+      { "name": "charts-core", "patterns": ["packages/charts/src/core/**"] },
+      { "name": "charts-react", "patterns": ["packages/charts/src/react/**"] },
+      { "name": "charts-vue", "patterns": ["packages/charts/src/vue/**"] },
+      { "name": "charts-prosemirror", "patterns": ["packages/charts/src/prosemirror/**"] },
+      { "name": "charts-vega", "patterns": ["packages/charts/src/vega/**"] }
+    ],
+    "rules": [
+      { "from": "components", "allow": [] },
+      { "from": "mapbox", "allow": [] },
+      { "from": "charts-spec", "allow": [] },
+      { "from": "charts-core", "allow": ["charts-spec"] },
+      { "from": "charts-react", "allow": ["charts-spec", "charts-core"] },
+      { "from": "charts-vue", "allow": ["charts-spec", "charts-core"] },
+      { "from": "charts-prosemirror", "allow": ["charts-spec", "charts-core"] },
+      { "from": "charts-vega", "allow": ["charts-spec", "charts-core"] }
+    ]
+  },
+  "duplicates": {
+    // A deliberate copy of packages/components/tests/canvas/pointer.ts: test
+    // helpers are not published, so there is nothing to import it from
+    // (packages/mapbox/CLAUDE.md § Invariants).
+    "ignore": ["packages/mapbox/tests/pointer.ts"]
+  },
+  "health": {
+    "maxCyclomatic": 20,
+    "maxCognitive": 15,
+    "maxCrap": 30,
+    // Written by `vp run test:coverage` (root vite.config.ts).
+    "coverage": "coverage/coverage-final.json"
+  }
+}

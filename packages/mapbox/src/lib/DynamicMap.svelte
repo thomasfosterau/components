@@ -4,8 +4,9 @@ The interactive Mapbox GL map, panned and zoomed, with a fallback when WebGL is 
 <!--
   DynamicMap — the interactive, WebGL half: Mapbox GL, panned and zoomed.
 
-  **Mapbox GL is an optional peer, loaded through a dynamic `import()` inside
-  the mount effect.** Three reasons, all of them load-bearing:
+  **Mapbox GL is this package's required peer, loaded through a dynamic
+  `import()` inside the mount effect.** Three reasons, all of them
+  load-bearing:
 
   - It is ~800 kB of WebGL. A static import would put a mapping engine in the
     shared chunk of every consumer of this package, whose maps live on two
@@ -13,13 +14,11 @@ The interactive Mapbox GL map, panned and zoomed, with a fallback when WebGL is 
   - Its stylesheet is a side effect, and this package claims `sideEffects:
     false`. A top-level `import 'mapbox-gl/dist/mapbox-gl.css'` would make that
     claim false; importing it here means it arrives only where a map does.
-  - An app with no maps should not have to install it. Optional peer, so `pnpm`
-    does not.
-
-  The package is not installed in this repository at all — the types come from
-  `./mapbox-gl.d.ts` — so the path this component takes here is the SAME path an
-  application that never installed the peer takes: the `catch` below, and
-  `unavailableLabel`. That is the branch the browser test drives.
+  - A failed load must degrade, not throw: no WebGL, a blocked or 404'd
+    bundle, and a constructor that throws all land on the same `catch` below,
+    and `unavailableLabel`. That is the branch the browser tests drive, by
+    mocking `mapbox-gl` with a `Map` whose constructor throws
+    (packages/mapbox/CLAUDE.md § Testing).
 
   ## ARIA contract
 

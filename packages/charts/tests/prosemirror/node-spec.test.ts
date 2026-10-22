@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import type { ChartSpec } from '../../src/spec/index.ts';
 import { DOMParser as PMDOMParser, DOMSerializer, Node, Schema } from 'prosemirror-model';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import {
   CHART_NODE_NAME,
   CHART_SPEC_ATTRIBUTE,

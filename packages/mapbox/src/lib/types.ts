@@ -12,7 +12,7 @@ export interface LngLat {
   readonly latitude: number;
 }
 
-/** A south-west / north-east box. */
+/** A geographic box, given by its south-west (`min`) and north-east (`max`) corners. */
 export interface BoundingBox {
   readonly min: LngLat;
   readonly max: LngLat;
@@ -26,7 +26,7 @@ export interface MapStyle {
   readonly styleId: string;
 }
 
-/** Where the camera sits. */
+/** A map camera: where it is centred, how far it is zoomed, and optionally its bearing and pitch. */
 export interface MapCamera {
   readonly centre: LngLat;
   /** 0…22; fractional levels are rounded to two places by the static API. */

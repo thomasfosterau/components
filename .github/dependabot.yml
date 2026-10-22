@@ -1,50 +1,48 @@
-# Dependabot version updates — the same shape as effect-drizzle-ext's, with
-# the groups this workspace needs.
+# Dependabot version updates. The `npm` ecosystem at `/` reads the pnpm
+# workspace and its catalogs (pnpm-workspace.yaml), so every bump is a catalog
+# edit plus a regenerated lockfile.
 #
-# `groups` collect dependencies that MUST move together: Svelte and its kit /
-# plugin / checker; the vite-plus toolchain; Storybook, whose addons are
-# versioned in lockstep with the core; and, for packages/charts, React with
-# React DOM and Vega with Vega-Lite. A dependency joins only the FIRST group
-# it matches, and no other group's patterns match a member of another.
+# `groups` are the sets that MUST move together, taken from the catalog
+# comments, then a catch-all for the remaining minor and patch updates (majors
+# outside a lockstep set stay individual PRs). Dependabot puts a dependency in
+# the FIRST group that matches, so the order runs specific -> general and
+# `exclude-patterns` keeps each package out of a group it would otherwise also
+# match. Every lockstep group takes all update types, majors included.
 #
-# `vite-plus-toolchain` is `vite-plus` plus the packages it pins exactly:
-# `vitest` and `@vitest/*` (here, `@vitest/browser-playwright`), so they never
-# arrive in separate PRs (#47, #88; see the `vite-plus` entry in
-# pnpm-workspace.yaml). Grouping only batches whatever each member's latest
-# release is, so EVERY group PR that bumps `vite-plus` needs two hand-pushed
-# fixes before merge:
-# - bump the `vite` alias to `npm:@voidzero-dev/vite-plus-core@<the new
-#   vite-plus version>` (Dependabot cannot, see `ignore` below);
-# - set `vitest` / `@vitest/browser-playwright` to the version the new
-#   vite-plus's `dependencies` / `peerDependencies` name, not past it (a
-#   vitest release vite-plus has not adopted yet, or one still in `cooldown`,
-#   lands out of step).
-# A group PR that does NOT bump `vite-plus` (vitest or `@vitest/*` released
-# alone) has no vite-plus version to follow: close it unmerged. The same check
-# applies to a vitest security update: this file's groups apply only to
-# version updates, so it arrives outside the group (as its own PR, unless
-# grouped security updates is on in the repository settings).
-# `vitest-browser-svelte` is deliberately outside the group: vite-plus does
-# not pin it, so its bumps need no alias step.
+# - `effect`: `effect` (also forced to one copy by `overrides`), every
+#   `@effect/*` package except `@effect/tsgo` (a toolchain member), and the
+#   form library that peers it.
+# - `toolchain`: `vite-plus` and everything it pins or patches against. It
+#   pins `vitest` and the `@vitest/*` packages EXACTLY (and so do
+#   `@vitest/browser-playwright` and `@vitest/coverage-istanbul`, which peer
+#   `vitest` at one version), and the `oxlint` / `oxfmt` / `oxlint-tsgolint` it
+#   carries. `@effect/tsgo`'s patch (the root `prepare`) hard-errors unless its
+#   release supports that exact oxlint / tsgolint and the native TypeScript,
+#   and the Effect lint plugin loads into that oxlint. A group PR is merged
+#   only once CI is green on it; see the by-hand steps below.
+# - `playwright`: the pinned `playwright` decides the Chromium revision CI
+#   installs (its catalog comment). `@vitest/browser*` sit in `toolchain`,
+#   because they pin `vitest`.
+# - the framework sets (`svelte`, `storybook`, `tailwind`) and the charts
+#   interpreters' sets (`react`, `vue`, `prosemirror`, `vega`, `d3`), whose
+#   members are versioned or typed in lockstep.
 #
-# `ignore` covers the catalog entries Dependabot cannot bump correctly:
-# - `vite` and `typescript` are npm aliases (`npm:@voidzero-dev/vite-plus-core`,
-#   `npm:@typescript/typescript6`); the alias target moves with vite-plus and
-#   the TypeScript 7.1 migration respectively, by hand. Ignoring `vite`
-#   removes only `vite` from consideration; no group pattern matches it, so
-#   the `vite-plus-toolchain` group still opens.
-# `playwright` is NOT ignored: CI installs the Chromium revision each release
-# expects, so its bumps are ordinary updates (see its catalog entry).
-# Each ignore is scoped to the `version-update:semver-*` update types, so
-# SECURITY updates stay enabled (a bare `dependency-name` ignore would block
-# those too).
+# `ignore` covers the npm ALIASES, which Dependabot cannot bump correctly;
+# they move by hand, in the PR of the group they belong to (AGENTS.md
+# § Common pitfalls):
+# - `vite` = `npm:@voidzero-dev/vite-plus-core@<vite-plus version>`: set it to
+#   the new `vite-plus` version in every `toolchain` PR that bumps vite-plus.
+#   Also set `vitest` / `@vitest/*` to the versions the new vite-plus's
+#   `dependencies` / `peerDependencies` name if the group took them past it.
+# - `@typescript/native` = `npm:typescript@7.x` and `typescript` =
+#   `npm:@typescript/typescript6@6.x`: move with `@effect/tsgo` to a version
+#   its `components` table lists (node_modules/@effect/tsgo/dist/effect-tsgo.cjs).
+# Each ignore is scoped to the `version-update:semver-*` types, so SECURITY
+# updates stay enabled.
 #
-# `cooldown` mirrors pnpm-workspace.yaml's `minimumReleaseAge` (1 day), and
-# its `minimumReleaseAgeExclude`: first-party `@thomasfosterau/*` releases are
-# not held.
-# Per the docs, cooldown is applied per dependency (inferred to hold inside a
-# group too): a member whose release is still inside it is left out of that
-# group PR, not the whole PR.
+# `cooldown` mirrors pnpm-workspace.yaml's `minimumReleaseAge` (1 day) and its
+# `minimumReleaseAgeExclude`: first-party `@thomasfosterau/*` releases are not
+# held. Cooldown applies per dependency, inside a group too.
 version: 2
 updates:
   - package-ecosystem: 'npm'
@@ -63,32 +61,117 @@ updates:
       exclude:
         - '@thomasfosterau/*'
     groups:
-      svelte:
+      effect:
+        applies-to: version-updates
+        update-types: ['major', 'minor', 'patch']
         patterns:
-          - 'svelte'
-          - 'svelte-check'
-          - '@sveltejs/*'
-      vite-plus-toolchain:
+          - 'effect'
+          - '@effect/*'
+          - '@thomasfosterau/effect-forms-svelte'
+        exclude-patterns:
+          - '@effect/tsgo'
+      toolchain:
+        applies-to: version-updates
+        update-types: ['major', 'minor', 'patch']
         patterns:
           - 'vite-plus'
+          - 'vite'
           - 'vitest'
           - '@vitest/*'
+          - 'oxlint'
+          - 'oxfmt'
+          - 'oxlint-tsgolint'
+          - '@effect/tsgo'
+          - '@typescript/native'
+          - 'typescript'
+          - '@typescript/typescript6'
+          - '@mpsuesser/oxlint-plugin-effect'
+      playwright:
+        applies-to: version-updates
+        update-types: ['major', 'minor', 'patch']
+        patterns:
+          - 'playwright'
+          - '@playwright/*'
+      svelte:
+        applies-to: version-updates
+        update-types: ['major', 'minor', 'patch']
+        patterns:
+          - 'svelte'
+          - '@sveltejs/*'
+          - 'svelte-check'
+          - 'svelte2tsx'
       storybook:
+        applies-to: version-updates
+        update-types: ['major', 'minor', 'patch']
         patterns:
           - 'storybook'
           - '@storybook/*'
+      tailwind:
+        applies-to: version-updates
+        update-types: ['major', 'minor', 'patch']
+        patterns:
+          - 'tailwindcss'
+          - '@tailwindcss/*'
+          - 'daisyui'
+      bits-ui:
+        applies-to: version-updates
+        update-types: ['major', 'minor', 'patch']
+        patterns:
+          - 'bits-ui'
+      changesets:
+        applies-to: version-updates
+        update-types: ['major', 'minor', 'patch']
+        patterns:
+          - '@changesets/*'
+      mapbox:
+        applies-to: version-updates
+        update-types: ['major', 'minor', 'patch']
+        patterns:
+          - 'mapbox-gl'
+          - '@types/mapbox-gl'
       # packages/charts: `react-dom` peers its own `react` release exactly.
       react:
+        applies-to: version-updates
+        update-types: ['major', 'minor', 'patch']
         patterns:
           - 'react'
           - 'react-dom'
           - '@types/react'
           - '@types/react-dom'
+      vue:
+        applies-to: version-updates
+        update-types: ['major', 'minor', 'patch']
+        patterns:
+          - 'vue'
+          - '@vue/*'
+      prosemirror:
+        applies-to: version-updates
+        update-types: ['major', 'minor', 'patch']
+        patterns:
+          - 'prosemirror-*'
       # packages/charts: the `/vega` suite compiles through both.
       vega:
+        applies-to: version-updates
+        update-types: ['major', 'minor', 'patch']
         patterns:
           - 'vega'
           - 'vega-lite'
+      # packages/charts' core: the runtime and its type packages.
+      d3:
+        applies-to: version-updates
+        update-types: ['major', 'minor', 'patch']
+        patterns:
+          - 'd3-*'
+          - '@types/d3-*'
+      # Everything else (`@lucide/svelte`, `@internationalized/date`,
+      # `@testing-library/jest-dom`, `vitest-browser-svelte`, `happy-dom`,
+      # `fallow`, `@types/node`, …): minor and patch updates batched in one
+      # PR; a major stays its own PR.
+      everything-else:
+        applies-to: version-updates
+        update-types: ['minor', 'patch']
+        patterns:
+          - '*'
     ignore:
       - dependency-name: 'vite'
         update-types:
@@ -104,8 +187,21 @@ updates:
             'version-update:semver-minor',
             'version-update:semver-patch',
           ]
+      - dependency-name: '@typescript/native'
+        update-types:
+          [
+            'version-update:semver-major',
+            'version-update:semver-minor',
+            'version-update:semver-patch',
+          ]
+
+  # All GitHub Actions in one PR. `directories`, not `directory: '/'`: the
+  # local composite action under .github/actions/setup pins actions too, and
+  # `/` covers only .github/workflows (the Swift workflow included).
   - package-ecosystem: 'github-actions'
-    directory: '/'
+    directories:
+      - '/'
+      - '/.github/actions/setup'
     schedule:
       interval: 'weekly'
       day: 'monday'
@@ -113,5 +209,10 @@ updates:
     labels:
       - 'dependencies'
     commit-message:
-      prefix: 'ci'
-      include: 'scope'
+      prefix: 'chore'
+    cooldown:
+      default-days: 1
+    groups:
+      github-actions:
+        patterns:
+          - '*'

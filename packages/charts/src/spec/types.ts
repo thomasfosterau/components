@@ -6,7 +6,7 @@
  * through the package boundary. A type-parity test asserts these stay
  * structurally identical to the schema-derived types.
  *
- * Design invariants (see docs/capability-matrix.md):
+ * Design invariants (see the README § Capability matrix):
  * - Grammar-level only: marks and encodings, never geometry, pixels, or
  *   renderer names.
  * - Every encoding channel carries an explicit `type`; interpreters

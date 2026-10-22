@@ -24,14 +24,15 @@ export const OG_SUBTITLE_PARAM = 'd';
 export const OG_VERSION_PARAM = 'v';
 
 /**
- * Length caps on the title / description carried in the URL. A renderer
- * should re-apply them defensively; here they keep the emitted URL short.
+ * Longest title, in characters, carried in a share-card URL. A renderer
+ * should re-apply this cap (and `OG_SUBTITLE_MAX_LENGTH`) defensively; here
+ * they keep the emitted URL short.
  */
 export const OG_TITLE_MAX_LENGTH = 120;
 /** Longest description, in characters, carried in a share-card URL; see `OG_TITLE_MAX_LENGTH`. */
 export const OG_SUBTITLE_MAX_LENGTH = 200;
 
-/** The rendered card's size — the 1.91:1 Open Graph standard. */
+/** Share-card width in pixels — the 1.91:1 Open Graph standard, with `OG_IMAGE_HEIGHT`. */
 export const OG_IMAGE_WIDTH = 1200;
 /** Share-card height in pixels; see `OG_IMAGE_WIDTH`. */
 export const OG_IMAGE_HEIGHT = 630;

@@ -19,6 +19,7 @@ export interface ChartProps {
   readonly height?: number;
   /** Margin overrides. */
   readonly margins?: Partial<Margins>;
+  /** Class for the root `<svg>` element, and for the default fallback `<div>`. */
   readonly className?: string;
   /** Rendered when the spec is invalid or its data is unavailable. */
   readonly fallback?: ReactNode | ((message: string) => ReactNode);
@@ -31,7 +32,7 @@ type ChartState =
 /**
  * Renders a portable chart spec as SVG.
  *
- * Pure rendering: the component computes geometry via chart-core in a memo
+ * Pure rendering: the component computes geometry via the `/core` entry in a memo
  * and emits SVG elements, so it works identically on the server
  * (renderToString / renderToStaticMarkup) and the client. The SVG uses a
  * viewBox, so it scales to its container with CSS.

@@ -74,7 +74,6 @@ catalog:
   d3-shape: ^3.2.0
   happy-dom: ^20.9.0
   prosemirror-model: ^1.25.7
-  prosemirror-state: ^1.4.4
   prosemirror-view: ^1.41.8
   react: ^19.3.1
   react-dom: ^19.3.1
@@ -145,17 +144,56 @@ catalog:
   # vite-plus pins `oxlint`, `oxfmt`, `vitest` and the `@vitest/*` packages
   # to exact versions. `vitest` and `@vitest/browser-playwright` FOLLOW that
   # pin (vite-plus 1.3.0 -> 5.0.5) rather than running ahead of it (#47).
-  # Dependabot's `vite-plus-toolchain` group (.github/dependabot.yml) bumps
+  # Dependabot's `toolchain` group (.github/dependabot.yml) bumps
   # `vite-plus`, `vitest` and `@vitest/*` together in one PR (#88). Before
   # merging that PR, push by hand: `vite` (ignored by Dependabot) to
   # `npm:@voidzero-dev/vite-plus-core@` the new vite-plus version, and
   # `vitest` / `@vitest/browser-playwright` to the version the new vite-plus's
   # `dependencies` / `peerDependencies` name if the group took them past it.
-  # A group PR that doesn't bump vite-plus itself is closed unmerged.
+  # A group PR that doesn't bump vite-plus itself is closed unmerged, unless it
+  # is an `@effect/tsgo` or lint-plugin bump that CI passes on its own.
   # `vite` is the same release published under its aliased core package.
   vite-plus: 1.3.0
   vite: npm:@voidzero-dev/vite-plus-core@1.3.0
   vitest: 5.0.5
+  # Istanbul coverage for the root `test:coverage` task, whose
+  # `coverage/coverage-final.json` `fallow audit` reads for per-function CRAP
+  # scores. Istanbul rather than v8 because it instruments in the transform,
+  # so the browser-mode suites report too. It pins `vitest` EXACTLY, so it
+  # moves with `vitest` above (Dependabot's `toolchain` group).
+  '@vitest/coverage-istanbul': 5.0.5
+  # Effect Language Service as a native (TypeScript-Go) binary, and the source
+  # of the `@effect/tsgo/oxlint-presets` lint preset the root vite.config.ts
+  # extends. `effect-tsgo patch --typescript --oxlint` (the root `prepare`)
+  # overwrites the native `tsc` and vite-plus's `oxlint` / `oxlint-tsgolint`
+  # with Effect-patched builds matched by gitHead, so this pins in lockstep
+  # with `@typescript/native` below and with the `oxlint` / `oxlint-tsgolint`
+  # vite-plus carries: 0.55.0 supports typescript 7.0.2, oxlint 1.87.0 –
+  # 1.89.0 and tsgolint 7.0.2003 / 7.0.2004; vite-plus 1.3.0 carries oxlint
+  # 1.88.0 and tsgolint 7.0.2004. Each @effect/tsgo release hard-errors
+  # (UnsupportedTargetPackageVersionError) on any other component version,
+  # failing the patch. Read the `components` table in
+  # node_modules/@effect/tsgo/dist/effect-tsgo.cjs before bumping any of the
+  # three. Dependabot's `toolchain` group brings `@effect/tsgo` with
+  # vite-plus; the `@typescript/native` alias moves by hand
+  # (.github/dependabot.yml).
+  '@effect/tsgo': 0.55.0
+  # TS7, the native Go compiler (bin `tsc`), Effect-patched by the `prepare`
+  # above. It type-checks packages/charts (the one pure-TS package, and the one
+  # whose `src/spec` is Effect code). The Svelte packages stay on the TS6
+  # `typescript` alias, because svelte-check needs the JS API.
+  '@typescript/native': npm:typescript@7.0.2
+  # The Effect oxlint rules (`effect.configs.recommended` in the root
+  # vite.config.ts), scoped there to the files that import Effect. 0.6.0 is
+  # built against `effect` 4.0.0, which the singleton override below lifts to
+  # the catalog's 4.0.x patch release; the scoped
+  # `@mpsuesser/oxlint-plugin-effect>effect` override effect-web needed for
+  # 0.5.0 (a beta build) is not needed.
+  '@mpsuesser/oxlint-plugin-effect': ^0.6.0
+  # Dead code, duplication, complexity and architecture boundaries
+  # (.fallowrc.json); the PreToolUse gate (.claude/hooks/fallow-gate.sh) runs
+  # its audit before every agent `git commit` / `git push`.
+  fallow: 3.34.1
   # `render` + locators for Svelte components under Vitest browser mode. The
   # app repos use @testing-library/svelte under happy-dom instead; this repo
   # runs the real browser, and this is the renderer Vitest browser mode
@@ -206,6 +244,8 @@ nodeLinker: hoisted
 allowBuilds:
   '@tailwindcss/oxide': true
   esbuild: true
+  # fallow verifies its platform binary's signature at install time.
+  fallow: true
 
 # Storybook 10.6 declares `vite-plus: "^0.1.15 || ^0.2.0"` and this workspace
 # is on 1.1.0 — the toolchain is deliberately ahead of what the addon ecosystem

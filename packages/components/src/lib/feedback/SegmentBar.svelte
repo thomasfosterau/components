@@ -32,6 +32,7 @@ One horizontal bar split into proportional, coloured segments: a vote share, a s
   /** The custom property a segment's `colourToken` is bound to. */
   const SEGMENT_COLOUR_PROPERTY = '--segment-colour';
 
+  /** One part of a `SegmentBar`: its label, its share of the bar, and its colour. */
   export interface BarSegment {
     /** Read out for this segment in the bar's accessible label. */
     readonly label: string;

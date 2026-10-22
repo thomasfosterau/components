@@ -1,5 +1,5 @@
 import { parseSpec } from '../../src/spec/index.ts';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { computeContext, DEFAULT_MARGINS } from '../../src/core/index.ts';
 
 const box = { width: 600, height: 400 };

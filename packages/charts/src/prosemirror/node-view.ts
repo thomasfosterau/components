@@ -28,10 +28,11 @@ const DEFAULT_BOX: Box = { width: 640, height: 360 };
  * Edit-time chart rendering inside ProseMirror.
  *
  * A NodeView is imperative DOM — exactly why the pure Layer 2 core pays off:
- * this class owns a plain <div>, computes geometry via chart-core, and sets
+ * this class owns a plain <div>, computes geometry via the `/core` entry, and sets
  * SVG markup. No framework, no reactivity.
  */
 export class ChartNodeView implements NodeView {
+  /** The wrapper element ProseMirror mounts; it holds the SVG or a placeholder message. */
   readonly dom: HTMLElement;
 
   private node: ProseMirrorNode;
@@ -60,6 +61,7 @@ export class ChartNodeView implements NodeView {
     return true;
   }
 
+  /** Invalidates any in-flight async data resolution so it cannot render after removal. */
   destroy(): void {
     // Invalidate any in-flight async render.
     this.renderToken += 1;

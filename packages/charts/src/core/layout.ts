@@ -9,8 +9,11 @@ export const DEFAULT_MARGINS: Margins = {
 };
 
 /**
- * Computes chart dimensions from an outer box and margins.
- * The plot area never goes negative: margins are clamped to the box.
+ * Computes chart dimensions from an outer box and optional margin overrides.
+ *
+ * Missing margins take their {@link DEFAULT_MARGINS} value. The plot area
+ * never goes negative: its width and height are clamped at zero, while the
+ * margins are kept as given.
  */
 export function computeDimensions(outer: Box, margins?: Partial<Margins>): Dimensions {
   const resolved: Margins = { ...DEFAULT_MARGINS, ...margins };

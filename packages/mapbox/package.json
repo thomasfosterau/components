@@ -18,7 +18,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/thomasfosterau/components.git",
-    "directory": "packages/maps"
+    "directory": "packages/mapbox"
   },
   "files": [
     "dist"
@@ -38,6 +38,7 @@
     "@thomasfosterau/components": "workspace:*"
   },
   "devDependencies": {
+    "@storybook/addon-svelte-csf": "catalog:",
     "@storybook/sveltekit": "catalog:",
     "@sveltejs/kit": "catalog:",
     "@sveltejs/package": "catalog:",

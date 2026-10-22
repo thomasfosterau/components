@@ -4,7 +4,7 @@
  * without errors or warnings.
  */
 import { parseSpec } from '../../src/spec/index.ts';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { compile } from 'vega-lite';
 import { emitVegaLite } from '../../src/vega/index.ts';
 import type { TopLevelSpec } from 'vega-lite';

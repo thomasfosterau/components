@@ -61,10 +61,15 @@ export const press = (surface: Locator, at: At): Promise<void> =>
  * A press and release with Alt held — the modifier `MapEditor` reads as
  * "remove this vertex".
  */
+// Unused by this package's suites, kept so this file stays identical to
+// packages/mapbox/tests/pointer.ts, whose MapEditor suite uses it.
+// fallow-ignore-next-line unused-export
 export const altPress = (surface: Locator, at: At): Promise<void> =>
   surface.click({ position: copy(at), modifiers: ['Alt'] });
 
 /** Two presses in quick succession, so the second carries `detail > 1`. */
+// Kept for parity with packages/mapbox/tests/pointer.ts (see `altPress`).
+// fallow-ignore-next-line unused-export
 export const doublePress = (surface: Locator, at: At): Promise<void> =>
   surface.dblClick({ position: copy(at) });
 

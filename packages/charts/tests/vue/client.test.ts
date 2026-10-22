@@ -3,7 +3,7 @@
  * Client-side tests: mounting, prop reactivity.
  */
 import { parseSpec } from '../../src/spec/index.ts';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vite-plus/test';
 import { createApp, h, nextTick, reactive, type App, type Component } from 'vue';
 import { Chart } from '../../src/vue/index.ts';
 

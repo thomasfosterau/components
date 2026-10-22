@@ -35,11 +35,11 @@ export type HotkeySequence = readonly string[];
 /** A hotkey trigger: a chord pressed together (`'$mod+k'`) or a sequence pressed in turn (`['g', 'p']`). */
 export type HotkeyTrigger = HotkeyChord | HotkeySequence;
 
-/** Palette grouping. Drives section headings and ordering. */
+/** The command-palette section a `CommandAction` is listed under. Drives section headings and ordering. */
 export type CommandActionGroup = 'actions' | 'navigation';
 
 /**
- * Where a registration lives. Page registrations are torn down when the
+ * Where a hotkey registration lives: `global` for the app shell, `page` for the mounted page. Page registrations are torn down when the
  * registering page unmounts and win over global registrations on trigger
  * conflicts.
  */
@@ -74,6 +74,8 @@ export interface CommandAction {
 
 /** A registration entry: an action plus the scope it was registered under. */
 export interface RegisteredAction {
+  /** The scope it was registered under. */
   scope: HotkeyScope;
+  /** The action as registered. */
   action: CommandAction;
 }

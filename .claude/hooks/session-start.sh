@@ -16,7 +16,7 @@
 # and the line that puts the toolchain on PATH sits *below* it. So the
 # environment is correct for a human at a prompt and broken for every
 # non-interactive shell, which is what an agent's tool calls and a git hook
-# both are. `vp` lives in `node_modules/.bin`, which is on nobody's PATH.
+# both are. `vp` and `fallow` live in `node_modules/.bin`, which is on nobody's PATH.
 #
 # Rather than fight PATH — which this script cannot export into its caller —
 # it links the tools into `~/.local/bin`, a directory already on PATH in these
@@ -149,14 +149,30 @@ fi
 # Unconditional, not only when node_modules is absent: a prebaked container can
 # carry a tree built from an OLDER lockfile, and stale dependencies masquerade
 # as `trunk` breakage. `--frozen-lockfile` is a sub-second no-op when in sync.
+# The install runs the root `prepare` too, which re-applies the `effect-tsgo`
+# patch to the native `tsc` and vite-plus's oxlint (idempotent).
+# pnpm through Corepack when it is available, so the version is the one
+# `packageManager` pins rather than whatever the image put on PATH; a bare
+# `pnpm` otherwise.
+if command -v corepack >/dev/null 2>&1 && (cd "$PROJECT_DIR" && corepack pnpm --version >/dev/null 2>&1); then
+  PNPM=(corepack pnpm)
+else
+  PNPM=(pnpm)
+fi
 if [ -f "$PROJECT_DIR/pnpm-lock.yaml" ]; then
   log "syncing dependencies against the lockfile…"
-  (cd "$PROJECT_DIR" && pnpm install --frozen-lockfile >/dev/null 2>&1) \
+  (cd "$PROJECT_DIR" && "${PNPM[@]}" install --frozen-lockfile >/dev/null 2>&1) \
     || log "dependency install failed; continuing"
 fi
 
 # node_modules/.bin only exists after the install, so link what it provides
-# afterwards.
+# afterwards. `fallow` is what the PreToolUse fallow gate
+# (.claude/hooks/fallow-gate.sh) runs before every agent `git commit` /
+# `git push`; `tsx` is linked if a package ever adds it (none does today, and
+# `link_tool` skips a missing binary).
+for tool in fallow tsx; do
+  link_tool "$PROJECT_DIR/node_modules/.bin/$tool"
+done
 write_vp_shim
 
 # ── 3. First-checkout codegen ────────────────────────────────────────────────

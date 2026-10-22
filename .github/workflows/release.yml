@@ -27,6 +27,8 @@ permissions: {}
 jobs:
   release:
     name: Version or publish
+    # A fork that copies this workflow must not try to publish.
+    if: github.repository == 'thomasfosterau/components'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     # A protected environment (deployment branches: `trunk` only), named by the
@@ -59,8 +61,10 @@ jobs:
           node-version: latest
           cache: pnpm
 
-      # `--ignore-scripts`: the root `prepare` only installs the Vite+ git
-      # hooks, and nothing on the build path needs an install script.
+      # `--ignore-scripts`, unlike CI's setup action: no install script runs in
+      # the job that holds `id-token: write`. Nothing on the build path needs
+      # one: the root `prepare` installs the Vite+ git hooks and applies the
+      # `effect-tsgo` patch, which only the type and lint gates use.
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 

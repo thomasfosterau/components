@@ -15,12 +15,12 @@
  *   workspace package.
  * - There are no Storybook tasks. This package's stories are rendered by the
  *   ONE Storybook in packages/components, whose `stories` glob reaches across
- *   into `../../maps/src/stories` — two Storybook installs for one design
+ *   into `../../mapbox/src/stories` — two Storybook installs for one design
  *   system is two review surfaces that can disagree.
  */
 
 import { svelte } from '@sveltejs/vite-plugin-svelte';
-import { playwright } from '@vitest/browser-playwright';
+import { playwright } from 'vite-plus/test/browser-playwright';
 import { defineConfig } from 'vite-plus';
 
 /**

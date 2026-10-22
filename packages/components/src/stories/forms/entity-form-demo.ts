@@ -11,6 +11,9 @@ import ParentPicker from './EntityFormParentPicker.svelte';
 const Uuid = Schema.String.check(Schema.isUUID());
 const Status = Schema.Literals(['draft', 'published']);
 
+// Read by EntityForm.stories.svelte's template, a reference fallow's Svelte
+// extraction does not credit.
+// fallow-ignore-next-line unused-export
 export const bedForm = defineEntityForm(
   {
     create: Schema.Struct({

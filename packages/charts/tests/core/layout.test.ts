@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { computeDimensions, DEFAULT_MARGINS } from '../../src/core/index.ts';
 
 describe('computeDimensions', () => {

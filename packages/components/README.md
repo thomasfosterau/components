@@ -1,6 +1,6 @@
 # @thomasfosterau/components
 
-Accessible Svelte 5 UI primitives, styled with [Tailwind CSS 4](https://tailwindcss.com) + [daisyUI 5](https://daisyui.com) and built on [bits-ui](https://bits-ui.com). The core families are in the root barrel and the heavier ones behind their own [entry points](#entry-points). The maps components live in the sibling package [`@thomasfosterau/components-mapbox`](../maps/README.md).
+Accessible Svelte 5 UI primitives, styled with [Tailwind CSS 4](https://tailwindcss.com) + [daisyUI 5](https://daisyui.com) and built on [bits-ui](https://bits-ui.com). The core families are in the root barrel and the heavier ones behind their own [entry points](#entry-points). The maps components live in the sibling package [`@thomasfosterau/components-mapbox`](https://github.com/thomasfosterau/components/blob/trunk/packages/mapbox/README.md).
 
 Four rules hold across all of them:
 
@@ -71,7 +71,7 @@ Every component that needs to resolve a link, navigate, know the current page or
 | `navigate` | `(url: string) => Promise<void> \| void` | Client-side navigation (`ConfirmDialog`'s `redirectTo`, `ConfirmButton`'s `redirectTo`, `CommandPalette`'s `href` rows). |
 | `isCurrent` | `(href: string) => boolean` | `aria-current="page"` decisions (`Breadcrumbs`, `Tabs` in `links` mode, `FilterBar`, `Sidebar`). |
 
-Every member is optional in the object you pass — an omitted one falls back individually to `defaultComponentsContext` (identity `href`, `window.location.assign` for navigation, pathname equality for `isCurrent`, runtime-default locale), so every component works unwired in a story or a test.
+Every member is optional in the object you pass — an omitted one falls back individually to `defaultComponentsContext` (identity `href`, `window.location.assign` for navigation, pathname equality for `isCurrent`, runtime-default locale), so every component works unwired in a story or a test. The object's type is exported as `ComponentsContext` (every member required; `setComponentsContext` takes the same members, each optional), and `getComponentsContext()` reads the merged result back for a component of your own.
 
 **Passing i18n messages.** There is no message catalogue in this package — every accessible-name prop has an English default and nothing more. An app using [Paraglide](https://inlang.com/m/gerre34r/library-inlang-paraglideJs) (or any other i18n library) passes its own messages at the call site:
 
@@ -130,7 +130,12 @@ Buttons, badges and surfaces — the family every other family builds on: `Alert
 | `ThemeToggle` | Light / dark switch | `lightTheme`, `darkTheme`, `storageKey? = 'theme'`, `label? = 'Toggle dark mode'`, `value? ⚓` | — | checkbox with `role="switch"` named by `label` |
 | `ConfirmButton` | Two-step inline confirm | `action: () => Promise<unknown>`, `idleLabel? = 'Delete'`, `confirmLabel?`, `cancelLabel?`, `pendingLabel?`, `confirmMessage?`, `failureMessage?`, `tone? = 'error'`, `redirectTo?` | — | failure is an `Alert live="assertive"`; both buttons `disabled` while pending; the confirm button keeps a name (`pendingLabel`) |
 
-`ui` also exports `tones.ts` (`Tone`, `Size`, `HeadingLevel` and the literal `Record<K, string>` class tables — `buttonTone`, `badgeVariant`, `cardVariant`, …), `colour-token.ts` (`colourTokenStyle`, for binding a component's colour custom property to a theme token), and `slug.ts` (`slugify`, used by `Heading`).
+`ui` also exports:
+
+- **`tones.ts`** — the daisyUI vocabulary as types: `Tone` (the semantic colours), `StatusTone` (`'info' | 'success' | 'warning' | 'error'`, what `Alert` takes), `Size` (`'xs'`…`'xl'`), `HeadingLevel` (`1`…`6`), `ButtonVariant`, `BadgeVariant`, `AlertVariant`, `LinkVariant` (`'primary' | 'muted' | 'plain'`), `CardVariant` (`'border' | 'dash' | 'plain'`), `DisclosureVariant` (`'arrow' | 'plus' | 'plain'`) and `ChipSize` (`'sm' | 'md'`). Each has a literal `Record<K, string>` class table, so Tailwind's scanner sees every class: `buttonTone`, `buttonVariant`, `buttonSize`, `badgeTone`, `badgeVariant`, `badgeSize`, `alertTone`, `alertVariant`, `progressTone`, `linkVariant`, `cardVariant`, `cardSize`, `collapseVariant` (the `Disclosure` marker), `chipSize`, `chipSwatchSize`, plus the prefix-free `backgroundTone` and `textTone` for a swatch or segment of your own.
+- **`colour-token.ts`** — `colourTokenStyle`, for binding a component's colour custom property to a theme token, and the two properties it binds: `BADGE_COLOUR_PROPERTY` (`'--badge-colour'`, `Badge`'s) and `CHIP_COLOUR_PROPERTY` (`'--chip-colour'`, `Chip`'s).
+- **`menu-context.ts`** — `MenuMode` (`'dropdown' | 'nav'`) and `setMenuMode(() => mode)` / `getMenuMode()`, the context through which a `MenuItem` learns its `Menu`'s mode. `Menu` sets it; a `MenuItem` with no `Menu` above it reads `'nav'`.
+- **`slug.ts`** — `slugify`, used by `Heading`.
 
 ```svelte
 <script lang="ts">
@@ -254,16 +259,24 @@ Dialogs, toasts, progress — chrome around something that just happened, or is 
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
 | `Dialog` | The modal | `open? ⚓`, `title`, `description?`, `closeLabel? = 'Close'`, `size?: 'sm'\|'md'\|'lg'\|'xl'` | `trigger?({ props })`, `children`, `actions?({ close })` | bits-ui `Dialog` owns it all: `role="dialog"` + `aria-modal`, `aria-labelledby`/`describedby`, focus trap, Escape, scroll lock, focus return. daisyUI `modal-box` is styling only |
-| `ConfirmDialog` | A destructive action behind a confirmation | `open? ⚓`, `title`, `description?`, `confirmLabel? = 'Delete'`, `cancelLabel? = 'Cancel'`, `pendingLabel? = 'Working…'`, `failureMessage?`, `closeLabel?`, `tone? = 'error'`, `size?`, **either** `onConfirm: () => Promise<unknown>` **or** `form: { action, method? = 'POST', fields?, enhance? }`, `redirectTo?` | `trigger?({ props })`, `children?` | `Dialog`'s, plus a failure as an `Alert live="assertive"` inside the still-open dialog; both buttons `disabled` while pending |
+| `ConfirmDialog` | A destructive action behind a confirmation | `open? ⚓`, `title`, `description?`, `confirmLabel? = 'Delete'`, `cancelLabel? = 'Cancel'`, `pendingLabel? = 'Working…'`, `failureMessage? = 'That didn’t work. Try again.'`, `closeLabel? = 'Close'`, `tone? = 'error'`, `size? = 'md'`, **either** `onConfirm: () => Promise<unknown>` **or** `form: ConfirmForm`, `redirectTo?` | `trigger?({ props })`, `children?` | `Dialog`'s, plus a failure as an `Alert live="assertive"` inside the still-open dialog; both buttons `disabled` while pending |
 | `Toaster` | The notification region | `position? = 'bottom-end'`, `regionLabel? = 'Notifications'`, `dismissLabel? = 'Dismiss'`, `durationMs? = 6000` | `children` (the app) | ONE `aria-live="polite"` region, present from mount, named by `regionLabel`; nothing live nested inside it — `getToaster()` gives `add({ title, description?, tone? }, durationMs?) → id` and `dismiss(id)` |
 | `LoadingBoundary` | Chrome around one read | `state: 'loading'\|'refreshing'\|'error'\|'ready'`, `loadingLabel? = 'Loading…'`, `errorLabel?`, `tone?: 'page'\|'section'` | `children`, `loading?`, `failed?({ message })` | loading chrome `role="status"`; failure `role="alert"`; children stay mounted through `refreshing` |
 | `ProgressBar` | Determinate or indeterminate progress | `label`, `value?`, `max? = 100`, `tone? = 'primary'`, `showValue?`, `locales?` | — | native `<progress>`, named by `label`; no `value` attribute at all when indeterminate |
-| `SegmentBar` | A proportional stacked bar | `label`, `segments: { label, fraction, colourToken?, tone? }[]`, `showValues?`, `marker?`, `size?: 'sm'\|'md'\|'lg'`, `locales?` | — | ONE `role="img"` whose `aria-label` spells out every segment ("Storage: Photos 62%, Video 31%") |
-| `StatTile` | One headline figure | `label`, `value: string \| number`, `delta?: { value, unit?, label? }`, `description?`, `upLabel?`, `downLabel?`, `flatLabel?`, `locales?` | `figure?` | reads label → value → change; the trend arrow is `aria-hidden`, direction is in visually hidden text |
+| `SegmentBar` | A proportional stacked bar | `label`, `segments: readonly BarSegment[]`, `showValues?`, `marker?` (a fraction), `size? = 'md'` (`'sm'\|'md'\|'lg'`), `locales?` | — | ONE `role="img"` whose `aria-label` spells out every segment ("Storage: Photos 62%, Video 31%") |
+| `StatTile` | One headline figure | `label`, `value: string \| number`, `delta?: StatDelta`, `description?`, `upLabel? = 'Up'`, `downLabel? = 'Down'`, `flatLabel? = 'No change'`, `locales?` | `figure?` | reads label → value → change; the trend arrow is `aria-hidden`, direction is in visually hidden text |
 | `Stats` | The wrapper a row of tiles sits in | `orientation?: 'horizontal'\|'vertical'\|'responsive'` (default `responsive`) | `children` | none of its own — name it with `aria-label` when a page has several |
-| `Timeline` | A dated sequence | `items: TimelineEntry[]`, `label? = 'Timeline'`, `presentLabel? = 'present'`, `toLabel? = 'to'`, `currentLabel? = 'Current'` | `item?(entry)` | `<ol>` named by `label`; an open-ended entry is introduced by `currentLabel` |
+| `Timeline` | A dated sequence | `items: readonly TimelineEntry[]`, `label? = 'Timeline'`, `presentLabel? = 'present'`, `toLabel? = 'to'`, `currentLabel? = 'Current'` | `item?(entry)` | `<ol>` named by `label`; an open-ended entry is introduced by `currentLabel` |
 
-`feedback` also exports `sizes.ts` (`DialogSize`, `ToastPosition`, `BarSize`, `StatsOrientation` and their class tables) and `toaster.ts` (`getToaster`, `setToaster`, `Toast`, `NewToast`, `ToastTone`, `ToasterApi`). `colourToken` on a `SegmentBar` segment or a `TimelineEntry` is a CSS custom-property name your theme declares — see `ui`'s `colourTokenStyle`.
+`feedback` also exports `sizes.ts` (`DialogSize`, `ToastPosition`, `BarSize`, `StatsOrientation` and their class tables `dialogSize`, `toastPosition`, `barSize`, `statsOrientation`) and `toaster.ts` (`getToaster`, `setToaster`, `Toast`, `NewToast`, `ToastTone`, `ToasterApi`), plus the prop types below. `colourToken` on a `SegmentBar` segment or a `TimelineEntry` is a CSS custom-property name your theme declares — see `ui`'s `colourTokenStyle`.
+
+| Type | What it is |
+| --- | --- |
+| `ConfirmForm` | `ConfirmDialog`'s `form` prop — a progressive-enhancement POST: `{ action, method?: 'POST', fields?: Record<string, string>, enhance?: (form) => void \| (() => void) }`. `fields` become hidden inputs inside the form; `enhance` is your app's own `use:enhance`. |
+| `BarSegment` | One `SegmentBar` part: `{ label, fraction, colourToken?, tone? }`, `fraction` in `[0, 1]`; `tone` applies only when there is no `colourToken`. |
+| `StatDelta` | `StatTile`'s change line: `{ value, unit?: 'count' \| 'percent' \| 'points', label? }`. Positive is up; with `unit: 'percent'`, `3.2` renders as `+3.2%`. |
+| `TimelineEntry` | One `Timeline` entry: `{ id, label, subtitle?, start: TimelineDate, end?: TimelineDate, href?, colourToken? }`. Omit `end` for an open-ended, still-current entry; `href` resolves through the components context. |
+| `TimelineDate` | One end of a span: `{ label, dateTime? }` — the display text and the machine-readable `<time datetime>` value. |
 
 ```svelte
 <script lang="ts">
@@ -354,7 +367,7 @@ Every primitive accepts it by spread — `<TextInput {...control} bind:value />`
 </form>
 ```
 
-`fields` also exports `field-types.ts` (`FieldControl`, `FieldSize`, `FieldOption`, `FieldOptionInput`, `toFieldOptions`) and the daisyUI size tables (`inputSize`, `selectSize`, …).
+`fields` also exports `field-types.ts` (`FieldControl`, `FieldSize`, `FieldOption`, `FieldOptionInput`, `toFieldOptions`) and the daisyUI size tables (`inputSize`, `textareaSize`, `selectSize`, `checkboxSize`, `toggleSize`, `fileInputSize`, each a `Record<FieldSize, string>`), and from `PushToggle` the `PushEnableResult` type (`{ _tag: 'enabled' | PushDeclineReason }`) and `PushDeclineReason` (`'unsupported' | 'unavailable' | 'denied'` — why `enable` did not subscribe, each with its own message prop).
 
 ```svelte
 <script lang="ts">
@@ -431,7 +444,9 @@ The tables, lists and pagers an index page and a detail page are built from. Two
 | `TreeListItem` | One leaf under it | — | `children?` | a plain `<li>` |
 | `DiffText` | A word- or character-level diff inline | `segments: DiffSegment[]`, `separator? = ' '`, `insertLabel?`, `deleteLabel?` | — | `<ins>`/`<del>` carry the meaning; colour and strike-through are the second copy, never the only one |
 
-`data` also exports `pageWindow`, `pageHref`, `nextSortState`, `columnAriaSort`, and the types `TableColumn`, `SortState`, `LinkListItemData`, `DiffSegment`. `pageHref(base, page, names?)` writes the position into `base`'s query, preserving every other parameter and the hash (JSON:API's `page[offset]`/`page[limit]` by default) — the callback shape a filtered list's pager needs so its own filter survives.
+`data` also exports `pageWindow`, `pageHref`, `nextSortState`, `columnAriaSort`, and the types `TableColumn`, `SortState`, `LinkListItemData`, `DiffSegment`. `pageHref(base, page, names?)` writes the position into `base`'s query, preserving every other parameter and the hash (JSON:API's `page[offset]`/`page[limit]` by default, exported as `PAGE_OFFSET_PARAM` / `PAGE_LIMIT_PARAM`; `names: PageParamNames` — `{ offset?, limit? }` — renames them) — the callback shape a filtered list's pager needs so its own filter survives. `pageWindow(page, total, siblings = 1): PageWindow` is the arithmetic `Pagination` draws: `{ page, pageCount, from, to, previous, next, items }`, page numbers 1-based, `previous` / `next` the neighbouring offsets (`undefined` at either end), and `items` a `readonly PageWindowItem[]` of `{ kind: 'page', page, offset, current }` and `{ kind: 'gap', after }` entries.
+
+`DescriptionList` hands its presentation to its rows through context: `DescriptionListStyle` is `{ variant, mono, showEmpty, emptyLabel }`, `setDescriptionListStyle(() => style)` / `getDescriptionListStyle()` set and read it, and `defaultDescriptionListStyle` (`grid`, not mono, empty rows hidden, `'unrecorded'`) is what a `DescriptionRow` uses outside any list.
 
 ```svelte
 <script lang="ts">
@@ -475,7 +490,17 @@ One family, two ways to fill it. Composed primitives (`InfoboxHeader`, `InfoboxI
 | `InfoboxSection` | A titled group of rows | `title?` + `HTMLAttributes<HTMLDListElement>` | `children` (the rows) | owns the `<dl>` |
 | `InfoboxRow` | One label/value pair | `label`, `value?: string \| number`, `href?` (through the components context), `external?`, `emptyLabel='unrecorded'`, `showEmpty?` + `HTMLAttributes<HTMLDivElement>` | `children?` (wins over `value`) | `<dt>`/`<dd>` pair; **empty by default** — `showEmpty` opts into an em dash captioned by `aria-label={emptyLabel}` |
 
-`InfoboxRowSpec` is a discriminated union — `{ kind: 'fact', label, value }` \| `{ kind: 'link', label, text, href, external? }` \| `{ kind: 'links', label, links: InfoboxLinkEntry[] }` \| `{ kind: 'image', ...InfoboxImageSpec }` \| `{ kind: 'custom', label, content: Snippet }` — filtered by the exported `infoboxRowIsPresent(row)`.
+`InfoboxRowSpec` is a discriminated union on `kind`, and each member is exported on its own:
+
+| Type | Shape | Skipped when |
+| --- | --- | --- |
+| `InfoboxFactRow` | `{ kind: 'fact', label, value: string \| number \| undefined }` — one identifying fact | `value` is `undefined` or `''` |
+| `InfoboxLinkRow` | `{ kind: 'link', label, text, href: string \| undefined, external? }` — one named link with its own visible text | `href` is `undefined` or `''` |
+| `InfoboxLinksRow` | `{ kind: 'links', label, links: readonly InfoboxLinkEntry[] \| undefined }` — a relationship rendered as several links (`InfoboxLinkEntry` is `{ label, href }`) | `links` is `undefined` or empty |
+| `InfoboxImageRow` | `{ kind: 'image', ...InfoboxImageSpec }` — the identifying picture, rendered above the `<dl>` as an `InfoboxImage` | `src` is `''` |
+| `InfoboxCustomRow` | `{ kind: 'custom', label, content: Snippet<[]> }` — arbitrary markup as the value | never |
+
+`InfoboxImageSpec` (`{ src, alt, caption?, width?, height?, eager? }`) is also what `Infobox`'s `image` prop takes. `infoboxRowIsPresent(row): boolean` is the "skipped when" column as a function — the one definition of an empty row that `Infobox` filters `rows` with.
 
 ```svelte
 <script lang="ts">
@@ -495,7 +520,7 @@ One family, two ways to fill it. Composed primitives (`InfoboxHeader`, `InfoboxI
 <!-- Typed rows — same primitives, one array. -->
 <script lang="ts">
   const rows: InfoboxRowSpec[] = [
-    { kind: 'image', src: taxon.image?.url, alt: taxon.name, eager: true },
+    { kind: 'image', src: taxon.imageUrl, alt: taxon.name, eager: true },
     { kind: 'fact', label: 'Family', value: taxon.family },
     { kind: 'links', label: 'Synonyms', links: taxon.synonyms.map((s) => ({ label: s.name, href: s.href })) },
   ];
@@ -514,7 +539,7 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 | `FormatList<T>` | Renders items through `Intl.ListFormat.formatToParts`, so conjunction/disjunction text ("and", ", ") comes from the runtime | `items: readonly T[]`, `style? = 'long'`, `type? = 'conjunction'`, `locales?` | `children(item: T)` | no wrapper element |
 | `RelativeTime` | "3 hours ago" / "in 2 days" via `Intl.RelativeTimeFormat`, picking the largest unit whose magnitude rounds to ≥ 1 | `value: Date \| number \| string`, `now?` (pin it in tests), `locales?`, `numeric? = 'auto'`, `style? = 'long'` | — | `<time datetime=ISO title=absolute>` — the absolute instant is never hidden |
 | `Year` | `<time>` with just a year — `datetime="1925"` — and its `Intl.DateTimeFormat` rendering | `value: Date \| number \| string` (a number is a calendar year; an instant contributes its UTC year), `locales?`, `era?`, `representation? = 'numeric'` (`'2-digit'`) | — | native `<time>`; `datetime` is a valid HTML year string (ISO instant before 1 CE) |
-| `Highlight` (+ exported `tokenise`) | Best-effort client-side token highlight for search results | `text: string`, `query: string` | — | `<mark>` per matched token; naive — a UX nicety, not the authoritative FTS match |
+| `Highlight` (+ exported `tokenise(text, query): { text, match }[]`, the segmentation it renders) | Best-effort client-side token highlight for search results | `text: string`, `query: string` | — | `<mark>` per matched token; naive — a UX nicety, not the authoritative FTS match |
 
 ```svelte
 <DateTime value={post.publishedAt} dateStyle="long" />
@@ -553,7 +578,7 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 <Figure caption="A row of tomato seedlings"><img src={photo.src} alt="Tomato seedlings" /></Figure>
 ```
 
-`imageDimensions(file: Blob): Promise<{ width, height }>` reads an image file's intrinsic pixel size with `createImageBitmap`, in the browser, so an upload form can submit `width` / `height` with the binary (it is what `ImageInput` measures with). It rejects with `ImageDimensionsUnavailable` where there is no `createImageBitmap` (on a server), and with the browser's own error for a file that does not decode.
+`imageDimensions(file: Blob): Promise<ImageDimensions>` (`ImageDimensions` is `{ width, height }`, in pixels) reads an image file's intrinsic pixel size with `createImageBitmap`, in the browser, so an upload form can submit `width` / `height` with the binary (it is what `ImageInput` measures with). It rejects with `ImageDimensionsUnavailable` where there is no `createImageBitmap` (on a server), and with the browser's own error for a file that does not decode.
 
 ## hotkeys
 
@@ -565,14 +590,32 @@ The family is also its own entry, `@thomasfosterau/components/hotkeys`. Import `
 | --- | --- | --- | --- | --- |
 | `HotkeyProvider` | The single global `keydown` listener: chords, sequences, the editable guard | — (reads the registry from context) | — | renders nothing. Its obligation is negative — it never steals a keystroke from a control that needs one. While focus is in an editable target, or while `paletteOpen`/`helpOpen` is set, only `allowInEditable` actions fire |
 | `HotkeyBadge` | A trigger as `kbd` chips | `trigger: HotkeyTrigger`, `commandLabel? = '⌘'`, `controlLabel? = 'Ctrl'`, `thenLabel? = 'then'` + `HTMLAttributes<HTMLSpanElement>` | — | `<kbd>` per key; `$mod` renders as `controlLabel` on the server and resolves per platform after mount |
-| `HotkeyHelpDialog` | The `?` overlay listing every live hotkey | `title? = 'Keyboard shortcuts'`, `closeLabel? = 'Close'`, `emptyLabel?`, `groupLabels? = { page: 'This page', global: 'Everywhere' }`, `commandLabel?`, `controlLabel?`, `thenLabel?` | — | this library's `Dialog`; each scope is a `<section>` with a heading over a `<ul>`. Opened/closed through the registry's `helpOpen` |
+| `HotkeyHelpDialog` | The overlay listing every live hotkey, opened by an action you register (conventionally `?`) | `title? = 'Keyboard shortcuts'`, `closeLabel? = 'Close'`, `emptyLabel? = 'No keyboard shortcuts are available on this page.'`, `groupLabels? = { page: 'This page', global: 'Everywhere' }`, `commandLabel?`, `controlLabel?`, `thenLabel?` | — | this library's `Dialog`; each scope is a `<section>` with a heading over a `<ul>`. Opened/closed through the registry's `helpOpen` |
 
 | Export | What it is |
 | --- | --- |
-| `createHotkeyRegistry({ isAdmin, dev? })` | Creates the registry and puts it in context. Call once, from the root layout. `isAdmin` is a function, so the gate is reactive. |
-| `getHotkeyRegistry()` / `tryGetHotkeyRegistry()` | Read it back; the second returns `undefined` instead of throwing — the seam `CommandPalette` uses to work with no registry. |
-| `registerHotkeys(() => actions, { scope? })` | Declarative registration for the calling component's lifetime; `scope` defaults to `'page'`. |
-| `HotkeyTrigger` | Either a **chord** (`'$mod+k'`) — modifiers held together, `$mod` being ⌘ on Apple platforms and Ctrl elsewhere — or a **sequence** (`'e'`, `['g', 'p']`) of plain keys pressed in order, buffered for `SEQUENCE_TIMEOUT_MS`. |
+| `createHotkeyRegistry(options: HotkeyRegistryOptions): HotkeyRegistry` | Creates the registry and puts it in context. Call once, from the root layout, during component initialisation. |
+| `HotkeyRegistryOptions` | `{ isAdmin: () => boolean, dev?: boolean }`. `isAdmin` is a function, so the gate is reactive; with `dev` set, registering a trigger that shadows an existing one logs a console warning (wire it to your bundler's dev flag). |
+| `getHotkeyRegistry()` / `tryGetHotkeyRegistry()` | Read it back; the first throws `HotkeyRegistryMissing` (an `Error` subclass) when no registry was created above, the second returns `undefined` instead — the seam `CommandPalette` uses to work with no registry. |
+| `registerHotkeys(() => actions, { scope? })` | Declarative registration for the calling component's lifetime; `scope` defaults to `'page'`. The thunk is reactive: when what it reads changes, the batch is replaced. |
+| `HotkeyRegistry` | The class `createHotkeyRegistry` returns. `paletteOpen` and `helpOpen` are writable `$state` flags (what a palette or help action toggles); `active` (role-filtered, match-precedence order: page before global, later registrations first), `paletteActions` (palette-visible, registration order) and `hotkeys` (those with a trigger, registration order) are read-only `RegisteredAction[]`s; `register(scope, actions)` returns its unregister function. An action with `requiresAdmin` is absent from all three for a viewer `isAdmin()` rejects. |
+| `CommandAction` | One registered action: `{ id, label, group: CommandActionGroup, run: () => void \| Promise<void>, trigger?: HotkeyTrigger, requiresAdmin?, paletteVisible?, allowInEditable? }`. No `trigger` makes it palette-only; `paletteVisible: false` makes it hotkey-only; `allowInEditable` lets it fire while focus is in an input (reserve it for the palette opener). |
+| `CommandActionGroup` | `'actions' \| 'navigation'` — the palette section an action is listed under. |
+| `HotkeyScope` | `'global' \| 'page'`. Page registrations are torn down with their page and win trigger conflicts over global ones. |
+| `RegisteredAction` | `{ scope, action }` — what the registry's read surfaces return. |
+| `HotkeyTrigger` | `HotkeyChord \| HotkeySequence`. A **chord** (`HotkeyChord`, a string such as `'$mod+k'`) is `+`-separated modifiers (`$mod`, `alt`, `shift`) and a key held together, `$mod` being ⌘ on Apple platforms and Ctrl elsewhere; a **sequence** (`HotkeySequence`, `readonly string[]` such as `['g', 'p']`) is plain keys pressed in order, buffered for `SEQUENCE_TIMEOUT_MS` (1000). A string without `+` (`'e'`, `'?'`) is a one-key sequence. Shift is never written for a shifted character: `'?'` already arrives as `?`. |
+
+The matching rules `HotkeyProvider` runs are exported as pure functions, for a caller building its own listener or testing its triggers:
+
+| Function | What it does |
+| --- | --- |
+| `matchChord(event, actions): CommandAction \| undefined` | The first action whose chord trigger matches the event. `actions` must already be in precedence order (`registry.active` is). The other platform's modifier must not be held, so Ctrl+K on a Mac does not fire `$mod+k`. |
+| `matchSequence(buffer, actions): SequenceMatch` | Matches a buffer of keys against every plain-key trigger. `SequenceMatch` is `{ exact: CommandAction \| undefined, isPrefix: boolean }` — the first action the buffer completes, and whether the buffer could still grow into a longer sequence. |
+| `isSequenceKey(event): boolean` | Whether the key can join a sequence: one printable character, no ⌘ / Ctrl / Alt. |
+| `hasChordModifier(event): boolean` | Whether ⌘, Ctrl or Alt is held. |
+| `isEditableTarget(target): boolean` | Whether the target is an `input`, `textarea`, `select` or contenteditable element — where only `allowInEditable` actions fire. |
+| `isApplePlatform(): boolean` | Whether `$mod` means ⌘ here (`navigator.platform` is a Mac or iOS device); `false` where there is no `navigator`. |
+| `triggerDisplay(trigger): TriggerDisplay` | The trigger as `HotkeyBadge` renders it: `TriggerDisplay` is `{ keys: readonly string[], sequential: boolean }`, keys upper-cased except `'$mod'`, which is left for the renderer to resolve per platform. |
 
 ```svelte
 <!-- Root layout, once. -->
@@ -581,7 +624,8 @@ The family is also its own entry, `@thomasfosterau/components/hotkeys`. Import `
 
   const hotkeys = createHotkeyRegistry({ isAdmin: () => user?.isAdmin === true, dev });
   registerHotkeys(() => [
-    { id: 'palette.toggle', label: 'Open the command palette', group: 'actions', trigger: '$mod+k', allowInEditable: true, paletteVisible: false, run: () => (hotkeys.paletteOpen = !hotkeys.paletteOpen) },
+    { id: 'palette.toggle', label: 'Open the command palette', group: 'actions', trigger: '$mod+k', allowInEditable: true, paletteVisible: false, run: () => { hotkeys.paletteOpen = !hotkeys.paletteOpen; } },
+    { id: 'help.toggle', label: 'Show keyboard shortcuts', group: 'actions', trigger: '?', run: () => { hotkeys.helpOpen = !hotkeys.helpOpen; } },
     { id: 'nav.plants', label: 'Go to plants', group: 'navigation', trigger: ['g', 'p'], run: () => goto('/plants') },
   ], { scope: 'global' });
 </script>
@@ -605,9 +649,9 @@ One component, because a palette is one thing: a dialog, a query box, and rows f
 
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
-| `CommandPalette` | The ⌘K palette: actions, navigation and search results in one list | `open? ⚓` (two-way bound to the registry's `paletteOpen` when a registry exists), `label? = 'Command palette'`, `placeholder? = 'Type a command or search…'`, `loadingLabel? = 'Searching…'`, `emptyLabel? = 'No results'`, `closeLabel? = 'Close'`, `groups?: readonly { id, label }[]`, `items?: readonly CommandItem[]`, `onSearch?: (query, signal) => Promise<readonly CommandItem[]>`, `debounceMs? = 150`, `onSelect?: (item) => void` | `item?(item)` | `Dialog`'s plus `Command`'s: the input is a `combobox` owning a `listbox`, each row an `option`, `aria-activedescendant` follows the arrow keys. The pending row is a `progressbar` named by `loadingLabel` |
+| `CommandPalette` | The ⌘K palette: actions, navigation and search results in one list | `open? ⚓` (two-way bound to the registry's `paletteOpen` when a registry exists), `label? = 'Command palette'`, `placeholder? = 'Type a command or search…'`, `loadingLabel? = 'Searching…'`, `emptyLabel? = 'No results'`, `closeLabel? = 'Close'`, `groups? = defaultCommandGroups` (`readonly CommandGroup[]`), `items?: readonly CommandItem[]`, `onSearch?: (query, signal) => Promise<readonly CommandItem[]>`, `debounceMs? = 150`, `onSelect?: (item) => void` | `item?(item)` | `Dialog`'s plus `Command`'s: the input is a `combobox` owning a `listbox`, each row an `option`, `aria-activedescendant` follows the arrow keys. The pending row is a `progressbar` named by `loadingLabel` |
 
-`onSearch` follows the same debounce / latest-wins (`AbortController`) / stale-while-revalidate rules as `fields/Combobox`. `CommandItem` is `{ id, label, group, hint?, badge?, run?, href? }`; activation closes the palette, calls `onSelect`, then `run`, then navigates to `href` through the components context.
+`onSearch` follows the same debounce / latest-wins (`AbortController`) / stale-while-revalidate rules as `fields/Combobox`. `CommandItem` is `{ id, label, group, hint?, badge?, run?, href? }`; activation closes the palette, calls `onSelect`, then `run`, then navigates to `href` through the components context. A row's `group` names a `CommandGroup` — `{ id, label }`, a section and its heading — and `groups` sets which sections render, in order; a row whose `group` is not listed there is not shown. `defaultCommandGroups` is `[{ id: 'actions', label: 'Actions' }, { id: 'navigation', label: 'Go to' }, { id: 'results', label: 'Results' }]`: the registry's two `CommandActionGroup`s, then a `results` section for `onSearch` rows. Pass your own array to rename or translate the headings.
 
 ```svelte
 <!-- With a hotkey registry mounted, no props are needed at all. -->
@@ -653,7 +697,7 @@ One component, because a palette is one thing: a dialog, a query box, and rows f
 
 **The CSL-type records are local.** `BookRecord`, `ChapterRecord`, `ScholarlyArticleRecord`, `ThesisRecord`, `ReportRecord`, `PublisherRecord` and `CitationDate` are defined in this package for now, because the bibliographic model they will align with, `@thomasfosterau/biblio`, is not published yet. Contributors are resolved `Credit`s in credit order, not linkage. An app maps its resources onto these shapes at its own seam. The JSON:API `included` resolver belongs to effect-jsonapi's client helpers, not here.
 
-`formatCitation`, `BibliographyManager`, `setupBibliography`, `getBibliographyContext`, and the `CitationData`/`CitationKind`/`FootnoteData`/`Credit` types are also exported. (`Citation` and `Footnote` name the components; the data shapes are `CitationData`/`FootnoteData` to avoid a value/type collision.)
+`formatCitation`, `BibliographyManager`, `setupBibliography`, `getBibliographyContext`, and the `CitationData`/`CitationKind`/`FootnoteData`/`Credit` types are also exported. (`Citation` and `Footnote` name the components; the data shapes are `CitationData`/`FootnoteData` to avoid a value/type collision.) `BibliographyManager.citations()` returns `readonly BibliographyEntry[]` — `{ citation: CitationData, order }`, one per distinct source in first-cited order, `order` being the number its markers show. `CreditedRecord` (`{ authors?, editors?, translators? }`, each a `readonly Credit[]` in credit order, never re-sorted) is the contributor shape every CSL record above extends.
 
 ```svelte
 <script lang="ts">
@@ -704,10 +748,23 @@ Field labels, submit labels and option labels come from the definition's own mes
 
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
-| `Head` | Title (with a site-name suffix), description, keywords, robots, canonical URL, `hreflang` alternates, a feed link, Open Graph + Twitter / X tags, share image, `article:*`, `prev` / `next` | `title: string`, `siteName?`, `titleSeparator? = ' \| '`, `description?`, `keywords?`, `type?: SchemaPageType` (derives `og:type`), `openGraphType?`, `canonical?`, `pathname?` (defaults to `window.location.pathname`; pass `page.url.pathname` for SSR), `canonicalHref?` (defaults to the context `href`), `alternates?` / `locales?`, `ogLocale?` (defaults to the context locale, `-` → `_`), `feed?: { path, title? = 'Latest changes', type? = 'application/feed+json' }`, `robots?`, `image?` → `shareCard?` → `defaultImage?` (precedence), `shareCardPath? = '/og'`, `shareCardAlt?` (defaults to `"<title> — <siteName>"`), `published?`, `modified?`, `section?`, `tags?`, `twitterCard? = 'summary_large_image'`, `twitterSite?`, `twitterCreator?`, `prevUrl?`, `nextUrl?` | — | — (head metadata only) |
+| `Head` | Title (with a site-name suffix), description, keywords, robots, canonical URL, `hreflang` alternates, a feed link, Open Graph + Twitter / X tags, share image, `article:*`, `prev` / `next` | `title: string`, `siteName?`, `titleSeparator? = ' \| '`, `description?`, `keywords?`, `type?: SchemaPageType` (derives `og:type`), `openGraphType?: OpenGraphType`, `canonical?`, `pathname?` (defaults to `window.location.pathname`; pass `page.url.pathname` for SSR), `canonicalHref?` (defaults to the context `href`), `alternates?: AlternateLink[]` or `locales?` (`alternates` wins), `ogLocale?` (defaults to the context locale, `-` → `_`), `feed?: FeedLink`, `robots?: Robots`, `image?: HeadImage` → `shareCard?: OgImageCard` → `defaultImage?: HeadImage` (precedence), `shareCardPath? = '/og'`, `shareCardAlt?: (card) => string` (default `"<card title> — <siteName>"`, the title alone without a `siteName`), `published?`, `modified?`, `section?`, `tags?`, `twitterCard?: TwitterCard = 'summary_large_image'`, `twitterSite?`, `twitterCreator?`, `prevUrl?`, `nextUrl?` | — | — (head metadata only) |
 | `JsonLd` | One `<script type="application/ld+json">` block, serialised by `serializeJsonLd` | `data: JsonLdObject \| null \| undefined` — nullish renders nothing | — | — |
 
-`serializeJsonLd(data)` escapes `<`, `>`, `&`, U+2028 and U+2029 so authored text cannot close the script element; the output is still valid JSON. `ogImageUrl(card, { href?, basePath? })` builds the content-addressed share-card URL `<basePath>/<slug>.png?t=…&d=…&v=…`, where the `v` token is the card's `updatedAt` in epoch milliseconds, so a content change always mints a new URL (link-preview scrapers only re-fetch a URL they have not seen). It returns `undefined` for a blank title. The param names (`OG_TITLE_PARAM`, `OG_SUBTITLE_PARAM`, `OG_VERSION_PARAM`), the length caps and `OG_IMAGE_WIDTH` / `OG_IMAGE_HEIGHT` are exported so a card renderer reads back exactly what `Head` wrote. The renderer itself is server code and does not live here.
+`serializeJsonLd(data)` escapes `<`, `>`, `&`, U+2028 and U+2029 so authored text cannot close the script element; the output is still valid JSON. `ogImageUrl(card, { href?, basePath? })` builds the content-addressed share-card URL `<basePath>/<slug>.png?t=…&d=…&v=…`, where the `v` token is the card's `updatedAt` in epoch milliseconds, so a content change always mints a new URL (link-preview scrapers only re-fetch a URL they have not seen). It returns `undefined` for a blank title. The param names (`OG_TITLE_PARAM` = `'t'`, `OG_SUBTITLE_PARAM` = `'d'`, `OG_VERSION_PARAM` = `'v'`), the length caps (`OG_TITLE_MAX_LENGTH` = 120 and `OG_SUBTITLE_MAX_LENGTH` = 200 characters, to which `ogImageUrl` truncates the title and description) and `OG_IMAGE_WIDTH` / `OG_IMAGE_HEIGHT` (1200 × 630) are exported so a card renderer reads back exactly what `Head` wrote, and should re-apply the caps itself. The renderer itself is server code and does not live here.
+
+| Type | What it is |
+| --- | --- |
+| `OgImageCard` | What a share card is built from: `{ id, title, description?, updatedAt? }`. `id` only builds the readable `<slug>.png` path segment; `updatedAt` (a `Date`, ISO string or epoch number) drives the `v` token, and when absent or unparseable the URL is keyed by title and description alone. `Head`'s `shareCard` prop. |
+| `OgImageUrlOptions` | `ogImageUrl`'s second argument: `{ href?, basePath? }`. `href` resolves the card path to the emitted URL (identity by default; `Head` passes its `canonicalHref`), `basePath` is where the renderer is mounted (default `'/og'`). |
+| `HeadImage` | A share image: `{ url, alt?, width?, height?, type? }`; `url` must be absolute, `type` is the MIME type. `Head`'s `image` and `defaultImage`. |
+| `AlternateLink` | One `<link rel="alternate" hreflang>`: `{ href, lang }`, `lang` a BCP 47 tag or `x-default`. `Head`'s `alternates`. |
+| `FeedLink` | `Head`'s `feed`: `{ path, title? = 'Latest changes', type? = 'application/feed+json' }`; `path` is resolved through `canonicalHref` like the canonical URL. |
+| `Robots` | `Head`'s `robots`: `{ index?, follow? }`, both defaulting to `true`. The `robots` meta is always emitted. |
+| `OpenGraphType` | `'website' \| 'article' \| 'profile'` — `Head`'s `openGraphType`, which wins over the one derived from `type`. |
+| `SchemaPageType` | `'WebPage' \| 'WebSite' \| 'CollectionPage' \| 'Article' \| 'BlogPosting' \| 'ProfilePage'` — `Head`'s `type`, used only to derive `og:type`. |
+| `TwitterCard` | `'summary' \| 'summary_large_image'` — `Head`'s `twitterCard`. |
+| `JsonLdObject` | A JSON-LD node with a top-level `@context` — what `JsonLd`'s `data` and `serializeJsonLd` take. Deliberately loose, so `schema-dts`'s `WithContext<Thing>` is assignable to it without this package depending on a vocabulary. |
 
 **Canonical on the production origin.** `Head` resolves the canonical URL, the feed and the share card through `canonicalHref`, which defaults to the components context's `href`. If your `href` returns relative, locale-prefixed paths, pass an absolute resolver instead:
 
@@ -742,10 +799,23 @@ Field labels, submit labels and option labels come from the definition's own mes
 
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
-| `Tip` | One piece of inline guidance — title, optional message, actions. Shows itself only when its store says it may, and remembers that it did | `config: TipConfig`, `store: TipStore`, `stack?: TipStack`, `dismissLabel? = 'Dismiss'`, `class?` | — | `role="status" aria-live="polite"`; the dismiss button has an accessible name from `dismissLabel` |
-| `PopoverTip` | A `Tip` anchored to the thing it explains, floating beside it via bits-ui's `Popover` | `config: TipConfig`, `store: TipStore`, `stack?: TipStack`, `placement? = 'top'` (`'top'\|'bottom'\|'left'\|'right'`), `dismissLabel? = 'Dismiss'`, `class?` | `children` — the trigger content | bits-ui `Popover` dialog ARIA on the trigger; the bubble carries `Tip`'s `role="status"` |
+| `Tip` | One piece of inline guidance — title, optional message, actions. Shows itself only when its store says it may, and remembers that it did | `config: TipConfig`, `store: TipStore`, `stack? = soloTipStack`, `dismissLabel? = 'Dismiss'`, `class?` | — | `role="status" aria-live="polite"`; the dismiss button has an accessible name from `dismissLabel` |
+| `PopoverTip` | A `Tip` anchored to the thing it explains, floating beside it via bits-ui's `Popover` | `config: TipConfig`, `store: TipStore`, `stack? = soloTipStack`, `placement?: TipPlacement = 'top'`, `dismissLabel? = 'Dismiss'`, `class?` | `children` — the trigger content | bits-ui `Popover` dialog ARIA on the trigger; the bubble carries `Tip`'s `role="status"` |
 
-`createTipStore`, `createTipStack`, `soloTipStack`, `memoryTipStorage`, `browserTipStorage` and the `Tip*` types are also exported.
+| Export | What it is |
+| --- | --- |
+| `createTipStore(options?: TipStoreOptions): TipStore` | The store. `TipStoreOptions` is `{ storage?: TipStorage, prefix? = 'tips:' }`; `storage` defaults to `browserTipStorage()`. Call once, high in the tree. |
+| `TipStore` | `register(config)` (re-registering an id replaces its config), `shouldDisplay(id)`, `getState(id)`, `markShown(id)`, `dismiss(id)`, `complete(id)`, `resetAll()`. An unregistered id never displays. |
+| `TipStorage` | `{ getItem, setItem, removeItem }` — the subset of the DOM `Storage` interface the store needs, so `localStorage` satisfies it and a test can pass a plain object. Every access is guarded; a refusing storage only costs persistence. |
+| `browserTipStorage()` / `memoryTipStorage()` | `localStorage` where it exists and accepts a write, else in-memory; and always in-memory (for tests and stories). |
+| `createTipStack(): TipStack` / `soloTipStack` | `TipStack` is `{ push, pop, isTopmost }` — which tips are on screen, most recent last, so Escape closes only the topmost. `soloTipStack` always answers "topmost", the default when a tip gets no `stack`. |
+| `TipConfig` | A tip as declared: `{ id, title, message?, actions?: TipAction[], rules?: TipRule[], frequency?: TipFrequency, maxDisplayCount? }`. |
+| `TipAction` | A button on the tip: `{ id, title, handler: () => void \| Promise<void> }`. Taking one awaits `handler`, then **completes** the tip. |
+| `TipRule` | `{ id, evaluate: () => boolean }`; every rule must hold for the tip to show. Synchronous on purpose — await your data first, then register the tip. |
+| `TipFrequency` | `'immediate' \| 'hourly' \| 'daily' \| 'weekly' \| 'once'` (default `'immediate'`): how soon a tip may reappear after it was last shown. |
+| `TipStatus` | `'pending' \| 'available' \| 'dismissed' \| 'completed'`. `dismissed` and `completed` are both terminal — `shouldDisplay` checks status before frequency, so neither shows again, even at `'immediate'`. |
+| `TipState` | What is persisted per tip: `{ id, status, displayCount, lastShown?, dismissedAt?, completedAt? }` (ISO 8601 timestamps). |
+| `TipPlacement` | `'top' \| 'bottom' \| 'left' \| 'right'` — `PopoverTip`'s `placement`. |
 
 ```ts
 import { createTipStore } from '@thomasfosterau/components/tips';
@@ -781,7 +851,7 @@ store.register({
 
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
-| `Chart` | A line, area or bar chart over one y axis, with a data table always present and a hover readout | `series`, `kind? = 'line'` (`'line'\|'area'\|'bar'`), `title`, `description?`, `height? = 240`, `showTable?`, `legendLabel? = 'Series'`, `tableLabel?` (defaults to `title`), `categoryLabel?`, `formatValue?`, `class?` | — | `<svg role="img">` named by `title`; the figures are always reachable through an (optionally hidden) `<table>` captioned by `tableLabel`; the hover readout is `role="status"` |
+| `Chart` | A line, area or bar chart over one y axis, with a data table always present and a hover readout | `series: readonly ChartSeries[]`, `kind?: ChartKind = 'line'`, `title`, `description?`, `height? = 240`, `showTable? = false`, `legendLabel? = 'Series'`, `tableLabel?` (defaults to `title`), `categoryLabel?`, `formatValue?`, `class?` | — | `<svg role="img">` named by `title`; the figures are always reachable through an (optionally hidden) `<table>` captioned by `tableLabel`; the hover readout is `role="status"` |
 
 ```svelte
 <script lang="ts">
@@ -796,9 +866,11 @@ store.register({
 <Chart {series} kind="bar" title="Observations by kind" formatValue={(v) => `${v} kg`} showTable />
 ```
 
+`ChartSeries` is `{ key, label, points: readonly ChartPoint[] }` and `ChartPoint` is `{ label, value }` — `label` the x-axis category, already localised; every series shares the first series' categories, in x order. `ChartKind` is `'line' | 'area' | 'bar'`.
+
 Rules it enforces rather than leaving to the caller: one y axis (two measures of different scale are two charts); the zero line is always drawn; identity is never colour alone (a legend for 2+ series, a direct end-of-line label for ≤4); the numbers are always readable as a `<table>`, visually hidden by default. `key` is stable identity and picks the colour, so a filtered-out series never repaints the survivors that remain.
 
-Series colours come from four validated theme slots, `--color-chart-1…4`, assigned by series order and never cycled — a fifth series draws in `--color-neutral` and the legend says which one it is. See [`theme.css`](src/lib/theme.css) for the measured separations, and `packages/components/CLAUDE.md`'s Terms section for the rules those measurements exist to keep.
+Series colours come from four validated theme slots, `--color-chart-1…4`, assigned by series order and never cycled — a fifth series draws in `--color-neutral` and the legend says which one it is. See [`theme.css`](https://github.com/thomasfosterau/components/blob/trunk/packages/components/src/lib/theme.css) for the measured separations, and the [package guide's Terms section](https://github.com/thomasfosterau/components/blob/trunk/packages/components/CLAUDE.md#terms) for the rules those measurements exist to keep.
 
 ## canvas
 
@@ -806,11 +878,11 @@ Series colours come from four validated theme slots, `--color-chart-1…4`, assi
 
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
-| `VectorCanvas` | A pan-and-zoom SVG surface over a `VectorDocument`, with elements drawn by a renderer the caller supplies. Reports gestures; mutates nothing | `doc`, `selected?`, `tool?`, `width?`, `height?`, `interactive?`, `label? = 'Vector editing canvas'`, `onviewportchange?`, `oninteract?`, `class?`, plus the native `<svg>` attributes | `element(shape, selected)` — draws one element; omitted, a fallback marker is drawn | `<svg role="application">` named by `label`. `application` is the honest role for a surface whose whole vocabulary is pointer gestures — and a promise the page must keep by offering a non-pointer route to the same edits |
+| `VectorCanvas` | A pan-and-zoom SVG surface over a `VectorDocument`, with elements drawn by a renderer the caller supplies. Reports gestures; mutates nothing | `doc: VectorDocument<T>`, `selected?: ReadonlySet<string>` (default empty), `tool? = 'select'` (`'pan'` is the one it handles itself), `width? = 800`, `height? = 600`, `interactive? = true`, `label? = 'Vector editing canvas'`, `onviewportchange?`, `oninteract?`, `class?`, plus the native `<svg>` attributes | `element(shape, selected)` — draws one element; omitted, a fallback marker is drawn | `<svg role="application">` named by `label`. `application` is the honest role for a surface whose whole vocabulary is pointer gestures — and a promise the page must keep by offering a non-pointer route to the same edits |
 
 ```svelte
 <script lang="ts">
-  import { VectorCanvas, type CanvasElement, type Viewport } from '@thomasfosterau/components/canvas';
+  import { VectorCanvas, type CanvasElement, type VectorDocument, type Viewport } from '@thomasfosterau/components/canvas';
   let doc = $state<VectorDocument>(plan);
 </script>
 
@@ -823,11 +895,29 @@ Series colours come from four validated theme slots, `--color-chart-1…4`, assi
 </VectorCanvas>
 ```
 
-`oninteract` reports `{ phase: 'down'|'move'|'up', tool, point, detail, native }` in CANVAS coordinates, already snapped when `doc.grid.snap` is set. `canvas/history.ts` gives pure undo/redo over `Transform`s rather than document snapshots (`emptyHistory`, `applyTransform`, `invertTransform`, `diffTransform`, `recordEdit`, `undo`, `redo`, `HISTORY_LIMIT = 100`) — a history of edits is bounded by the size of the edits, not the size of the plan. `canvas/utils.ts` gives the geometry underneath it: `screenToCanvas`/`canvasToScreen`, `snapToGrid`, `distance`, `pointInRect`, `pointNearLine`, `sortByZIndex`, `boundingBox`, `rotatePoint`, `panBy`, `zoomAbout`, `generateId`.
+`oninteract` reports `{ phase: 'down'|'move'|'up', tool, point, detail, native }` in CANVAS coordinates, already snapped when `doc.grid.snap` is set; `detail` counts rapid presses at one spot (2 on the second of a double-press, always 1 on `move` and `up`).
+
+The document model is plain data:
+
+| Type | What it is |
+| --- | --- |
+| `VectorDocument<T>` | `{ version, metadata, viewport: Viewport, grid: GridConfig, elements: readonly T[] }` — the whole editable document, `version` being your schema version for migrations. |
+| `CanvasElement` | What every element carries: `{ id: ElementId, type, position: Point, rotation, zIndex, strokeColor, strokeWidth, fillColor, opacity, locked, visible?, label?, metadata? }`. Extend it with your own element types; `type` is the discriminator your renderer switches on. |
+| `ElementId` | `string` — an element's stable identity (`generateId()` mints one with `crypto.randomUUID()`). |
+| `Point` | `{ x, y }` in canvas coordinates — the document's own space, not the screen's. |
+| `Rect` | `{ x, y, width, height }` — an axis-aligned box in canvas coordinates (`boundingBox`, `pointInRect`). |
+| `Viewport` | `{ offsetX, offsetY, zoom }` — pan and zoom, `zoom: 1` being 100%. |
+| `GridConfig` | `{ visible, size, snap, color }` — the background grid, its cell size in canvas units, whether pointer positions snap to it, and a CSS colour. |
+| `Transform<T>` | A change as data: `{ type: 'add' \| 'update' \| 'delete' \| 'batch', elementIds, elements?, previousElements? }`. Carrying the previous elements is what makes it invertible. |
+| `HistoryEntry<T>` | One undo-stack entry: `{ transform, timestamp, description? }` (`timestamp` in epoch milliseconds). |
+| `History<T>` | `{ past, future }` — the undo stack (oldest first) and the redo stack (nearest first). The caller owns it, as it owns the document. |
+| `HistoryStep<T>` | `{ doc, history }` — the result of one `undo` or `redo`. |
+
+`canvas/history.ts` gives pure undo/redo over `Transform`s rather than document snapshots (`emptyHistory`, `applyTransform`, `invertTransform`, `diffTransform`, `recordEdit`, `undo`, `redo`, `HISTORY_LIMIT = 100`) — a history of edits is bounded by the size of the edits, not the size of the plan. `undo(doc, history)` and `redo(doc, history)` return `readonly HistoryStep[]` holding one step, or none when there is nothing to take back, so `const [step] = undo(doc, history)` needs no sentinel. `canvas/utils.ts` gives the geometry underneath it: `screenToCanvas`/`canvasToScreen`, `snapToGrid`, `distance`, `pointInRect`, `pointNearLine`, `sortByZIndex`, `boundingBox`, `rotatePoint`, `panBy`, `zoomAbout`, `generateId`.
 
 ## maps — moved
 
-Maps live in their own package, [`@thomasfosterau/components-mapbox`](../maps/README.md) (`pnpm add @thomasfosterau/components-mapbox mapbox-gl`), because they need `mapbox-gl`; nothing in this package imports it, and `@thomasfosterau/components/maps` is no longer an entry point.
+Maps live in their own package, [`@thomasfosterau/components-mapbox`](https://github.com/thomasfosterau/components/blob/trunk/packages/mapbox/README.md) (`pnpm add @thomasfosterau/components-mapbox mapbox-gl`), because they need `mapbox-gl`; nothing in this package imports it, and `@thomasfosterau/components/maps` is no longer an entry point.
 
 ## License
 
