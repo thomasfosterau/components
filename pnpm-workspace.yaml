@@ -36,7 +36,7 @@ catalog:
   # that package exists at all, adjacent to `packages/components` rather than
   # inside it: a component whose behaviour needs a specific third-party engine
   # lives in its own package, so the core library stays free of it. Installed
-  # here as a devDependency of packages/maps too, so that package's own browser
+  # here as a devDependency of packages/mapbox too, so that package's own browser
   # suite and its stories load the real module. The range is what consumers
   # must satisfy.
   'mapbox-gl': ^3.33.0
