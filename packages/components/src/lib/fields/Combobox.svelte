@@ -49,13 +49,26 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
   COMMITS. The fall-through happens where it matters — a query that matched
   nothing, or a panel the reader never opened — which is exactly the case a
   no-JS search form depends on.
+
+  `postedValue="query"` turns the widget into a search box, and changes two
+  things. The `name` moves onto the visible `<input>`, so the form posts the
+  typed text, and it does so with JavaScript off because the server-rendered
+  input is the posted control. And Enter submits the form unless the reader
+  MOVED to an option with the keyboard (`navigated`): bits-ui's
+  auto-highlight of the first candidate does not count, so typing a query and
+  pressing Enter searches for that query instead of opening the first
+  suggestion. Clicking an option still commits it.
 -->
 <script lang="ts" generics="T">
   import { Combobox } from 'bits-ui';
   import type { Snippet } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
   import { inputSize, type FieldSize } from './field-types.ts';
 
-  interface Props {
+  /** Keys of the root `<div>`'s attributes that this component claims for itself. */
+  type OwnKeys = 'id' | 'class' | 'children';
+
+  interface Props extends Omit<HTMLAttributes<HTMLDivElement>, OwnKeys> {
     /** The selected item's id. */
     value?: string | undefined;
     /** A static list, filtered here by label. Ignored when `onSearch` is set. */
@@ -80,8 +93,26 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
     label: string;
     /** Placeholder in the input. */
     placeholder?: string | undefined;
-    /** Posted field name. Set it to render a hidden input carrying the id. */
+    /**
+     * Posted field name. With `postedValue="id"` it renders a hidden input
+     * carrying the selected id; with `postedValue="query"` it goes on the
+     * visible input, which posts the typed text.
+     */
     name?: string | undefined;
+    /**
+     * What the field under `name` posts: the selected item's id, or the typed
+     * query text. `'query'` makes the input itself the posted control (so a
+     * plain GET search form works with JavaScript off) and makes Enter submit
+     * the form unless the reader arrowed to an option.
+     * @defaultValue `'id'`
+     */
+    postedValue?: 'id' | 'query' | undefined;
+    /** Text in the input at mount, such as the current search. A selected item's label wins. */
+    initialQuery?: string | undefined;
+    /** Called with the raw input text on every keystroke. */
+    onQueryChange?: ((query: string) => void) | undefined;
+    /** Called with the item the reader committed (click, or Enter on a highlighted row). */
+    onSelect?: ((item: T) => void) | undefined;
     /**
      * Shown when a settled search returned nothing.
      * @defaultValue `'No matches'`
@@ -112,8 +143,18 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
      * @defaultValue `'md'`
      */
     size?: FieldSize | undefined;
-    /** Extra classes, merged last. */
+    /** Extra classes on the root, merged last. */
     class?: string | undefined;
+    /** Extra classes on the `<input>`, merged last (e.g. daisyUI `join-item`). */
+    inputClass?: string | undefined;
+    /** Keep the label as the input's accessible name but hide it visually. */
+    hideLabel?: boolean | undefined;
+    /**
+     * Portal the listbox to `<body>`. `false` renders it inside this
+     * component's root instead; it still floats over the layout.
+     * @defaultValue `true`
+     */
+    portal?: boolean | undefined;
     /** Replace a row's contents. */
     item?: Snippet<[T]> | undefined;
     /** Rendered after the rows — a "create this" row, a "see all" link. */
@@ -133,6 +174,10 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
     label,
     placeholder,
     name,
+    postedValue = 'id',
+    initialQuery,
+    onQueryChange,
+    onSelect,
     emptyLabel = 'No matches',
     pendingLabel = 'Searching…',
     errorMessage,
@@ -143,21 +188,29 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
     disabled = false,
     size = 'md',
     class: className,
+    inputClass,
+    hideLabel = false,
+    portal = true,
     item,
     footer,
     empty,
+    ...rest
   }: Props = $props();
 
   const uid = $props.id();
   const inputId = $derived(idProp ?? uid);
 
-  let query = $state('');
+  // Only the initial value seeds the text; later changes come from typing.
+  // svelte-ignore state_referenced_locally
+  let query = $state(initialQuery ?? '');
   let open = $state(false);
   let results = $state<readonly T[]>([]);
   let pending = $state(false);
   let searchError = $state<string | undefined>();
   /** The id of the row bits-ui currently has under the cursor, if any. */
   let highlighted = $state<string | undefined>();
+  /** The reader moved the cursor with the keyboard since they last typed. */
+  let navigated = false;
 
   let timer: ReturnType<typeof setTimeout> | undefined;
   let inFlight: AbortController | undefined;
@@ -176,6 +229,11 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
     const match = items.find((entry) => getId(entry) === value);
     return match === undefined ? undefined : getLabel(match);
   });
+
+  /** Seeds bits-ui's input text once, at mount. */
+  const initialText = $derived(selectedLabel ?? initialQuery);
+
+  const postsQuery = $derived(postedValue === 'query');
 
   const visibleError = $derived(errorMessage ?? searchError);
 
@@ -216,6 +274,8 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
 
   const typed = (event: Event & { currentTarget: HTMLInputElement }): void => {
     query = event.currentTarget.value;
+    navigated = false;
+    onQueryChange?.(query);
     if (onSearch === undefined) {
       open = true;
       return;
@@ -233,8 +293,18 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
     schedule(query);
   };
 
+  const navigationKeys = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End', 'PageDown', 'PageUp']);
+
   const keydown = (event: KeyboardEvent): void => {
-    if (event.key !== 'Enter' || highlighted !== undefined) return;
+    if (navigationKeys.has(event.key)) {
+      navigated = true;
+      return;
+    }
+    if (event.key !== 'Enter') return;
+    // In query mode a highlight the reader did not move to is bits-ui's
+    // auto-highlight, not a choice: treat it as nothing highlighted.
+    const committing = highlighted !== undefined && (!postsQuery || navigated);
+    if (committing) return;
     // Nothing to commit. Close first so bits-ui's own Enter branch takes the
     // closed path, which returns without `preventDefault` — that is what lets
     // a wrapping form submit.
@@ -242,8 +312,8 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
   };
 </script>
 
-<div class={['fieldset w-full', className]}>
-  <label class="label" for={inputId}>{label}</label>
+<div {...rest} class={['fieldset w-full', className]}>
+  <label class={['label', hideLabel && 'sr-only']} for={inputId}>{label}</label>
 
   <Combobox.Root
     type="single"
@@ -251,23 +321,27 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
     value={value ?? ''}
     onValueChange={(next) => {
       value = next === '' ? undefined : next;
+      if (next === '' || onSelect === undefined) return;
+      const chosen = visible.find((entry) => getId(entry) === next);
+      if (chosen !== undefined) onSelect(chosen);
     }}
     {disabled}
     {required}
   >
     <Combobox.Input
       id={inputId}
-      {...selectedLabel === undefined ? {} : { defaultValue: selectedLabel }}
+      {...initialText === undefined ? {} : { defaultValue: initialText }}
+      {...postsQuery && name !== undefined ? { name } : {}}
       {placeholder}
       autocomplete="off"
       aria-describedby={describedBy === '' ? undefined : describedBy}
       aria-invalid={invalid ? 'true' : undefined}
       oninput={typed}
       onkeydown={keydown}
-      class={['input w-full', inputSize[size], invalid && 'input-error']}
+      class={['input w-full', inputSize[size], invalid && 'input-error', inputClass]}
     />
 
-    <Combobox.Portal>
+    <Combobox.Portal disabled={!portal}>
       <Combobox.Content
         sideOffset={4}
         class="menu bg-base-100 rounded-box border-base-300 z-50 max-h-72 min-w-64 overflow-auto border p-2 shadow-md"
@@ -315,11 +389,12 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
   </Combobox.Root>
 
   <!--
-    The posted value is the id, not the typed text: bits-ui's own hidden input
-    is not used, because `name` here means "post the selection" and nothing
-    else about the widget should depend on it.
+    In id mode the posted value is the id, not the typed text: bits-ui's own
+    hidden input is not used, because `name` here means "post the selection"
+    and nothing else about the widget should depend on it. In query mode the
+    visible input above carries `name` instead.
   -->
-  {#if name !== undefined}
+  {#if name !== undefined && !postsQuery}
     <input type="hidden" {name} value={value ?? ''} />
   {/if}
 

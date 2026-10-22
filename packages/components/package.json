@@ -54,6 +54,11 @@
       "svelte": "./dist/tips/index.js",
       "default": "./dist/tips/index.js"
     },
+    "./hotkeys": {
+      "types": "./dist/hotkeys/index.d.ts",
+      "svelte": "./dist/hotkeys/index.js",
+      "default": "./dist/hotkeys/index.js"
+    },
     "./seo": {
       "types": "./dist/seo/index.d.ts",
       "svelte": "./dist/seo/index.js",

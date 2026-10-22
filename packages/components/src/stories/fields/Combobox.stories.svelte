@@ -9,7 +9,7 @@
       docs: {
         description: {
           component:
-            'A single-select typeahead over a static list OR an asynchronous search, on bits-ui’s `Combobox`. bits-ui owns the listbox ARIA, the roving cursor and the outside-click handling; this component owns the search lifecycle — debounce, latest-wins via `AbortController`, and stale-while-revalidate so the previous results stay on screen while the next request is in flight. Enter with nothing highlighted deliberately lets a wrapping `<form>` submit.',
+            'A single-select typeahead over a static list OR an asynchronous search, on bits-ui’s `Combobox`. bits-ui owns the listbox ARIA, the roving cursor and the outside-click handling; this component owns the search lifecycle — debounce, latest-wins via `AbortController`, and stale-while-revalidate so the previous results stay on screen while the next request is in flight. Enter with nothing highlighted deliberately lets a wrapping `<form>` submit. `postedValue="query"` turns it into a search box: the input itself posts the typed text under `name` (so a GET form works with JavaScript off), and Enter submits unless the reader arrowed to a suggestion.',
         },
       },
     },
@@ -50,6 +50,8 @@
 <script lang="ts">
   let staticValue = $state<string | undefined>('rosa-canina');
   let asyncValue = $state<string | undefined>();
+  let searchQuery = $state('rosa');
+  let picked = $state<string | undefined>();
 </script>
 
 <Story name="Static list">
@@ -125,4 +127,40 @@
       errorMessage="The index could not be reached."
     />
   </div>
+</Story>
+
+<Story name="Search box (posts the typed query)">
+  <form
+    method="GET"
+    action="#search"
+    class="join max-w-md"
+    onsubmit={(event) => event.preventDefault()}
+  >
+    <Combobox
+      label="Search"
+      hideLabel
+      placeholder="Search taxa"
+      name="query"
+      postedValue="query"
+      initialQuery="rosa"
+      onSearch={searchTaxa}
+      getId={taxonId}
+      getLabel={taxonLabel}
+      getBadge={taxonBadge}
+      inputClass="join-item"
+      class="p-0"
+      onQueryChange={(next) => (searchQuery = next)}
+      onSelect={(taxon) => (picked = taxon.name)}
+    >
+      {#snippet footer({ query })}
+        <p class="fieldset-label border-base-300 mt-1 border-t px-3 pt-2">
+          Press Enter to see every result for “{query}”.
+        </p>
+      {/snippet}
+    </Combobox>
+    <button type="submit" class="btn btn-primary join-item">Search</button>
+  </form>
+  <p class="text-base-content/70 mt-3 text-sm">
+    Query: “{searchQuery}” · Picked: {picked ?? 'nothing'}
+  </p>
 </Story>

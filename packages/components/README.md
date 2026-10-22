@@ -94,6 +94,7 @@ Heavier families are separate `exports` entries so a consumer that never uses th
 | `@thomasfosterau/components/citations` | citations | `Citation`, `Footnote`, `ReferenceList`, `FootnoteList`, `CreditList`, `DOILink`/`ISBNLink`/`ISSNLink`, the CSL-type renderers (`BookCitation`, `ChapterCitation`, `ScholarlyArticleCitation`, `ThesisCitation`, `ReportCitation`, `Publisher`), `formatCitation`, `BibliographyManager`. |
 | `@thomasfosterau/components/canvas` | canvas | `VectorCanvas` and the pan/zoom/history/geometry toolkit underneath it. |
 | `@thomasfosterau/components/charts` | charts | `Chart` — one component, plain SVG, no charting dependency. |
+| `@thomasfosterau/components/hotkeys` | hotkeys | The same exports the barrel re-exports, as their own entry, so `import('@thomasfosterau/components/hotkeys')` can load `HotkeyHelpDialog` lazily. |
 | `@thomasfosterau/components/tips` | tips | `Tip`, `PopoverTip`, `createTipStore`, `createTipStack`. |
 | `@thomasfosterau/components/entity-form` | forms | `EntityForm` — needs the optional peer `@thomasfosterau/effect-forms-svelte` (see [entity-form](#entity-form)). |
 | `@thomasfosterau/components/seo` | seo | `Head`, `JsonLd`, `serializeJsonLd`, `ogImageUrl` and the share-card constants. |
@@ -337,8 +338,21 @@ Every primitive accepts it by spread — `<TextInput {...control} bind:value />`
 | `ImageInput` | `FileInput` + preview + dimension probe | `file ⚓`, `width ⚓`, `height ⚓`, `previewAlt? = 'Preview of the selected image'`, `name?`, `accept?`, `maxBytes?`, `tooLargeMessage?` | — | preview `<img>` named by `previewAlt`; emits hidden `width`/`height` inputs once `name` is set |
 | `VideoInput` | `FileInput` + a progress readout | `file ⚓`, `progress ⚓` (0–100), `progressLabel? = 'Upload progress'`, `onSelect?`, `accept? = 'video/*'`, `maxBytes?`, `tooLargeMessage?` | — | native `<progress>` named by `progressLabel`, shown only while `0 < progress < 100` |
 | `SearchInput` | A search field with clear and spinner | `label`, `value ⚓`, `onInput?`, `onSubmit?`, `onClear?`, `pending?`, `clearLabel? = 'Clear search'`, `size?`, `name? = 'q'`, `placeholder? = 'Search'` | — | composite `<div class="input">`; icon/spinner `aria-hidden`; clear button labelled |
-| `Combobox<T>` | Typeahead over a list or a search | `value ⚓: string \| undefined`, `items?: readonly T[]` **or** `onSearch: (query, signal) => Promise<readonly T[]>`, `debounceMs? = 150`, `getId`, `getLabel`, `getBadge?`, `label`, `placeholder?`, `name?`, `emptyLabel? = 'No matches'`, `pendingLabel? = 'Searching…'`, `errorMessage?`, `id?`, `describedBy?`, `invalid?`, `required?`, `size?` | `item?(item)`, `footer?({ query, pending })`, `empty?({ query })` | bits-ui listbox ARIA; Enter with nothing highlighted lets a wrapping `<form>` submit |
+| `Combobox<T>` | Typeahead over a list or a search | `value ⚓: string \| undefined`, `items?: readonly T[]` **or** `onSearch: (query, signal) => Promise<readonly T[]>`, `debounceMs? = 150`, `getId`, `getLabel`, `getBadge?`, `label`, `hideLabel?`, `placeholder?`, `name?`, `postedValue? = 'id'` (`'id' \| 'query'`), `initialQuery?`, `onQueryChange?: (query) => void`, `onSelect?: (item) => void`, `emptyLabel? = 'No matches'`, `pendingLabel? = 'Searching…'`, `errorMessage?`, `id?`, `describedBy?`, `invalid?`, `required?`, `size?`, `inputClass?`, `portal? = true` + `HTMLAttributes<HTMLDivElement>` on the root | `item?(item)`, `footer?({ query, pending })`, `empty?({ query })` | bits-ui listbox ARIA; Enter with nothing highlighted lets a wrapping `<form>` submit |
 | `FieldErrors` | The messages under one control | `errors: readonly string[]`, `id?` + `HTMLAttributes<HTMLDivElement>` | — | ONE `role="alert"` region holding one `<p>` per message; renders nothing while empty |
+
+`Combobox` posts the selected id under `name` (a hidden input) by default. `postedValue="query"` makes it a search box instead: `name` goes on the visible input, so a plain `<form method="GET">` posts the typed text with JavaScript on or off, and Enter submits that form unless the reader moved to a suggestion with the arrow keys (clicking a suggestion still commits it, and `onSelect` receives it). `hideLabel` keeps `label` as the accessible name but renders it `sr-only`; `portal={false}` renders the listbox inside the component rather than in `<body>`, still floating.
+
+```svelte
+<form method="GET" action="/search" class="join">
+  <Combobox
+    label="Search" hideLabel name="query" postedValue="query" initialQuery={currentQuery}
+    onSearch={suggest} getId={(hit) => hit.id} getLabel={(hit) => hit.title}
+    inputClass="join-item" onSelect={(hit) => navigate(hit.href)}
+  />
+  <button type="submit" class="btn join-item">Search</button>
+</form>
+```
 
 `fields` also exports `field-types.ts` (`FieldControl`, `FieldSize`, `FieldOption`, `FieldOptionInput`, `toFieldOptions`) and the daisyUI size tables (`inputSize`, `selectSize`, …).
 
@@ -544,6 +558,8 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 ## hotkeys
 
 One registry answers "what can the viewer do right now"; `HotkeyProvider` matches keystrokes against it, `HotkeyHelpDialog` lists what carries a trigger, and `search`'s `CommandPalette` lists what is palette-visible. An app creates the registry in its root layout, renders `HotkeyProvider` once, and registers actions from anywhere below — global ones from the layout, page ones from the page, torn down on unmount.
+
+The family is also its own entry, `@thomasfosterau/components/hotkeys`. Import `HotkeyHelpDialog` from it dynamically (`const { HotkeyHelpDialog } = await import('@thomasfosterau/components/hotkeys')`) to keep the dialog out of your entry chunk until the first `?`.
 
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
