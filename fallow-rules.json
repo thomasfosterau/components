@@ -1,0 +1,70 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/rule-pack-schema.json",
+  "version": 1,
+  "name": "components-boundaries",
+  "description": "The import boundaries AGENTS.md and the package CLAUDE.md files state, as policy-violation findings. Relative imports across packages and the charts layering are .fallowrc.json's zones; this pack covers what a zone cannot see: package-name and external specifiers.",
+  "rules": [
+    {
+      "id": "no-sveltekit-app-modules",
+      "kind": "banned-import",
+      "specifiers": ["$app", "$env", "$service-worker"],
+      "files": ["packages/components/src/lib/**", "packages/mapbox/src/lib/**"],
+      "message": "SvelteKit resolves this only inside an app, and src/lib ships. Take it as a prop or from getComponentsContext() (AGENTS.md § Common pitfalls)."
+    },
+    {
+      "id": "no-effect-in-svelte-packages",
+      "kind": "banned-import",
+      "specifiers": ["effect"],
+      "files": ["packages/components/src/lib/**", "packages/mapbox/src/lib/**"],
+      "message": "`effect` is not a peer of the Svelte packages. Only the /entity-form entry reaches it, and only through @thomasfosterau/effect-forms-svelte (packages/components/CLAUDE.md § Boundary)."
+    },
+    {
+      "id": "form-library-only-in-entity-form",
+      "kind": "banned-import",
+      "specifiers": ["@thomasfosterau/effect-forms-svelte"],
+      "files": ["packages/components/src/lib/**", "packages/mapbox/src/lib/**"],
+      "exclude": [
+        "packages/components/src/lib/forms/EntityForm.svelte",
+        "packages/components/src/lib/forms/entity-form.ts"
+      ],
+      "message": "The form library is an optional peer reached only from the /entity-form entry; importing it anywhere else makes every consumer install it."
+    },
+    {
+      "id": "effect-only-in-charts-spec",
+      "kind": "banned-import",
+      "specifiers": ["effect"],
+      "files": ["packages/charts/src/**"],
+      "exclude": ["packages/charts/src/spec/**"],
+      "message": "Effect stays inside packages/charts/src/spec, and never in a published type (packages/charts/CLAUDE.md § Boundary)."
+    },
+    {
+      "id": "charts-independent",
+      "kind": "banned-import",
+      "specifiers": ["@thomasfosterau/components", "@thomasfosterau/components-mapbox"],
+      "files": ["packages/charts/src/**"],
+      "message": "@thomasfosterau/charts is independent of the Svelte packages (packages/charts/CLAUDE.md § Boundary)."
+    },
+    {
+      "id": "svelte-packages-independent-of-charts",
+      "kind": "banned-import",
+      "specifiers": ["@thomasfosterau/charts"],
+      "files": ["packages/components/src/lib/**", "packages/mapbox/src/lib/**"],
+      "message": "The Svelte packages do not import @thomasfosterau/charts; the Svelte Chart in /charts is a separate, series-based component."
+    },
+    {
+      "id": "mapbox-core-via-canvas-only",
+      "kind": "banned-import",
+      "specifiers": [
+        "@thomasfosterau/components/citations",
+        "@thomasfosterau/components/charts",
+        "@thomasfosterau/components/tips",
+        "@thomasfosterau/components/hotkeys",
+        "@thomasfosterau/components/seo",
+        "@thomasfosterau/components/entity-form",
+        "@thomasfosterau/components/theme.css"
+      ],
+      "files": ["packages/mapbox/src/lib/**"],
+      "message": "packages/mapbox consumes the core only through its published /canvas entry (packages/mapbox/CLAUDE.md § Boundary). The bare root import is banned by the root vite.config.ts's no-restricted-imports, which can match it exactly."
+    }
+  ]
+}

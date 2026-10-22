@@ -53,6 +53,28 @@ export default defineConfig({
         dependsOn: [{ from: 'dependencies', task: 'check' }],
         cache: false,
       },
+      // Every package's suite in ONE vitest process (the `test.projects`
+      // below), under one Istanbul coverage map, `coverage/coverage-final.json`,
+      // which `fallow audit` reads for exact per-function CRAP scores
+      // (`health.coverage` in .fallowrc.json). Without it fallow estimates
+      // every function as uncovered, and any function with cyclomatic
+      // complexity >= 5 fails the audit on its own. Not a CI gate: the gate is
+      // `vp run -r test:unit`; run this before `fallow audit` (the PreToolUse
+      // fallow gate runs the audit but never refreshes the map).
+      //
+      // Each package's own `test:unit` gets its `sync` / sibling `build` edges
+      // from its own task; this one process gets them named here: both Svelte
+      // packages' `svelte-kit sync`, and packages/components' `build`, whose
+      // `dist/` the packages/mapbox suite imports through `exports`.
+      'test:coverage': {
+        command: 'vp test run --coverage',
+        dependsOn: [
+          '@thomasfosterau/components#sync',
+          '@thomasfosterau/components#build',
+          '@thomasfosterau/components-mapbox#sync',
+        ],
+        cache: false,
+      },
     },
   },
 
@@ -95,6 +117,22 @@ export default defineConfig({
           'no-restricted-imports': [
             'error',
             {
+              // Exact package names, which fallow's rule pack cannot ban
+              // without also banning their subpaths: packages/mapbox reaches
+              // the core only through `/canvas` (the other subpaths are
+              // banned in fallow-rules.json), and no package imports itself
+              // or @thomasfosterau/charts by name.
+              paths: [
+                {
+                  name: '@thomasfosterau/components',
+                  message:
+                    'Import a family by relative path inside packages/components; packages/mapbox reaches the core only through @thomasfosterau/components/canvas.',
+                },
+                {
+                  name: '@thomasfosterau/charts',
+                  message: 'The Svelte packages are independent of @thomasfosterau/charts.',
+                },
+              ],
               patterns: [
                 {
                   group: ['$app/**', '$env/**', '$service-worker'],
@@ -162,6 +200,20 @@ export default defineConfig({
         },
       },
     ],
+  },
+
+  // The root vitest run behind `test:coverage`: each package's own
+  // vite.config.ts is one project (browser mode for the Svelte packages, Node
+  // for packages/charts), so one run covers all three.
+  test: {
+    projects: ['packages/*/vite.config.ts'],
+    coverage: {
+      provider: 'istanbul',
+      reporter: ['text-summary', 'json-summary', 'json'],
+      reportsDirectory: './coverage',
+      include: ['packages/*/src/lib/**/*.{ts,svelte}', 'packages/charts/src/**/*.{ts,tsx}'],
+      exclude: ['**/*.d.ts'],
+    },
   },
 
   // Oxfmt — formatter of record for the workspace. `.svelte` files are outside

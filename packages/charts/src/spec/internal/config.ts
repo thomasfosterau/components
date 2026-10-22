@@ -1,5 +1,10 @@
 import * as Schema from 'effect/Schema';
 
+// The `typeof X.Type` aliases below deliberately share their names with the
+// public mirror types in `../types.ts`: `tests/spec/type-parity.test.ts`
+// asserts each pair equal. Neither barrel re-exports this module.
+// fallow-ignore-file duplicate-export
+
 /** Portable presentation hints honoured (or gracefully ignored) by every interpreter. */
 export const Config = Schema.Struct({
   title: Schema.optionalKey(Schema.String.annotate({ description: 'The chart title.' })),

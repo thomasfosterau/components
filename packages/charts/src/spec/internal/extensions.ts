@@ -1,5 +1,10 @@
 import * as Schema from 'effect/Schema';
 
+// The `typeof X.Type` aliases below deliberately share their names with the
+// public mirror types in `../types.ts`: `tests/spec/type-parity.test.ts`
+// asserts each pair equal. Neither barrel re-exports this module.
+// fallow-ignore-file duplicate-export
+
 /**
  * Web-only, non-portable hints (e.g. preferred renderer, interaction
  * descriptors). Native interpreters ignore this entirely; web interpreters

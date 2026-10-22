@@ -1,5 +1,10 @@
 import * as Schema from 'effect/Schema';
 
+// The `typeof X.Type` aliases below deliberately share their names with the
+// public mirror types in `../types.ts`: `tests/spec/type-parity.test.ts`
+// asserts each pair equal. Neither barrel re-exports this module.
+// fallow-ignore-file duplicate-export
+
 /**
  * The declared type of an encoded field (the Vega-Lite model).
  *
@@ -7,12 +12,7 @@ import * as Schema from 'effect/Schema';
  * every interpreter (TS, Swift, Kotlin) reconstructs typed plottable values
  * from these declarations — never by sniffing JSON runtime values.
  */
-export const FieldType = Schema.Literals([
-  'quantitative',
-  'ordinal',
-  'nominal',
-  'temporal',
-]).annotate({
+const FieldType = Schema.Literals(['quantitative', 'ordinal', 'nominal', 'temporal']).annotate({
   identifier: 'FieldType',
   description:
     'The declared type of an encoded field. Interpreters reconstruct typed values ' +
@@ -20,7 +20,7 @@ export const FieldType = Schema.Literals([
 });
 
 /** A mapping from a data field to a visual channel, with an explicit type. */
-export const Channel = Schema.Struct({
+const Channel = Schema.Struct({
   field: Schema.String.annotate({
     description: 'The name of the field in each datum that this channel reads.',
   }),

@@ -38,6 +38,7 @@
     "@thomasfosterau/components": "workspace:*"
   },
   "devDependencies": {
+    "@storybook/addon-svelte-csf": "catalog:",
     "@storybook/sveltekit": "catalog:",
     "@sveltejs/kit": "catalog:",
     "@sveltejs/package": "catalog:",
