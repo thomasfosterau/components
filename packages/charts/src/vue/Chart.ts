@@ -13,7 +13,7 @@ type ChartState =
 /**
  * Renders a portable chart spec as SVG.
  *
- * Pure rendering: geometry is computed via chart-core in a computed ref and
+ * Pure rendering: geometry is computed via the `/core` entry in a computed ref and
  * emitted as SVG vnodes, so the component works identically with Vue SSR
  * (`@vue/server-renderer`) and on the client. The SVG uses a viewBox, so it
  * scales to its container with CSS.

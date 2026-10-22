@@ -38,8 +38,8 @@ export const DEFAULT_RADIUS_RANGE: readonly [number, number] = [3, 12];
 export const DEFAULT_POINT_RADIUS = 4;
 
 /**
- * A positional scale bundle: the public ResolvedScale plus the underlying
- * d3 scale, kept internally for tick computation and geometry building.
+ * A positional scale bundle: the serialisable ResolvedScale plus the
+ * underlying d3 scale, which tick computation and the geometry builders read.
  */
 export type PositionalScale =
   | {
