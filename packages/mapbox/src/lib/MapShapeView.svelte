@@ -59,9 +59,15 @@ Draws one area, path or point of a plan, with grips or indicators when selected.
   interface Props {
     /** The shape to draw, in canvas coordinates. */
     shape: MapShape;
-    /** Draw the selection highlight and vertex markers. */
+    /**
+     * Draw the selection highlight and vertex markers.
+     * @defaultValue `false`
+     */
     selected?: boolean | undefined;
-    /** Whether this shape's vertices can be dragged; grips instead of indicators. */
+    /**
+     * Whether this shape's vertices can be dragged; grips instead of indicators.
+     * @defaultValue `false`
+     */
     editable?: boolean | undefined;
   }
 

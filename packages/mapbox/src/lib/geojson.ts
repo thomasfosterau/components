@@ -64,7 +64,7 @@ import type { LngLat } from './types.ts';
 /** A GeoJSON position: `[longitude, latitude]`, optionally with an altitude. */
 export type GeoPosition = readonly number[];
 
-/** `coordinates` at the four nesting depths GeoJSON uses, as the model types them. */
+/** A GeoJSON `coordinates` value, at any of the four nesting depths GeoJSON uses. */
 export type GeoCoordinates =
   | GeoPosition
   | readonly GeoPosition[]
@@ -72,11 +72,11 @@ export type GeoCoordinates =
   | readonly (readonly (readonly GeoPosition[])[])[];
 
 /**
- * A GeoJSON geometry object, structurally the model's `GeoJsonGeometry`.
+ * A GeoJSON geometry object of any type but `GeometryCollection`.
  *
- * `GeometryCollection` is absent here because it is absent there — it is the
- * one geometry type whose payload is recursive, and a garden boundary is a
- * polygon or a multipolygon.
+ * Structurally an application's own stored geometry type. `GeometryCollection`
+ * is absent because it is the one geometry type whose payload is recursive,
+ * and a stored boundary is a polygon or a multipolygon.
  */
 export interface GeoGeometry {
   readonly type:
@@ -100,10 +100,13 @@ export interface GeoFrame {
 }
 
 /**
- * 2²⁰ canvas units to the degree — about 9.4 units to the metre at the
- * equator, so a 10 m bed is ~94 units across and the default 20-unit grid is
- * a couple of metres. Small enough that a whole garden fits the viewport's
- * 0.1–10 zoom range without the caller pre-scaling anything.
+ * The default scale exponent of a {@link GeoFrame}: 2²⁰ canvas units to the
+ * degree.
+ *
+ * That is about 9.4 units to the metre at the equator, so a 10 m area is ~94
+ * units across and the default 20-unit grid is a couple of metres. Small
+ * enough that a whole site fits the viewport's 0.1–10 zoom range without the
+ * caller pre-scaling anything.
  */
 export const DEFAULT_SCALE_EXPONENT = 20;
 
@@ -125,7 +128,7 @@ export interface GeometryImport {
 
 const scaleOf = (frame: GeoFrame): number => 2 ** frame.scaleExponent;
 
-/** A frame anchored at `origin`. */
+/** A {@link GeoFrame} anchored at `origin`, scaled by `2 ** scaleExponent`. */
 export const geoFrame = (origin: LngLat, scaleExponent = DEFAULT_SCALE_EXPONENT): GeoFrame => ({
   origin,
   scaleExponent,

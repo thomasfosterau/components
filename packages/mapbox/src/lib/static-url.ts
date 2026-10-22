@@ -14,7 +14,10 @@ import type { BoundingBox, MapCamera, MapStyle } from './types.ts';
 
 const BASE = 'https://api.mapbox.com';
 
-/** What the static endpoint puts between the style and the size. */
+/**
+ * How a static map is framed: by a camera, by a bounding box to fit, or
+ * automatically around its overlay.
+ */
 export type StaticView =
   /** The camera, as `lon,lat,zoom,bearing,pitch`. */
   | { readonly kind: 'camera'; readonly camera: MapCamera }

@@ -38,7 +38,7 @@ A static raster map first, upgraded to the interactive map once the page has hyd
     style: MapStyle;
     /** The centre, zoom, bearing and pitch. */
     camera: MapCamera;
-    /** Intrinsic size of the raster, and the height the live map takes. */
+    /** Intrinsic width of the raster; the live map fills its container's width. */
     width: number;
     /** Intrinsic height of the raster, and the height of the live map. */
     height: number;
