@@ -241,6 +241,7 @@ nodeLinker: hoisted
 allowBuilds:
   '@tailwindcss/oxide': true
   esbuild: true
+  # fallow verifies its platform binary's signature at install time.
   fallow: true
 
 # Storybook 10.6 declares `vite-plus: "^0.1.15 || ^0.2.0"` and this workspace

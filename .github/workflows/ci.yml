@@ -1,32 +1,34 @@
 name: CI
 
-# ONE job, ONE required check. The pipeline is a short, ordered list of the
-# same gates a human runs before pushing — there is no stage to deploy, no
-# credential to inject and no service to provision, so nothing here needs a
-# `needs:` graph.
+# ONE job, ONE required check. The pipeline is the ordered list of gates in
+# AGENTS.md § Verification; the task graph behind each lives in the
+# vite.config.ts files, not in GitHub Actions `needs:`. There is no stage to
+# deploy, no credential to inject and no service to provision.
 #
-# The one step that is CI-only is the Playwright browser install: `test:unit`
-# drives real Chromium at exactly the revision the pinned `playwright`
-# expects (see that entry in pnpm-workspace.yaml), which a fresh runner does
-# not carry.
+# The one CI-only step is the Playwright browser install: `test:unit` and
+# `storybook:build` drive real Chromium at exactly the revision the pinned
+# `playwright` expects (see that entry in pnpm-workspace.yaml), which a fresh
+# runner does not carry.
 
 on:
+  pull_request:
+    branches: [trunk]
+    types: [opened, reopened, synchronize, ready_for_review]
   push:
     branches: [trunk]
-  pull_request:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/trunk' }}
 
-# Nothing by default; each job grants exactly what it uses.
+# Nothing by default; the job grants exactly what it uses.
 permissions: {}
 
 jobs:
   ci:
     name: Check, test, build
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     permissions:
       contents: read
     steps:
@@ -34,31 +36,23 @@ jobs:
         with:
           persist-credentials: false
 
-      # pnpm before Node so setup-node's `cache: pnpm` can resolve the store
-      # path. The pnpm version comes from the `packageManager` field in
-      # package.json — do not pin it here as well, or the two drift.
-      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: ./.github/actions/setup
 
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      # The Vite+ task cache (`vp run`'s cached `check`, `build`, `test:unit`
+      # outputs). Keyed per commit with a prefix fallback, so a push restores
+      # the nearest earlier run and each task's own input fingerprint decides
+      # what re-runs.
+      - name: Restore the Vite+ task cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          node-version: latest
-          cache: pnpm
-
-      # `--ignore-scripts`: the root `prepare` only installs the Vite+ git
-      # hooks, which a runner has no use for, and the two allowed builds
-      # (`esbuild`, `@tailwindcss/oxide`) resolve their platform binaries
-      # through optional dependencies, not their postinstall.
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --ignore-scripts
-
-      # `vp`, `svelte-check`, `svelte-package`, `storybook` and `playwright`
-      # all land in node_modules/.bin, which is on nobody's PATH by default.
-      - name: Put the toolchain on PATH
-        run: echo "$GITHUB_WORKSPACE/node_modules/.bin" >> "$GITHUB_PATH"
+          path: node_modules/.vite/task-cache
+          key: vp-task-v1-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            vp-task-v1-${{ runner.os }}-
 
       # Chromium + its apt system libraries, at exactly the revision the pinned
       # `playwright` expects, so a `playwright` bump needs nothing else here.
-      - name: Install Chromium for the browser suite
+      - name: Install Chromium for the browser suites
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Format and lint
@@ -67,11 +61,14 @@ jobs:
       - name: Type check
         run: vp run check
 
-      - name: Unit tests (browser)
+      - name: Unit tests
         run: vp run -r test:unit
 
-      - name: Build the library
+      - name: Build the packages
         run: vp run -r build
 
       - name: Build Storybook
         run: vp run --filter ./packages/components storybook:build
+
+      - name: Audit dependencies
+        run: pnpm audit --audit-level high

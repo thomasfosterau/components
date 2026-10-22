@@ -27,12 +27,22 @@
 # `vitest-browser-svelte` is deliberately outside the group: vite-plus does
 # not pin it, so its bumps need no alias step.
 #
+# `@vitest/coverage-istanbul` (the root `test:coverage` task) pins `vitest`
+# exactly too, and `@vitest/*` already puts it in the group.
+#
 # `ignore` covers the catalog entries Dependabot cannot bump correctly:
 # - `vite` and `typescript` are npm aliases (`npm:@voidzero-dev/vite-plus-core`,
 #   `npm:@typescript/typescript6`); the alias target moves with vite-plus and
 #   the TypeScript 7.1 migration respectively, by hand. Ignoring `vite`
 #   removes only `vite` from consideration; no group pattern matches it, so
 #   the `vite-plus-toolchain` group still opens.
+# - `@effect/tsgo` and `@typescript/native` (an alias, `npm:typescript@7.x`):
+#   `effect-tsgo patch` in the root `prepare` hard-errors unless the tsgo
+#   release supports the exact native TypeScript AND the exact oxlint /
+#   oxlint-tsgolint that vite-plus carries (the `components` table in
+#   node_modules/@effect/tsgo/dist/effect-tsgo.cjs). A version-only bump of
+#   any one of the three cannot be checked here, so all three move together,
+#   by hand, alongside a vite-plus bump (see their catalog comment).
 # `playwright` is NOT ignored: CI installs the Chromium revision each release
 # expects, so its bumps are ordinary updates (see its catalog entry).
 # Each ignore is scoped to the `version-update:semver-*` update types, so
@@ -104,8 +114,26 @@ updates:
             'version-update:semver-minor',
             'version-update:semver-patch',
           ]
+      - dependency-name: '@effect/tsgo'
+        update-types:
+          [
+            'version-update:semver-major',
+            'version-update:semver-minor',
+            'version-update:semver-patch',
+          ]
+      - dependency-name: '@typescript/native'
+        update-types:
+          [
+            'version-update:semver-major',
+            'version-update:semver-minor',
+            'version-update:semver-patch',
+          ]
+  # `directories`, not `directory: '/'`: the local composite action under
+  # .github/actions/setup pins actions too, and `/` covers only workflows.
   - package-ecosystem: 'github-actions'
-    directory: '/'
+    directories:
+      - '/'
+      - '/.github/actions/setup'
     schedule:
       interval: 'weekly'
       day: 'monday'
