@@ -20,6 +20,10 @@ Best-effort client-side highlighting of query tokens in a search result.
     match: boolean;
   }
 
+  /**
+   * Split `text` into segments, each flagged `match` when it is a case-insensitive hit for one of `query`'s whitespace-separated tokens.
+   * A blank `query` or `text` returns the whole text as one unmatched segment.
+   */
   export function tokenise(text: string, query: string): Segment[] {
     const tokens = query
       .trim()

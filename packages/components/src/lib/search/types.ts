@@ -10,6 +10,7 @@
  * @module
  */
 
+/** One row of the command palette: an id, a label, the group it sits in, and what activating it does. */
 export interface CommandItem {
   /** Stable id. Unique within its group; it is what bits-ui ranks and selects on. */
   id: string;
@@ -29,7 +30,9 @@ export interface CommandItem {
 
 /** A palette section: an id rows point at, and the heading it renders. */
 export interface CommandGroup {
+  /** What a `CommandItem`'s `group` names. */
   id: string;
+  /** The section heading. */
   label: string;
 }
 

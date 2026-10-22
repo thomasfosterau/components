@@ -31,6 +31,7 @@ A vertical daisyUI `timeline` of dated entries.
   /** The custom property an entry's `colourToken` is bound to. */
   const TIMELINE_COLOUR_PROPERTY = '--timeline-colour';
 
+  /** One end of a `Timeline` entry's span: display text plus an optional machine-readable `datetime`. */
   export interface TimelineDate {
     /** Display text, e.g. `March 1996`. */
     readonly label: string;
@@ -38,7 +39,9 @@ A vertical daisyUI `timeline` of dated entries.
     readonly dateTime?: string | undefined;
   }
 
+  /** One dated entry of a `Timeline`: a label, a start, an optional end and link, and an optional theme colour. */
   export interface TimelineEntry {
+    /** Stable key for the entry. */
     readonly id: string;
     /** The entry itself — the line in the box. */
     readonly label: string;

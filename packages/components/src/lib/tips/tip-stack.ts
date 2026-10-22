@@ -8,6 +8,7 @@
  * @module
  */
 
+/** Which tips are on screen, most recent last, so Escape closes only the topmost one. */
 export interface TipStack {
   /** Mark a tip visible, moving it to the top if it was already there. */
   push: (id: string) => void;

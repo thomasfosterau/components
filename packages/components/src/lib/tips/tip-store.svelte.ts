@@ -20,7 +20,8 @@ import type { TipConfig, TipState } from './types.ts';
 const DEFAULT_PREFIX = 'tips:';
 
 /**
- * The subset of `Storage` this needs, so a test can pass a plain object.
+ * The subset of the DOM `Storage` interface a tip store reads and writes, so a
+ * test can pass a plain object.
  *
  * The signatures are the DOM `Storage` interface's own, `null` included: this
  * type exists so `globalThis.localStorage` satisfies it structurally.

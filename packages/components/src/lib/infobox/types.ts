@@ -26,7 +26,7 @@ export interface InfoboxImageSpec {
   readonly eager?: boolean | undefined;
 }
 
-/** A single identifying fact (e.g. publication year, ISBN, page count). */
+/** An `Infobox` row holding a single identifying fact (e.g. publication year, ISBN, page count). */
 export interface InfoboxFactRow {
   readonly kind: 'fact';
   readonly label: string;
@@ -34,7 +34,7 @@ export interface InfoboxFactRow {
   readonly value: string | number | undefined;
 }
 
-/** A single named link, rendered as one row with its own visible text. */
+/** An `Infobox` row holding a single named link, with its own visible text. */
 export interface InfoboxLinkRow {
   readonly kind: 'link';
   readonly label: string;
@@ -51,7 +51,7 @@ export interface InfoboxLinkEntry {
   readonly href: string;
 }
 
-/** A named outbound relationship rendered as one or more links. */
+/** An `Infobox` row for a named outbound relationship, rendered as one or more links. */
 export interface InfoboxLinksRow {
   readonly kind: 'links';
   readonly label: string;
@@ -60,7 +60,7 @@ export interface InfoboxLinksRow {
 }
 
 /**
- * A hero/identifying image row. Renders above the `<dl>` as an
+ * An `Infobox` row for the hero/identifying image. Renders above the `<dl>` as an
  * `InfoboxImage`, not as a `dt`/`dd` pair — the same shape `Infobox`'s own
  * `image` prop takes, offered as a row for the callers who build the whole
  * infobox from one `rows` array.
@@ -69,7 +69,7 @@ export interface InfoboxImageRow extends InfoboxImageSpec {
   readonly kind: 'image';
 }
 
-/** A row whose value is arbitrary markup (a badge, a formatted quantity). */
+/** An `Infobox` row whose value is arbitrary markup (a badge, a formatted quantity). */
 export interface InfoboxCustomRow {
   readonly kind: 'custom';
   readonly label: string;

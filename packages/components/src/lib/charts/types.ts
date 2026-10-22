@@ -27,5 +27,5 @@ export interface ChartSeries {
   readonly points: readonly ChartPoint[];
 }
 
-/** How the magnitude is drawn. */
+/** How a `Chart` draws its values: as a line, a filled area, or bars. */
 export type ChartKind = 'line' | 'area' | 'bar';

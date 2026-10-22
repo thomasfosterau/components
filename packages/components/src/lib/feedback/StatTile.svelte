@@ -22,6 +22,7 @@ One daisyUI `stat`: a headline figure with its label and optional change line an
   import type { HTMLAttributes } from 'svelte/elements';
   import { getComponentsContext } from '../context.svelte.ts';
 
+  /** The change line a `StatTile` shows under its value: a signed amount, how to render it, and trailing words. */
   export interface StatDelta {
     /**
      * The change. Positive is up. With `unit: 'percent'` it is read as a
