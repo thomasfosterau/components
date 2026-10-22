@@ -1,5 +1,5 @@
-import { computeContext, type ChartContext, type DataRows, type Margins } from '../core/index.ts';
-import { isDataRef, validateSpec, type ChartSpec } from '../spec/index.ts';
+import { resolveChart, type DataRows, type Margins } from '../core/index.ts';
+import type { ChartSpec } from '../spec/index.ts';
 import { useMemo, type ReactNode } from 'react';
 import { Axes } from './axes.tsx';
 import { Marks } from './marks.tsx';
@@ -25,10 +25,6 @@ export interface ChartProps {
   readonly fallback?: ReactNode | ((message: string) => ReactNode) | undefined;
 }
 
-type ChartState =
-  | { readonly kind: 'ready'; readonly spec: ChartSpec; readonly context: ChartContext }
-  | { readonly kind: 'error'; readonly message: string };
-
 /**
  * Renders a portable chart spec as SVG.
  *
@@ -46,35 +42,10 @@ export function Chart({
   className,
   fallback,
 }: ChartProps) {
-  const state = useMemo<ChartState>(() => {
-    const validation = validateSpec(spec);
-    if (!validation.ok) {
-      return { kind: 'error', message: `Invalid chart spec: ${validation.errors[0] ?? ''}` };
-    }
-    if (isDataRef(validation.value.data) && !data) {
-      return {
-        kind: 'error',
-        message: 'Chart data is stored externally; pass resolved rows via the data prop',
-      };
-    }
-    try {
-      return {
-        kind: 'ready',
-        spec: validation.value,
-        context: computeContext(
-          validation.value,
-          { width, height },
-          data,
-          margins ? { margins } : undefined,
-        ),
-      };
-    } catch (error) {
-      return {
-        kind: 'error',
-        message: error instanceof Error ? error.message : 'Failed to compute chart',
-      };
-    }
-  }, [spec, data, width, height, margins]);
+  const state = useMemo(
+    () => resolveChart(spec, { width, height }, data, { margins }),
+    [spec, data, width, height, margins],
+  );
 
   if (state.kind === 'error') {
     return <ChartFallback message={state.message} fallback={fallback} className={className} />;

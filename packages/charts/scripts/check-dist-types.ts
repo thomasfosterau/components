@@ -12,8 +12,10 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const dist = resolve(dirname(fileURLToPath(import.meta.url)), '../dist');
-const offenders = readdirSync(dist)
-  .filter((file) => file.endsWith('.d.mts'))
+// Recursive, for the `/svelte` entry's `svelte-package` output in
+// `dist/svelte/`, whose declarations are `.d.ts`.
+const offenders = readdirSync(dist, { recursive: true, encoding: 'utf8' })
+  .filter((file) => file.endsWith('.d.mts') || file.endsWith('.d.ts'))
   .filter((file) => /\beffect\b/.test(readFileSync(join(dist, file), 'utf8')));
 
 if (offenders.length > 0) {

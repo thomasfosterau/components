@@ -1,23 +1,30 @@
 /**
  * Vite config for `@thomasfosterau/charts`: the Node unit suite and the
- * `vp pack` (tsdown) build that produces `dist/`.
+ * `vp pack` (tsdown) + `svelte-package` build that produces `dist/`.
  *
  * Same task names and cache fingerprint as the two Svelte packages, so the
  * root `check` and the `-r` gates reach it unchanged, with three differences
- * that follow from this package containing no Svelte:
+ * that follow from this package being mostly plain TypeScript:
  *
- * - `build` is `vp pack`, not `svelte-package`, and there is no `sync`: the
- *   package is plain TypeScript (and TSX for the React entry), bundled into
- *   one `.mjs` + `.d.mts` per entry with shared chunks between them.
- * - `check` is `tsc`, twice: once over everything, once over `spec` and
- *   `core` with no DOM or Node types (tsconfig.pure.json), which is what
- *   keeps Layers 1 and 2 portable. `tsc` is the native TypeScript 7 binary
- *   (`@typescript/native`), Effect-patched by the root `prepare`.
+ * - `build` is `vp pack` first: everything but the `/svelte` entry is plain
+ *   TypeScript (and TSX for the React entry), bundled into one `.mjs` +
+ *   `.d.mts` per entry with shared chunks between them. `svelte-package`
+ *   then copies `src/svelte` into `dist/svelte` as `.svelte` source for the
+ *   consumer's compiler (in that order: `vp pack` empties `dist/`). There is
+ *   no `sync`: nothing here extends `$app/tsconfig`.
+ * - `check` is `tsc`, twice: once over everything but the Svelte entry, once
+ *   over `spec` and `core` with no DOM or Node types (tsconfig.pure.json),
+ *   which is what keeps Layers 1 and 2 portable. `tsc` is the native
+ *   TypeScript 7 binary (`@typescript/native`), Effect-patched by the root
+ *   `prepare`. Then `svelte-check` over the Svelte entry and its suite
+ *   (tsconfig.svelte.json), which `tsc` cannot read.
  * - `test:unit` runs under Node, not browser mode. The suites are geometry,
  *   parsing and SSR string output; the few that mount into a DOM opt into
  *   `happy-dom` per file. See CLAUDE.md § Testing.
  */
 
+import { svelte } from '@sveltejs/vite-plugin-svelte';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite-plus';
 
 /**
@@ -38,13 +45,15 @@ export default defineConfig({
       // The published artifact, then the Effect isolation invariant checked
       // against what actually ships (scripts/check-dist-types.ts).
       build: {
-        command: 'vp pack && node scripts/check-dist-types.ts',
+        command:
+          'vp pack && svelte-package -i src/svelte -o dist/svelte --tsconfig tsconfig.svelte.json && node scripts/check-dist-types.ts',
         cache: {
           output: ['dist/**'],
         },
       },
       check: {
-        command: 'tsc -p tsconfig.json && tsc -p tsconfig.pure.json',
+        command:
+          'tsc -p tsconfig.json && tsc -p tsconfig.pure.json && svelte-check --tsconfig ./tsconfig.svelte.json',
         cache: {
           input: cacheInputs,
           output: [],
@@ -82,6 +91,27 @@ export default defineConfig({
     format: ['esm'],
     dts: true,
     sourcemap: true,
+  },
+
+  // Compiles the `/svelte` entry for its suite. The suite renders through
+  // `svelte/server`, so the plugin's default (server) resolution is the one
+  // the tests want.
+  plugins: [svelte()],
+
+  // The `/svelte` entry imports the spec and core by the package's own name
+  // (tsconfig.svelte.json says why); the suite resolves those names to the
+  // sources, as `check` does, rather than to a `dist/` that may not be built.
+  resolve: {
+    alias: [
+      {
+        find: /^@thomasfosterau\/charts$/,
+        replacement: fileURLToPath(new URL('src/spec/index.ts', import.meta.url)),
+      },
+      {
+        find: /^@thomasfosterau\/charts\/core$/,
+        replacement: fileURLToPath(new URL('src/core/index.ts', import.meta.url)),
+      },
+    ],
   },
 
   test: {

@@ -1,14 +1,10 @@
-import { computeContext, type ChartContext, type DataRows, type Margins } from '../core/index.ts';
-import { isDataRef, validateSpec, type ChartSpec } from '../spec/index.ts';
+import { resolveChart, type DataRows, type Margins } from '../core/index.ts';
+import type { ChartSpec } from '../spec/index.ts';
 import { computed, defineComponent, h, type PropType, type VNode } from 'vue';
 import { renderAxes, renderMarks } from './render.ts';
 
 const TITLE_COLOR = '#111827';
 const FONT_FAMILY = 'system-ui, sans-serif';
-
-type ChartState =
-  | { readonly kind: 'ready'; readonly spec: ChartSpec; readonly context: ChartContext }
-  | { readonly kind: 'error'; readonly message: string };
 
 /**
  * Renders a portable chart spec as SVG.
@@ -33,35 +29,11 @@ export const Chart = defineComponent({
     margins: { type: Object as PropType<Partial<Margins>>, default: undefined },
   },
   setup(props, { slots }) {
-    const state = computed<ChartState>(() => {
-      const validation = validateSpec(props.spec);
-      if (!validation.ok) {
-        return { kind: 'error', message: `Invalid chart spec: ${validation.errors[0] ?? ''}` };
-      }
-      if (isDataRef(validation.value.data) && !props.data) {
-        return {
-          kind: 'error',
-          message: 'Chart data is stored externally; pass resolved rows via the data prop',
-        };
-      }
-      try {
-        return {
-          kind: 'ready',
-          spec: validation.value,
-          context: computeContext(
-            validation.value,
-            { width: props.width, height: props.height },
-            props.data,
-            props.margins ? { margins: props.margins } : undefined,
-          ),
-        };
-      } catch (error) {
-        return {
-          kind: 'error',
-          message: error instanceof Error ? error.message : 'Failed to compute chart',
-        };
-      }
-    });
+    const state = computed(() =>
+      resolveChart(props.spec, { width: props.width, height: props.height }, props.data, {
+        margins: props.margins,
+      }),
+    );
 
     return () => {
       const current = state.value;
