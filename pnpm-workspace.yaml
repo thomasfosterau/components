@@ -53,7 +53,7 @@ catalog:
   # its first consumer: the real components land on top of this scaffold and
   # every one that needs an affordance icon reaches for this rather than
   # inlining an `<svg>`.
-  '@lucide/svelte': ^1.59.0
+  '@lucide/svelte': ^1.60.0
   # `@thomasfosterau/charts` (packages/charts) — the portable chart spec, its
   # geometry core and its non-Svelte interpreters, merged in from the former
   # `thomasfosterau/charts` repo. `d3-scale` / `d3-shape` are the core's
