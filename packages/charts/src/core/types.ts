@@ -56,10 +56,10 @@ export interface ResolvedScale {
 
 /** The resolved scales for a chart, keyed by channel. */
 export interface ChartScales {
-  readonly x?: ResolvedScale;
-  readonly y?: ResolvedScale;
-  readonly color?: ResolvedScale;
-  readonly size?: ResolvedScale;
+  readonly x?: ResolvedScale | undefined;
+  readonly y?: ResolvedScale | undefined;
+  readonly color?: ResolvedScale | undefined;
+  readonly size?: ResolvedScale | undefined;
 }
 
 /** An axis tick. */
@@ -72,8 +72,8 @@ export interface Tick {
 
 /** Axis ticks, keyed by positional channel. */
 export interface ChartTicks {
-  readonly x?: ReadonlyArray<Tick>;
-  readonly y?: ReadonlyArray<Tick>;
+  readonly x?: ReadonlyArray<Tick> | undefined;
+  readonly y?: ReadonlyArray<Tick> | undefined;
 }
 
 /**
@@ -91,7 +91,7 @@ export interface ChartContext {
 /** Options for `computeContext`. */
 export interface ComputeContextOptions {
   /** Margin overrides. Defaults: top 20, right 20, bottom 40, left 48. */
-  readonly margins?: Partial<Margins>;
+  readonly margins?: Partial<Margins> | undefined;
 }
 
 /** Resolved data rows: what the host passes after resolving any data ref. */

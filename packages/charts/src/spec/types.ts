@@ -14,6 +14,12 @@
  * - The portable subset targets the intersection of native charting
  *   vocabularies (Swift Charts, Compose). Web-only richness goes in
  *   `extensions` and degrades gracefully.
+ * - Optional members are bare `prop?: T`, the one exception to the
+ *   workspace's `T | undefined` rule: these types describe a JSON document,
+ *   where a key is present with a value or absent and `undefined` does not
+ *   exist. The schemas say the same (`Schema.optionalKey`), so `parseSpec`
+ *   rejects a present-but-undefined key, and widening either side would make
+ *   the emitted JSON Schema admit `null`.
  */
 
 /** The current portable chart spec version. */

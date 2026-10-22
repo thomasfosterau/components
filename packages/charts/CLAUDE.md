@@ -4,7 +4,7 @@ The portable chart package: a durable chart spec (and its JSON Schema), a pure g
 
 ## Where it differs from the Svelte packages
 
-This package contains no Svelte, so most of AGENTS.md's component conventions (runes, attribute spreading, daisyUI tables, stories, browser tests) have nothing to apply to. What it keeps: catalog-only versions, `exactOptionalPropertyTypes`-safe `T | undefined` optionals, `"sideEffects": false`, changesets, the five gates. What it changes, and why:
+This package contains no Svelte, so most of AGENTS.md's component conventions (runes, attribute spreading, daisyUI tables, stories, browser tests) have nothing to apply to. What it keeps: catalog-only versions, `exactOptionalPropertyTypes`-safe `T | undefined` optionals (except on the JSON-document types, `spec/types.ts` and `vega/types.ts`, whose keys are present or absent: their schemas use `Schema.optionalKey`, and widening them would make the emitted JSON Schema admit `null`), `"sideEffects": false`, changesets, the five gates. What it changes, and why:
 
 - **Built with `vp pack` (tsdown), not `svelte-package`.** One `.mjs` + `.d.mts` per entry in `dist/`, shared chunks between them. No `svelte-kit sync`, no `svelte.config.js`.
 - **`check` is `tsc`, twice** (see [vite.config.ts](vite.config.ts)): `tsconfig.json` over everything, then `tsconfig.pure.json` over `src/spec` and `src/core` with no DOM lib and no ambient types. That `tsc` is TypeScript 7 (`@typescript/native`), Effect-patched by the root `prepare`, and `tsconfig.json` loads the `@effect/language-service` plugin, so Effect diagnostics on `src/spec` print here; the Svelte packages stay on the TS6 alias svelte-check needs. `vp pack`'s declaration bundler uses the TS6 JS API.

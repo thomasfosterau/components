@@ -27,6 +27,32 @@ const lineSpec = parseSpec({
 });
 
 describe('Chart SSR', () => {
+  it('treats an explicitly forwarded undefined like an omitted prop', () => {
+    // A wrapper forwarding its own optional props passes `undefined`; under
+    // `exactOptionalPropertyTypes` this only compiles because every optional
+    // prop is declared `T | undefined` (AGENTS.md § Conventions).
+    const forwarded: {
+      readonly data?: undefined;
+      readonly width?: number | undefined;
+      readonly height?: number | undefined;
+      readonly margins?: undefined;
+      readonly className?: string | undefined;
+      readonly fallback?: undefined;
+    } = {};
+    const html = renderToStaticMarkup(
+      <Chart
+        spec={lineSpec}
+        data={forwarded.data}
+        width={forwarded.width}
+        height={forwarded.height}
+        margins={forwarded.margins}
+        className={forwarded.className}
+        fallback={forwarded.fallback}
+      />,
+    );
+    expect(html).toBe(renderToStaticMarkup(<Chart spec={lineSpec} />));
+  });
+
   it('renders an SVG with a viewBox (scales via CSS, no measurement needed)', () => {
     const html = renderToStaticMarkup(<Chart spec={lineSpec} width={640} height={360} />);
     expect(html).toContain('<svg');

@@ -10,9 +10,9 @@ export const CHART_SPEC_ATTRIBUTE = 'data-chart-spec';
 /** Options for {@link createChartNodeSpec}. */
 export interface ChartNodeSpecOptions {
   /** The node group. Defaults to 'block'. */
-  readonly group?: string;
+  readonly group?: string | undefined;
   /** Extra class for the rendered DOM element. */
-  readonly className?: string;
+  readonly className?: string | undefined;
 }
 
 /** The attrs shape of a chart node. */

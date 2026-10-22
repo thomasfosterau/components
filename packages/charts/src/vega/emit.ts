@@ -18,11 +18,11 @@ export interface EmitVegaLiteOptions {
    * Vega-Lite has no concept of host data references, so the host must
    * pre-resolve them (see the capability matrix).
    */
-  readonly rows?: ReadonlyArray<Datum>;
+  readonly rows?: ReadonlyArray<Datum> | undefined;
   /** Chart width. Defaults to 'container' (responsive). */
-  readonly width?: number | 'container';
+  readonly width?: number | 'container' | undefined;
   /** Chart height in pixels. */
-  readonly height?: number;
+  readonly height?: number | undefined;
 }
 
 /** Thrown when a spec cannot be represented in Vega-Lite. */
