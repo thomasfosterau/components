@@ -67,7 +67,7 @@ export default defineConfig({
       // affordance, not a gate. `--no-open` because agent sessions have no
       // browser to hand the URL to.
       // `build` is a dependency of both, not just `sync`: the `stories` glob
-      // reaches into the sibling packages/maps, whose components import
+      // reaches into the sibling packages/mapbox, whose components import
       // `@thomasfosterau/components/canvas` — this package's own built `dist/`.
       // The sibling's `sync` too: its stories are compiled here, and its
       // tsconfig extends the `$app/tsconfig` that its own `sync` writes (#55).
