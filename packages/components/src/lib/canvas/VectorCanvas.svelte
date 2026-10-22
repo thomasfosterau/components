@@ -13,12 +13,29 @@ A pan-and-zoom SVG surface over a `VectorDocument`, with each element drawn by a
   ## ARIA contract
 
   The `<svg>` is `role="application"` named by `label` (default "Vector editing
-  canvas"). `application` is the honest role for a surface whose whole input
-  vocabulary is pointer gestures the page interprets — it tells a screen reader
-  to pass keys through rather than to read the SVG as a picture. It is also a
-  promise this component alone cannot keep: an application that makes a canvas
-  its only way to do something owes the reader a second, non-pointer path to the
-  same edit, and that path is the page's, not this component's.
+  canvas"). `application` is the honest role for a surface that interprets its
+  own input — it tells a screen reader to pass keys through rather than to read
+  the SVG as a picture — and it is a promise that the surface HANDLES those
+  keys, which § Keys keeps.
+
+  ## Keys
+
+  When `interactive`, the `<svg>` is one Tab stop, and every keydown and keyup
+  on it goes to `onkey` FIRST. What a key means to the elements is the
+  application's, for the same reason a pointer gesture is. Only a key the
+  application left alone (did not `preventDefault`), and not a Ctrl, Alt or
+  Meta chord, falls through to the two bindings this component owns, because
+  it owns the viewport:
+
+  | Key                     | Does                                         |
+  | ----------------------- | -------------------------------------------- |
+  | Arrow keys (`pan` tool) | pan by 40 screen pixels; Shift for 160       |
+  | `+` / `=`, `-`          | zoom in / out about the centre of the view   |
+
+  The application says which of its elements is focused through
+  `activedescendant` (an element id inside the surface), so DOM focus stays on
+  the `<svg>` and the arrow keys never scroll the page out from under the
+  reader.
 
   ## Two decisions worth stating
 
@@ -43,7 +60,13 @@ A pan-and-zoom SVG surface over a `VectorDocument`, with each element drawn by a
   import type { CanvasElement, Point, VectorDocument, Viewport } from './types.ts';
   import { panBy, screenToCanvas, snapToGrid, sortByZIndex, zoomAbout } from './utils.ts';
 
-  interface Props extends Omit<SVGAttributes<SVGSVGElement>, 'width' | 'height' | 'class'> {
+  // The key and focus handlers are the surface's own; `onkey` and
+  // `onfocuschange` are how a caller hears them.
+  interface Props
+    extends Omit<
+      SVGAttributes<SVGSVGElement>,
+      'width' | 'height' | 'class' | 'onkeydown' | 'onkeyup' | 'onfocus' | 'onblur'
+    > {
     /** The document to draw: its elements, viewport and grid. */
     doc: VectorDocument<T>;
     /**
@@ -78,6 +101,24 @@ A pan-and-zoom SVG surface over a `VectorDocument`, with each element drawn by a
      * @defaultValue `'Vector editing canvas'`
      */
     label?: string | undefined;
+    /**
+     * The id of the element that has keyboard focus inside the surface, for
+     * `aria-activedescendant`; `''` for none.
+     * @defaultValue `''`
+     */
+    activedescendant?: string | undefined;
+    /**
+     * The id of an element describing the surface's keys, for
+     * `aria-describedby`; `''` for none.
+     * @defaultValue `''`
+     */
+    describedby?: string | undefined;
+    /** Drawn above every element, in canvas coordinates: a cursor, a guide. */
+    overlay?: Snippet<[]> | undefined;
+    /** Every keydown and keyup on the surface, before its own keys; `preventDefault` claims the key. */
+    onkey?: ((event: KeyboardEvent) => void) | undefined;
+    /** Whether the surface has keyboard focus, each time that changes. */
+    onfocuschange?: ((focused: boolean) => void) | undefined;
     /**
      * The viewport after a pan or a zoom.
      *
@@ -115,6 +156,11 @@ A pan-and-zoom SVG surface over a `VectorDocument`, with each element drawn by a
     element,
     interactive = true,
     label = 'Vector editing canvas',
+    activedescendant = '',
+    describedby = '',
+    overlay,
+    onkey,
+    onfocuschange,
     onviewportchange,
     oninteract,
     class: className,
@@ -223,6 +269,47 @@ A pan-and-zoom SVG surface over a `VectorDocument`, with each element drawn by a
     const pointer = { x: event.clientX - box.left, y: event.clientY - box.top };
     onviewportchange?.(zoomAbout(doc.viewport, pointer, event.deltaY > 0 ? 0.9 : 1.1));
   };
+
+  /** Screen pixels one arrow press pans by with the `pan` tool; Shift multiplies it. */
+  const PAN_STEP = 40;
+  const COARSE_PAN = 4;
+
+  /** Which way the view moves for each arrow: right reveals more of the right. */
+  const PAN_DIRECTIONS = new Map<string, Point>([
+    ['ArrowLeft', { x: 1, y: 0 }],
+    ['ArrowRight', { x: -1, y: 0 }],
+    ['ArrowUp', { x: 0, y: 1 }],
+    ['ArrowDown', { x: 0, y: -1 }],
+  ]);
+
+  /** The zoom factor per key; `=` is `+` without the Shift. */
+  const ZOOM_KEYS = new Map<string, number>([
+    ['+', 1.1],
+    ['=', 1.1],
+    ['-', 0.9],
+  ]);
+
+  /** The view's own keys, for whatever the application did not claim. */
+  const viewKey = (event: KeyboardEvent): boolean => {
+    const factor = ZOOM_KEYS.get(event.key);
+    if (factor !== undefined) {
+      onviewportchange?.(zoomAbout(doc.viewport, { x: width / 2, y: height / 2 }, factor));
+      return true;
+    }
+    const direction = PAN_DIRECTIONS.get(event.key);
+    if (tool !== 'pan' || direction === undefined) return false;
+    const step = PAN_STEP * (event.shiftKey ? COARSE_PAN : 1);
+    onviewportchange?.(panBy(doc.viewport, direction.x * step, direction.y * step));
+    return true;
+  };
+
+  const key = (event: KeyboardEvent): void => {
+    if (!interactive) return;
+    onkey?.(event);
+    if (event.type !== 'keydown' || event.defaultPrevented) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    if (viewKey(event)) event.preventDefault();
+  };
 </script>
 
 <div
@@ -231,6 +318,10 @@ A pan-and-zoom SVG surface over a `VectorDocument`, with each element drawn by a
   style:height="{height}px"
   style:touch-action="none"
 >
+  <!-- Svelte's a11y table files `application` under the non-interactive roles;
+       ARIA defines it as the role that takes focus and handles its own keys,
+       which is exactly what the tabindex and the key handlers are for. -->
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
   <svg
     {...rest}
     bind:this={surface}
@@ -238,7 +329,14 @@ A pan-and-zoom SVG surface over a `VectorDocument`, with each element drawn by a
     {height}
     role="application"
     aria-label={label}
-    class="cursor-crosshair"
+    aria-activedescendant={activedescendant === '' ? undefined : activedescendant}
+    aria-describedby={describedby === '' ? undefined : describedby}
+    tabindex={interactive ? 0 : undefined}
+    class="focus-visible:outline-primary cursor-crosshair focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2"
+    onkeydown={key}
+    onkeyup={key}
+    onfocus={() => onfocuschange?.(true)}
+    onblur={() => onfocuschange?.(false)}
     onpointerdown={down}
     onpointermove={move}
     onpointerup={up}
@@ -289,6 +387,8 @@ A pan-and-zoom SVG surface over a `VectorDocument`, with each element drawn by a
           {/if}
         </g>
       {/each}
+
+      {@render overlay?.()}
     </g>
   </svg>
 </div>

@@ -25,9 +25,11 @@
     interactive?: boolean;
     snap?: boolean;
     tool?: string;
+    /** A key the fixture claims in `onkey`, as an application would; `''` for none. */
+    claim?: string;
   }
 
-  let { interactive = true, snap = false, tool = 'select' }: Props = $props();
+  let { interactive = true, snap = false, tool = 'select', claim = '' }: Props = $props();
 
   const element: CanvasElement = {
     id: 'one',
@@ -53,6 +55,11 @@
     elements: [element],
   });
 
+  /** The keys `onkey` saw, as `type:key`, newest last. */
+  let keys = $state<readonly string[]>([]);
+  /** Whether the surface last reported having focus. */
+  let focused = $state(false);
+
   /** The gestures the canvas reported, newest last. */
   let gestures = $state<readonly { phase: string; point: Point }[]>([]);
 
@@ -71,6 +78,8 @@
   data-offset-x={whole(doc.viewport.offsetX)}
   data-offset-y={whole(doc.viewport.offsetY)}
   data-zoom={doc.viewport.zoom}
+  data-keys={keys.join('|')}
+  data-focused={focused}
   data-gestures={gestures
     .map((entry) => `${entry.phase}:${whole(entry.point.x)},${whole(entry.point.y)}`)
     .join('|')}
@@ -83,6 +92,13 @@
     height={200}
     onviewportchange={(viewport: Viewport) => {
       doc = { ...doc, viewport };
+    }}
+    onkey={(event: KeyboardEvent) => {
+      keys = [...keys, `${event.type}:${event.key}`];
+      if (event.key === claim) event.preventDefault();
+    }}
+    onfocuschange={(next: boolean) => {
+      focused = next;
     }}
     oninteract={(event) => {
       gestures = [...gestures, { phase: event.phase, point: event.point }];

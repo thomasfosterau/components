@@ -39,9 +39,20 @@
     drawable?: boolean;
     /** Shapes selected before the first gesture, so a vertex spec need not click twice. */
     selection?: readonly string[];
+    /**
+     * Snap to the 10-unit grid, so a real pointer's sub-pixel landing reports
+     * whole units: what a spec comparing a pointer edit with a key edit needs.
+     */
+    snap?: boolean;
   }
 
-  let { locked = false, tool = 'select', drawable = false, selection = [] }: Props = $props();
+  let {
+    locked = false,
+    tool = 'select',
+    drawable = false,
+    selection = [],
+    snap = false,
+  }: Props = $props();
 
   const area = (id: string, x: number, y: number, zIndex: number): MapShape => ({
     id,
@@ -67,7 +78,8 @@
     version: '1',
     metadata: {},
     viewport: { offsetX: 0, offsetY: 0, zoom: 1 },
-    grid: { visible: false, size: 10, snap: false, color: '' },
+    // svelte-ignore state_referenced_locally
+    grid: { visible: false, size: 10, snap, color: '' },
     elements: [area('near', 20, 20, 0), area('far', 220, 20, 0)],
   });
   // svelte-ignore state_referenced_locally
@@ -113,6 +125,7 @@
   data-kinds={doc.elements.map((shape) => `${shape.id}:${shape.type}`).join('|')}
   data-history="{history.past.length}/{history.future.length}"
   data-entries={history.past.map((entry) => entry.description ?? '').join(',')}
+  data-committed={JSON.stringify(history.past.at(-1)?.transform ?? {})}
 >
   <button type="button" onclick={stepBack}>Undo</button>
   <button type="button" onclick={stepForward}>Redo</button>

@@ -102,3 +102,90 @@ test('zooms on the wheel, in both directions', async () => {
   await surface.wheel({ delta: { y: 100 } });
   expect(await zoom()).toBeCloseTo(0.99);
 });
+
+/** The fixture's published state, one `data-*` attribute at a time. */
+const state = async (screen: Awaited<ReturnType<typeof render>>, name: string): Promise<string> =>
+  (await screen.getByTestId('canvas-state').element()).getAttribute(`data-${name}`) ?? '';
+
+/** Give the surface keyboard focus, as Tab would. */
+const focus = async (screen: Awaited<ReturnType<typeof render>>): Promise<void> => {
+  (screen.getByRole('application').element() as SVGSVGElement).focus();
+  await expect.element(screen.getByRole('application')).toHaveFocus();
+};
+
+test('is one Tab stop when interactive, and none when it is not', async () => {
+  const screen = await render(CanvasFixture);
+  await userEvent.tab();
+  await expect.element(screen.getByRole('application')).toHaveFocus();
+  expect(await state(screen, 'focused')).toBe('true');
+  await screen.unmount();
+
+  const inert = await render(CanvasFixture, { interactive: false });
+  await expect.element(inert.getByRole('application')).not.toHaveAttribute('tabindex');
+});
+
+test('hands every key to the application first, down and up', async () => {
+  const screen = await render(CanvasFixture);
+  await focus(screen);
+
+  await userEvent.keyboard('x');
+
+  expect(await state(screen, 'keys')).toBe('keydown:x|keyup:x');
+});
+
+test('pans on the arrow keys with the pan tool, further with Shift', async () => {
+  const screen = await render(CanvasFixture, { tool: 'pan' });
+  await focus(screen);
+
+  await userEvent.keyboard('{ArrowRight}');
+  expect(await state(screen, 'offset-x')).toBe('-40');
+  await userEvent.keyboard('{Shift>}{ArrowUp}{/Shift}');
+  expect(await state(screen, 'offset-y')).toBe('160');
+});
+
+test('leaves the arrow keys alone with any other tool', async () => {
+  const screen = await render(CanvasFixture);
+  await focus(screen);
+
+  await userEvent.keyboard('{ArrowRight}');
+
+  expect(await state(screen, 'offset-x')).toBe('0');
+});
+
+test('does not pan on a key the application claimed', async () => {
+  const screen = await render(CanvasFixture, { tool: 'pan', claim: 'ArrowRight' });
+  await focus(screen);
+
+  await userEvent.keyboard('{ArrowRight}');
+
+  expect(await state(screen, 'offset-x')).toBe('0');
+});
+
+test('zooms about the centre on plus and minus', async () => {
+  const screen = await render(CanvasFixture);
+  await focus(screen);
+
+  await userEvent.keyboard('+');
+  expect(Number(await state(screen, 'zoom'))).toBeCloseTo(1.1);
+  // About the centre (100, 100): the centre stays put.
+  expect(await state(screen, 'offset-x')).toBe('-10');
+  await userEvent.keyboard('-');
+  expect(Number(await state(screen, 'zoom'))).toBeCloseTo(0.99);
+});
+
+test('leaves Ctrl, Alt and Meta chords to the page', async () => {
+  const screen = await render(CanvasFixture);
+  await focus(screen);
+
+  await userEvent.keyboard('{Control>}-{/Control}');
+
+  expect(await state(screen, 'zoom')).toBe('1');
+});
+
+test('points aria-activedescendant at nothing until the application names an element', async () => {
+  const screen = await render(CanvasFixture);
+
+  await expect
+    .element(screen.getByRole('application'))
+    .not.toHaveAttribute('aria-activedescendant');
+});

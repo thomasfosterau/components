@@ -204,6 +204,16 @@
       Alt-click a corner to remove it. With a drawing tool in hand, click to place each corner and
       double-click — or click the first corner again — to finish.
     </p>
+    <p class="text-base-content/70 text-sm">
+      Or Tab to the plan and use the keyboard: <kbd class="kbd kbd-sm">]</kbd> /
+      <kbd class="kbd kbd-sm">[</kbd> pick the next or previous area, the arrow keys move it a grid
+      step (Shift for five), <kbd class="kbd kbd-sm">Enter</kbd> steps into its corners — brackets
+      walk corners and midpoints, arrows move one, <kbd class="kbd kbd-sm">Enter</kbd> on a midpoint
+      adds a corner, <kbd class="kbd kbd-sm">Delete</kbd> removes one — and
+      <kbd class="kbd kbd-sm">Escape</kbd> steps back out. With a drawing tool, the arrows move the
+      cursor, <kbd class="kbd kbd-sm">Enter</kbd> places a corner and
+      <kbd class="kbd kbd-sm">Escape</kbd> finishes. A held arrow is one undo step.
+    </p>
     <MapEditor
       {doc}
       {selected}
