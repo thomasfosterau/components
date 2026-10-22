@@ -6,7 +6,7 @@ import { parseSpec } from '../../src/spec/index.ts';
 import { act } from 'react';
 import { createRoot, hydrateRoot, type Root } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vite-plus/test';
 import { Chart } from '../../src/react/index.ts';
 
 const pointSpec = parseSpec({

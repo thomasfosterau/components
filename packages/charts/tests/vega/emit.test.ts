@@ -1,5 +1,5 @@
 import { parseSpec, type ChartSpec } from '../../src/spec/index.ts';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { emitVegaLite, VEGA_LITE_SCHEMA, VegaLiteEmitError } from '../../src/vega/index.ts';
 
 const lineSpec = parseSpec({

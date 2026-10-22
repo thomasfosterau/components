@@ -1,6 +1,6 @@
 import { computeContext } from '../../src/core/index.ts';
 import { parseSpec } from '../../src/spec/index.ts';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { renderContextToSvg } from '../../src/prosemirror/index.ts';
 
 const box = { width: 640, height: 360 };

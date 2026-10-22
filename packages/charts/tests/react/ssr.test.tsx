@@ -4,7 +4,7 @@
  */
 import { parseSpec, type ChartSpec } from '../../src/spec/index.ts';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { Chart } from '../../src/react/index.ts';
 
 const lineSpec = parseSpec({

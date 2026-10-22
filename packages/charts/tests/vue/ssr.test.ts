@@ -3,7 +3,7 @@
  * with no DOM and no client JavaScript.
  */
 import { parseSpec, type ChartSpec } from '../../src/spec/index.ts';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { createSSRApp, h, type Component } from 'vue';
 import { renderToString } from 'vue/server-renderer';
 import { Chart } from '../../src/vue/index.ts';

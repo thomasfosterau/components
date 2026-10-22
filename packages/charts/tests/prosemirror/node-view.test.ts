@@ -3,7 +3,7 @@ import type { DataRows } from '../../src/core/index.ts';
 import type { ChartSpec } from '../../src/spec/index.ts';
 import { Schema } from 'prosemirror-model';
 import type { EditorView } from 'prosemirror-view';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vite-plus/test';
 import {
   CHART_NODE_NAME,
   ChartNodeView,

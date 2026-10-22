@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { computeTicks, resolvePositionalScale } from '../../src/core/index.ts';
 
 const range: readonly [number, number] = [0, 100];
