@@ -68,7 +68,7 @@ export interface MapEdit {
 }
 
 /** How few vertices each kind can be reduced to before it stops being one. */
-const MINIMUM_VERTICES = { polygon: 3, line: 2, marker: 0 } as const;
+export const MINIMUM_VERTICES = { polygon: 3, line: 2, marker: 0 } as const;
 
 /** How near a pointer must come to a handle, in canvas units, to take it. */
 export const HANDLE_TOLERANCE = 6;

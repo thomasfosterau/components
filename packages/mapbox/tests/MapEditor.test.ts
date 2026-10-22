@@ -280,3 +280,331 @@ test('drops the futures once the document has diverged from them', async () => {
   await drag(surface, INSIDE_NEAR, { x: 50, y: 40 });
   expect(await read(screen, 'history')).toBe('1/0');
 });
+
+// ── Keys ────────────────────────────────────────────────────────────────────
+//
+// Chromium's own key input, through `userEvent.keyboard`, on a surface given
+// focus the way Tab gives it. `{Key>n}` presses and holds, so the repeats are
+// real auto-repeat keydowns and the release is a separate `{/Key}`.
+
+/** Give the surface keyboard focus, as Tab would. */
+const focus = async (screen: Awaited<ReturnType<typeof render>>): Promise<void> => {
+  (screen.getByRole('application').element() as SVGSVGElement).focus();
+  await expect.element(screen.getByRole('application')).toHaveFocus();
+};
+
+/** What assistive tech hears for the surface's active descendant. */
+const focusedName = async (screen: Awaited<ReturnType<typeof render>>): Promise<string> => {
+  const id = screen.getByRole('application').element().getAttribute('aria-activedescendant');
+  return document.getElementById(id ?? '')?.getAttribute('aria-label') ?? '';
+};
+
+/** The polite live region's text: what the last keyboard edit did. */
+const announced = async (screen: Awaited<ReturnType<typeof render>>): Promise<string> =>
+  screen.getByRole('status').element().textContent ?? '';
+
+test('is described by its keys', async () => {
+  const screen = await render(MapEditorFixture);
+
+  await expect
+    .element(screen.getByRole('application'))
+    .toHaveAccessibleDescription(/Right and left bracket choose the next or previous shape/);
+});
+
+test('walks the shapes in paint order with the bracket keys, and names the one it lands on', async () => {
+  const screen = await render(MapEditorFixture);
+  await focus(screen);
+
+  await userEvent.keyboard(']');
+  expect(await read(screen, 'selected')).toBe('near');
+  expect(await focusedName(screen)).toBe('area');
+  await userEvent.keyboard(']');
+  expect(await read(screen, 'selected')).toBe('far');
+  await userEvent.keyboard(']');
+  expect(await read(screen, 'selected')).toBe('near');
+  // `[` opens a key descriptor in `userEvent.keyboard`; `[[` is the key itself.
+  await userEvent.keyboard('[[');
+  expect(await read(screen, 'selected')).toBe('far');
+});
+
+test('moves the selected shape a grid step per arrow, five with Shift', async () => {
+  const screen = await render(MapEditorFixture, { selection: ['near'] });
+  await focus(screen);
+
+  await userEvent.keyboard('{ArrowRight}');
+  expect(await read(screen, 'positions')).toBe('near@30,20|far@220,20');
+  await userEvent.keyboard('{Shift>}{ArrowDown}{/Shift}');
+  expect(await read(screen, 'positions')).toBe('near@30,70|far@220,20');
+  expect(await announced(screen)).toBe('30, 70');
+});
+
+test('records a held arrow as one edit, committed on the key’s release', async () => {
+  const screen = await render(MapEditorFixture, { selection: ['near'] });
+  await focus(screen);
+
+  await userEvent.keyboard('{ArrowRight>4}');
+  expect(await read(screen, 'positions')).toBe('near@60,20|far@220,20');
+  expect(await read(screen, 'history')).toBe('0/0');
+  await userEvent.keyboard('{/ArrowRight}');
+  expect(await read(screen, 'history')).toBe('1/0');
+
+  await screen.getByRole('button', { name: 'Undo' }).click();
+  expect(await read(screen, 'positions')).toBe('near@20,20|far@220,20');
+});
+
+test('commits a held arrow when the surface loses focus before the release', async () => {
+  const screen = await render(MapEditorFixture, { selection: ['near'] });
+  await focus(screen);
+
+  await userEvent.keyboard('{ArrowLeft>}');
+  (screen.getByRole('application').element() as SVGSVGElement).blur();
+
+  await expect.poll(() => read(screen, 'history')).toBe('1/0');
+  await userEvent.keyboard('{/ArrowLeft}');
+});
+
+test('commits the same transform for a key move as for the pointer drag it matches', async () => {
+  const pointer = await render(MapEditorFixture, { snap: true });
+  await drag(pointer.getByRole('application'), INSIDE_NEAR, { x: 50, y: 30 });
+  const dragged = await read(pointer, 'committed');
+  expect(dragged).not.toBe('{}');
+  await pointer.unmount();
+
+  const screen = await render(MapEditorFixture, { selection: ['near'], snap: true });
+  await focus(screen);
+  await userEvent.keyboard('{ArrowRight>2/}');
+
+  expect(await read(screen, 'committed')).toBe(dragged);
+});
+
+test('refuses to move a locked shape, and says so', async () => {
+  const screen = await render(MapEditorFixture, { selection: ['near'], locked: true });
+  await focus(screen);
+
+  await userEvent.keyboard('{ArrowRight}');
+
+  expect(await read(screen, 'positions')).toBe('near@20,20|far@220,20');
+  expect(await announced(screen)).toBe('Locked; it cannot be changed');
+  expect(await focusedName(screen)).toBe('area, locked');
+});
+
+test('clears the selection on Escape, and lets a second Escape through to the page', async () => {
+  const screen = await render(MapEditorFixture, { selection: ['near'] });
+  await focus(screen);
+  const passed: boolean[] = [];
+  const listen = (event: KeyboardEvent): void => {
+    passed.push(!event.defaultPrevented);
+  };
+  document.addEventListener('keydown', listen);
+
+  await userEvent.keyboard('{Escape}');
+  expect(await read(screen, 'selected')).toBe('');
+  await userEvent.keyboard('{Escape}');
+  document.removeEventListener('keydown', listen);
+
+  expect(passed).toEqual([false, true]);
+});
+
+test('leaves chords to the page, so its own Ctrl+Z still works', async () => {
+  const screen = await render(MapEditorFixture, { selection: ['near'] });
+  await focus(screen);
+
+  await userEvent.keyboard('{Control>}{ArrowRight}{/Control}');
+
+  expect(await read(screen, 'positions')).toBe('near@20,20|far@220,20');
+});
+
+test('enters a shape’s handles on Enter and walks vertices and midpoints in outline order', async () => {
+  const screen = await render(MapEditorFixture, { selection: ['near'] });
+  await focus(screen);
+
+  await userEvent.keyboard('{Enter}');
+  expect(await focusedName(screen)).toBe('Vertex 1 of 4, at 20, 20');
+  await userEvent.keyboard(']');
+  expect(await focusedName(screen)).toBe(
+    'Midpoint between vertices 1 and 2; Enter adds a vertex here',
+  );
+  await userEvent.keyboard(']');
+  expect(await focusedName(screen)).toBe('Vertex 2 of 4, at 60, 20');
+  // Backwards from the first handle wraps to the polygon's closing edge.
+  await userEvent.keyboard('[[[[[[');
+  expect(await focusedName(screen)).toBe(
+    'Midpoint between vertices 4 and 1; Enter adds a vertex here',
+  );
+});
+
+test('rings the focused vertex only while the surface has focus', async () => {
+  const screen = await render(MapEditorFixture, { selection: ['near'] });
+  const surface = screen.getByRole('application').element();
+  const rings = (): number => surface.querySelectorAll('circle[aria-hidden="true"]').length;
+  await focus(screen);
+
+  await userEvent.keyboard('{Enter}');
+  expect(rings()).toBe(1);
+  (surface as SVGSVGElement).blur();
+  await expect.poll(rings).toBe(0);
+});
+
+test('moves the focused vertex, not the shape, as one edit', async () => {
+  const screen = await render(MapEditorFixture, { selection: ['near'] });
+  await focus(screen);
+
+  await userEvent.keyboard('{Enter}]]{ArrowRight>2/}');
+
+  expect(await near(screen)).toBe('near:0,0 60,0 40,40 0,40');
+  expect(await read(screen, 'positions')).toBe('near@20,20|far@220,20');
+  expect(await read(screen, 'history')).toBe('1/0');
+});
+
+test('commits the same transform for a key-moved vertex as for a dragged one', async () => {
+  const pointer = await render(MapEditorFixture, { selection: ['near'], snap: true });
+  await drag(pointer.getByRole('application'), NEAR_CORNER, { x: 60, y: 30 });
+  const dragged = await read(pointer, 'committed');
+  expect(dragged).not.toBe('{}');
+  await pointer.unmount();
+
+  const screen = await render(MapEditorFixture, { selection: ['near'], snap: true });
+  await focus(screen);
+  await userEvent.keyboard('{Enter}]]{ArrowDown}');
+
+  expect(await read(screen, 'committed')).toBe(dragged);
+});
+
+test('adds a vertex at the focused midpoint on Enter, and focuses it', async () => {
+  const screen = await render(MapEditorFixture, { selection: ['near'] });
+  await focus(screen);
+
+  await userEvent.keyboard('{Enter}] ');
+
+  expect(await near(screen)).toBe('near:0,0 20,0 40,0 40,40 0,40');
+  expect(await focusedName(screen)).toBe('Vertex 2 of 5, at 40, 20');
+  expect(await announced(screen)).toBe('Vertex 2 of 5 added');
+  expect(await read(screen, 'history')).toBe('1/0');
+});
+
+test('adds a vertex at the midpoint and carries it off on an arrow, as ONE step', async () => {
+  const screen = await render(MapEditorFixture, { selection: ['near'] });
+  await focus(screen);
+
+  await userEvent.keyboard('{Enter}]{ArrowUp}');
+  expect(await near(screen)).toBe('near:0,0 20,-10 40,0 40,40 0,40');
+  expect(await read(screen, 'history')).toBe('1/0');
+
+  await screen.getByRole('button', { name: 'Undo' }).click();
+  expect(await near(screen)).toBe('near:0,0 40,0 40,40 0,40');
+});
+
+test('removes the focused vertex on Delete, and refuses below three', async () => {
+  const screen = await render(MapEditorFixture, { selection: ['near'] });
+  await focus(screen);
+
+  await userEvent.keyboard('{Enter}{Delete}');
+  expect(await near(screen)).toBe('near:40,0 40,40 0,40');
+  expect(await announced(screen)).toBe('Vertex removed; 3 left');
+  await userEvent.keyboard('{Backspace}');
+  expect(await near(screen)).toBe('near:40,0 40,40 0,40');
+  expect(await announced(screen)).toBe('Not removed: this outline needs at least 3 vertices');
+  expect(await read(screen, 'history')).toBe('1/0');
+});
+
+test('steps back out of the handles on Escape before touching the selection', async () => {
+  const screen = await render(MapEditorFixture, { selection: ['near'] });
+  await focus(screen);
+
+  await userEvent.keyboard('{Enter}{Escape}');
+  expect(await read(screen, 'selected')).toBe('near');
+  expect(await focusedName(screen)).toBe('area');
+  // Back at the shape level, the arrows move the whole shape again.
+  await userEvent.keyboard('{ArrowRight}');
+  expect(await read(screen, 'positions')).toBe('near@30,20|far@220,20');
+});
+
+test('offers no handles on a locked shape', async () => {
+  const screen = await render(MapEditorFixture, { selection: ['near'], locked: true });
+  await focus(screen);
+
+  await userEvent.keyboard('{Enter}');
+
+  expect(await focusedName(screen)).toBe('area, locked');
+});
+
+test('records nothing for an alt-click that the vertex floor refused', async () => {
+  const screen = await render(MapEditorFixture, { selection: ['near'] });
+  await focus(screen);
+  await userEvent.keyboard('{Enter}{Delete}');
+
+  // `near` is a triangle now, (60,20) (60,60) (20,60): at its floor.
+  await altPress(screen.getByRole('application'), { x: 58, y: 58 });
+
+  expect(await near(screen)).toBe('near:40,0 40,40 0,40');
+  expect(await read(screen, 'history')).toBe('1/0');
+});
+
+test('shows a drawing cursor at the middle of the view when the surface takes focus', async () => {
+  const screen = await render(MapEditorFixture, { tool: 'draw-polygon', drawable: true });
+  await focus(screen);
+
+  expect(await focusedName(screen)).toBe('Drawing cursor at 150, 110');
+});
+
+test('draws an outline with the arrows and Enter, one undo step per vertex, and finishes on Escape', async () => {
+  const screen = await render(MapEditorFixture, { tool: 'draw-polygon', drawable: true });
+  await focus(screen);
+
+  await userEvent.keyboard('{Enter}{Shift>}{ArrowRight}{/Shift}{Enter}');
+  await userEvent.keyboard('{Shift>}{ArrowDown}{/Shift} ');
+  expect((await read(screen, 'outlines')).split('|')[2]).toBe('drawn-1:0,0 50,0 50,50');
+  expect(await read(screen, 'entries')).toBe('add,update,update');
+
+  await userEvent.keyboard('{Escape}');
+  expect(await read(screen, 'kinds')).toBe('near:polygon|far:polygon|drawn-1:polygon');
+  expect(await announced(screen)).toBe('Outline finished');
+  // Finished: the next Enter starts a new outline rather than extending this one.
+  await userEvent.keyboard('{Enter}');
+  expect(await read(screen, 'kinds')).toBe(
+    'near:polygon|far:polygon|drawn-1:polygon|drawn-2:polygon',
+  );
+});
+
+test('finishes when Enter is pressed back on the first vertex', async () => {
+  const screen = await render(MapEditorFixture, { tool: 'draw-line', drawable: true });
+  await focus(screen);
+
+  await userEvent.keyboard('{Enter}{Shift>}{ArrowRight}{/Shift}{Enter}');
+  await userEvent.keyboard('{Shift>}{ArrowLeft}{/Shift}{Enter}');
+
+  expect((await read(screen, 'outlines')).split('|')[2]).toBe('drawn-1:0,0 50,0');
+  expect(await announced(screen)).toBe('Outline finished');
+});
+
+test('abandons an under-length outline the moment Escape is pressed', async () => {
+  const screen = await render(MapEditorFixture, { tool: 'draw-polygon', drawable: true });
+  await focus(screen);
+
+  await userEvent.keyboard('{Enter}{ArrowRight}{Enter}{Escape}');
+
+  expect(await read(screen, 'kinds')).toBe('near:polygon|far:polygon');
+  expect(await read(screen, 'selected')).toBe('');
+  expect(await announced(screen)).toBe('Outline too short to keep; discarded');
+});
+
+test('abandons an under-length outline as soon as the tool is switched, not on the next press', async () => {
+  const screen = await render(MapEditorFixture, { tool: 'draw-polygon', drawable: true });
+  const surface = screen.getByRole('application');
+  await press(surface, { x: 20, y: 120 });
+  await press(surface, { x: 70, y: 120 });
+
+  await screen.rerender({ tool: 'select' });
+
+  expect(await read(screen, 'kinds')).toBe('near:polygon|far:polygon');
+});
+
+test('says drawing is off when the page offers no defaults for a new shape', async () => {
+  const screen = await render(MapEditorFixture, { tool: 'draw-polygon' });
+  await focus(screen);
+
+  await userEvent.keyboard('{Enter}');
+
+  expect(await read(screen, 'kinds')).toBe('near:polygon|far:polygon');
+  expect(await announced(screen)).toBe('Drawing is not available here');
+});

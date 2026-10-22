@@ -51,8 +51,8 @@ Everything is exported from the package root, which is the only entry point: `im
 | `StaticMap` | One raster from the Mapbox Static Images API, with a 2× `srcset` entry for high-density displays. No JavaScript, no WebGL; renders on the server | `style`, `view`, `width`, `height`, `accessToken`, `alt` (**required**), `overlay?`, `class?`, plus native `<img>` attributes (`src`, `srcset` and `style` excepted — `style` is the MAP style here; `loading="lazy"` and `decoding="async"` are always set) | — | `<img>` named by `alt`. Required rather than defaulted: a map is content, and a decorative empty alt withholds it silently |
 | `DynamicMap` | The interactive WebGL half: Mapbox GL, panned and zoomed. Scroll-zoom stays off except while a finger is down, so the map never swallows the page scroll | `accessToken`, `style`, `camera`, `height? = 400` (the width fills the container), `label? = 'Map'`, `panHintLabel? = 'Use two fingers to move the map'`, `unavailableLabel? = 'Map unavailable'`, `class?`, plus native `<div>` attributes (`style` excepted) | — | `role="application"` named by `label`. When the engine or WebGL cannot load, replaced by a `<p>` carrying `unavailableLabel` |
 | `Map` | The raster first, the live map once the page has hydrated | `accessToken`, `style`, `camera`, `width`, `height`, `alt`, `interactive? = true`, `panHintLabel?`, `unavailableLabel?`, `class?` | — | one name, `alt`, serves both halves: the raster's alternative text and the live map's `label` |
-| `MapEditor` | A plan-drawing surface: areas, paths and points on a snapping grid, selected, dragged, reshaped and drawn | `doc`, `selected? = new Set()`, `tool? = 'select'` (`'select' \| 'pan' \| 'draw-polygon' \| 'draw-line'`), `width? = 800`, `height? = 600`, `label? = 'Plan editor'`, `onchange?`, `onselect?`, `onviewportchange?`, `newShape?`, `class?` | — | inherited from `VectorCanvas`: one `role="application"` surface named by `label` |
-| `MapShapeView` | How one area, path or point is drawn. Renders `<g>`, so it lives inside an `<svg>` | `shape`, `selected? = false`, `editable? = false` | — | none of its own, deliberately — naming every shape would put hundreds of unreachable nodes inside a widget a screen reader is being told to pass keys through |
+| `MapEditor` | A plan-drawing surface: areas, paths and points on a snapping grid, selected, dragged, reshaped and drawn | `doc`, `selected? = new Set()`, `tool? = 'select'` (`'select' \| 'pan' \| 'draw-polygon' \| 'draw-line'`), `width? = 800`, `height? = 600`, `label? = 'Plan editor'`, `onchange?`, `onselect?`, `onviewportchange?`, `newShape?`, `locales?`, the keyboard path's copy (see [§ Keys](#keys)), `class?` | — | inherited from `VectorCanvas`: one `role="application"` Tab stop named by `label` and described by `keysDescription`; `aria-activedescendant` names the focused shape, handle or drawing cursor, and a polite `role="status"` region announces each keyboard edit |
+| `MapShapeView` | How one area, path or point is drawn. Renders `<g>`, so it lives inside an `<svg>` | `shape`, `selected? = false`, `editable? = false`, `focus? = ''` (`'shape'` or a handle key such as `'vertex-2'`), `focusId? = ''`, `focusLabel? = ''`, `focusVisible? = false` | — | only the focused part is named (`focusId`, `role="img"`, `focusLabel`), for the editor's `aria-activedescendant`; naming every shape would put hundreds of unreachable nodes inside a widget a screen reader is told to pass keys through. `focusVisible` rings a focused handle |
 
 ```svelte
 <script lang="ts">
@@ -96,6 +96,38 @@ Everything is exported from the package root, which is the only entry point: `im
 | `newShape` | `(kind: 'polygon' \| 'line', at: Point) => MapShape` | The first press of a drawing gesture. Absent means drawing is off |
 
 `VectorDocument`, `Viewport` and `Point` are the core library's, from [`@thomasfosterau/components/canvas`](https://github.com/thomasfosterau/components/blob/trunk/packages/components/README.md).
+
+### Keys
+
+Every pointer edit has a keyboard path through the same functions and the same `committed` contract. The surface is one Tab stop; focus stays on it, and `aria-activedescendant` names the part being worked on.
+
+| Key | Select tool, shape level | Select tool, handle level |
+| --- | --- | --- |
+| `]` / `[` | select the next / previous shape (paint order) | focus the next / previous handle: vertices and edge midpoints, in outline order |
+| Arrows (Shift: ×5) | move the shape one grid step | move the vertex; on a midpoint, add a vertex there and move it (one undo) |
+| Enter / Space | go into the shape's handles (areas and paths) | on a midpoint, add a vertex and focus it |
+| Delete / Backspace | — | remove the vertex, down to 3 for an area and 2 for a path (a refusal is announced) |
+| Escape | clear the selection; a second Escape passes through to the page | back to the shape level |
+
+With a drawing tool, a cursor starts at the centre of the view: arrows move it, Enter or Space places a vertex (Enter back on the first vertex finishes), and Escape finishes the outline at once, discarding one still too short. Switching tool mid-outline finishes it too. With the pan tool the arrows pan, and `+` / `-` zoom with any tool (both `VectorCanvas`'s). Ctrl, Alt and Meta chords are left to the page. A held arrow is one edit: each repeat reports `committed: false`, and the release (or a blur, or a pointer press) commits once, with the same transform the matching pointer drag commits.
+
+Every string is a prop with an English default; coordinates are formatted with `locales` (the runtime default when absent):
+
+| Prop | Signature | Default |
+| --- | --- | --- |
+| `keysDescription` | `string` | how the keys work, in one paragraph |
+| `shapeLabel` | `({ kind, label, locked }) => string` | `'Lawn, area, locked'` (`polygon` → area, `line` → path, `marker` → point) |
+| `vertexLabel` | `(index, count, x, y) => string` | `'Vertex 2 of 4, at 40, 20'` |
+| `midpointLabel` | `(from, to) => string` | `'Midpoint between vertices 2 and 3; Enter adds a vertex here'` |
+| `cursorLabel` | `(x, y) => string` | `'Drawing cursor at 40, 20'` |
+| `movedMessage` | `(x, y) => string` | `'40, 20'` |
+| `lockedMessage` | `string` | `'Locked; it cannot be changed'` |
+| `vertexAddedMessage` | `(index, count) => string` | `'Vertex 3 of 5 added'` |
+| `vertexRemovedMessage` | `(count) => string` | `'Vertex removed; 4 left'` |
+| `vertexKeptMessage` | `(minimum) => string` | `'Not removed: this outline needs at least 3 vertices'` |
+| `outlineFinishedMessage` | `string` | `'Outline finished'` |
+| `outlineDiscardedMessage` | `string` | `'Outline too short to keep; discarded'` |
+| `drawingOffMessage` | `string` | `'Drawing is not available here'` |
 
 ## Static map URLs
 
@@ -205,7 +237,7 @@ if (frame !== undefined) {
 
 - **Shape** — an area (`polygon`, closed), a path (`line`, open) or a point (`marker`, a disc). All three sit at a `position` in canvas coordinates; an outline's `points` are relative to it, so moving a shape never rewrites its corners.
 - **Grip vs indicator** — `MapShapeView` draws a selected outline's vertices as filled grips when `editable` and as hollow rings otherwise: the affordance matches the capability, so a read-only plan never offers a handle that does nothing. An editable outline also gets hollow, dashed midpoint handles, from which a new vertex is dragged out.
-- **Committed edit** — `MapEditor` reports every pointer move with `committed: false` and the release once with `committed: true`, carrying a `Transform` spanning the whole gesture. A page records history on `committed` alone, so one drag is one undo entry. History and shape creation stay with the page that owns the document; the editor keeps neither.
+- **Committed edit** — `MapEditor` reports every pointer move (or held-arrow repeat) with `committed: false` and the release once with `committed: true`, carrying a `Transform` spanning the whole gesture. A page records history on `committed` alone, so one drag is one undo entry. History and shape creation stay with the page that owns the document; the editor keeps neither.
 - **Geo frame** — how a stored GeoJSON geometry becomes canvas coordinates: subtract an origin, scale by a power of two, negate y. Chosen for exact invertibility, not looks (it is equirectangular, so a plan reads wider than it is away from the equator). A document in this frame wants `grid.snap: false`, or the grid quantises the boundary.
 
 ## License

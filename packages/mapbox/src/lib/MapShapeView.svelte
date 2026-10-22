@@ -32,12 +32,20 @@ Draws one area, path or point of a plan, with grips or indicators when selected.
 
   ## ARIA contract
 
-  None of its own, deliberately: this renders `<g>` inside a surface that is
-  already `role="application"` and named by `VectorCanvas`'s `label`. Naming
-  each shape here would put a hundred unreachable nodes into the accessibility
-  tree of a widget a screen reader is being told to pass keys through. The
-  reader's route to the same information is the page's list of shapes beside
-  the canvas, not the canvas.
+  Only the focused part is named. This renders `<g>` inside a surface that is
+  already `role="application"` and named by `VectorCanvas`'s `label`; naming
+  every shape would put a hundred unreachable nodes into the accessibility tree
+  of a widget a screen reader is told to pass keys through.
+
+  `MapEditor` keeps keyboard focus on its surface and points
+  `aria-activedescendant` at whichever part of a shape it means: the shape
+  itself (`focus="shape"`) or one handle (`focus="vertex-2"`, `"midpoint-3"`,
+  the same keys the handles are drawn under). That part, and only that part,
+  carries `focusId`, `role="img"` and `focusLabel`, so assistive tech announces
+  it; `focusVisible` draws a ring round a focused handle so a sighted keyboard
+  user sees the same thing. The ring is one more entry in `handles`, and the
+  naming attributes ride on each entry's `attributes`, so the markup still
+  makes no decisions.
 -->
 <script lang="ts">
   import type { Point } from '@thomasfosterau/components/canvas';
@@ -54,6 +62,9 @@ Draws one area, path or point of a plan, with grips or indicators when selected.
     /** An SVG dash pattern, or `'none'` — the keyword, so the field is never absent. */
     readonly dash: string;
     readonly cursor: string;
+    readonly strokeWidth: number;
+    /** Extra attributes: the focused part's id and name, or the ring's `aria-hidden`. */
+    readonly attributes: Readonly<Record<string, string>>;
   }
 
   interface Props {
@@ -69,9 +80,42 @@ Draws one area, path or point of a plan, with grips or indicators when selected.
      * @defaultValue `false`
      */
     editable?: boolean | undefined;
+    /**
+     * The part with keyboard focus: `'shape'`, a handle's key (`'vertex-2'`,
+     * `'midpoint-3'`), or `''` for none.
+     * @defaultValue `''`
+     */
+    focus?: string | undefined;
+    /**
+     * The DOM id the focused part carries, for the surface's `aria-activedescendant`.
+     * @defaultValue `''`
+     */
+    focusId?: string | undefined;
+    /**
+     * What assistive tech announces for the focused part.
+     * @defaultValue `''`
+     */
+    focusLabel?: string | undefined;
+    /**
+     * Whether to ring a focused handle: while the surface itself has focus.
+     * @defaultValue `false`
+     */
+    focusVisible?: boolean | undefined;
   }
 
-  let { shape, selected = false, editable = false }: Props = $props();
+  let {
+    shape,
+    selected = false,
+    editable = false,
+    focus = '',
+    focusId = '',
+    focusLabel = '',
+    focusVisible = false,
+  }: Props = $props();
+
+  /** The attributes `aria-activedescendant` needs on whichever part is focused. */
+  const named = $derived({ id: focusId, role: 'img', 'aria-label': focusLabel });
+  const groupAttributes = $derived(focus === 'shape' && focusId !== '' ? named : {});
 
   const stroke = $derived(selected ? 'var(--color-primary)' : shape.strokeColor);
   const strokeWidth = $derived(selected ? shape.strokeWidth + 1 : shape.strokeWidth);
@@ -99,29 +143,57 @@ Draws one area, path or point of a plan, with grips or indicators when selected.
         stroke: editable ? 'var(--color-base-100)' : 'var(--color-primary)',
         dash: 'none',
         cursor: editable ? 'cursor-grab' : '',
+        strokeWidth: 1,
+        attributes: {},
       }),
     );
-    if (!editable) return vertices;
     // Hollow, dashed and smaller than a grip: this is not a vertex yet.
     // Dragging one splits its edge and the new vertex comes away under the
     // pointer.
-    return vertices.concat(
-      edgeMidpoints(shape).map(
-        (midpoint): Handle => ({
-          key: `midpoint-${midpoint.index}`,
-          point: midpoint.point,
-          radius: 2.5,
-          fill: 'var(--color-base-100)',
-          stroke: 'var(--color-primary)',
-          dash: '1 1',
-          cursor: 'cursor-copy',
-        }),
-      ),
+    const midpoints = edgeMidpoints(shape).map(
+      (midpoint): Handle => ({
+        key: `midpoint-${midpoint.index}`,
+        point: midpoint.point,
+        radius: 2.5,
+        fill: 'var(--color-base-100)',
+        stroke: 'var(--color-primary)',
+        dash: '1 1',
+        cursor: 'cursor-copy',
+        strokeWidth: 1,
+        attributes: {},
+      }),
     );
+    const drawn = editable ? vertices.concat(midpoints) : vertices;
+    return drawn.flatMap((handle) => (handle.key === focus ? focused(handle) : [handle]));
   });
+
+  /**
+   * A focused handle: named for assistive tech, and — while the surface has
+   * focus — ringed outside the grip in the text colour, so the ring reads
+   * against the grip's fill and against the shape under it.
+   */
+  const focused = (handle: Handle): readonly Handle[] => {
+    const labelled = focusId === '' ? handle : { ...handle, attributes: named };
+    if (!focusVisible) return [labelled];
+    const ring: Handle = {
+      ...handle,
+      key: 'focus-ring',
+      radius: handle.radius + 2.5,
+      fill: 'none',
+      stroke: 'var(--color-base-content)',
+      dash: 'none',
+      cursor: '',
+      strokeWidth: 1.5,
+      attributes: { 'aria-hidden': 'true' },
+    };
+    return [ring, labelled];
+  };
 </script>
 
-<g transform="translate({shape.position.x},{shape.position.y}) rotate({shape.rotation})">
+<g
+  transform="translate({shape.position.x},{shape.position.y}) rotate({shape.rotation})"
+  {...groupAttributes}
+>
   {#if shape.type === 'marker'}
     <circle r={shape.radius ?? 6} fill={shape.fillColor} {stroke} stroke-width={strokeWidth} />
   {:else}
@@ -138,12 +210,13 @@ Draws one area, path or point of a plan, with grips or indicators when selected.
          coordinate key makes that a duplicate-key crash mid-drag. -->
     {#each handles as handle (handle.key)}
       <circle
+        {...handle.attributes}
         cx={handle.point.x}
         cy={handle.point.y}
         r={handle.radius}
         fill={handle.fill}
         stroke={handle.stroke}
-        stroke-width="1"
+        stroke-width={handle.strokeWidth}
         stroke-dasharray={handle.dash}
         class={handle.cursor}
       />
