@@ -19,6 +19,7 @@
     "packages/charts/src/core/index.ts",
     "packages/charts/src/prosemirror/index.ts",
     "packages/charts/src/react/index.ts",
+    "packages/charts/src/svelte/index.ts",
     "packages/charts/src/vega/index.ts",
     "packages/charts/src/vue/index.ts",
     "packages/*/src/stories/**/*.stories.{ts,svelte}",
@@ -78,6 +79,7 @@
       { "name": "charts-core", "patterns": ["packages/charts/src/core/**"] },
       { "name": "charts-react", "patterns": ["packages/charts/src/react/**"] },
       { "name": "charts-vue", "patterns": ["packages/charts/src/vue/**"] },
+      { "name": "charts-svelte", "patterns": ["packages/charts/src/svelte/**"] },
       { "name": "charts-prosemirror", "patterns": ["packages/charts/src/prosemirror/**"] },
       { "name": "charts-vega", "patterns": ["packages/charts/src/vega/**"] }
     ],
@@ -88,6 +90,10 @@
       { "from": "charts-core", "allow": ["charts-spec"] },
       { "from": "charts-react", "allow": ["charts-spec", "charts-core"] },
       { "from": "charts-vue", "allow": ["charts-spec", "charts-core"] },
+      // Reaches spec and core by the package's own name, never by relative
+      // path: svelte-package copies src/svelte alone into dist/svelte
+      // (packages/charts/tsconfig.svelte.json).
+      { "from": "charts-svelte", "allow": [] },
       { "from": "charts-prosemirror", "allow": ["charts-spec", "charts-core"] },
       { "from": "charts-vega", "allow": ["charts-spec", "charts-core"] }
     ]

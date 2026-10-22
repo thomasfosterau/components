@@ -8,7 +8,7 @@ Accessible Svelte 5 components built on Tailwind CSS 4, daisyUI 5 and bits-ui, w
 | --- | --- | --- |
 | [`@thomasfosterau/components`](./packages/components) | [![npm](https://img.shields.io/npm/v/@thomasfosterau/components)](https://www.npmjs.com/package/@thomasfosterau/components) | Accessible Svelte 5 UI primitives: daisyUI classes for styling, bits-ui for interaction, every string a prop. The core families in one barrel; citations, canvas, charts, tips, SEO, hotkeys and the Effect-backed `EntityForm` behind their own entry points. |
 | [`@thomasfosterau/components-mapbox`](./packages/mapbox) | [![npm](https://img.shields.io/npm/v/@thomasfosterau/components-mapbox)](https://www.npmjs.com/package/@thomasfosterau/components-mapbox) | Mapbox GL maps and a plan editor for `@thomasfosterau/components`: a static raster, the interactive surface, and the GeoJSON seam. `mapbox-gl` is a required peer. |
-| [`@thomasfosterau/charts`](./packages/charts) | [![npm](https://img.shields.io/npm/v/@thomasfosterau/charts)](https://www.npmjs.com/package/@thomasfosterau/charts) | A portable, renderer-agnostic chart spec and its JSON Schema, a pure TypeScript geometry core, and React, Vue, ProseMirror and Vega-Lite interpreters (plus the Swift `ChartSpecKit`). No Svelte. |
+| [`@thomasfosterau/charts`](./packages/charts) | [![npm](https://img.shields.io/npm/v/@thomasfosterau/charts)](https://www.npmjs.com/package/@thomasfosterau/charts) | A portable, renderer-agnostic chart spec and its JSON Schema, a pure TypeScript geometry core, and React, Vue, Svelte, ProseMirror and Vega-Lite interpreters (plus the Swift `ChartSpecKit`). Its Svelte `Chart` reads the spec; the core library's `/charts` one takes series props. |
 
 ## Install
 

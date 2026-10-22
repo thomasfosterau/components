@@ -1,0 +1,20 @@
+{
+  // The `/svelte` entry and its suite, which `tsc` cannot read: `svelte-check`
+  // type-checks them (`check`) and `svelte-package` emits their declarations
+  // from this file (`build`). The entry imports the spec and core by the
+  // package's own name, because `svelte-package` copies `src/svelte` alone
+  // into `dist/svelte` and a relative `../core/index.ts` would not survive
+  // the copy; `paths` points those names at the sources, so neither task
+  // needs a built `dist/`. The specifiers are emitted unchanged, and in a
+  // consumer they resolve to the published `dist/index.mjs` and
+  // `dist/core.mjs`.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "paths": {
+      "@thomasfosterau/charts": ["./src/spec/index.ts"],
+      "@thomasfosterau/charts/core": ["./src/core/index.ts"]
+    }
+  },
+  "include": ["src/svelte", "tests/svelte"]
+}

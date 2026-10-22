@@ -2,7 +2,8 @@
   // The whole package: every entry, the tests and the schema script. The
   // interpreters (`react`, `vue`, `prosemirror`) legitimately touch the DOM,
   // so this config keeps the base's `dom` libs; `tsconfig.pure.json` re-checks
-  // `spec` and `core` without them.
+  // `spec` and `core` without them. The `/svelte` entry and its suite are
+  // `.svelte`, which `tsc` cannot read: `tsconfig.svelte.json` covers them.
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
@@ -18,5 +19,6 @@
       }
     ]
   },
-  "include": ["src", "tests", "scripts", "vite.config.ts"]
+  "include": ["src", "tests", "scripts", "vite.config.ts"],
+  "exclude": ["src/svelte", "tests/svelte"]
 }

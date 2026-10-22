@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | `@thomasfosterau/components` | `packages/components` | The core library. Peers: `svelte`; optional `@thomasfosterau/effect-forms-svelte`, reached only from `/entity-form`. Rules in [its CLAUDE.md](packages/components/CLAUDE.md). |
 | `@thomasfosterau/components-mapbox` | `packages/mapbox` | Maps and the plan editor. Required peer `mapbox-gl`; consumes the core through its published `/canvas` entry. Rules in [its CLAUDE.md](packages/mapbox/CLAUDE.md). |
-| `@thomasfosterau/charts` | `packages/charts` | The portable chart spec, its JSON Schema and geometry core, and the React / Vue / ProseMirror / Vega-Lite interpreters (merged in from the former `thomasfosterau/charts` repo). No Svelte: built with `vp pack`, tested under Node, framework peers optional per entry; `effect` is a runtime dependency of its spec entry. Independent of the other two. Rules in [its CLAUDE.md](packages/charts/CLAUDE.md). |
+| `@thomasfosterau/charts` | `packages/charts` | The portable chart spec, its JSON Schema and geometry core, and the React / Vue / Svelte / ProseMirror / Vega-Lite interpreters (merged in from the former `thomasfosterau/charts` repo). Plain TypeScript built with `vp pack`, except the `/svelte` entry, which `svelte-package` ships as `.svelte` source; tested under Node, framework peers (`svelte` included) optional per entry; `effect` is a runtime dependency of its spec entry. Independent of the other two. Rules in [its CLAUDE.md](packages/charts/CLAUDE.md). |
 
 ## Common pitfalls
 
@@ -18,7 +18,7 @@
 
 ## Conventions
 
-These are the Svelte packages' conventions; `packages/charts` contains no Svelte and follows only the language-level ones (catalog, `T | undefined` optionals, `sideEffects`) — its CLAUDE.md says which.
+These are the Svelte packages' conventions; `packages/charts` follows the language-level ones (catalog, `T | undefined` optionals, `sideEffects`), and its one Svelte entry, `/svelte`, takes some of the component ones — its CLAUDE.md says which.
 
 - **Svelte 5 runes and snippets only.** `$props`, `$state`, `$derived`, `$effect`, `{#snippet}` / `{@render}`. No `export let`, no slots, no stores in component code, no legacy event directives.
 - **Every component spreads the native attributes of the element it renders and merges `class`.**

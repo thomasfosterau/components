@@ -11,6 +11,8 @@
 
 export { computeContext } from './context.ts';
 
+export { resolveChart, type ResolvedChart } from './resolve.ts';
+
 export { computeDimensions, DEFAULT_MARGINS } from './layout.ts';
 
 export { makeAccessor, type FieldValue } from './accessor.ts';
