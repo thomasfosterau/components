@@ -3,7 +3,9 @@
  *
  * Deliberately structural (not imported from the vega-lite package) so this
  * package stays dependency-light; the test suite validates emitted specs
- * against the real Vega-Lite compiler.
+ * against the real Vega-Lite compiler. Optional members are bare `prop?: T`:
+ * like the chart spec's types, these describe a JSON document, in which a key
+ * is present with a value or absent.
  */
 
 /** A Vega-Lite field definition for a positional or mark-property channel. */

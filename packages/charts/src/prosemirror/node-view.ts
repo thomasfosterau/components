@@ -15,11 +15,11 @@ export interface ChartNodeViewOptions {
    * measurable width yet. The SVG scales to its container via viewBox,
    * so this only sets the aspect ratio and coordinate precision.
    */
-  readonly defaultBox?: Box;
+  readonly defaultBox?: Box | undefined;
   /** Resolves data refs at edit time. Without it, ref-data charts show a placeholder. */
-  readonly resolveData?: DataResolver;
+  readonly resolveData?: DataResolver | undefined;
   /** Extra class for the wrapper element. */
-  readonly className?: string;
+  readonly className?: string | undefined;
 }
 
 const DEFAULT_BOX: Box = { width: 640, height: 360 };

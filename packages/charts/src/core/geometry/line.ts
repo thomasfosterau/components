@@ -32,7 +32,7 @@ export function buildSeries(args: {
   readonly yScale: PositionalScale;
   readonly color?: Channel | undefined;
   readonly colorScale?: ResolvedScale | undefined;
-  readonly pathOf?: (points: ReadonlyArray<SeriesPoint>) => string;
+  readonly pathOf?: ((points: ReadonlyArray<SeriesPoint>) => string) | undefined;
 }): Series[] {
   const xAccessor = makeAccessor(args.x);
   const yAccessor = makeAccessor(args.y);

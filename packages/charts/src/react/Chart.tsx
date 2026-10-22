@@ -12,17 +12,17 @@ export interface ChartProps {
   /** The portable chart spec. Runtime-validated, since specs come from documents. */
   readonly spec: ChartSpec;
   /** Resolved data rows. Required when the spec's data is a reference. */
-  readonly data?: DataRows;
+  readonly data?: DataRows | undefined;
   /** Outer width in pixels (the SVG scales to its container via viewBox). */
-  readonly width?: number;
+  readonly width?: number | undefined;
   /** Outer height in pixels. */
-  readonly height?: number;
+  readonly height?: number | undefined;
   /** Margin overrides. */
-  readonly margins?: Partial<Margins>;
+  readonly margins?: Partial<Margins> | undefined;
   /** Class for the root `<svg>` element, and for the default fallback `<div>`. */
-  readonly className?: string;
+  readonly className?: string | undefined;
   /** Rendered when the spec is invalid or its data is unavailable. */
-  readonly fallback?: ReactNode | ((message: string) => ReactNode);
+  readonly fallback?: ReactNode | ((message: string) => ReactNode) | undefined;
 }
 
 type ChartState =
