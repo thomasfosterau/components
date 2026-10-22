@@ -11,7 +11,8 @@
  *   one `.mjs` + `.d.mts` per entry with shared chunks between them.
  * - `check` is `tsc`, twice: once over everything, once over `spec` and
  *   `core` with no DOM or Node types (tsconfig.pure.json), which is what
- *   keeps Layers 1 and 2 portable.
+ *   keeps Layers 1 and 2 portable. `tsc` is the native TypeScript 7 binary
+ *   (`@typescript/native`), Effect-patched by the root `prepare`.
  * - `test:unit` runs under Node, not browser mode. The suites are geometry,
  *   parsing and SSR string output; the few that mount into a DOM opt into
  *   `happy-dom` per file. See CLAUDE.md § Testing.
