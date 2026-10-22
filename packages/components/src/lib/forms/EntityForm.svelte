@@ -48,6 +48,7 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   } from '@thomasfosterau/effect-forms-svelte';
   import type { HTMLFormAttributes } from 'svelte/elements';
   import DateInput from '../fields/DateInput.svelte';
+  import type { FieldControl } from '../fields/field-types.ts';
   import FormField from '../fields/FormField.svelte';
   import Select from '../fields/Select.svelte';
   import TextInput from '../fields/TextInput.svelte';
@@ -208,7 +209,42 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   // The empty path is the form's own (non-field) messages.
   const rootErrors = $derived(form.errorsAt([]));
   const fieldId = (key: string): string => `entity-form-${key}`;
+  // The `FormField` wrapper is the same for a select and a scalar entry.
+  const fieldAttrs = (entry: SelectEntry | ScalarEntry) => ({
+    id: fieldId(entry.key),
+    label: entry.options.label(),
+    required: entry.options.required === true,
+    errors: handle(entry.key).visibleErrors,
+    requiredLabel,
+  });
 </script>
+
+<!-- A scalar entry's control: a textarea, a date input or a text input. -->
+{#snippet scalarInput(entry: ScalarEntry, control: FieldControl)}
+  {#if entry.multiline}
+    <Textarea
+      {...control}
+      name={entry.key}
+      placeholder={entry.options.placeholder?.()}
+      bind:value={() => getField(entry.key), (next: string) => setField(entry.key, next)}
+    />
+  {:else if entry.options.type === 'date'}
+    <DateInput
+      {...control}
+      name={entry.key}
+      bind:value={() => getField(entry.key), (next: string) => setField(entry.key, next)}
+    />
+  {:else}
+    <TextInput
+      {...control}
+      name={entry.key}
+      type={entry.options.type === 'url' ? 'url' : 'text'}
+      inputmode={inputMode(entry)}
+      placeholder={entry.options.placeholder?.()}
+      bind:value={() => getField(entry.key), (next: string) => setField(entry.key, next)}
+    />
+  {/if}
+{/snippet}
 
 <form {...rest} {...enhance(form)} {action} class={['space-y-4', className]}>
   {#if showHiddenId}
@@ -221,13 +257,7 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     {#if entry._tag === 'widget'}
       <entry.component {...entry.props()} {...fieldProps[entry.key] ?? {}} {...bridge(entry)} />
     {:else if entry._tag === 'select'}
-      <FormField
-        id={fieldId(entry.key)}
-        label={entry.options.label()}
-        required={entry.options.required === true}
-        errors={handle(entry.key).visibleErrors}
-        {requiredLabel}
-      >
+      <FormField {...fieldAttrs(entry)}>
         {#snippet children(control)}
           <Select
             {...control}
@@ -239,37 +269,9 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
         {/snippet}
       </FormField>
     {:else}
-      <FormField
-        id={fieldId(entry.key)}
-        label={entry.options.label()}
-        required={entry.options.required === true}
-        errors={handle(entry.key).visibleErrors}
-        {requiredLabel}
-      >
+      <FormField {...fieldAttrs(entry)}>
         {#snippet children(control)}
-          {#if entry.multiline}
-            <Textarea
-              {...control}
-              name={entry.key}
-              placeholder={entry.options.placeholder?.()}
-              bind:value={() => getField(entry.key), (next: string) => setField(entry.key, next)}
-            />
-          {:else if entry.options.type === 'date'}
-            <DateInput
-              {...control}
-              name={entry.key}
-              bind:value={() => getField(entry.key), (next: string) => setField(entry.key, next)}
-            />
-          {:else}
-            <TextInput
-              {...control}
-              name={entry.key}
-              type={entry.options.type === 'url' ? 'url' : 'text'}
-              inputmode={inputMode(entry)}
-              placeholder={entry.options.placeholder?.()}
-              bind:value={() => getField(entry.key), (next: string) => setField(entry.key, next)}
-            />
-          {/if}
+          {@render scalarInput(entry, control)}
         {/snippet}
       </FormField>
     {/if}
