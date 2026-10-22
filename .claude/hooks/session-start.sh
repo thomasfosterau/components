@@ -151,9 +151,17 @@ fi
 # as `trunk` breakage. `--frozen-lockfile` is a sub-second no-op when in sync.
 # The install runs the root `prepare` too, which re-applies the `effect-tsgo`
 # patch to the native `tsc` and vite-plus's oxlint (idempotent).
+# pnpm through Corepack when it is available, so the version is the one
+# `packageManager` pins rather than whatever the image put on PATH; a bare
+# `pnpm` otherwise.
+if command -v corepack >/dev/null 2>&1 && (cd "$PROJECT_DIR" && corepack pnpm --version >/dev/null 2>&1); then
+  PNPM=(corepack pnpm)
+else
+  PNPM=(pnpm)
+fi
 if [ -f "$PROJECT_DIR/pnpm-lock.yaml" ]; then
   log "syncing dependencies against the lockfile…"
-  (cd "$PROJECT_DIR" && pnpm install --frozen-lockfile >/dev/null 2>&1) \
+  (cd "$PROJECT_DIR" && "${PNPM[@]}" install --frozen-lockfile >/dev/null 2>&1) \
     || log "dependency install failed; continuing"
 fi
 

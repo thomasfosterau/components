@@ -144,13 +144,14 @@ catalog:
   # vite-plus pins `oxlint`, `oxfmt`, `vitest` and the `@vitest/*` packages
   # to exact versions. `vitest` and `@vitest/browser-playwright` FOLLOW that
   # pin (vite-plus 1.3.0 -> 5.0.5) rather than running ahead of it (#47).
-  # Dependabot's `vite-plus-toolchain` group (.github/dependabot.yml) bumps
+  # Dependabot's `toolchain` group (.github/dependabot.yml) bumps
   # `vite-plus`, `vitest` and `@vitest/*` together in one PR (#88). Before
   # merging that PR, push by hand: `vite` (ignored by Dependabot) to
   # `npm:@voidzero-dev/vite-plus-core@` the new vite-plus version, and
   # `vitest` / `@vitest/browser-playwright` to the version the new vite-plus's
   # `dependencies` / `peerDependencies` name if the group took them past it.
-  # A group PR that doesn't bump vite-plus itself is closed unmerged.
+  # A group PR that doesn't bump vite-plus itself is closed unmerged, unless it
+  # is an `@effect/tsgo` or lint-plugin bump that CI passes on its own.
   # `vite` is the same release published under its aliased core package.
   vite-plus: 1.3.0
   vite: npm:@voidzero-dev/vite-plus-core@1.3.0
@@ -159,7 +160,7 @@ catalog:
   # `coverage/coverage-final.json` `fallow audit` reads for per-function CRAP
   # scores. Istanbul rather than v8 because it instruments in the transform,
   # so the browser-mode suites report too. It pins `vitest` EXACTLY, so it
-  # moves with `vitest` above (Dependabot's `vite-plus-toolchain` group).
+  # moves with `vitest` above (Dependabot's `toolchain` group).
   '@vitest/coverage-istanbul': 5.0.5
   # Effect Language Service as a native (TypeScript-Go) binary, and the source
   # of the `@effect/tsgo/oxlint-presets` lint preset the root vite.config.ts
@@ -173,7 +174,9 @@ catalog:
   # (UnsupportedTargetPackageVersionError) on any other component version,
   # failing the patch. Read the `components` table in
   # node_modules/@effect/tsgo/dist/effect-tsgo.cjs before bumping any of the
-  # three; Dependabot's `effect-tsgo-toolchain` group moves them together.
+  # three. Dependabot's `toolchain` group brings `@effect/tsgo` with
+  # vite-plus; the `@typescript/native` alias moves by hand
+  # (.github/dependabot.yml).
   '@effect/tsgo': 0.55.0
   # TS7, the native Go compiler (bin `tsc`), Effect-patched by the `prepare`
   # above. It type-checks packages/charts (the one pure-TS package, and the one
