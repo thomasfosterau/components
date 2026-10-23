@@ -438,7 +438,7 @@ The tables, lists and pagers an index page and a detail page are built from. Two
 | `PaginationFooter` | `ResultCount` + `Pagination` from one set of numbers | `shown`, `offset`, `limit`, `total`, `href?`/`onPage?`, `variant?`, `siblings?`, `size?`, `label?`, `previousLabel?`, `nextLabel?`, `pageLabel?`, `countLabel?`, `locales?` | — | its two parts' |
 | `ItemList<T>` | The list container, keying and empty state | `items`, `variant?: 'compact'\|'stacked'\|'grid'\|'cards'`, `getKey(item,index)`, `emptyMessage? = 'Nothing here yet.'`, `feed?`, `label?`, `busy?` | `item(item, index)`, `empty?` | default: `<ul>`/`<li>`; `feed`: `<div role="feed" aria-label aria-busy>` of `<article aria-posinset aria-setsize tabindex="-1">` |
 | `LinkListItem` | The common row body | `href`, `title`, `subtitle?`, `badges?`, `headingLevel?` | `meta?` | the title is the row's only interactive element |
-| `DescriptionList` | `<dl>` of label/value pairs in four shapes | `variant?: 'grid'\|'card'\|'divided'\|'inline'`, `mono?`, `showEmpty?`, `emptyLabel? = 'unrecorded'` | `children` | a real `<dl>` |
+| `DescriptionList` | `<dl>` of label/value pairs in four shapes, or `bare` in the caller's own layout | `variant?: 'grid'\|'card'\|'divided'\|'inline'\|'bare'`, `mono?`, `showEmpty?`, `emptyLabel? = 'unrecorded'` | `children` | a real `<dl>`; in `card` and `bare` every `<dt>`/`<dd>` is a direct child of it, and `bare` adds no classes beyond the caller's `class` |
 | `DescriptionRow` | One pair inside it | `label`, `value?` **or** `children`, `valueClass?`, `labelClass?`, `showEmpty?`, `emptyLabel?` | `children?` | `<dt>`/`<dd>`; a row with nothing renders **nothing** (or `emptyLabel` when `showEmpty`) |
 | `TreeList` | One collapsible node of a hierarchy | `open? ⚓ = true`, `title: string \| Snippet` | `title?`, `children?` | native `<details>`/`<summary>` inside `<ul>`/`<li>`; deliberately **not** `role="tree"` |
 | `TreeListItem` | One leaf under it | — | `children?` | a plain `<li>` |
@@ -450,7 +450,7 @@ The tables, lists and pagers an index page and a detail page are built from. Two
 
 ```svelte
 <script lang="ts">
-  import { Table, DataGrid, PaginationFooter, pageHref, ItemList, LinkListItem, DescriptionList, DescriptionRow, type SortState, type TableColumn } from '@thomasfosterau/components';
+  import { Table, DataGrid, PaginationFooter, pageHref, ItemList, LinkListItem, DescriptionList, DescriptionRow, ExternalLink, type SortState, type TableColumn } from '@thomasfosterau/components';
 
   let sort = $state<SortState | undefined>({ key: 'name', direction: 'asc' });
   const columns: readonly TableColumn<Plant>[] = [
@@ -475,6 +475,12 @@ The tables, lists and pagers an index page and a detail page are built from. Two
   <DescriptionRow label="Captured"><DateTime value={media.capturedAt} dateStyle="long" /></DescriptionRow>
   <!-- No licence recorded? The row is simply not there. -->
   <DescriptionRow label="Licence">{#if media.licence}<Link href={media.licence.href}>{media.licence.name}</Link>{/if}</DescriptionRow>
+</DescriptionList>
+
+<!-- `bare`: the page owns the grid; rows and its own pairs share the two columns. -->
+<DescriptionList variant="bare" class="grid grid-cols-[auto_1fr] gap-x-4">
+  <dt>Name</dt><dd>{organisation.name}</dd>
+  <DescriptionRow label="Website"><ExternalLink href={organisation.website}>{organisation.website}</ExternalLink></DescriptionRow>
 </DescriptionList>
 ```
 

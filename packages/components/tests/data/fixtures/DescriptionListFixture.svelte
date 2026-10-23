@@ -5,16 +5,23 @@
   import DescriptionRow from '../../../src/lib/data/DescriptionRow.svelte';
 
   interface Props {
-    variant?: 'grid' | 'card' | 'divided' | 'inline';
+    variant?: 'grid' | 'card' | 'divided' | 'inline' | 'bare';
+    class?: string;
     mono?: boolean;
     showEmpty?: boolean;
     emptyLabel?: string;
   }
 
-  let { variant = 'grid', mono = false, showEmpty = false, emptyLabel }: Props = $props();
+  let {
+    variant = 'grid',
+    mono = false,
+    showEmpty = false,
+    emptyLabel,
+    class: className,
+  }: Props = $props();
 </script>
 
-<DescriptionList {variant} {mono} {showEmpty} {emptyLabel}>
+<DescriptionList {variant} {mono} {showEmpty} {emptyLabel} class={className}>
   <DescriptionRow label="Formula" value="C8H10N4O2" />
   <DescriptionRow label="Collected" value="" />
   <DescriptionRow label="Licence">

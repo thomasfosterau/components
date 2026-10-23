@@ -65,6 +65,19 @@
   </DescriptionList>
 </Story>
 
+<Story name="Bare, in the caller's own grid">
+  <!-- `bare` adds no layout: the caller's class lays the <dl> out, and each row's
+       <dt>/<dd> sits directly in it beside the caller's own pairs. -->
+  <DescriptionList variant="bare" class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
+    <dt class="text-base-content/60 text-sm">Name</dt>
+    <dd class="text-sm">Royal Botanic Garden</dd>
+    <DescriptionRow label="Founded" value={1816} />
+    <DescriptionRow label="Website">
+      <Link href="https://example.org">example.org</Link>
+    </DescriptionRow>
+  </DescriptionList>
+</Story>
+
 <Story name="Showing the absences">
   <!-- A specimen record whose blank fields are what the reader came to check. -->
   <DescriptionList variant="divided" showEmpty emptyLabel="not recorded">
