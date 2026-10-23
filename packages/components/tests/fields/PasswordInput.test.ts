@@ -76,7 +76,8 @@ test('submitting the form hides the password again', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
 
   expect(onSubmitted).toHaveBeenCalledOnce();
-  expect((onSubmitted.mock.calls[0]?.[0] as FormData).get('password')).toBe('hunter2hunter2');
+  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
+  expect(data.get('password')).toBe('hunter2hunter2');
   await expect.element(screen.getByLabelText('Password')).toHaveAttribute('type', 'password');
   await expect
     .element(screen.getByRole('button', { name: 'Show password' }))
