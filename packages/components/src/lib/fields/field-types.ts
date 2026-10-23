@@ -105,3 +105,11 @@ export const rangeSize: Record<FieldSize, string> = {
   md: 'range-md',
   lg: 'range-lg',
 };
+
+/** Literal cell size and text-size classes per `FieldSize` for `PinInput`'s cells; a lookup table so Tailwind's scanner sees every class. */
+export const pinCellSize: Record<FieldSize, string> = {
+  xs: 'size-6 text-xs',
+  sm: 'size-8 text-sm',
+  md: 'size-10 text-base',
+  lg: 'size-12 text-lg',
+};
