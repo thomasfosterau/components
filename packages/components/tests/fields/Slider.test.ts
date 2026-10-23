@@ -134,6 +134,26 @@ test('inside FormField the hint describes it and errors mark it invalid', async 
   await expect.element(slider).toHaveAttribute('aria-invalid', 'true');
 });
 
+test('inside FormField the label names it, and a click on the label focuses it', async () => {
+  const screen = await render(SliderFormFixture, {});
+
+  const slider = screen.getByRole('slider', { name: 'Hours of sun' });
+  await expect.element(slider).toBeInTheDocument();
+  await screen.getByText('Hours of sun').click();
+  await expect.element(slider).toHaveFocus();
+});
+
+test('inside FormField each range thumb reads the label then its own name', async () => {
+  const screen = await render(SliderFormFixture, { range: true });
+
+  await expect
+    .element(screen.getByRole('slider', { name: 'Hours of sun Minimum' }))
+    .toBeInTheDocument();
+  await expect
+    .element(screen.getByRole('slider', { name: 'Hours of sun Maximum' }))
+    .toBeInTheDocument();
+});
+
 test('name posts one hidden input per thumb', async () => {
   const onSubmitted = vi.fn();
   const screen = await render(SliderFormFixture, { range: true, onSubmitted });

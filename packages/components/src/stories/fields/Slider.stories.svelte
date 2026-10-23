@@ -54,11 +54,11 @@
 </Story>
 
 <Story name="Inside FormField">
-  <!-- `label` repeats FormField's until FieldControl carries the label's id (#179); then `{...control}` alone names it. -->
+  <!-- `{...control}` alone names it: every thumb is `aria-labelledby` the FormField's `labelId`. -->
   <div class="max-w-sm">
     <FormField label="Hours of sun" hint="Full sun is six hours or more." errors={['Most roses need at least four hours.']}>
       {#snippet children(control)}
-        <Slider {...control} label="Hours of sun" name="sun" min={0} max={12} value={3} formatValue={(v) => `${v} h`} />
+        <Slider {...control} name="sun" min={0} max={12} value={3} formatValue={(v) => `${v} h`} />
       {/snippet}
     </FormField>
   </div>
