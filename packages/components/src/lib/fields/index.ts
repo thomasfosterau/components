@@ -24,6 +24,7 @@ export { default as Fieldset } from './Fieldset.svelte';
 export { default as FileInput } from './FileInput.svelte';
 export { default as FormField } from './FormField.svelte';
 export { default as ImageInput } from './ImageInput.svelte';
+export { default as PinInput } from './PinInput.svelte';
 export { default as RadioGroup } from './RadioGroup.svelte';
 export { default as SearchInput } from './SearchInput.svelte';
 export { default as Select } from './Select.svelte';
