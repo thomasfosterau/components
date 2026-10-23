@@ -2,11 +2,12 @@
  * How a {@link DescriptionRow} learns which {@link DescriptionList} it is
  * inside.
  *
- * The four list variants render their rows differently — a `grid` row is a
- * wrapper holding a stacked `<dt>`/`<dd>` pair, while a `card` row's `<dt>`
- * and `<dd>` are siblings in the list's own two-column grid, because a
- * wrapper would break the alignment the grid exists for. A call site writes
- * the same `<DescriptionRow>` either way.
+ * The list variants render their rows differently — a `grid` row is a
+ * wrapper holding a stacked `<dt>`/`<dd>` pair, while a `card` or `bare`
+ * row's `<dt>` and `<dd>` are direct children of the `<dl>`, because a
+ * wrapper would break the alignment of a two-column grid (the list's own for
+ * `card`, the consumer's for `bare`). A call site writes the same
+ * `<DescriptionRow>` either way.
  *
  * The variant travels down as context rather than as a prop so a caller
  * cannot get a list and its rows out of step, and so the list stays the
@@ -20,7 +21,12 @@ import { getContext, setContext } from 'svelte';
 
 /** The presentation a `DescriptionList` asks its rows for. */
 export interface DescriptionListStyle {
-  readonly variant: 'grid' | 'card' | 'divided' | 'inline';
+  /**
+   * The layout. `bare` adds no layout classes to the list and renders each
+   * row's `<dt>`/`<dd>` as direct children of the `<dl>`, for a consumer that
+   * lays the list out itself.
+   */
+  readonly variant: 'grid' | 'card' | 'divided' | 'inline' | 'bare';
   /** Render values in a fixed-width face that breaks anywhere. */
   readonly mono: boolean;
   /** Render a row whose value is empty, using `emptyLabel`. */

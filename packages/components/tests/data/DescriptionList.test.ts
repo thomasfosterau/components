@@ -7,6 +7,7 @@
 
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
+import DescriptionListBareFixture from './fixtures/DescriptionListBareFixture.svelte';
 import DescriptionListFixture from './fixtures/DescriptionListFixture.svelte';
 
 const terms = (): string[] =>
@@ -51,4 +52,46 @@ test('every other variant wraps the pair so it stays together when rows wrap', a
   expect(list).toHaveClass('flex');
   expect(document.querySelector('dt')?.parentElement).not.toBe(list);
   expect(document.querySelector('dt')?.parentElement?.tagName).toBe('DIV');
+});
+
+test('bare adds no layout and puts every dt/dd directly in the caller’s list', async () => {
+  await render(DescriptionListFixture, {
+    variant: 'bare',
+    class: 'grid grid-cols-[auto_1fr]',
+  });
+
+  const list = document.querySelector('dl');
+  // Only the caller's classes: none of the other variants' layout.
+  expect(list?.className.split(/\s+/).filter(Boolean).sort()).toEqual([
+    'grid',
+    'grid-cols-[auto_1fr]',
+  ]);
+  expect(list?.querySelector('div')).toBeNull();
+  expect([...(list?.children ?? [])].map((node) => node.tagName)).toEqual([
+    'DT',
+    'DD',
+    'DT',
+    'DD',
+    'DT',
+    'DD',
+  ]);
+  expect(terms()).toEqual(['Formula', 'Licence', 'Height']);
+});
+
+test('bare rows sit beside a caller’s own dt/dd pairs in its grid', async () => {
+  await render(DescriptionListBareFixture);
+
+  const list = document.querySelector('dl');
+  expect(list).toHaveClass('grid', 'grid-cols-[auto_1fr]');
+  expect([...(list?.children ?? [])].map((node) => node.tagName)).toEqual([
+    'DT',
+    'DD',
+    'DT',
+    'DD',
+    'DT',
+    'DD',
+  ]);
+  // The empty "Closed" row is still absent, bare or not.
+  expect(terms()).toEqual(['Name', 'Founded', 'Website']);
+  expect(definitions()).toEqual(['Royal Botanic Garden', '1816', 'example.org']);
 });

@@ -1,10 +1,14 @@
 <!-- @component
-Label/value pairs as a `grid`, a bordered `card`, `divided` rows or `inline` pairs.
+Label/value pairs as a `grid`, a bordered `card`, `divided` rows, `inline` pairs, or `bare` pairs in a layout the caller supplies.
 -->
 <!--
   DescriptionList — label / value pairs, in the four shapes a detail page
   wants them: a two-column `grid`, a bordered `card` with the labels in a
-  fixed gutter, `divided` rows, or `inline` pairs running across a line.
+  fixed gutter, `divided` rows, or `inline` pairs running across a line —
+  or `bare`, which adds no layout of its own: the `<dl>` takes only the
+  caller's `class` (say `grid grid-cols-[auto_1fr] gap-x-4`) and every
+  row's `<dt>`/`<dd>` is a direct child of it, so a consumer-owned grid can
+  mix `DescriptionRow`s with its own `<dt>`/`<dd>` pairs and keep its columns.
 
   One component rather than the two the apps had. They had split it by how the
   VALUE arrives — one took rows as strings, the other took them as markup —
@@ -68,6 +72,8 @@ Label/value pairs as a `grid`, a bordered `card`, `divided` rows or `inline` pai
     card: 'card card-border card-body bg-base-100 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-[12rem_1fr]',
     divided: 'divide-base-300 divide-y',
     inline: 'flex flex-wrap gap-x-6 gap-y-2',
+    // The caller's `class` is the whole layout.
+    bare: '',
   };
 
   // A getter, not a snapshot: the rows re-read it, so a list whose `variant`

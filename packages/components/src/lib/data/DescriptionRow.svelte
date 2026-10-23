@@ -12,10 +12,11 @@ One label and its value inside a `DescriptionList`.
   Both settings come from the enclosing list by default and can be overridden
   per row.
 
-  The `card` variant's `<dt>` and `<dd>` are siblings of every other row's,
-  directly in the list's two-column grid: a wrapper would break the alignment
-  the grid exists for. Every other variant wraps the pair, so the two stay
-  together when the rows wrap.
+  The `card` and `bare` variants' `<dt>` and `<dd>` are siblings of every
+  other row's, directly in the `<dl>` (the list's own two-column grid for
+  `card`, whatever layout the caller gave it for `bare`): a wrapper would
+  break the alignment the grid exists for. Every other variant wraps the
+  pair, so the two stay together when the rows wrap.
 
   ARIA contract: the `<dt>`/`<dd>` pairing is the whole contract — nothing is
   added to it, and nothing needs to be.
@@ -67,7 +68,7 @@ One label and its value inside a `DescriptionList`.
 {/snippet}
 
 {#if visible}
-  {#if style().variant === 'card'}
+  {#if style().variant === 'card' || style().variant === 'bare'}
     {@render pair()}
   {:else if style().variant === 'inline'}
     <div class="flex items-baseline gap-2">{@render pair()}</div>
