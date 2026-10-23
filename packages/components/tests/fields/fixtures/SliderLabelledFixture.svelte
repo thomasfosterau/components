@@ -8,7 +8,7 @@
   let { range = false }: Props = $props();
 </script>
 
-<!-- What `FormField` will hand over once FieldControl carries `labelId` (#179). -->
+<!-- A hand-made label, as a caller outside a `FormField` would wire `labelId`. -->
 <span id="sun-label">Hours of sun</span>
 {#if range}
   <Slider labelId="sun-label" type="multiple" min={0} max={12} value={[2, 6]} />

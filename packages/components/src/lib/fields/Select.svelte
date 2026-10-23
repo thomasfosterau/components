@@ -41,6 +41,12 @@ A native `<select>` in daisyUI styling over a list of options, with an optional 
      * @defaultValue `''`
      */
     describedBy?: string | undefined;
+    /**
+     * `FieldControl`: the visible label's id. Not used — this control is
+     * labelable, so the `FormField`'s `<label for>` already names it; taken
+     * here so a spread `FieldControl` does not leak it as an attribute.
+     */
+    labelId?: string | undefined;
   }
 
   let {
@@ -50,6 +56,7 @@ A native `<select>` in daisyUI styling over a list of options, with an optional 
     size = 'md',
     invalid = false,
     describedBy = '',
+    labelId: _labelId,
     class: className,
     ...rest
   }: Props = $props();

@@ -37,6 +37,12 @@ A daisyUI `checkbox` with its label in the same `<label>`, so the whole row is t
      * @defaultValue `''`
      */
     describedBy?: string | undefined;
+    /**
+     * `FieldControl`: the visible label's id. Not used — this control is
+     * labelable, so the `FormField`'s `<label for>` already names it; taken
+     * here so a spread `FieldControl` does not leak it as an attribute.
+     */
+    labelId?: string | undefined;
   }
 
   let {
@@ -45,6 +51,7 @@ A daisyUI `checkbox` with its label in the same `<label>`, so the whole row is t
     size = 'md',
     invalid = false,
     describedBy = '',
+    labelId: _labelId,
     class: className,
     ...rest
   }: Props = $props();

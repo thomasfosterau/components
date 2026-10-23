@@ -51,6 +51,12 @@ A switch for an on/off setting that takes effect immediately, rather than a chec
      * @defaultValue `''`
      */
     describedBy?: string | undefined;
+    /**
+     * `FieldControl`: the visible label's id. Not used — this control is
+     * labelable, so the `FormField`'s `<label for>` already names it; taken
+     * here so a spread `FieldControl` does not leak it as an attribute.
+     */
+    labelId?: string | undefined;
   }
 
   let {
@@ -61,6 +67,7 @@ A switch for an on/off setting that takes effect immediately, rather than a chec
     size = 'md',
     invalid = false,
     describedBy = '',
+    labelId: _labelId,
     disabled = false,
     class: className,
     ...rest

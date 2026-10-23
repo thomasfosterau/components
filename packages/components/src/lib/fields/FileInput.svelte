@@ -52,6 +52,12 @@ A native file input in daisyUI `file-input` styling, with the chosen `File` bind
      * @defaultValue `''`
      */
     describedBy?: string | undefined;
+    /**
+     * `FieldControl`: the visible label's id. Not used — this control is
+     * labelable, so the `FormField`'s `<label for>` already names it; taken
+     * here so a spread `FieldControl` does not leak it as an attribute.
+     */
+    labelId?: string | undefined;
   }
 
   let {
@@ -63,6 +69,7 @@ A native file input in daisyUI `file-input` styling, with the chosen `File` bind
     size = 'md',
     invalid = false,
     describedBy = '',
+    labelId: _labelId,
     class: className,
     ...rest
   }: Props = $props();

@@ -39,6 +39,12 @@ A daisyUI `input` over a native `<input>`, with a bindable `value` and `FieldCon
      * @defaultValue `''`
      */
     describedBy?: string | undefined;
+    /**
+     * `FieldControl`: the visible label's id. Not used — this control is
+     * labelable, so the `FormField`'s `<label for>` already names it; taken
+     * here so a spread `FieldControl` does not leak it as an attribute.
+     */
+    labelId?: string | undefined;
   }
 
   let {
@@ -47,6 +53,7 @@ A daisyUI `input` over a native `<input>`, with a bindable `value` and `FieldCon
     size = 'md',
     invalid = false,
     describedBy = '',
+    labelId: _labelId,
     class: className,
     ...rest
   }: Props = $props();

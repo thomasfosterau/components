@@ -30,6 +30,12 @@ A daisyUI `textarea` with a bindable `value` and `FieldControl` wiring. `rows` d
      * @defaultValue `''`
      */
     describedBy?: string | undefined;
+    /**
+     * `FieldControl`: the visible label's id. Not used — this control is
+     * labelable, so the `FormField`'s `<label for>` already names it; taken
+     * here so a spread `FieldControl` does not leak it as an attribute.
+     */
+    labelId?: string | undefined;
   }
 
   let {
@@ -37,6 +43,7 @@ A daisyUI `textarea` with a bindable `value` and `FieldControl` wiring. `rows` d
     size = 'md',
     invalid = false,
     describedBy = '',
+    labelId: _labelId,
     rows = 4,
     class: className,
     ...rest

@@ -38,7 +38,7 @@ A story must not depend on anything the consumer would not have: no app state, n
 
 ## Terms
 
-- **`FieldControl`** — the `{ id, describedBy, invalid, required }` object `fields/FormField` (or `fields/Fieldset`) derives from a single `id` and hands its `children` snippet. Every control in `fields/` accepts it by spread — `<TextInput {...control} bind:value />` — so `for`/`id`, `aria-describedby`, `aria-invalid` and `required` cannot drift apart between the label and the control. Declared in `fields/field-types.ts`.
+- **`FieldControl`** — the `{ id, labelId, describedBy, invalid, required }` object `fields/FormField` (or `fields/Fieldset`) derives from a single `id` and hands its `children` snippet. Every control in `fields/` accepts it by spread — `<TextInput {...control} bind:value />` — so `for`/`id`, `aria-describedby`, `aria-invalid` and `required` cannot drift apart between the label and the control. `labelId` is the `<label>`'s id, for a role-based control `<label for>` cannot name (it uses `aria-labelledby`); labelable primitives take and drop it. Declared in `fields/field-types.ts`.
 
 - **`ItemList` feed mode** — `data/ItemList`'s `feed?` prop switches its wrapper from `<ul>`/`<li>` (the default, where the list structure alone is the semantics) to `<div role="feed" aria-label aria-busy>` of `<article aria-posinset aria-setsize tabindex="-1">`. Feed mode is for a stream where only a window is ever in the DOM (infinite scroll, "load more") — `aria-posinset`/`aria-setsize` state each item's position in the whole even though the DOM only holds a slice, and `busy` reflects a fetch in flight for more. Use the default `<ul>` mode for a list that is entirely in the DOM at once.
 

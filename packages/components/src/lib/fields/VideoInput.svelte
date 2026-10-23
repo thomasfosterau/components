@@ -55,6 +55,12 @@ A `FileInput` plus the progress readout for an upload the caller performs.
     invalid?: boolean | undefined;
     /** `FieldControl`: space-separated ids for `aria-describedby`. */
     describedBy?: string | undefined;
+    /**
+     * `FieldControl`: the visible label's id. Not used — the file input is
+     * labelable, so `<label for>` names it; passed through to `FileInput`,
+     * which drops it.
+     */
+    labelId?: string | undefined;
   }
 
   let {

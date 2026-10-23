@@ -4,7 +4,7 @@ The label, hint and errors frame around one control, handing it the `FieldContro
 <!--
   FormField — the label + hint + errors frame around one control.
 
-  The control is a snippet that receives a `FieldControl` (`id`,
+  The control is a snippet that receives a `FieldControl` (`id`, `labelId`,
   `describedBy`, `invalid`, `required`) to spread onto the primitive, so the
   label's `for`, the control's `aria-describedby` and `aria-invalid`, and the
   error region's `role="alert"` all stay wired together from a single `id`.
@@ -12,7 +12,13 @@ The label, hint and errors frame around one control, handing it the `FieldContro
   drop any of the field primitives — or their own `<input>` — into the slot.
 
   ARIA contract: `<label for>` names the control (so clicking the text focuses
-  it); `describedBy` lists the hint's id then the error region's id, in that
+  it). `<label for>` only reaches a labelable element (`input`, `select`,
+  `textarea`, `button`, `meter`, `output`, `progress`), so the label also
+  carries an id — `labelId` — for a role-based control (a slider thumb, a
+  `group` / `radiogroup` root) to point `aria-labelledby` at, and a click on
+  the label is forwarded to such a control: it focuses the control itself if
+  it is focusable, else its first focusable descendant (a roving group's
+  current tab stop). `describedBy` lists the hint's id then the error region's id, in that
   reading order, and is empty when there is neither; `invalid` is true exactly
   when there is at least one error. The required marker is a `*` that is
   `aria-hidden` beside a visually-hidden `requiredLabel`, both inside the
@@ -66,22 +72,45 @@ The label, hint and errors frame around one control, handing it the `FieldContro
 
   const uid = $props.id();
   const id = $derived(idProp ?? uid);
+  const labelId = $derived(`${id}-label`);
   const hintId = $derived(`${id}-hint`);
   const errorId = $derived(`${id}-error`);
   const invalid = $derived(errors.length > 0);
 
   const control = $derived<FieldControl>({
     id,
+    labelId,
     describedBy: [hint === undefined ? '' : hintId, invalid ? errorId : '']
       .filter((part) => part !== '')
       .join(' '),
     invalid,
     required,
   });
+
+  // The elements a `<label for>` can name; the platform handles those.
+  const LABELABLE = 'button, input, meter, output, progress, select, textarea';
+
+  // `<label for>` does nothing for a role-based control, so forward the click:
+  // focus the control if it is focusable, else its first focusable descendant.
+  const forwardClick = (): void => {
+    const control = document.getElementById(id);
+    if (control === null || control.matches(LABELABLE)) return;
+    const focusable = (element: HTMLElement): boolean =>
+      element.tabIndex >= 0 && !element.hasAttribute('disabled');
+    const target = focusable(control)
+      ? control
+      : Array.from(control.querySelectorAll<HTMLElement>('*')).find(focusable);
+    target?.focus();
+  };
 </script>
 
 <div {...rest} class={['fieldset', className]}>
-  <label class="label" for={id}>
+  <!-- The click handler restores what `<label for>` does natively — a pointer
+       shortcut to the control — for a control `for` cannot reach. Keyboard
+       users reach the control itself with Tab, as with any label, so there is
+       no key handler to add and the label stays non-interactive. -->
+  <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
+  <label class="label" for={id} id={labelId} onclick={forwardClick}>
     <span>{label}</span>
     {#if required}
       <span class="text-error" aria-hidden="true">*</span>

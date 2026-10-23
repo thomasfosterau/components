@@ -327,6 +327,7 @@ Form controls wired through the `FormField` + `FieldControl` contract. `FormFiel
 ```ts
 interface FieldControl {
   id: string;
+  labelId: string; // the visible <label>'s id
   describedBy: string;
   invalid: boolean;
   required: boolean;
@@ -335,10 +336,12 @@ interface FieldControl {
 
 Every primitive accepts it by spread — `<TextInput {...control} bind:value />` — so `for`/`id`, `aria-describedby`, `aria-invalid` and `required` cannot drift apart. `errors` is always `readonly string[]`; a field that fails three rules says three things.
 
+**When a control uses `labelId`.** `<label for>` names only a labelable element (`input`, `select`, `textarea`, `button`, `meter`, `output`, `progress`); every primitive above is one, and ignores `labelId` (it never reaches the DOM as an attribute). A control whose focusable part is a role on a `span` or `div` — a `role="slider"` thumb, a `role="group"` or `radiogroup` root, a segmented date group — points `aria-labelledby={control.labelId}` at the label instead, and `FormField` forwards a click on its label to it (the control itself if focusable, else its first focusable descendant). `Fieldset` hands its `children` a `FieldsetControl` (`{ labelId }`, the `<legend>`'s id) for the same purpose. `RadioGroup` is its own frame with its own `legend`, so it takes neither.
+
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
-| `FormField` | Label + hint + errors around one control | `id?`, `label`, `hint?`, `errors?: readonly string[]`, `required?`, `requiredLabel? = '(required)'` + `HTMLAttributes<HTMLDivElement>` | `children(control)` | `<label for>` names the control; `describedBy` lists hint id then error id; `aria-invalid` when there are errors |
-| `Fieldset` | The same frame for a GROUP | `legend`, `hint?`, `errors?`, `required?`, `requiredLabel?` + `HTMLAttributes<HTMLFieldSetElement>` | `children` | real `<fieldset>`/`<legend>`; hint/errors are `aria-describedby` on the fieldset; `data-invalid` instead of `aria-invalid` (the implicit `group` role rejects it) |
+| `FormField` | Label + hint + errors around one control | `id?`, `label`, `hint?`, `errors?: readonly string[]`, `required?`, `requiredLabel? = '(required)'` + `HTMLAttributes<HTMLDivElement>` | `children(control)` | `<label for>` names the control (a role-based control uses `aria-labelledby={labelId}`; label clicks are forwarded to it); `describedBy` lists hint id then error id; `aria-invalid` when there are errors |
+| `Fieldset` | The same frame for a GROUP | `legend`, `hint?`, `errors?`, `required?`, `requiredLabel?` + `HTMLAttributes<HTMLFieldSetElement>` | `children({ labelId })` | real `<fieldset>`/`<legend>`; `labelId` is the legend's id; hint/errors are `aria-describedby` on the fieldset; `data-invalid` instead of `aria-invalid` (the implicit `group` role rejects it) |
 | `TextInput` | The daisyUI `input` | `value ⚓`, `type? = 'text'` (`text\|email\|url\|password\|tel\|number\|search`), `size?: FieldSize`, `invalid?`, `describedBy?` + `HTMLInputAttributes` | — | native `<input>` |
 | `Textarea` | The daisyUI `textarea` | `value ⚓`, `rows? = 4`, `size?`, `invalid?`, `describedBy?` | — | native `<textarea>` |
 | `Select` | One choice, natively | `options: (FieldOption \| string)[]`, `value ⚓`, `placeholder?`, `size?`, `invalid?`, `describedBy?` | — | native `<select>`; placeholder is a disabled first `<option>` |
@@ -370,7 +373,7 @@ Every primitive accepts it by spread — `<TextInput {...control} bind:value />`
 </form>
 ```
 
-`fields` also exports `field-types.ts` (`FieldControl`, `FieldSize`, `FieldOption`, `FieldOptionInput`, `toFieldOptions`) and the daisyUI size tables (`inputSize`, `textareaSize`, `selectSize`, `checkboxSize`, `toggleSize`, `fileInputSize`, `rangeSize`, `pinCellSize`, each a `Record<FieldSize, string>`), and from `PushToggle` the `PushEnableResult` type (`{ _tag: 'enabled' | PushDeclineReason }`) and `PushDeclineReason` (`'unsupported' | 'unavailable' | 'denied'` — why `enable` did not subscribe, each with its own message prop).
+`fields` also exports `field-types.ts` (`FieldControl`, `FieldsetControl`, `FieldSize`, `FieldOption`, `FieldOptionInput`, `toFieldOptions`) and the daisyUI size tables (`inputSize`, `textareaSize`, `selectSize`, `checkboxSize`, `toggleSize`, `fileInputSize`, `rangeSize`, `pinCellSize`, each a `Record<FieldSize, string>`), and from `PushToggle` the `PushEnableResult` type (`{ _tag: 'enabled' | PushDeclineReason }`) and `PushDeclineReason` (`'unsupported' | 'unavailable' | 'denied'` — why `enable` did not subscribe, each with its own message prop).
 
 ```svelte
 <script lang="ts">

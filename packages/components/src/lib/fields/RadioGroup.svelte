@@ -17,6 +17,9 @@ One choice from a short, known list, on bits-ui’s `RadioGroup`.
   question as a heading-ish `<span>` and points `aria-labelledby` at it. That
   is why this is the one field group NOT built on `Fieldset`, and the hint and
   errors hang off the radiogroup element itself through `aria-describedby`.
+  It is a whole frame (question, hint, errors), not a control a `FormField`
+  wraps, so it keeps its own `legend` rather than taking a `FieldControl`'s
+  `labelId`: inside a `FormField` it would render two labels.
 
   The marker is drawn rather than delegated to daisyUI's `.radio`, because
   that class styles an `<input type="radio">` through `:checked` and bits-ui's
