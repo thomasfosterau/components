@@ -34,6 +34,10 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   enhancement); a SvelteKit app passes its `$app/forms`-backed `enhanceForm`,
   which this package cannot import.
 
+  **Form-level messages.** The store's root errors and the caller's
+  `messages` (a failure the store never saw, such as a server action's
+  `fail(500, { message })`) share one `FormErrors` block, store errors first.
+
   Every string that is not the definition's own (labels, submit labels and
   option labels are its message thunks) is a prop with an English default.
 -->
@@ -109,6 +113,13 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
      * @defaultValue `'(required)'` (from `FormField`)
      */
     requiredLabel?: string | undefined;
+    /**
+     * Form-level messages from outside the store — a server action's failure
+     * message that carries no form state (`page.form?.message`, wrapped in an
+     * array). Rendered in the same `FormErrors` block as the store's own root
+     * errors, after them, one `role="alert"` each. The text is shown as given.
+     */
+    messages?: readonly string[] | undefined;
   }
 
   let {
@@ -124,6 +135,7 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     pendingLabel = 'Saving…',
     selectPlaceholder = 'Choose…',
     requiredLabel,
+    messages,
     class: className,
     ...rest
   }: Props = $props();
@@ -207,7 +219,8 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     ),
   );
   // The empty path is the form's own (non-field) messages.
-  const rootErrors = $derived(form.errorsAt([]));
+  // The caller's `messages` (a server fault with no form state) follow them.
+  const rootErrors = $derived([...form.errorsAt([]), ...(messages ?? [])]);
   const fieldId = (key: string): string => `entity-form-${key}`;
   // The `FormField` wrapper is the same for a select and a scalar entry.
   const fieldAttrs = (entry: SelectEntry | ScalarEntry) => ({

@@ -37,3 +37,13 @@
     onsubmit={(event) => event.preventDefault()}
   />
 </Story>
+
+<Story name="With a server message">
+  <EntityForm
+    definition={bedForm}
+    mode="create"
+    cancelHref="/beds"
+    messages={['The server could not save this bed. Try again in a minute.']}
+    onsubmit={(event) => event.preventDefault()}
+  />
+</Story>
