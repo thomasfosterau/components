@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Menu from '../../../src/lib/ui/Menu.svelte';
+  import DropdownMenu from '../../../src/lib/ui/DropdownMenu.svelte';
   import MenuItem from '../../../src/lib/ui/MenuItem.svelte';
   import MenuSeparator from '../../../src/lib/ui/MenuSeparator.svelte';
 
@@ -11,7 +11,7 @@
   let { label = 'Account', onSignOut }: Props = $props();
 </script>
 
-<Menu mode="dropdown" {label}>
+<DropdownMenu {label}>
   {#snippet trigger({ props })}
     <button {...props} type="button">Ada Lovelace</button>
   {/snippet}
@@ -19,4 +19,4 @@
   <MenuItem href="/settings" disabled>Settings</MenuItem>
   <MenuSeparator />
   <MenuItem onSelect={onSignOut}>Sign out</MenuItem>
-</Menu>
+</DropdownMenu>
