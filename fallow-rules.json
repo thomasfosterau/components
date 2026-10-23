@@ -30,6 +30,20 @@
       "message": "The form library is an optional peer reached only from the /entity-form entry; importing it anywhere else makes every consumer install it."
     },
     {
+      "id": "nav-menu-without-bits-ui",
+      "kind": "banned-import",
+      "specifiers": ["bits-ui"],
+      "files": [
+        "packages/components/src/lib/ui/Menu.svelte",
+        "packages/components/src/lib/ui/MenuItem.svelte",
+        "packages/components/src/lib/ui/MenuSeparator.svelte",
+        "packages/components/src/lib/ui/menu-context.ts",
+        "packages/components/src/lib/ui/dropdown/dropdown-parts.ts",
+        "packages/components/src/lib/layout/Sidebar.svelte"
+      ],
+      "message": "Navigation-only menus must not reach bits-ui's DropdownMenu (~30 KB gzip on every page, #129). The dropdown parts live in ui/DropdownMenu.svelte and ui/dropdown/*.svelte and reach MenuItem / MenuSeparator through context."
+    },
+    {
       "id": "effect-only-in-charts-spec",
       "kind": "banned-import",
       "specifiers": ["effect"],

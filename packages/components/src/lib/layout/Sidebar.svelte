@@ -6,7 +6,7 @@ The app shell’s navigation column: a brand mark, the primary links and an acco
   top, the primary links in the middle, an account block at the bottom.
 
   A thin composition and nothing more. The links themselves are `MenuItem`s
-  inside a `Menu mode="nav"`, which already owns the whole navigation
+  inside a `Menu`, which already owns the whole navigation
   contract — the `<nav aria-label>` landmark, the `<ul class="menu">`, and
   `aria-current="page"` on the item the reader is on. This adds only what a
   sidebar has and a menu does not.

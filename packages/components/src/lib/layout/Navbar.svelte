@@ -7,8 +7,8 @@ The site banner: brand, primary links and account controls, with a disclosure fo
   not fit.
 
   The three regions are snippets (`start` / `center` / `end`) because the
-  content is the app's — its brand mark, its search form, its `Menu
-  mode="dropdown"` account menu. What this owns is the structure: the banner
+  content is the app's — its brand mark, its search form, its `DropdownMenu`
+  account menu. What this owns is the structure: the banner
   landmark, the named navigation inside it, the responsive bar, and the
   toggle.
 

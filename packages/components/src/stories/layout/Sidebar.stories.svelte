@@ -12,7 +12,7 @@
       docs: {
         description: {
           component:
-            'The app shell’s standing navigation column — a thin composition of `Menu mode="nav"` with a brand region above and an account region below. Deliberately NOT wrapped in an `<aside>`: `complementary` is the wrong landmark for a site’s primary navigation, and it would put a second landmark around the `navigation` one.',
+            'The app shell’s standing navigation column — a thin composition of `Menu` with a brand region above and an account region below. Deliberately NOT wrapped in an `<aside>`: `complementary` is the wrong landmark for a site’s primary navigation, and it would put a second landmark around the `navigation` one.',
         },
       },
     },

@@ -123,9 +123,10 @@ Buttons, badges and surfaces — the family every other family builds on: `Alert
 | `Disclosure` | Expandable section | `open? ⚓`, `title: string \| Snippet`, `variant?: 'arrow'\|'plus'\|'plain'`, `contentClass?` | `title?`, `children` | native `<details>`/`<summary>` — no hand-written `aria-expanded` |
 | `Tooltip` | Hover/focus supplement | `text?`, `side? = 'top'`, `sideOffset? = 6`, `openDelay? = 400`, `open? ⚓` | `content?`, `children({ props })` | bits-ui `aria-describedby`; Escape closes |
 | `Popover` | Floating interactive panel | `open? ⚓`, `side? = 'bottom'`, `align? = 'center'`, `sideOffset? = 8`, `title?`, `closeLabel? = 'Close'` | `trigger({ props })`, `children` | bits-ui dialog ARIA: `aria-haspopup="dialog"`, `aria-expanded`, focus trap, Escape, focus return |
-| `Menu` | Nav list or dropdown menu | `mode?: 'dropdown'\|'nav'` (default `nav`), `label`, `open? ⚓`, `side?`, `align?` | `trigger?({ props })`, `children` | nav: `<nav aria-label>` + `<ul class="menu">`; dropdown: bits-ui `role="menu"` |
-| `MenuItem` | One entry of a `Menu` | `href?`, `onSelect?`, `current?`, `disabled?` | `icon?`, `children` | nav: `aria-current="page"` + `menu-active`; dropdown: bits-ui `role="menuitem"` |
-| `MenuSeparator` | Rule between item groups | — | — | `role="separator"` (dropdown mode) inside a `role="none"` `<li>` |
+| `Menu` | Navigation list | `label`, `class?` | `children` | `<nav aria-label>` + `<ul class="menu">`; imports nothing from bits-ui |
+| `DropdownMenu` | Application menu behind a trigger | `label`, `open? ⚓`, `side? = 'bottom'`, `align? = 'end'`, `class?` | `trigger?({ props })`, `children` | bits-ui `role="menu"`: `aria-haspopup`/`aria-expanded`, roving focus, typeahead, Escape, focus return. The only `Menu*` component that loads bits-ui's dropdown |
+| `MenuItem` | One entry of a `Menu` or `DropdownMenu` | `href?`, `onSelect?`, `current?`, `disabled?` | `icon?`, `children` | in a `Menu`: `aria-current="page"` + `menu-active`; in a `DropdownMenu`: bits-ui `role="menuitem"` |
+| `MenuSeparator` | Rule between item groups | — | — | `role="separator"` (bits-ui's in a `DropdownMenu`, inside a `role="none"` `<li>`) |
 | `ShareButton` | Platform share sheet | `title?`, `text?`, `url?`, `label? = 'Share'`, `tone?`, `variant? = 'ghost'`, `size? = 'sm'`, `onShare?`, `onError?` | `children?` | renders **nothing** without `navigator.share` (decided after mount) |
 | `ThemeToggle` | Light / dark switch | `lightTheme`, `darkTheme`, `storageKey? = 'theme'`, `label? = 'Toggle dark mode'`, `value? ⚓` | — | checkbox with `role="switch"` named by `label` |
 | `ConfirmButton` | Two-step inline confirm | `action: () => Promise<unknown>`, `idleLabel? = 'Delete'`, `confirmLabel?`, `cancelLabel?`, `pendingLabel?`, `confirmMessage?`, `failureMessage?`, `tone? = 'error'`, `redirectTo?` | — | failure is an `Alert live="assertive"`; both buttons `disabled` while pending; the confirm button keeps a name (`pendingLabel`) |
@@ -134,7 +135,7 @@ Buttons, badges and surfaces — the family every other family builds on: `Alert
 
 - **`tones.ts`** — the daisyUI vocabulary as types: `Tone` (the semantic colours), `StatusTone` (`'info' | 'success' | 'warning' | 'error'`, what `Alert` takes), `Size` (`'xs'`…`'xl'`), `HeadingLevel` (`1`…`6`), `ButtonVariant`, `BadgeVariant`, `AlertVariant`, `LinkVariant` (`'primary' | 'muted' | 'plain'`), `CardVariant` (`'border' | 'dash' | 'plain'`), `DisclosureVariant` (`'arrow' | 'plus' | 'plain'`) and `ChipSize` (`'sm' | 'md'`). Each has a literal `Record<K, string>` class table, so Tailwind's scanner sees every class: `buttonTone`, `buttonVariant`, `buttonSize`, `badgeTone`, `badgeVariant`, `badgeSize`, `alertTone`, `alertVariant`, `progressTone`, `linkVariant`, `cardVariant`, `cardSize`, `collapseVariant` (the `Disclosure` marker), `chipSize`, `chipSwatchSize`, plus the prefix-free `backgroundTone` and `textTone` for a swatch or segment of your own.
 - **`colour-token.ts`** — `colourTokenStyle`, for binding a component's colour custom property to a theme token, and the two properties it binds: `BADGE_COLOUR_PROPERTY` (`'--badge-colour'`, `Badge`'s) and `CHIP_COLOUR_PROPERTY` (`'--chip-colour'`, `Chip`'s).
-- **`menu-context.ts`** — `MenuMode` (`'dropdown' | 'nav'`) and `setMenuMode(() => mode)` / `getMenuMode()`, the context through which a `MenuItem` learns its `Menu`'s mode. `Menu` sets it; a `MenuItem` with no `Menu` above it reads `'nav'`.
+- **`menu-context.ts`** — `MenuMode` (`'dropdown' | 'nav'`) and `getMenuMode()`, which tells a menu item of your own which kind of menu it is in: `'dropdown'` inside a `DropdownMenu`, otherwise `'nav'`.
 - **`slug.ts`** — `slugify`, used by `Heading`.
 
 ```svelte
@@ -169,7 +170,7 @@ Buttons, badges and surfaces — the family every other family builds on: `Alert
 
 ```svelte
 <script lang="ts">
-  import { Menu, MenuItem, MenuSeparator, Button, ThemeToggle } from '@thomasfosterau/components';
+  import { Menu, DropdownMenu, MenuItem, MenuSeparator, Button, ThemeToggle } from '@thomasfosterau/components';
   import { ChevronDown } from '@lucide/svelte';
 </script>
 
@@ -180,14 +181,14 @@ Buttons, badges and surfaces — the family every other family builds on: `Alert
 </Menu>
 
 <!-- Account menu: bits-ui roving focus, typeahead, Escape, focus return. -->
-<Menu mode="dropdown" label="Account">
+<DropdownMenu label="Account">
   {#snippet trigger({ props })}
     <Button {...props} variant="ghost">Ada Lovelace<ChevronDown class="size-4" aria-hidden="true" /></Button>
   {/snippet}
   <MenuItem href="/account">Your profile</MenuItem>
   <MenuSeparator />
   <MenuItem onSelect={signOut}>Sign out</MenuItem>
-</Menu>
+</DropdownMenu>
 
 <ThemeToggle lightTheme="garden-light" darkTheme="garden-dark" storageKey="garden:theme" />
 ```
@@ -207,7 +208,7 @@ The landmarks a page is assembled from, and the blocks that sit inside them. Str
 | `Section` | A titled block of a page | `title`, `headingLevel? = 2`, `headingId?`, `count?`, `description?`, `empty? = false`, `emptyMessage? = 'Nothing here yet.'`, `locales?` | `children`, `actions?`, `emptyState?` | `<section aria-labelledby>` pointing at its own heading; `headingId` defaults to a slug of `title` |
 | `Tabs` | One strip, two things | `items: readonly TabItem[]`, `mode? = 'panels'`, `value? ⚓`, `label? = 'Sections'`, `variant? = 'border'`, `size? = 'md'` | `panel?(item)` | panels: bits-ui `Tabs` (tablist/tab/tabpanel, roving tabindex, arrows); links: `<nav>` of anchors with `aria-current="page"` |
 | `FilterBar` | The filter row above a list | `options: readonly FilterOption[]`, `label` | — | `<nav aria-label>` of `btn`-styled anchors; the active one carries `aria-current="page"` |
-| `Sidebar` | The standing navigation column | `label?`, `title?`, `headingLevel? = 2` | `brand?`, `footer?`, `children` (the `MenuItem`s) | the landmark is `Menu mode="nav"`'s; deliberately not an `<aside>` — `complementary` is the wrong landmark for primary navigation |
+| `Sidebar` | The standing navigation column | `label?`, `title?`, `headingLevel? = 2` | `brand?`, `footer?`, `children` (the `MenuItem`s) | the landmark is `Menu`'s; deliberately not an `<aside>` — `complementary` is the wrong landmark for primary navigation |
 
 `layout` also exports `types.ts` (`Crumb`, `TabItem`, `FilterOption`, `TabsMode`, `TabsVariant`, `tabsVariant`, `tabsSize`).
 

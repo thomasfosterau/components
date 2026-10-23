@@ -2,6 +2,7 @@
   import { Search } from '@lucide/svelte';
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import Navbar from '../../lib/layout/Navbar.svelte';
+  import DropdownMenu from '../../lib/ui/DropdownMenu.svelte';
   import Menu from '../../lib/ui/Menu.svelte';
   import MenuItem from '../../lib/ui/MenuItem.svelte';
   import MenuSeparator from '../../lib/ui/MenuSeparator.svelte';
@@ -40,14 +41,14 @@
           <input type="search" name="q" placeholder="Search" aria-label="Search the site" />
         </label>
       </form>
-      <Menu mode="dropdown" label="Account">
+      <DropdownMenu label="Account">
         {#snippet trigger({ props })}
           <Button {...props} variant="ghost" size="sm">Ada Lovelace</Button>
         {/snippet}
         <MenuItem href="/account">Your profile</MenuItem>
         <MenuSeparator />
         <MenuItem onSelect={() => undefined}>Sign out</MenuItem>
-      </Menu>
+      </DropdownMenu>
     {/snippet}
   </Navbar>
 </Story>

@@ -1,9 +1,9 @@
 <!-- @component
-One entry of a `Menu`, in whichever mode the enclosing `Menu` declared.
+One entry of a `Menu` (a navigation link) or of a `DropdownMenu` (a bits-ui menu item).
 -->
 <!--
-  MenuItem — one entry of a `Menu`, in whichever of the two modes the
-  enclosing `Menu` declared.
+  MenuItem — one entry of a `Menu` or of a `DropdownMenu`; which one is
+  decided by whether a `DropdownMenu` encloses it, never by a prop.
 
   In `nav` mode it is a plain `<li><a>`: the current page takes daisyUI's
   `menu-active` AND `aria-current="page"`, because the highlight is a
@@ -11,24 +11,27 @@ One entry of a `Menu`, in whichever mode the enclosing `Menu` declared.
   context's `isCurrent(href)`, which is what an app without a router-aware
   context uses.
 
-  In `dropdown` mode it renders through bits-ui's `DropdownMenu.Item` `child`
-  snippet, so the element is still the caller's own `<a>` or `<button>` —
-  carrying bits-ui's `role="menuitem"`, its focus management and its
-  selection handling — rather than a `<div>` pretending to be one. An item
-  with an `href` is a link and must stay a link (middle-click, "open in new
-  tab"); an item without one is a button.
+  Inside a `DropdownMenu` it renders the item part that menu lends it
+  (`dropdown/DropdownItemPart.svelte`, through context), which goes through
+  bits-ui's `DropdownMenu.Item` `child` snippet, so the element is still the
+  caller's own `<a>` or `<button>` — carrying bits-ui's `role="menuitem"`, its
+  focus management and its selection handling — rather than a `<div>`
+  pretending to be one. This file imports nothing from bits-ui, so a
+  navigation-only page never loads the dropdown runtime (#129). An item with
+  an `href` is a link and must stay a link (middle-click, "open in new tab");
+  an item without one is a button.
 
-  ARIA contract: the `<li>` wrapper is `role="none"` in dropdown mode so it
-  does not sit between `role="menu"` and `role="menuitem"`. `disabled` is
-  bits-ui's in dropdown mode (skipped by arrow keys, not activatable) and
-  `aria-disabled` + no `href` in nav mode, where there is no widget to skip.
+  ARIA contract: inside a `DropdownMenu` the `<li>` wrapper is `role="none"`
+  so it does not sit between `role="menu"` and `role="menuitem"`, and
+  `disabled` is bits-ui's (skipped by arrow keys, not activatable). In a
+  navigation list `disabled` is `aria-disabled` + no `href`, where there is
+  no widget to skip.
   The `icon` snippet is decorative — the label carries the meaning.
 -->
 <script lang="ts">
-  import { DropdownMenu } from 'bits-ui';
   import type { Snippet } from 'svelte';
   import { getComponentsContext } from '../context.svelte.ts';
-  import { getMenuMode } from './menu-context.ts';
+  import { getDropdownParts } from './dropdown/dropdown-parts.ts';
 
   interface Props {
     /** Where the item navigates. Omitted, the item is a button. */
@@ -43,7 +46,7 @@ One entry of a `Menu`, in whichever mode the enclosing `Menu` declared.
     icon?: Snippet<[]> | undefined;
     /** Extra classes on the `<li>`. */
     class?: string | undefined;
-    /** The item's content: a link or button in `nav` mode, the label in `dropdown` mode. */
+    /** The item's label. */
     children: Snippet<[]>;
   }
 
@@ -51,7 +54,7 @@ One entry of a `Menu`, in whichever mode the enclosing `Menu` declared.
     $props();
 
   const context = getComponentsContext();
-  const mode = getMenuMode();
+  const dropdown = getDropdownParts();
 
   const resolved = $derived(href === undefined ? undefined : context.href(href));
   // bits-ui's `onSelect` is not optional-friendly under
@@ -67,20 +70,15 @@ One entry of a `Menu`, in whichever mode the enclosing `Menu` declared.
   {@render children()}
 {/snippet}
 
-{#if mode() === 'dropdown'}
-  <li role="none" class={className}>
-    <DropdownMenu.Item {disabled} onSelect={select}>
-      {#snippet child({ props })}
-        {#if resolved === undefined}
-          <button {...props} type="button">{@render label()}</button>
-        {:else}
-          <a {...props} href={resolved} aria-current={isCurrent ? 'page' : undefined}>
-            {@render label()}
-          </a>
-        {/if}
-      {/snippet}
-    </DropdownMenu.Item>
-  </li>
+{#if dropdown}
+  <dropdown.item
+    href={resolved}
+    current={isCurrent}
+    {disabled}
+    onSelect={select}
+    class={className}
+    {label}
+  />
 {:else}
   <li class={className}>
     {#if resolved === undefined}

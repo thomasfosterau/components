@@ -1,33 +1,28 @@
 /**
- * How a {@link MenuItem} learns which {@link Menu} it is inside.
+ * How a {@link MenuItem} learns which kind of menu it is inside.
  *
- * The two menu modes render entirely different markup — a bits-ui
- * `DropdownMenu.Item` with roving focus and typeahead, or a plain anchor in a
- * `<ul class="menu">` navigation list — but a call site writes the same
- * `<MenuItem>` either way. The mode travels down as context rather than as a
- * prop so a caller can never get the two out of step, and so `Menu` stays the
- * single place the choice is made.
+ * A `MenuItem` renders entirely different markup in a `DropdownMenu` — a
+ * bits-ui `DropdownMenu.Item` with roving focus and typeahead — and in a
+ * `Menu` or a hand-assembled list, where it is a plain anchor in a
+ * `<ul class="menu">` navigation list. A call site writes the same
+ * `<MenuItem>` either way. The mode is never a prop: it is whether a
+ * `DropdownMenu` encloses the item, so a caller can never get the two out of
+ * step.
  *
- * A `MenuItem` mounted with no `Menu` above it (a list of links assembled by
- * hand) falls back to `nav`, which is the mode that needs nothing from its
- * parent.
+ * `DropdownMenu` is the one component that imports bits-ui's dropdown, and it
+ * lends the item and separator parts to its descendants through context, so a
+ * navigation-only `Menu` never loads the dropdown runtime (#129).
  *
  * @module
  */
 
-import { getContext, setContext } from 'svelte';
+import { getDropdownParts } from './dropdown/dropdown-parts.ts';
 
-/** Which of the two things daisyUI calls a `menu` a `Menu` renders: a dropdown or a navigation list. */
+/** Which of the two things daisyUI calls a `menu` an item is inside: a dropdown or a navigation list. */
 export type MenuMode = 'dropdown' | 'nav';
 
-const MENU_MODE_KEY = Symbol('@thomasfosterau/components:menu-mode');
-
-/** Declare the mode every descendant `MenuItem` renders in. Called by `Menu`. */
-export function setMenuMode(mode: () => MenuMode): void {
-  setContext<() => MenuMode>(MENU_MODE_KEY, mode);
-}
-
-/** The enclosing `Menu`'s mode, or `nav` when there is no enclosing `Menu`. */
+/** The enclosing menu's mode: `dropdown` inside a `DropdownMenu`, otherwise `nav`. */
 export function getMenuMode(): () => MenuMode {
-  return getContext<(() => MenuMode) | undefined>(MENU_MODE_KEY) ?? (() => 'nav');
+  const mode: MenuMode = getDropdownParts() === undefined ? 'nav' : 'dropdown';
+  return () => mode;
 }
