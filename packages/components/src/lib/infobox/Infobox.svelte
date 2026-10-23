@@ -25,6 +25,7 @@ The summary rail beside an entity page’s prose: an optional header and image a
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import Link from '../ui/Link.svelte';
+  import type { HeadingLevel } from '../ui/tones.ts';
   import InfoboxHeader from './InfoboxHeader.svelte';
   import InfoboxImage from './InfoboxImage.svelte';
   import InfoboxRow from './InfoboxRow.svelte';
@@ -40,6 +41,12 @@ The summary rail beside an entity page’s prose: an optional header and image a
     title?: string | undefined;
     /** A line under the title. */
     subtitle?: string | undefined;
+    /**
+     * The title's heading level (`InfoboxHeader`'s). Keep the default beside
+     * prose; raise it when the box is a section of the page in its own right.
+     * @defaultValue `3`
+     */
+    headingLevel?: Exclude<HeadingLevel, 1> | undefined;
     /**
      * Accessible name for the region when there is no `title`.
      * @defaultValue `'Key facts'`
@@ -58,6 +65,7 @@ The summary rail beside an entity page’s prose: an optional header and image a
   let {
     title,
     subtitle,
+    headingLevel,
     label = 'Key facts',
     image,
     rows,
@@ -85,7 +93,7 @@ The summary rail beside an entity page’s prose: an optional header and image a
   ]}
 >
   {#if title !== undefined}
-    <InfoboxHeader {title} {subtitle} />
+    <InfoboxHeader {title} {subtitle} {headingLevel} />
   {/if}
   {#if image !== undefined}
     <InfoboxImage {...image} />

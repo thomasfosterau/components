@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'The title block at the top of an `Infobox`: an `h3`, deliberately outside the document outline.',
+          'The title block at the top of an `Infobox`: an `h3` by default, deliberately outside the document outline. `headingLevel` raises it when the box is a section of the page in its own right.',
       },
     },
   },
@@ -23,3 +23,8 @@ export const WithSubtitle: Story = {
 };
 
 export const TitleOnly: Story = { args: { title: 'Bed 3' } };
+
+export const AsASection: Story = {
+  name: 'As a section (h2)',
+  args: { title: 'Key facts', headingLevel: 2 },
+};

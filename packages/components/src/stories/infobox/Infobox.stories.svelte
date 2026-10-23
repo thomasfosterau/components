@@ -79,6 +79,14 @@
   <Infobox title="Solanum lycopersicum" rows={taxonRows} />
 </Story>
 
+<Story name="As a section of the page (h2)">
+  <!-- The box is a page section in its own right, so its title sits at the section level. -->
+  <div class="max-w-sm">
+    <h1 class="mb-4 text-2xl font-bold">Solanum lycopersicum</h1>
+    <Infobox title="Key facts" headingLevel={2} rows={taxonRows} />
+  </div>
+</Story>
+
 <Story name="With an identifying image">
   <Infobox
     title="Anthony Albanese"

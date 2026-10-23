@@ -28,3 +28,13 @@ test('spreads native attributes and merges class', async () => {
   const element = screen.getByTestId('header');
   await expect.element(element).toHaveClass('my-header');
 });
+
+test('headingLevel changes only the tag, for a box that is a section of the page', async () => {
+  const screen = await render(InfoboxHeader, { title: 'Key facts', headingLevel: 2 });
+
+  const heading = screen.getByRole('heading', { level: 2, name: 'Key facts' });
+  await expect.element(heading).toBeInTheDocument();
+  expect(heading.element().tagName).toBe('H2');
+  await expect.element(heading).toHaveClass('text-lg', 'font-bold');
+  expect(screen.getByRole('heading', { level: 3 }).elements()).toHaveLength(0);
+});

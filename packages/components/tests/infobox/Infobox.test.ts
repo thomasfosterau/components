@@ -150,3 +150,20 @@ test('a links row resolves each href through the components context', async () =
     .element(screen.getByRole('link', { name: 'Anthony Albanese' }))
     .toHaveAttribute('href', '/en/people/albanese');
 });
+
+test('titles the box with an h3 by default', async () => {
+  const screen = await render(Infobox, { title: 'Rosa canina' });
+
+  await expect
+    .element(screen.getByRole('heading', { level: 3, name: 'Rosa canina' }))
+    .toBeInTheDocument();
+});
+
+test('headingLevel is forwarded to the header, matching the page outline', async () => {
+  const screen = await render(Infobox, { title: 'Key facts', headingLevel: 2 });
+
+  await expect
+    .element(screen.getByRole('heading', { level: 2, name: 'Key facts' }))
+    .toBeInTheDocument();
+  expect(screen.getByRole('heading', { level: 3 }).elements()).toHaveLength(0);
+});
