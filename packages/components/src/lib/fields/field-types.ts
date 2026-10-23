@@ -131,3 +131,11 @@ export const pinCellSize: Record<FieldSize, string> = {
   md: 'size-10 text-base',
   lg: 'size-12 text-lg',
 };
+
+/** Literal daisyUI button size per `FieldSize` for a button inside an `input` composite (`NumberField`'s − / +, `PasswordInput`'s reveal toggle), one step smaller than the field so it fits; a lookup table so Tailwind's scanner sees every class. */
+export const inputButtonSize: Record<FieldSize, string> = {
+  xs: 'btn-xs',
+  sm: 'btn-xs',
+  md: 'btn-sm',
+  lg: 'btn-md',
+};
