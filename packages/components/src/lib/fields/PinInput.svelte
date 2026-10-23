@@ -94,6 +94,12 @@ A fixed-length code — a sign-in code, a TOTP, an invite code — typed one cha
      */
     describedBy?: string | undefined;
     /**
+     * `FieldControl`: the visible label's id. Not used — the real input is
+     * labelable, so the `FormField`'s `<label for>` already names it; taken
+     * here so a spread `FieldControl` does not leak it as an attribute.
+     */
+    labelId?: string | undefined;
+    /**
      * `FieldControl`: the field is in error — sets `aria-invalid` and the error border.
      * @defaultValue `false`
      */
@@ -112,6 +118,7 @@ A fixed-length code — a sign-in code, a TOTP, an invite code — typed one cha
     disabled = false,
     id,
     describedBy = '',
+    labelId: _labelId,
     invalid = false,
     class: className,
     ...rest
