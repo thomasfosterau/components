@@ -13,6 +13,9 @@ test('a group named by its heading, its radio items exclusive', async () => {
     .toHaveAttribute('aria-checked', 'true');
 
   await userEvent.click(screen.getByRole('menuitemradio', { name: 'Compact' }));
+  await expect.element(screen.getByTestId('view-state')).toHaveTextContent('compact');
+
+  // Reopened, the group reads the bound value back.
   await userEvent.click(screen.getByRole('button', { name: 'View options' }));
 
   await expect

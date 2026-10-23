@@ -26,8 +26,11 @@ test('the region is focusable, and Shift+F10 opens the menu from the keyboard', 
   await userEvent.keyboard('{Shift>}{F10}{/Shift}');
   await expect.element(screen.getByRole('menu', { name: MENU })).toBeInTheDocument();
 
-  await userEvent.keyboard('{ArrowDown}');
+  // bits-ui focuses the first item as the menu mounts, so the arrow keys
+  // carry on from there.
   await expect.element(screen.getByRole('menuitem', { name: 'Rename' })).toHaveFocus();
+  await userEvent.keyboard('{ArrowDown}');
+  await expect.element(screen.getByRole('menuitem', { name: 'Open' })).toHaveFocus();
 });
 
 test('the Menu key opens it too', async () => {

@@ -11,6 +11,9 @@ test('in a DropdownMenu it is a menuitemcheckbox that toggles', async () => {
   await expect.element(item).toHaveAttribute('aria-checked', 'true');
 
   await userEvent.click(item);
+  await expect.element(screen.getByTestId('view-state')).toHaveTextContent('archived hidden');
+
+  // Reopened, the item reads the bound state back.
   await userEvent.click(screen.getByRole('button', { name: 'View options' }));
 
   await expect
