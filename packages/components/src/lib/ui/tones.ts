@@ -124,6 +124,21 @@ export const progressTone: Record<Tone, string> = {
   error: 'progress-error',
 };
 
+/**
+ * Literal daisyUI class per `Tone` for `Slider`; a lookup table so Tailwind's scanner sees every class.
+ * Each sets `color` (the fill, read as `currentColor`) and `--range-thumb` (the thumb face).
+ */
+export const rangeTone: Record<Tone, string> = {
+  neutral: 'range-neutral',
+  primary: 'range-primary',
+  secondary: 'range-secondary',
+  accent: 'range-accent',
+  info: 'range-info',
+  success: 'range-success',
+  warning: 'range-warning',
+  error: 'range-error',
+};
+
 /** Plain background classes, for a segment or swatch without a component prefix. */
 export const backgroundTone: Record<Tone, string> = {
   neutral: 'bg-neutral',

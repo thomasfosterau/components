@@ -94,3 +94,14 @@ export const fileInputSize: Record<FieldSize, string> = {
   md: 'file-input-md',
   lg: 'file-input-lg',
 };
+
+/**
+ * Literal daisyUI class per `FieldSize` for `Slider`; a lookup table so Tailwind's scanner sees every class.
+ * Each sets `--range-thumb-size`, which the slider's thumb and track are sized from.
+ */
+export const rangeSize: Record<FieldSize, string> = {
+  xs: 'range-xs',
+  sm: 'range-sm',
+  md: 'range-md',
+  lg: 'range-lg',
+};
