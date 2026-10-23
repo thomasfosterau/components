@@ -1,9 +1,9 @@
 <!-- @component
-One entry of a `Menu` (a navigation link) or of a `DropdownMenu` (a bits-ui menu item).
+One entry of a `Menu` (a navigation link), or of a `DropdownMenu` or `ContextMenu` (a bits-ui menu item).
 -->
 <!--
-  MenuItem — one entry of a `Menu` or of a `DropdownMenu`; which one is
-  decided by whether a `DropdownMenu` encloses it, never by a prop.
+  MenuItem — one entry of a `Menu`, `DropdownMenu` or `ContextMenu`; which
+  one is decided by the enclosing menu, never by a prop.
 
   In `nav` mode it is a plain `<li><a>`: the current page takes daisyUI's
   `menu-active` AND `aria-current="page"`, because the highlight is a
@@ -11,8 +11,8 @@ One entry of a `Menu` (a navigation link) or of a `DropdownMenu` (a bits-ui menu
   context's `isCurrent(href)`, which is what an app without a router-aware
   context uses.
 
-  Inside a `DropdownMenu` it renders the item part that menu lends it
-  (`dropdown/DropdownItemPart.svelte`, through context), which goes through
+  Inside a `DropdownMenu` or `ContextMenu` it renders the item part that menu lends it
+  (`menu-parts/ItemPart.svelte`, through context), which goes through
   bits-ui's `DropdownMenu.Item` `child` snippet, so the element is still the
   caller's own `<a>` or `<button>` — carrying bits-ui's `role="menuitem"`, its
   focus management and its selection handling — rather than a `<div>`
@@ -31,7 +31,7 @@ One entry of a `Menu` (a navigation link) or of a `DropdownMenu` (a bits-ui menu
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { getComponentsContext } from '../context.svelte.ts';
-  import { getDropdownParts } from './dropdown/dropdown-parts.ts';
+  import { getMenuParts } from './menu-parts/menu-parts.ts';
 
   interface Props {
     /** Where the item navigates. Omitted, the item is a button. */
@@ -54,7 +54,7 @@ One entry of a `Menu` (a navigation link) or of a `DropdownMenu` (a bits-ui menu
     $props();
 
   const context = getComponentsContext();
-  const dropdown = getDropdownParts();
+  const parts = getMenuParts();
 
   const resolved = $derived(href === undefined ? undefined : context.href(href));
   // bits-ui's `onSelect` is not optional-friendly under
@@ -70,8 +70,8 @@ One entry of a `Menu` (a navigation link) or of a `DropdownMenu` (a bits-ui menu
   {@render children()}
 {/snippet}
 
-{#if dropdown}
-  <dropdown.item
+{#if parts}
+  <parts.item
     href={resolved}
     current={isCurrent}
     {disabled}

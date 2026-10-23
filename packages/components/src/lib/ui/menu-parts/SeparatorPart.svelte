@@ -1,17 +1,17 @@
 <!-- @component
-Internal: the bits-ui separator a `MenuSeparator` renders inside a `DropdownMenu`.
+Internal: the bits-ui separator a `MenuSeparator` renders inside a `DropdownMenu` or `ContextMenu`.
 -->
 <!--
   bits-ui's own separator carries `role="separator"` and keeps it out of the
   menu's arrow-key navigation; the `role="none"` `<li>` keeps the
   presentational list item out of the accessibility tree. Lent to
-  `MenuSeparator` through `dropdown-parts.ts`.
+  `MenuSeparator` through `menu-parts.ts`.
 -->
 <script lang="ts">
   import { DropdownMenu } from 'bits-ui';
-  import type { DropdownSeparatorPartProps } from './dropdown-parts.ts';
+  import type { SeparatorPartProps } from './menu-parts.ts';
 
-  let { class: className }: DropdownSeparatorPartProps = $props();
+  let { class: className }: SeparatorPartProps = $props();
 </script>
 
 <li role="none">
