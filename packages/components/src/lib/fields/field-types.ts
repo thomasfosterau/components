@@ -17,11 +17,29 @@
 export interface FieldControl {
   /** The control's `id`; the `FormField` label points at it. */
   readonly id: string;
+  /**
+   * The id of the visible `<label>`. A labelable control (`input`, `select`,
+   * `textarea`, `button`, …) ignores it: `<label for>` already names it. A
+   * control `<label for>` cannot reach — a `role="slider"` thumb, a
+   * `role="group"` / `radiogroup` root, a segmented date group — points
+   * `aria-labelledby` at it instead of taking a labelling prop of its own.
+   */
+  readonly labelId: string;
   /** Space-separated ids of the hint / error paragraphs; empty when neither is shown. */
   readonly describedBy: string;
   /** The field currently shows an error. */
   readonly invalid: boolean;
   readonly required: boolean;
+}
+
+/**
+ * What `<Fieldset>` hands its `children` snippet: the id of its `<legend>`,
+ * for a role-based control inside the group (which a legend names only
+ * through the `<fieldset>`, a different node) to point `aria-labelledby` at.
+ */
+export interface FieldsetControl {
+  /** The id of the `<legend>`. */
+  readonly labelId: string;
 }
 
 /** Size steps shared by the field primitives (daisyUI has no `xl` field). */

@@ -13,6 +13,10 @@ The `FormField` frame — legend, hint, errors — for a group of controls rathe
   the implicit `group` role does not support it, so the invalid state is a
   `data-invalid` hook for styling and the error region is what announces it.
 
+  The `children` snippet receives a `FieldsetControl`, the `<legend>`'s id as
+  `labelId`, for a role-based control inside the group to point
+  `aria-labelledby` at.
+
   `CheckboxGroup` is built on this. `RadioGroup` is not — bits-ui's radio
   group renders its own `role="radiogroup"` element, and a role inside a
   `<fieldset>` would be named by nothing, so it names itself from a heading it
@@ -22,6 +26,7 @@ The `FormField` frame — legend, hint, errors — for a group of controls rathe
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import FieldErrors from './FieldErrors.svelte';
+  import type { FieldsetControl } from './field-types.ts';
 
   interface Props extends Omit<HTMLAttributes<HTMLFieldSetElement>, 'children'> {
     /** The group's `<legend>`; names every control inside it. */
@@ -40,8 +45,8 @@ The `FormField` frame — legend, hint, errors — for a group of controls rathe
      * @defaultValue `'(required)'`
      */
     requiredLabel?: string | undefined;
-    /** The grouped controls. */
-    children: Snippet<[]>;
+    /** The grouped controls; receives the legend's id as `labelId`. */
+    children: Snippet<[FieldsetControl]>;
   }
 
   let {
@@ -56,6 +61,7 @@ The `FormField` frame — legend, hint, errors — for a group of controls rathe
   }: Props = $props();
 
   const uid = $props.id();
+  const labelId = `${uid}-legend`;
   const hintId = `${uid}-hint`;
   const errorId = `${uid}-error`;
   const invalid = $derived(errors.length > 0);
@@ -73,14 +79,14 @@ The `FormField` frame — legend, hint, errors — for a group of controls rathe
   data-invalid={invalid ? '' : undefined}
   class={['fieldset', className]}
 >
-  <legend class="fieldset-legend">
+  <legend class="fieldset-legend" id={labelId}>
     {legend}
     {#if required}
       <span class="text-error" aria-hidden="true">*</span>
       <span class="sr-only">{requiredLabel}</span>
     {/if}
   </legend>
-  {@render children()}
+  {@render children({ labelId })}
   {#if hint !== undefined}
     <p class="fieldset-label" id={hintId}>{hint}</p>
   {/if}

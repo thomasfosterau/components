@@ -61,3 +61,24 @@
     {/snippet}
   </FormField>
 </Story>
+
+<Story name="A control `<label for>` cannot name">
+  <!-- A role-based control points `aria-labelledby` at `labelId`; a click on the label focuses it. -->
+  <FormField label="Hours of sun" hint="Use the arrow keys once focused.">
+    {#snippet children(control)}
+      <div
+        id={control.id}
+        role="slider"
+        tabindex="0"
+        aria-labelledby={control.labelId}
+        aria-describedby={control.describedBy === '' ? undefined : control.describedBy}
+        aria-valuemin={0}
+        aria-valuemax={12}
+        aria-valuenow={6}
+        class="badge badge-outline focus-visible:outline-primary focus-visible:outline-2"
+      >
+        6 hours
+      </div>
+    {/snippet}
+  </FormField>
+</Story>

@@ -41,6 +41,12 @@ A native `<input type="date">` in daisyUI `input` styling, with `FieldControl` w
      * @defaultValue `''`
      */
     describedBy?: string | undefined;
+    /**
+     * `FieldControl`: the visible label's id. Not used — this control is
+     * labelable, so the `FormField`'s `<label for>` already names it; taken
+     * here so a spread `FieldControl` does not leak it as an attribute.
+     */
+    labelId?: string | undefined;
   }
 
   let {
@@ -50,6 +56,7 @@ A native `<input type="date">` in daisyUI `input` styling, with `FieldControl` w
     size = 'md',
     invalid = false,
     describedBy = '',
+    labelId: _labelId,
     class: className,
     ...rest
   }: Props = $props();

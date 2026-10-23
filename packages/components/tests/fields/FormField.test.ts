@@ -1,6 +1,7 @@
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import FormFieldFixture from './fixtures/FormFieldFixture.svelte';
+import FormFieldRoleFixture from './fixtures/FormFieldRoleFixture.svelte';
 
 /**
  * The wiring is the whole component: one `id` becomes the label's `for`, the
@@ -96,4 +97,35 @@ test('requiredLabel is a prop', async () => {
   await expect
     .element(screen.getByRole('textbox'))
     .toHaveAccessibleName('Scientific name must be filled in');
+});
+
+test('the label carries the `labelId` it hands the control, and a labelable control ignores it', async () => {
+  const screen = await render(FormFieldFixture, { id: 'taxon-name', label: 'Scientific name' });
+
+  expect(screen.container.querySelector('label')?.id).toBe('taxon-name-label');
+  // Named by `for`; `labelId` is not leaked onto the input as an attribute.
+  const input = screen.getByRole('textbox', { name: 'Scientific name' }).element();
+  expect(input.hasAttribute('labelid')).toBe(false);
+  expect(input.hasAttribute('aria-labelledby')).toBe(false);
+});
+
+test('a role-based control is named through `labelId`', async () => {
+  const screen = await render(FormFieldRoleFixture, {});
+
+  await expect.element(screen.getByRole('slider', { name: 'Hours of sun' })).toBeInTheDocument();
+  await expect.element(screen.getByRole('radiogroup', { name: 'Watering' })).toBeInTheDocument();
+});
+
+test('a click on the label focuses a focusable non-labelable control', async () => {
+  const screen = await render(FormFieldRoleFixture, {});
+
+  await screen.getByText('Hours of sun').click();
+  await expect.element(screen.getByRole('slider', { name: 'Hours of sun' })).toHaveFocus();
+});
+
+test('a click on the label focuses a roving group’s current tab stop', async () => {
+  const screen = await render(FormFieldRoleFixture, {});
+
+  await screen.getByText('Watering').click();
+  await expect.element(screen.getByRole('radio', { name: 'Weekly' })).toHaveFocus();
 });

@@ -1,6 +1,7 @@
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import FieldsetFixture from './fixtures/FieldsetFixture.svelte';
+import FieldsetRoleFixture from './fixtures/FieldsetRoleFixture.svelte';
 
 test('the legend names the group', async () => {
   const screen = await render(FieldsetFixture, { legend: 'Growing conditions' });
@@ -41,4 +42,14 @@ test('a group with nothing to say carries no aria-describedby', async () => {
   await expect
     .element(screen.getByRole('group', { name: /Growing conditions/ }))
     .not.toHaveAttribute('aria-describedby');
+});
+
+test('the legend carries the id it hands its children as `labelId`', async () => {
+  const screen = await render(FieldsetRoleFixture, {});
+
+  const legend = screen.container.querySelector('legend');
+  expect(legend?.id).not.toBe('');
+  await expect
+    .element(screen.getByRole('radiogroup', { name: 'Watering' }))
+    .toHaveAttribute('aria-labelledby', legend?.id ?? '');
 });

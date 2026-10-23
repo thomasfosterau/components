@@ -132,6 +132,12 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
      * @defaultValue `''`
      */
     describedBy?: string | undefined;
+    /**
+     * `FieldControl`: the visible label's id. Not used — this control is
+     * labelable, so the `FormField`'s `<label for>` already names it; taken
+     * here so a spread `FieldControl` does not leak it as an attribute.
+     */
+    labelId?: string | undefined;
     /** `FieldControl`: the field is in error. */
     invalid?: boolean | undefined;
     /** `FieldControl`: the field must be filled. */
@@ -183,6 +189,7 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
     errorMessage,
     id: idProp,
     describedBy = '',
+    labelId: _labelId,
     invalid = false,
     required = false,
     disabled = false,
