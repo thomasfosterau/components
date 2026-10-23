@@ -140,3 +140,31 @@ describe('the form element', () => {
       .toHaveAttribute('href', '/things');
   });
 });
+
+describe('form-level messages', () => {
+  it('renders no alert when there is nothing to say', async () => {
+    const screen = await render(EntityForm, { definition: thingForm, mode: 'create' });
+    expect(screen.getByRole('alert').elements()).toHaveLength(0);
+  });
+
+  it("renders the caller's messages as one alert each, in order, before the fields", async () => {
+    const screen = await render(EntityForm, {
+      definition: thingForm,
+      mode: 'create',
+      messages: ['The server could not save this.', 'Try again in a minute.'],
+    });
+    const alerts = screen.getByRole('alert').elements();
+    expect(alerts.map((alert) => alert.textContent?.trim())).toEqual([
+      'The server could not save this.',
+      'Try again in a minute.',
+    ]);
+    // A failed submit is announced where the reader starts reading the form.
+    const firstField = screen.container.querySelector('[name="title"]');
+    expect(firstField).not.toBeNull();
+    for (const alert of alerts) {
+      expect(alert.compareDocumentPosition(firstField!) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+    }
+  });
+});
