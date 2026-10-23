@@ -493,8 +493,8 @@ One family, two ways to fill it. Composed primitives (`InfoboxHeader`, `InfoboxI
 
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
-| `Infobox` | The summary rail frame | `title?`, `subtitle?`, `label='Key facts'`, `image?: InfoboxImageSpec`, `rows?: readonly InfoboxRowSpec[]`, `float?` + `HTMLAttributes<HTMLElement>` | `children?` (extra composed markup, rendered after `rows`) | `<aside aria-label={title ?? label}>` |
-| `InfoboxHeader` | The title block | `title`, `subtitle?` + `HTMLAttributes<HTMLDivElement>` | — | `<h3>`, deliberately outside the document outline |
+| `Infobox` | The summary rail frame | `title?`, `subtitle?`, `headingLevel? = 3` (`2`–`6`, forwarded to `InfoboxHeader`), `label='Key facts'`, `image?: InfoboxImageSpec`, `rows?: readonly InfoboxRowSpec[]`, `float?` + `HTMLAttributes<HTMLElement>` | `children?` (extra composed markup, rendered after `rows`) | `<aside aria-label={title ?? label}>` |
+| `InfoboxHeader` | The title block | `title`, `subtitle?`, `headingLevel? = 3` (`2`–`6`) + `HTMLAttributes<HTMLDivElement>` | — | `<h3>` by default, deliberately outside the document outline; raise `headingLevel` to the page's section level when the box is a section in its own right |
 | `InfoboxImage` | The identifying picture | `src`, `alt`, `caption?`, `width?`, `height?`, `eager?` | — | `<figure>`/`<img>`/`<figcaption>`; default lazy |
 | `InfoboxSection` | A titled group of rows | `title?` + `HTMLAttributes<HTMLDListElement>` | `children` (the rows) | owns the `<dl>` |
 | `InfoboxRow` | One label/value pair | `label`, `value?: string \| number`, `href?` (through the components context), `external?`, `emptyLabel='unrecorded'`, `showEmpty?` + `HTMLAttributes<HTMLDivElement>` | `children?` (wins over `value`) | `<dt>`/`<dd>` pair; **empty by default** — `showEmpty` opts into an em dash captioned by `aria-label={emptyLabel}` |
