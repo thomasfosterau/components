@@ -69,6 +69,11 @@
       "svelte": "./dist/forms/entity-form.js",
       "default": "./dist/forms/entity-form.js"
     },
+    "./context-menu": {
+      "types": "./dist/ui/context-menu.d.ts",
+      "svelte": "./dist/ui/context-menu.js",
+      "default": "./dist/ui/context-menu.js"
+    },
     "./theme.css": "./dist/theme.css"
   },
   "dependencies": {

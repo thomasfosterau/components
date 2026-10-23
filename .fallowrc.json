@@ -14,6 +14,7 @@
     "packages/components/src/lib/hotkeys/index.ts",
     "packages/components/src/lib/seo/index.ts",
     "packages/components/src/lib/forms/entity-form.ts",
+    "packages/components/src/lib/ui/context-menu.ts",
     "packages/mapbox/src/lib/index.ts",
     "packages/charts/src/spec/index.ts",
     "packages/charts/src/core/index.ts",

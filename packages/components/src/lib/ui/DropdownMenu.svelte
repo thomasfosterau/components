@@ -15,14 +15,15 @@ An application menu behind a trigger — a bits-ui dropdown of `MenuItem`s style
   dropdown: `Menu`, `MenuItem`, `MenuSeparator` and `Sidebar` import nothing
   from bits-ui (#129). The children are the same `MenuItem` /
   `MenuSeparator` a `Menu` takes; this component lends them its bits-ui item
-  and separator parts through context (`dropdown/dropdown-parts.ts`).
+  and separator parts through context (`menu-parts/menu-parts.ts`), and
+  the same for `MenuCheckboxItem`, `MenuRadioGroup`, `MenuRadioItem` and
+  `MenuSub`.
 -->
 <script lang="ts">
   import { DropdownMenu } from 'bits-ui';
   import type { Snippet } from 'svelte';
-  import DropdownItemPart from './dropdown/DropdownItemPart.svelte';
-  import DropdownSeparatorPart from './dropdown/DropdownSeparatorPart.svelte';
-  import { setDropdownParts } from './dropdown/dropdown-parts.ts';
+  import { menuParts } from './menu-parts/parts.ts';
+  import { setMenuParts } from './menu-parts/menu-parts.ts';
 
   interface Props {
     /** Accessible name of the open menu. */
@@ -57,7 +58,7 @@ An application menu behind a trigger — a bits-ui dropdown of `MenuItem`s style
     children,
   }: Props = $props();
 
-  setDropdownParts({ item: DropdownItemPart, separator: DropdownSeparatorPart });
+  setMenuParts(menuParts('dropdown'));
 </script>
 
 <DropdownMenu.Root bind:open>

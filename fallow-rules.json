@@ -38,10 +38,22 @@
         "packages/components/src/lib/ui/MenuItem.svelte",
         "packages/components/src/lib/ui/MenuSeparator.svelte",
         "packages/components/src/lib/ui/menu-context.ts",
-        "packages/components/src/lib/ui/dropdown/dropdown-parts.ts",
-        "packages/components/src/lib/layout/Sidebar.svelte"
+        "packages/components/src/lib/layout/Sidebar.svelte",
+        "packages/components/src/lib/ui/MenuCheckboxItem.svelte",
+        "packages/components/src/lib/ui/MenuRadioGroup.svelte",
+        "packages/components/src/lib/ui/MenuRadioItem.svelte",
+        "packages/components/src/lib/ui/MenuSub.svelte",
+        "packages/components/src/lib/ui/menu-parts/menu-parts.ts"
       ],
-      "message": "Navigation-only menus must not reach bits-ui's DropdownMenu (~30 KB gzip on every page, #129). The dropdown parts live in ui/DropdownMenu.svelte and ui/dropdown/*.svelte and reach MenuItem / MenuSeparator through context."
+      "message": "Navigation-only menus must not reach bits-ui's menus (~30 KB gzip on every page, #129). The bits-ui parts live in ui/menu-parts/*.svelte, are imported only by ui/DropdownMenu.svelte and ui/ContextMenu.svelte (through menu-parts/parts.ts), and reach the Menu* children through context."
+    },
+    {
+      "id": "context-menu-own-entry",
+      "kind": "banned-import",
+      "specifiers": ["./ContextMenu.svelte", "../ui/ContextMenu.svelte"],
+      "files": ["packages/components/src/lib/**"],
+      "exclude": ["packages/components/src/lib/ui/context-menu.ts"],
+      "message": "ContextMenu is reached only through its own @thomasfosterau/components/context-menu entry (ui/context-menu.ts), so the root barrel never loads it (#157)."
     },
     {
       "id": "effect-only-in-charts-spec",
