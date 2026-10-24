@@ -28,6 +28,7 @@ export { default as MultiSelect } from './MultiSelect.svelte';
 export { default as PasswordInput } from './PasswordInput.svelte';
 export { default as PinInput } from './PinInput.svelte';
 export { default as RadioGroup } from './RadioGroup.svelte';
+export { default as Rating } from './Rating.svelte';
 export { default as SearchInput } from './SearchInput.svelte';
 export { default as Select } from './Select.svelte';
 export { default as Slider } from './Slider.svelte';
