@@ -1,5 +1,77 @@
 # @thomasfosterau/components
 
+## 0.2.0
+
+### Minor Changes
+
+- b160b83: `VectorCanvas` handles keys. When `interactive`, its `<svg>` is one Tab stop with a focus-visible outline. Every keydown and keyup goes to the new `onkey` prop first; a key the caller doesn't claim (with `preventDefault`) falls through to the canvas's own: arrows pan with the `pan` tool (Shift pans further), and `+` / `=` / `-` zoom about the centre. Also new: `activedescendant`, `describedby`, an `overlay` snippet drawn above the elements, and `onfocuschange`. The native `onkeydown` / `onkeyup` / `onfocus` / `onblur` attributes are no longer accepted through the spread (the surface couldn't take focus before, so they never fired); use `onkey` and `onfocuschange`.
+- f76d83f: `Combobox` can act as a search box, and the hotkeys family gets its own entry point.
+
+  - `postedValue: 'id' | 'query'` (default `'id'`). With `'query'`, `name` goes on the visible input, so a plain GET form posts the typed text with or without JavaScript, and Enter submits the form unless the reader arrowed to a suggestion.
+  - New props: `inputClass` (extra classes on the input, merged last), `initialQuery` (seeds the input text), `onQueryChange` (every keystroke), `onSelect` (the committed item), `hideLabel` (an `sr-only` label) and `portal` (default `true`; `false` keeps the listbox inside the component).
+  - The root `<div>` now spreads the remaining native attributes, such as `data-testid`.
+  - New `@thomasfosterau/components/hotkeys` export, so `HotkeyHelpDialog` can be imported lazily. The root barrel still re-exports the family.
+
+- 9ced607: New `ContextMenu`, on its own entry `@thomasfosterau/components/context-menu`: a menu at the pointer on right-click, long-press, or Shift+F10 / the Menu key on the focused region, on bits-ui's `ContextMenu`. It takes the same `MenuItem` / `MenuSeparator` children as `DropdownMenu`.
+
+  New menu children for both `DropdownMenu` and `ContextMenu`, exported from the barrel: `MenuCheckboxItem` (`role="menuitemcheckbox"`), `MenuRadioGroup` / `MenuRadioItem` (`role="menuitemradio"`) and `MenuSub` (a submenu). Like `MenuItem`, they import nothing from bits-ui: the enclosing menu lends them its parts through context, so a navigation-only page still loads no menu runtime.
+
+  `MenuMode` gains `'context'`: `getMenuMode()` reports it inside a `ContextMenu`.
+
+- bbbd37f: `DescriptionList` gains a `bare` variant: the `<dl>` takes only the caller's `class` and every `DescriptionRow`'s `<dt>`/`<dd>` is a direct child of it, so a consumer-owned grid (`grid-cols-[auto_1fr]`, say) can hold `DescriptionRow`s beside its own `<dt>`/`<dd>` pairs without a wrapper breaking its columns. `DescriptionListStyle['variant']` widens to include `'bare'`.
+- 021f9e7: `EntityForm` (`./entity-form`) takes a `messages` prop: form-level messages from outside its store, such as a SvelteKit action's `fail(500, { message })` that carries no form state (`messages={page.form?.message ? [page.form.message] : undefined}`). They render in the same `FormErrors` block as the store's root errors, after them, one `role="alert"` each.
+- 0e6558e: **Breaking:** `FieldControl` has a required `labelId`, the id of the `FormField`'s visible `<label>` (now rendered with that id). A control `<label for>` cannot name — a `role="slider"` thumb, a `group` / `radiogroup` root, a segmented date group — points `aria-labelledby` at it, and `FormField` forwards a click on its label to such a control (the control itself if focusable, else its first focusable descendant). Code that builds a `FieldControl` by hand must now supply `labelId`.
+
+  Every labelable field primitive (`TextInput`, `Textarea`, `DateInput`, `Select`, `Checkbox`, `Toggle`, `FileInput`, `ImageInput`, `VideoInput`, `Combobox`, `PinInput`) accepts and drops `labelId`, so spreading a `FieldControl` never leaks it as an attribute. `Fieldset` gives its `<legend>` an id and hands its `children` snippet a new `FieldsetControl` (`{ labelId }`).
+
+  `Slider` inside a `FormField` is now named by the field's label through `{...control}` alone, with no `label` repeated, and a click on the label focuses its first thumb.
+
+- a2778bc: New `MultiSelect` field (`fields`): several choices from a longer known list in a compact trigger that summarises them ("Full sun, Well-drained, +1"), on bits-ui's `Select` with `type="multiple"`.
+
+  - `values` binds a `string[]`, always kept in option order; `options` takes the same `FieldOption | string` shape as `Select`.
+  - `maxShown` (default 2) and `formatOverflow` shape the summary; `placeholder`, `portal`, `size`, an `option` snippet for a richer option body, and the `FieldControl` props on the trigger.
+  - The listbox is `aria-multiselectable` and stays open while options are toggled; disabled options carry `aria-disabled`; `name` posts one hidden input per value.
+
+- 12d015e: New `NumberField` field (`fields`): an exact number shown through `Intl.NumberFormat` (units, percent, currency, grouping) in the context's locale and parsed back in the same locale, with − / + stepper buttons — the APG spinbutton.
+
+  - `value` is a `number | undefined`; typed text is parsed on blur or Enter (`"1.234,5"` in `de-DE` is `1234.5`), clamped to `min` / `max`, rounded to the step's or the format's precision, and passed to `onCommit`. Unparseable text reverts; an empty field is `undefined`.
+  - `role="spinbutton"` with `aria-valuenow`, `aria-valuemin` / `aria-valuemax` and the formatted `aria-valuetext`; Arrow Up / Down ± `step`, Page Up / Down ± `largeStep`, Home / End to the bounds. The − / + buttons (`decrementLabel`, `incrementLabel`) stay out of the tab order, are disabled at the bounds and auto-repeat while held. No scroll-wheel handling.
+  - `name` posts the raw number through a hidden input, never the formatted text.
+  - The − / + buttons are sized from the shared `inputButtonSize` table.
+
+- 1d66b79: New `PasswordInput` field (`fields`): a password field with a "Show password" toggle and an explicit `purpose` that sets `autocomplete` to `current-password` or `new-password`, so a password manager fills a sign-in form and offers to generate on a sign-up one.
+
+  - The toggle is a real `type="button"` (it never submits the form) with a constant accessible name, `showLabel`, and an `aria-pressed` state; it `aria-controls` the input, keeps focus, and keeps the input's selection across the type flip.
+  - `revealed` is bindable; `revealable={false}` drops the toggle; the field hides again when its form submits.
+  - `...rest` (`name`, `minlength`, `aria-*`, `data-*`) lands on the inner input, `class` on the wrapper, `inputClass` on the input.
+  - New `inputButtonSize` class table in `fields/field-types.ts`, for a button inside an `input` composite.
+
+- 3f71b80: New `PinInput` field (`fields`): a fixed-length code — a sign-in code, a TOTP, an invite code — typed one character per visible cell into ONE real input, on bits-ui's `PinInput`, so paste, SMS autofill (`autocomplete="one-time-code"`), password managers and form posting treat it as one field.
+
+  - `length` (default 6), `charset` (`'numeric'` | `'alphanumeric'`, setting `inputmode` and the input's pattern), `masked` (bullets in the cells), `onComplete(code)`, `pasteTransformer` (default strips whitespace and hyphens, so "123 456" pastes as "123456"), `size`, and the `FieldControl` props on the real input.
+  - The cells are `aria-hidden` presentation; `FormField`'s label names the input.
+  - New `pinCellSize` class table in `fields/field-types.ts`.
+
+- 63b3124: New `Slider` field (`fields`): a number, or a `[low, high]` range, picked from a bounded, stepped scale on bits-ui's `Slider`, in daisyUI `range` colours and sizes.
+
+  - `type="single"` binds a `number`; `type="multiple"` binds a `number[]` (default `[min, max]`), one thumb per entry, and the thumbs cannot cross.
+  - `formatValue` (default `Intl.NumberFormat(locales)`) sets each thumb's `aria-valuetext` and the visible readout (`showValue`, default on); `ticks`, `orientation`, array `step` snap points, `tone`, `size`.
+  - Arrow keys step, Page Up / Page Down jump a tenth of the scale, Home / End go to the ends; `onCommit` fires once per finished interaction.
+  - Named by `aria-labelledby={labelId}` (each range thumb adds its own `thumbLabels` entry) or, outside a `FormField`, by `label`; `name` posts one hidden input per thumb.
+  - New class tables `rangeTone` (`ui/tones.ts`) and `rangeSize` (`fields/field-types.ts`).
+
+- 38f0c1c: `Infobox` and `InfoboxHeader` take a `headingLevel` prop (`2`–`6`, default `3`). The `h3` default still keeps a box beside prose out of the page outline; raise it when the box is a section of the page in its own right. Only the tag changes.
+- 8017613: **Breaking:** `Menu`'s dropdown mode moves to a new `DropdownMenu` component, so a page that only navigates (`Sidebar`, `Menu`, `MenuItem`, `MenuSeparator`) no longer pulls bits-ui's `DropdownMenu` into its bundle (about 30 KB gzip on every page, #129).
+
+  - `<Menu mode="dropdown" label …>` becomes `<DropdownMenu label …>`, with the same `open`, `side`, `align`, `class` and `trigger` props and the same `MenuItem` / `MenuSeparator` children. Its roles, accessible name and keyboard behaviour are unchanged.
+  - `Menu` drops the `mode`, `open`, `side`, `align` and `trigger` props: it is the navigation list only.
+  - `setMenuMode` is removed. `getMenuMode()` still reports `'dropdown'` inside a `DropdownMenu` and `'nav'` elsewhere.
+
+### Patch Changes
+
+- bbabaef: Doc comments: the exported types that lacked one (`BarSegment`, `StatDelta`, `TimelineDate`, `TimelineEntry`, `tokenise`) gain one, `CommandItem` and `TipStack` hover their own comment rather than their module's, and the first sentences of the infobox row, hotkey, SEO, canvas, chart and tip types stand alone. The README now documents every export, with corrected defaults and examples that compile.
+- bbabaef: `EntityForm`'s emitted types name their owners: `fieldProps` values are the form library's widget `props()` shape and `enhance` returns the store's own `props` type (both structurally unchanged). The root errors now come from the store's `errorsAt([])` instead of a cast into its error tree; behaviour is unchanged.
+
 ## 0.1.0
 
 ### Minor Changes
