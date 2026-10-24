@@ -13,6 +13,8 @@
  * @module
  */
 
+import type { Size } from '../ui/tones.ts';
+
 /** Wiring a field primitive receives from its enclosing `FormField`. */
 export interface FieldControl {
   /** The control's `id`; the `FormField` label points at it. */
@@ -138,4 +140,13 @@ export const inputButtonSize: Record<FieldSize, string> = {
   sm: 'btn-xs',
   md: 'btn-sm',
   lg: 'btn-md',
+};
+
+/** Literal daisyUI class per `Size` for `Rating`; each sets `--size`, the star height. A lookup table so Tailwind's scanner sees every class. */
+export const ratingSize: Record<Size, string> = {
+  xs: 'rating-xs',
+  sm: 'rating-sm',
+  md: 'rating-md',
+  lg: 'rating-lg',
+  xl: 'rating-xl',
 };
