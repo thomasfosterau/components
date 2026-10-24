@@ -25,6 +25,7 @@ export { default as FileInput } from './FileInput.svelte';
 export { default as FormField } from './FormField.svelte';
 export { default as ImageInput } from './ImageInput.svelte';
 export { default as MultiSelect } from './MultiSelect.svelte';
+export { default as NumberField } from './NumberField.svelte';
 export { default as PasswordInput } from './PasswordInput.svelte';
 export { default as PinInput } from './PinInput.svelte';
 export { default as RadioGroup } from './RadioGroup.svelte';
