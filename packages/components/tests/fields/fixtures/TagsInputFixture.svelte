@@ -9,6 +9,7 @@
     onSearch?: ((query: string, signal: AbortSignal) => Promise<readonly string[]>) | undefined;
     errors?: readonly string[] | undefined;
     required?: boolean | undefined;
+    allowDuplicates?: boolean | undefined;
     /** Called when the wrapping form submits, with what it would post. */
     onSubmitted?: ((data: FormData) => void) | undefined;
   }
@@ -20,6 +21,7 @@
     onSearch,
     errors,
     required,
+    allowDuplicates,
     onSubmitted,
   }: Props = $props();
 </script>
@@ -32,7 +34,9 @@
 >
   <FormField label="Tags" hint="Press Enter or comma after each." {errors} {required}>
     {#snippet children(control)}
-      <TagsInput {...control} name="tags" {max} {suggestions} {onSearch} debounceMs={0} bind:values />
+      <TagsInput {...control} name="tags" {max} {suggestions} {onSearch} {allowDuplicates}
+        debounceMs={0}
+        bind:values />
     {/snippet}
   </FormField>
   <button type="submit">Save</button>

@@ -36,9 +36,10 @@ An open-ended list of short strings the reader types — tags, aliases, keywords
   Focus is never lost after a removal: it lands on the tag that took its
   place, else the one before, else the input.
 
-  `required` means "at least one tag": the text input is `required` (so the
-  browser blocks submission) only while there are no tags, and
-  `aria-required` throughout. `max` disables the input at the cap. `name`
+  `required` means "at least one committed tag": while there are none, the
+  text input carries a custom validity error (`requiredMessage`), so the
+  browser blocks submission even when uncommitted text sits in the input;
+  `aria-required` is set throughout. `max` disables the input at the cap. `name`
   posts one hidden input per tag.
 -->
 <script lang="ts">
@@ -138,6 +139,11 @@ An open-ended list of short strings the reader types — tags, aliases, keywords
      * @defaultValue `false`
      */
     required?: boolean | undefined;
+    /**
+     * The validation message while `required` and no tag has been committed.
+     * @defaultValue `'Add at least one tag.'`
+     */
+    requiredMessage?: string | undefined;
   }
 
   let {
@@ -162,6 +168,7 @@ An open-ended list of short strings the reader types — tags, aliases, keywords
     describedBy = '',
     invalid = false,
     required = false,
+    requiredMessage = 'Add at least one tag.',
     class: className,
     ...rest
   }: Props = $props();
@@ -191,7 +198,7 @@ An open-ended list of short strings the reader types — tags, aliases, keywords
     const needle = text.trim().toLowerCase();
     return pool.filter(
       (entry) =>
-        !present.has(entry.toLowerCase()) &&
+        (allowDuplicates || !present.has(entry.toLowerCase())) &&
         (onSearch !== undefined || entry.toLowerCase().includes(needle)),
     );
   });
@@ -202,11 +209,16 @@ An open-ended list of short strings the reader types — tags, aliases, keywords
     placeholder,
     autocomplete: 'off' as const,
     disabled: disabled || full,
-    required: required && values.length === 0,
     'aria-required': required ? ('true' as const) : undefined,
     'aria-describedby': describedBy === '' ? undefined : describedBy,
     'aria-invalid': invalid ? ('true' as const) : undefined,
     class: 'min-w-24 grow',
+  });
+
+  // Validity follows the committed tags, not the text: typed-but-uncommitted
+  // text must not satisfy `required`.
+  $effect(() => {
+    input?.setCustomValidity(required && values.length === 0 ? requiredMessage : '');
   });
 
   /** Add `raw` as a tag if `normalise`, the duplicate rule and `max` allow it. */
@@ -269,6 +281,8 @@ An open-ended list of short strings the reader types — tags, aliases, keywords
   }
 
   function inputKeydown(event: KeyboardEvent): void {
+    // An IME uses Enter (and may use the delimiter keys) to confirm a candidate.
+    if (event.isComposing) return;
     if (event.key === 'Enter') {
       enterKey(event);
     } else if (delimiters.includes(event.key)) {
@@ -285,9 +299,13 @@ An open-ended list of short strings the reader types — tags, aliases, keywords
     const separators = [...delimiters, '\n'];
     if (!separators.some((separator) => pasted.includes(separator))) return;
     event.preventDefault();
+    // Splice the paste into the caret / selection, as a native paste would, then split.
+    const target = event.currentTarget as HTMLInputElement;
+    const start = target.selectionStart ?? text.length;
+    const end = target.selectionEnd ?? text.length;
     const pieces = separators.reduce<string[]>(
       (parts, separator) => parts.flatMap((part) => part.split(separator)),
-      [`${text}${pasted}`],
+      [`${text.slice(0, start)}${pasted}${text.slice(end)}`],
     );
     for (const piece of pieces) add(piece);
     clearText();

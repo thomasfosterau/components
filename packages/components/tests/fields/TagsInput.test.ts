@@ -133,18 +133,90 @@ test('a wrapping form posts one entry per tag', async () => {
   expect(data.getAll('tags')).toEqual(['a', 'b']);
 });
 
-test('inside FormField: label, hint, errors, and required means at least one tag', async () => {
+test('inside FormField: label, hint, errors, and aria-required throughout', async () => {
   const screen = await render(TagsInputFixture, { errors: ['Add a tag.'], required: true });
 
   const input = screen.getByLabelText(/Tags/);
   await expect.element(input).toHaveAttribute('aria-invalid', 'true');
   await expect.element(input).toHaveAttribute('aria-required', 'true');
-  // Native `required` only while there are no tags; `aria-required` throughout.
-  await expect.element(input).toHaveAttribute('required');
   await expect.element(input).toHaveAccessibleDescription(/Press Enter or comma after each\./);
+});
+
+test('required is satisfied by a committed tag, never by uncommitted text', async () => {
+  const onSubmitted = vi.fn();
+  const screen = await render(TagsInputFixture, { required: true, onSubmitted });
+
+  const input = screen.getByLabelText(/Tags/);
+  const element = input.element() as HTMLInputElement;
+  await userEvent.click(input);
+  await userEvent.keyboard('herb');
+  expect(element.validity.valid).toBe(false);
+  expect(element.validationMessage).toBe('Add at least one tag.');
+  await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+  expect(onSubmitted).not.toHaveBeenCalled();
 
   await userEvent.click(input);
-  await userEvent.keyboard('herb{Enter}');
-  await expect.element(input).not.toHaveAttribute('required');
+  await userEvent.keyboard('{Enter}');
+  await expect.poll(() => element.validity.valid).toBe(true);
   await expect.element(input).toHaveAttribute('aria-required', 'true');
+});
+
+test('with allowDuplicates a chosen suggestion stays available', async () => {
+  const screen = await render(TagsInputFixture, {
+    suggestions: ['bee-friendly', 'native'],
+    allowDuplicates: true,
+    values: ['bee-friendly'],
+  });
+
+  await userEvent.click(screen.getByRole('combobox', { name: 'Tags' }));
+  await userEvent.keyboard('bee');
+  await expect.element(screen.getByRole('option', { name: 'bee-friendly' })).toBeVisible();
+});
+
+test('without allowDuplicates a present tag is not suggested', async () => {
+  const screen = await render(TagsInputFixture, {
+    suggestions: ['bee-friendly', 'bee-hive'],
+    values: ['bee-friendly'],
+  });
+
+  await userEvent.click(screen.getByRole('combobox', { name: 'Tags' }));
+  await userEvent.keyboard('bee');
+  await expect.element(screen.getByRole('option', { name: 'bee-hive' })).toBeVisible();
+  expect(screen.getByRole('option', { name: 'bee-friendly' }).elements()).toHaveLength(0);
+});
+
+test('Enter and delimiters confirming an IME composition do not commit a tag', async () => {
+  const screen = await render(TagsInputFixture, {});
+
+  const input = screen.getByLabelText('Tags');
+  await userEvent.click(input);
+  await userEvent.keyboard('にほん');
+  for (const key of ['Enter', ',']) {
+    const event = new KeyboardEvent('keydown', {
+      key,
+      isComposing: true,
+      bubbles: true,
+      cancelable: true,
+    });
+    input.element().dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(false);
+  }
+  expect(screen.getByRole('listitem').elements()).toHaveLength(0);
+  await expect.element(input).toHaveValue('にほん');
+});
+
+test('a paste replaces the selection before it is split', async () => {
+  const screen = await render(TagsInputFixture, {});
+
+  const input = screen.getByLabelText('Tags');
+  await userEvent.click(input);
+  await userEvent.keyboard('old');
+  (input.element() as HTMLInputElement).setSelectionRange(0, 3);
+  pasteInto(input.element(), 'a, b');
+  await expect.element(screen.getByTestId('bound')).toHaveTextContent(/^a\|b$/);
+
+  await userEvent.keyboard('xz');
+  (input.element() as HTMLInputElement).setSelectionRange(1, 1);
+  pasteInto(input.element(), 'y,w');
+  await expect.element(screen.getByTestId('bound')).toHaveTextContent(/^a\|b\|xy\|wz$/);
 });
