@@ -12,7 +12,8 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
   bits-ui's here. What is NOT bits-ui's, and is what this file is actually
   about, is the SEARCH LIFECYCLE.
 
-  The search lifecycle, in the order the problems bite:
+  The search lifecycle (`latest-search.svelte.ts`, shared with `TagsInput`),
+  in the order the problems bite:
 
     debounce         a keystroke does not start a request; `debounceMs` of
                      quiet does.
@@ -64,6 +65,7 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import { inputSize, type FieldSize } from './field-types.ts';
+  import { LatestSearch } from './latest-search.svelte.ts';
 
   /** Keys of the root `<div>`'s attributes that this component claims for itself. */
   type OwnKeys = 'id' | 'class' | 'children';
@@ -211,16 +213,17 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
   // svelte-ignore state_referenced_locally
   let query = $state(initialQuery ?? '');
   let open = $state(false);
-  let results = $state<readonly T[]>([]);
-  let pending = $state(false);
-  let searchError = $state<string | undefined>();
+  const searcher = new LatestSearch<T>(
+    () => onSearch,
+    () => debounceMs,
+  );
+  const results = $derived(searcher.results);
+  const pending = $derived(searcher.pending);
+  const searchError = $derived(searcher.error);
   /** The id of the row bits-ui currently has under the cursor, if any. */
   let highlighted = $state<string | undefined>();
   /** The reader moved the cursor with the keyboard since they last typed. */
   let navigated = false;
-
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  let inFlight: AbortController | undefined;
 
   /** Static mode filters locally; async mode shows whatever last settled. */
   const visible = $derived.by(() => {
@@ -244,40 +247,7 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
 
   const visibleError = $derived(errorMessage ?? searchError);
 
-  const search = (text: string): void => {
-    if (onSearch === undefined) return;
-    inFlight?.abort();
-    const own = new AbortController();
-    inFlight = own;
-    pending = true;
-    searchError = undefined;
-    void onSearch(text, own.signal)
-      .then((next) => {
-        // A superseded request must not write: `inFlight` is the identity
-        // check, `signal.aborted` catches the caller aborting its own work.
-        if (own.signal.aborted || inFlight !== own) return;
-        results = next;
-        pending = false;
-      })
-      .catch((error: unknown) => {
-        if (own.signal.aborted || inFlight !== own) return;
-        pending = false;
-        searchError = error instanceof Error ? error.message : String(error);
-      });
-  };
-
-  const schedule = (text: string): void => {
-    if (timer !== undefined) clearTimeout(timer);
-    timer = setTimeout(() => {
-      timer = undefined;
-      search(text);
-    }, debounceMs);
-  };
-
-  $effect(() => () => {
-    if (timer !== undefined) clearTimeout(timer);
-    inFlight?.abort();
-  });
+  $effect(() => () => searcher.dispose());
 
   const typed = (event: Event & { currentTarget: HTMLInputElement }): void => {
     query = event.currentTarget.value;
@@ -288,16 +258,12 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
       return;
     }
     if (query.trim() === '') {
-      if (timer !== undefined) clearTimeout(timer);
-      inFlight?.abort();
-      inFlight = undefined;
-      pending = false;
-      results = [];
+      searcher.clear();
       open = false;
       return;
     }
     open = true;
-    schedule(query);
+    searcher.schedule(query);
   };
 
   const navigationKeys = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End', 'PageDown', 'PageUp']);

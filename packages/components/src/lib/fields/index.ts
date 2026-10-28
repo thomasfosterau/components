@@ -33,6 +33,7 @@ export { default as Rating } from './Rating.svelte';
 export { default as SearchInput } from './SearchInput.svelte';
 export { default as Select } from './Select.svelte';
 export { default as Slider } from './Slider.svelte';
+export { default as TagsInput } from './TagsInput.svelte';
 export { default as Textarea } from './Textarea.svelte';
 export { default as TextInput } from './TextInput.svelte';
 export { default as Toggle } from './Toggle.svelte';
