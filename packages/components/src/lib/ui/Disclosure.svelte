@@ -16,13 +16,20 @@ A native `<details>` wearing daisyUI’s `collapse`.
   a second copy can only be wrong). `open` is bindable, so a caller can drive
   the state, and the four apps' "open this section because its form failed"
   case is a one-line binding.
+
+  Exclusive groups are native too: give several `Disclosure`s the same
+  `name` (spread onto `<details>`) and the browser keeps at most one open.
+  What a `Disclosure` cannot carry is a heading, because `<summary>`'s
+  children are presentational, so a heading inside it drops out of the
+  heading tree. For a stack of headed sections, or a bindable "which one is
+  open", use `Accordion`.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import type { HTMLAttributes } from 'svelte/elements';
+  import type { HTMLDetailsAttributes } from 'svelte/elements';
   import { collapseVariant, type DisclosureVariant } from './tones.ts';
 
-  interface Props extends Omit<HTMLAttributes<HTMLDetailsElement>, 'title'> {
+  interface Props extends Omit<HTMLDetailsAttributes, 'title' | 'open'> {
     /** Whether the section is expanded. Bindable. */
     open?: boolean | undefined;
     /** The summary — its own text, or a snippet for richer markup. */

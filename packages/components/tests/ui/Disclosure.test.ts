@@ -2,6 +2,7 @@ import { userEvent } from 'vite-plus/test/browser';
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import Disclosure from '../../src/lib/ui/Disclosure.svelte';
+import DisclosureGroupFixture from './fixtures/DisclosureGroupFixture.svelte';
 import { textSnippet } from './snippets.ts';
 
 test('is a native details/summary, with no hand-written ARIA', async () => {
@@ -55,4 +56,15 @@ test('the variant picks the daisyUI marker', async () => {
   const details = screen.getByTestId('disclosure');
   await expect.element(details).toHaveClass('collapse');
   await expect.element(details).toHaveClass('collapse-plus');
+});
+
+test('a shared name makes an exclusive native group: opening one closes the other', async () => {
+  const screen = await render(DisclosureGroupFixture, {});
+
+  const [first, second] = screen.container.querySelectorAll('summary');
+  first?.click();
+  await expect.element(screen.getByText('First body.')).toBeVisible();
+  second?.click();
+  await expect.element(screen.getByText('Second body.')).toBeVisible();
+  await expect.element(screen.getByText('First body.')).not.toBeVisible();
 });
