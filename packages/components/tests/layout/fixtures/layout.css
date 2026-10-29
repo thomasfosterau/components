@@ -1,0 +1,4 @@
+/* Tailwind for the layout primitives' computed-style tests only: the unit
+   suite otherwise loads no CSS. Scoped by @source to the primitives. */
+@import 'tailwindcss' source(none);
+@source '../../../src/lib/layout';

@@ -271,6 +271,26 @@ The landmarks a page is assembled from, and the blocks that sit inside them. Str
 </Sidebar>
 ```
 
+### Layout primitives and spacing scale
+
+`VStack`, `HStack`, `Cluster`, `Grid`, `Spacer` and `Fits` are thin, typed wrappers over Tailwind utilities with a constrained vocabulary. Use them where the spacing should follow the library's rhythm (a stack of fields, a row of buttons, a grid of cards). Write raw Tailwind for one-off layout the scale has no step for. The tokens are literal tables in `layout/space.ts`, exported from the barrel:
+
+| Token | Steps |
+| --- | --- |
+| `Gap` → `gapClass` | `none` 0, `xs` 0.25rem, `sm` 0.5rem, `md` 1rem (default), `lg` 2rem, `xl` 3rem |
+| `MinItem` → `minItemClass` | `xs` 10rem, `sm` 12rem, `md` 16rem, `lg` 20rem: the narrowest a `Grid` item gets |
+| `FitsBreakpoint` | `20rem`, `28rem`, `36rem`, `48rem`, `64rem` |
+
+| Component | Purpose | Props | Snippets | ARIA |
+| --- | --- | --- | --- | --- |
+| `VStack` / `HStack` | Children in a column / row (SwiftUI `VStack` / `HStack`) | `gap? = 'md'`, `align?`, `justify?` (`'start'\|'center'\|'end'\|'between'`), `divider?`, `as? = 'div'` (`'div'\|'ul'\|'ol'\|'section'\|'nav'`); `HStack` adds `responsive?` (a column below `sm`) | `children` | none of their own; `as="ul"`/`"ol"` restores `role="list"` (children `<li>`); `divider` is a decorative rule between children only; no `reverse`, so visual order never contradicts the DOM (WCAG 1.3.2) |
+| `Cluster` | Wrapping inline items: tags, buttons | `gap? = 'sm'`, `align? = 'center'`, `justify?`, `as?` | `children` | as above |
+| `Grid` | Columns by minimum item width, not breakpoints | `minItem? = 'md'`, `gap? = 'md'`, `as?` | `children` | as above |
+| `Spacer` | Flexible space in a stack: pushes the rest to the far end | — | — | `aria-hidden` |
+| `Fits` | The first layout that fits its container (SwiftUI `ViewThatFits`) | `layouts: Snippet[]` (widest first), `breakpoints: FitsBreakpoint[]` (one fewer, descending) | — | switches at declared container widths with `@container` queries, no JavaScript (CSS cannot measure content). Inactive layouts are `display: none`, so exactly one copy of each control is in the accessibility tree |
+
+`ui/Stack` is a different thing: daisyUI's overlapping pile of cards.
+
 ## feedback
 
 Dialogs, toasts, progress — chrome around something that just happened, or is happening now. What these share is the live region and the announcement order, not the markup.
