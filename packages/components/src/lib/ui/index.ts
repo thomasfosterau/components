@@ -44,6 +44,7 @@ export { default as MenuSub } from './MenuSub.svelte';
 export { default as Popover } from './Popover.svelte';
 export { default as ShareButton } from './ShareButton.svelte';
 export { default as Skeleton } from './Skeleton.svelte';
+export { default as Spinner } from './Spinner.svelte';
 export { default as ThemeToggle } from './ThemeToggle.svelte';
 export { default as Tooltip } from './Tooltip.svelte';
 export { default as VisuallyHidden } from './VisuallyHidden.svelte';

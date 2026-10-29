@@ -19,6 +19,7 @@ The daisyUI `btn` with tone, variant and size; `loading` disables it and sets `a
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { HTMLButtonAttributes } from 'svelte/elements';
+  import Spinner from './Spinner.svelte';
   import {
     buttonSize,
     buttonTone,
@@ -81,7 +82,7 @@ The daisyUI `btn` with tone, variant and size; `loading` disables it and sets `a
   ]}
 >
   {#if loading}
-    <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+    <Spinner decorative size="sm" />
   {:else if icon}
     {@render icon()}
   {/if}
