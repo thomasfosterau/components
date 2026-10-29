@@ -3,6 +3,7 @@ import { buildAreaGeometry } from './geometry/area.ts';
 import { buildBarGeometry } from './geometry/bar.ts';
 import { buildLineGeometry } from './geometry/line.ts';
 import { buildPointGeometry } from './geometry/point.ts';
+import { buildTreeGeometry } from './geometry/tree.ts';
 import type { Geometry } from './geometry/types.ts';
 import { computeDimensions } from './layout.ts';
 import {
@@ -77,7 +78,10 @@ export function computeContext(
   return {
     dimensions,
     scales: buildScales(xPositional, yPositional, colorScale, sizeScale),
-    geometry: buildGeometry(spec, rows, xPositional, yPositional, colorScale, sizeScale),
+    geometry:
+      spec.mark === 'tree'
+        ? buildTreeMark(spec, rows, dimensions.plot, colorScale)
+        : buildGeometry(spec, rows, xPositional, yPositional, colorScale, sizeScale),
     ticks: buildTicks(xPositional, yPositional),
   };
 }
@@ -109,6 +113,28 @@ function buildTicks(x: PositionalScale | undefined, y: PositionalScale | undefin
     ...(x ? { x: computeTicks(x) } : {}),
     ...(y ? { y: computeTicks(y) } : {}),
   };
+}
+
+/** A `tree` mark's geometry; `parseSpec` has guaranteed its `id` and `parent` channels. */
+function buildTreeMark(
+  spec: ChartSpec,
+  rows: DataRows,
+  plot: ChartContext['dimensions']['plot'],
+  colorScale: ResolvedScale | undefined,
+): Geometry {
+  const { id, parent, label, color } = spec.encoding;
+  if (id === undefined || parent === undefined)
+    return { mark: 'tree', nodes: [], links: [], outline: [] };
+  return buildTreeGeometry({
+    data: rows,
+    plot,
+    id,
+    parent,
+    label,
+    color,
+    colorScale,
+    options: spec.tree,
+  });
 }
 
 function buildGeometry(
@@ -144,6 +170,8 @@ function buildGeometry(
       return buildBarGeometry({ ...args, x2: spec.encoding.x2, y2: spec.encoding.y2 });
     case 'point':
       return buildPointGeometry({ ...args, size: spec.encoding.size, sizeScale });
+    case 'tree':
+      return emptyGeometry('tree');
   }
 }
 
@@ -157,5 +185,7 @@ function emptyGeometry(mark: ChartSpec['mark']): Geometry {
       return { mark: 'bar', bars: [] };
     case 'point':
       return { mark: 'point', points: [] };
+    case 'tree':
+      return { mark: 'tree', nodes: [], links: [], outline: [] };
   }
 }

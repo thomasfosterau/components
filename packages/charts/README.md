@@ -112,6 +112,35 @@ A range bar is a `bar` with an end channel: one row per task (`y`), a bar from i
 }
 ```
 
+### Example: a plant taxonomy (spec 1.1)
+
+A `tree` draws one node per row, joined to the row its `parent` names (`null` for a root). Nodes are laid out tidily: leaves in depth-first order, each parent centred over its children.
+
+```json
+{
+  "specVersion": "1.1",
+  "mark": "tree",
+  "encoding": {
+    "id": { "field": "id", "type": "nominal" },
+    "parent": { "field": "parent", "type": "nominal" },
+    "label": { "field": "name", "type": "nominal" },
+    "color": { "field": "rank", "type": "nominal" }
+  },
+  "data": {
+    "values": [
+      { "id": "solanaceae", "parent": null, "name": "Solanaceae", "rank": "Family" },
+      { "id": "solanum", "parent": "solanaceae", "name": "Solanum", "rank": "Genus" },
+      { "id": "tomato", "parent": "solanum", "name": "S. lycopersicum", "rank": "Species" },
+      { "id": "capsicum", "parent": "solanaceae", "name": "Capsicum", "rank": "Genus" }
+    ]
+  },
+  "tree": { "orientation": "vertical", "linkStyle": "orthogonal" },
+  "config": { "title": "Nightshades" }
+}
+```
+
+Every interpreter also renders the hierarchy as a visually hidden nested list beside the SVG, so assistive technology reads the tree's structure rather than a flat picture.
+
 ## API reference
 
 Every exported symbol, grouped by the entry that exports it. Signatures are the published TypeScript ones; all object types are `readonly`.
@@ -178,12 +207,13 @@ if (result.ok) {
 
 | Type | Shape and role |
 | --- | --- |
-| `ChartSpec` | The portable spec: `{ specVersion: SpecVersion; mark: Mark; encoding: Encoding; data: Data; scales?: Scales; config?: Config; extensions?: Extensions }`. |
+| `ChartSpec` | The portable spec: `{ specVersion: SpecVersion; mark: Mark; encoding: Encoding; data: Data; scales?: Scales; config?: Config; tree?: TreeOptions; extensions?: Extensions }`. |
 | `SpecVersion` | `'1' \| '1.1'`. |
-| `Mark` | `'bar' \| 'line' \| 'point' \| 'area'` — the intersection of the native charting vocabularies. |
+| `Mark` | `'bar' \| 'line' \| 'point' \| 'area' \| 'tree'` — the v1 four are the intersection of the native charting vocabularies; `tree` (spec 1.1) is a hierarchy drawn by its own layout. |
 | `FieldType` | `'quantitative' \| 'ordinal' \| 'nominal' \| 'temporal'` — the declared type of an encoded field. Temporal values are ISO 8601 strings or epoch milliseconds. |
 | `Channel` | `{ field: string; type: FieldType }` — maps a data field to a visual channel. Interpreters read values by the declared `type`, never by sniffing. |
-| `Encoding` | `{ x?, y?, x2?, y2?, color?, size?, opacity?: Channel }`. Every v1 mark needs `x` and `y` to draw anything; `x2` / `y2` (spec 1.1) make a `bar` a range bar. |
+| `Encoding` | `{ x?, y?, x2?, y2?, color?, size?, opacity?: Channel }`. Every v1 mark needs `x` and `y` to draw anything; `x2` / `y2` (spec 1.1) make a `bar` a range bar. `id` / `parent` / `label` (spec 1.1) belong to the `tree` mark, which takes no positional channels. |
+| `TreeOptions` | `{ orientation?: 'vertical' \| 'horizontal'; linkStyle?: 'orthogonal' \| 'curved' }` (spec 1.1) — layout of the `tree` mark: roots at the top (default) or the left, right-angled (default) or curved links. |
 | `DatumValue` | `string \| number \| boolean \| null` — one value in a row. |
 | `Datum` | `{ [field: string]: DatumValue }` — one flat data row. |
 | `InlineData` | `{ values: ReadonlyArray<Datum> }` — rows embedded in the spec. |
@@ -248,6 +278,8 @@ Geometry is in **plot** coordinates: translate by `dimensions.margins.left` / `.
 | `buildLineGeometry(args): LineGeometry` | One `Series` per colour category (one unsplit series without a colour encoding), each with its points and an SVG path. Rows missing either position are skipped. |
 | `buildAreaGeometry(args): AreaGeometry` | As `buildLineGeometry`, with each path closed down to the zero baseline, or to the bottom of the plot when y is not linear. |
 | `buildBarGeometry(args): BarGeometry` | One `BarRect` per row, grown from the zero baseline (negative values hang below it). Band x-scales give the bar width; continuous x-scales get 80% of an equal share of the plot width, at least 1 px. |
+| `buildTreeGeometry(args: { data; plot: Box; id: Channel; parent: Channel; label?; color?; colorScale?; options?: TreeOptions }): TreeGeometry` | Lays out a `tree`: leaves take equal breadth slots in depth-first order, each parent centred over its first and last child, depths spread evenly along the other axis, so siblings never overlap. Throws `Error` naming the row (1-based) on a missing or duplicate id, a parent that is not an id, or a cycle; `resolveChart` returns it as the message. |
+| `outlineText(node: { label: string; category: string \| undefined }): string` | The text of one entry in a tree's nested-list alternative: the label, then the colour category in words. |
 | `buildPointGeometry(args & { size?: Channel \| undefined; sizeScale?: ResolvedScale \| undefined }): PointGeometry` | One `PointCircle` per row; the radius comes from `sizeScale`, else `DEFAULT_POINT_RADIUS`. |
 
 The four builders take `args: { data: DataRows; x: Channel; y: Channel; xScale: PositionalScale; yScale: PositionalScale; color?: Channel | undefined; colorScale?: ResolvedScale | undefined }`; series splitting and colours need both `color` and `colorScale`.
@@ -261,6 +293,7 @@ The four builders take `args: { data: DataRows; x: Channel; y: Channel; xScale: 
 | `DEFAULT_RADIUS_RANGE` | `[3, 12]` | Radius range in pixels for the `size` channel on point marks. |
 | `DEFAULT_POINT_RADIUS` | `4` | Point radius when there is no size encoding or the value is missing. |
 | `DEFAULT_TICK_COUNT` | `5` | Target tick count for continuous scales in `computeTicks`. |
+| `VISUALLY_HIDDEN_STYLE` | an inline `style` string | The visually-hidden style every interpreter puts on a tree's nested-list alternative (inline, since the interpreters ship no CSS). |
 
 #### Types
 
@@ -281,7 +314,11 @@ The four builders take `args: { data: DataRows; x: Channel; y: Channel; xScale: 
 | `ChartTicks` | `{ x?: ReadonlyArray<Tick>; y?: ReadonlyArray<Tick> }`. |
 | `ChartContext` | `{ dimensions: Dimensions; scales: ChartScales; geometry: Geometry; ticks: ChartTicks }` — everything an interpreter needs to draw. |
 | `ResolvedChart` | `{ kind: 'ready'; spec: ChartSpec; context: ChartContext } \| { kind: 'error'; message: string }` — the result of `resolveChart`. |
-| `Geometry` | `LineGeometry \| BarGeometry \| PointGeometry \| AreaGeometry`, discriminated by `mark`. |
+| `Geometry` | `LineGeometry \| BarGeometry \| PointGeometry \| AreaGeometry \| TreeGeometry`, discriminated by `mark`. |
+| `TreeGeometry` | `{ mark: 'tree'; nodes: ReadonlyArray<TreeNodeBox>; links: ReadonlyArray<TreeLink>; outline: ReadonlyArray<TreeOutlineNode> }` — no scales or ticks; the interpreters draw no axes for it. |
+| `TreeNodeBox` | `{ id; label: string; depth; x; y; width; height: number; color: string \| undefined; datum: Datum }` — a node's box in plot pixels, depth-first. |
+| `TreeLink` | `{ from; to: string; path: string }` — parent and child ids, and the SVG `d` of the link. |
+| `TreeOutlineNode` | `{ id; label: string; category: string \| undefined; children: ReadonlyArray<TreeOutlineNode> }` — the hierarchy for the nested-list text alternative. |
 | `LineGeometry` | `{ mark: 'line'; series: ReadonlyArray<Series> }`. |
 | `AreaGeometry` | `{ mark: 'area'; series: ReadonlyArray<Series> }` — paths closed to the baseline. |
 | `Series` | `{ key: string \| null; color: string \| undefined; points: ReadonlyArray<SeriesPoint>; path: string }` — `key` is the colour category (`null` for the unsplit series), `path` the SVG `d` attribute (`''` with no points). |
@@ -441,6 +478,7 @@ new EditorView(document.querySelector('#editor'), {
 | `createChartNodeSpec(options?: ChartNodeSpecOptions): NodeSpec` | The chart node: an atom (selectable, draggable) whose only attr is `spec` (default `null`), so `toJSON` / `fromJSON` carry the spec as is. `toDOM` writes `<div class="chart-node" data-chart-spec="…">` with the encoded spec JSON (empty for a `null` spec); `parseDOM` reads it back and validates it, and an invalid spec does not match the rule, leaving other rules to try. |
 | `chartNodeViewFactory(options?: ChartNodeViewOptions): (node: Node, view: EditorView, getPos: () => number \| undefined) => ChartNodeView` | A constructor for the editor's `nodeViews` prop. |
 | `ChartNodeView` | `new ChartNodeView(node: Node, view: EditorView, options?: ChartNodeViewOptions)`. A `NodeView` whose `dom` is a `<div class="chart-node-view">` holding the rendered SVG. It re-validates the spec on every render and otherwise shows a `<div class="chart-node-view__placeholder">` with a message (no chart configured, invalid spec, data stored externally when there is no `resolveData`, loading, failed to load, or the core's error). It measures its own width and keeps `defaultBox`'s aspect ratio. `update` re-renders for a node of the same type (and returns `false` for any other), `ignoreMutation` returns `true`, and `destroy` drops any pending async resolution. |
+| `renderTreeOutline(context: ChartContext): string` | A tree's visually hidden nested `<ul>` text alternative as an HTML string (`''` for any other mark). The NodeView appends it after the SVG, whose `role="img"` would otherwise hide the structure. |
 | `renderContextToSvg(context: ChartContext, options?: RenderSvgOptions): string` | Renders a `ChartContext` to an SVG string with no DOM, for the NodeView's `innerHTML`, server rendering or tests. The root is `<svg role="img" viewBox="…">` with no `aria-label` (the title is drawn as `<text>`); the title, class and tick labels are XML-escaped. |
 
 #### Constants
@@ -479,7 +517,8 @@ try {
 | Export | Description |
 | --- | --- |
 | `emitVegaLite(spec: ChartSpec, options?: EmitVegaLiteOptions): VegaLiteSpec` | Translates the mark and typed encodings one-to-one. `config.title` becomes `title`, `config.tooltip` becomes `mark.tooltip`, and `scales.x` / `scales.y` become the x and y `scale` (`domain`, `nice`, `zero`); `extensions` are ignored. Data comes from `options.rows` if given, else inline `values`, else a `url` ref's `id` as `url`. |
-| `VegaLiteEmitError` | `Error` subclass (`name: 'VegaLiteEmitError'`) thrown when a `query` or `node` ref arrives without `options.rows`. |
+| `VegaLiteEmitError` | `Error` subclass (`name: 'VegaLiteEmitError'`) with a `reason`: `'unresolved-data'` when a `query` or `node` ref arrives without `options.rows`, `'unsupported-mark'` for a `tree` (Vega-Lite has no tree layout). |
+| `VegaLiteEmitErrorReason` | `'unsupported-mark' \| 'unresolved-data'`. |
 | `VEGA_LITE_SCHEMA` | `'https://vega.github.io/schema/vega-lite/v6.json'` — the `$schema` of every emitted spec. |
 | `EmitVegaLiteOptions` | `{ rows?: ReadonlyArray<Datum>; width?: number \| 'container'; height?: number }` — pre-resolved rows, width (default `'container'`, responsive) and height in pixels. |
 | `VegaLiteSpec` | `{ $schema: string; title?: string; mark: { type: Mark; tooltip?: boolean }; data: VegaLiteData; encoding: VegaLiteEncoding; width?: number \| 'container'; height?: number }` — the single-view subset the emitter produces, typed structurally rather than imported from `vega-lite`. |
@@ -524,8 +563,9 @@ For every spec field and mark type, this records which interpreters honour it an
 | `line` | ✅ | ✅ `line` | 🔵 `LineMark` | 🔵 | 🔵 | n/a — part of the portable intersection |
 | `point` | ✅ | ✅ `point`/`circle` | 🔵 `PointMark` | 🔵 | 🔵 | n/a — part of the portable intersection |
 | `area` | ✅ | ✅ `area` | 🔵 `AreaMark` | 🔵 | 🔵 | n/a — part of the portable intersection |
+| `tree` (spec 1.1) | ✅ tidy layout (`buildTreeGeometry`), plus a visually hidden nested list | ⛔ `VegaLiteEmitError` with reason `'unsupported-mark'` (Vega-Lite has no tree layout; use full Vega's `tree` transform or another interpreter) | 🟡 `TreeLayout` drawn on a SwiftUI `Canvas` outside Swift Charts, the hierarchy as accessibility children | 🟡 custom layout outside the charting library | 🔵 | Render the nested-list fallback (the hierarchy as text), never an empty plot |
 
-The v1 mark set is deliberately the intersection of the native charting vocabularies. New marks (e.g. `rect`, `rule`, `arc`) require a minor `specVersion` bump (see [§ Spec versioning](#spec-versioning)) and a row here **before** implementation.
+The v1 mark set is deliberately the intersection of the native charting vocabularies. `tree` is the one exception (owner decision on #256): no native charting library has it, so every interpreter lays it out itself from the same algorithm, and the matrix rule 2 below is met by the nested-list degradation. New marks (e.g. `rect`, `rule`, `arc`) require a minor `specVersion` bump (see [§ Spec versioning](#spec-versioning)) and a row here **before** implementation.
 
 ### Encoding channels
 
@@ -535,9 +575,20 @@ The v1 mark set is deliberately the intersection of the native charting vocabula
 | `encoding.y` | ✅ | ✅ | 🔵 `.value(y:)` | 🔵 | 🔵 | Same as `x` |
 | `encoding.x2` (spec 1.1) | ✅ range bars: each bar spans `x` to `x2` in `y`'s bands; an end before its start is normalised; the domain covers both ends and is not forced through zero | ✅ `x2` (field only; shares `x`'s type and scale) | 🔵 `BarMark(xStart:xEnd:y:)` | 🟡 floating bars via a custom column layer; where unavailable, a bar from the axis origin to `x2` | 🔵 | Only with `mark: "bar"` and an `x` of the same `quantitative` or `temporal` type (`parseSpec` rejects anything else). The Gantt / timeline basis |
 | `encoding.y2` (spec 1.1) | ✅ vertical range bars, as `x2` | ✅ `y2` | 🔵 `BarMark(x:yStart:yEnd:)` | 🟡 as `x2` | 🔵 | As `x2`, on y |
+| `encoding.id` / `encoding.parent` (spec 1.1) | ✅ `tree` only: `id` names each row (unique), `parent` names its parent's id (`null` for a root; several roots make a forest) | ⛔ (no `tree`) | 🟡 `TreeLayout` | 🟡 | 🔵 | Both required with `mark: "tree"` and rejected on every other mark; a `tree` takes no `x` / `y` / `x2` / `y2`. Row errors (duplicate id, unknown parent, cycle) are reported with the row number |
+| `encoding.label` (spec 1.1) | ✅ `tree` only: the node text | ⛔ | 🟡 | 🟡 | 🔵 | Ignored → the node's id |
 | `encoding.color` | ✅ | ✅ | 🔵 `.foregroundStyle(by:)` | 🔵 | 🔵 | Ignored → single default series colour |
 | `encoding.size` | ✅ point only | ✅ | 🟡 `.symbolSize(by:)` (point only) | 🟡 | 🔵 | Ignored → default mark size |
 | `encoding.opacity` | 🟡 parsed, not resolved | ✅ | 🟡 limited | 🟡 | 🔵 | Ignored → fully opaque marks |
+
+### Mark options
+
+| Field | TS core | Vega-Lite | Swift Charts | Compose | Media | Degradation when unsupported |
+| --- | --- | --- | --- | --- | --- | --- |
+| `tree.orientation` (spec 1.1) | ✅ `vertical` (roots on top, default) or `horizontal` (roots on the left) | ⛔ | 🟡 | 🟡 | 🔵 | Ignored → vertical |
+| `tree.linkStyle` (spec 1.1) | ✅ `orthogonal` (default) or `curved` | ⛔ | 🟡 | 🟡 | 🔵 | Ignored → orthogonal |
+
+`tree` is rejected on any mark other than `tree`.
 
 ### Encoding field types
 
@@ -588,7 +639,7 @@ The TS core never resolves references itself: `computeContext` takes already-res
 
 **The rule (owner decision on #255 / #256):** versions are `major.minor`, and `SPEC_VERSION` is the one a new spec should declare (`'1.1'`).
 
-- **A minor version only adds.** Every `'1'` spec is a valid `'1.1'` spec and renders the same. New channels and marks come in a minor version and need a row in this matrix first. `'1.1'` adds `encoding.x2` / `encoding.y2`, and `parseSpec` rejects them in a `'1'` spec.
+- **A minor version only adds.** Every `'1'` spec is a valid `'1.1'` spec and renders the same. New channels and marks come in a minor version and need a row in this matrix first. `'1.1'` adds `encoding.x2` / `encoding.y2`, the `tree` mark with its `id` / `parent` / `label` channels and `tree` options, and `parseSpec` rejects all of them in a `'1'` spec.
 - **Degradation across minors is defined:** an interpreter given a newer `1.x` spec ignores channels it does not know, and renders a mark it does not know through the data-table fallback, never an empty plot. A new major version is a break, and an interpreter rejects it with a clear error.
 - **What is implemented today:** this release accepts `'1'` and `'1.1'` exactly. Interpreters published before it (spec `'1'` only) close every object, so they reject a `'1.1'` document rather than ignore its range channels. Accepting newer `1.x` minors and the data-table fallback are tracked in #304.
 

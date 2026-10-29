@@ -3,7 +3,7 @@ import { isDataRef, validateSpec, type ChartSpec } from '../spec/index.ts';
 import type { Node as ProseMirrorNode } from 'prosemirror-model';
 import type { EditorView, NodeView } from 'prosemirror-view';
 import type { ChartNodeAttrs } from './node-spec.ts';
-import { renderContextToSvg } from './render-svg.ts';
+import { renderContextToSvg, renderTreeOutline } from './render-svg.ts';
 
 /** Resolves a data reference to rows. The host (CMS) owns how refs are fetched. */
 export type DataResolver = (spec: ChartSpec) => DataRows | Promise<DataRows>;
@@ -118,7 +118,8 @@ export class ChartNodeView implements NodeView {
     const box = this.measureBox();
     try {
       const context = computeContext(spec, box, rows);
-      this.dom.innerHTML = renderContextToSvg(context, { title: spec.config?.title });
+      this.dom.innerHTML =
+        renderContextToSvg(context, { title: spec.config?.title }) + renderTreeOutline(context);
     } catch (error) {
       this.renderMessage(error instanceof Error ? error.message : 'Failed to render chart');
     }

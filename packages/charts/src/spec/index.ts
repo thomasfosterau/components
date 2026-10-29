@@ -13,6 +13,7 @@ export {
   SPEC_VERSION,
   type SpecVersion,
   type Mark,
+  type TreeOptions,
   type FieldType,
   type Channel,
   type Encoding,

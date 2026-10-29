@@ -67,10 +67,49 @@ function rangeErrors(spec: ChartSpec): ReadonlyArray<string> {
   return Arr.flatMap(RANGE_PAIRS, ([end, start]) => rangePairErrors(spec, end, start));
 }
 
+/** The channels only the `tree` mark takes, and the positional ones it does not. */
+const TREE_CHANNELS = ['id', 'parent', 'label'] as const;
+const POSITIONAL_CHANNELS = ['x', 'y', 'x2', 'y2'] as const;
+
+/**
+ * The `tree` mark's rules (spec 1.1): it needs `'1.1'` and `id` + `parent`,
+ * takes no positional channel (position is laid out, not encoded), and its
+ * channels and `tree` options are invalid on any other mark. The row-level
+ * rules (unique ids, known parents, no cycles) need the rows, so the core
+ * checks them when it lays the tree out.
+ */
+function treeErrors(spec: ChartSpec): ReadonlyArray<string> {
+  const present = (names: ReadonlyArray<keyof ChartSpec['encoding']>) =>
+    Arr.filter(names, (name) => spec.encoding[name] !== undefined);
+  if (spec.mark !== 'tree') {
+    return Arr.appendAll(
+      Arr.map(
+        present(TREE_CHANNELS),
+        (name) => `["encoding"]["${name}"]: only valid with mark "tree"`,
+      ),
+      spec.tree === undefined ? [] : ['["tree"]: only valid with mark "tree"'],
+    );
+  }
+  return Arr.getSomes([
+    spec.specVersion === '1'
+      ? Option.some('["mark"]: "tree" needs specVersion "1.1"')
+      : Option.none(),
+    spec.encoding.id === undefined
+      ? Option.some('["encoding"]["id"]: mark "tree" needs an id channel')
+      : Option.none(),
+    spec.encoding.parent === undefined
+      ? Option.some('["encoding"]["parent"]: mark "tree" needs a parent channel')
+      : Option.none(),
+    ...Arr.map(present(POSITIONAL_CHANNELS), (name) =>
+      Option.some(`["encoding"]["${name}"]: mark "tree" lays out position; it takes no "${name}"`),
+    ),
+  ]);
+}
+
 function decode(input: unknown): ValidationResult {
   return Result.match(decodeChartSpec(input), {
     onSuccess: (value): ValidationResult =>
-      Arr.match(rangeErrors(value), {
+      Arr.match(Arr.appendAll(rangeErrors(value), treeErrors(value)), {
         onEmpty: (): ValidationResult => ({ ok: true, value }),
         onNonEmpty: (errors): ValidationResult => ({ ok: false, errors }),
       }),

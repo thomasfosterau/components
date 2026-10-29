@@ -150,3 +150,17 @@ describe('Chart SSR', () => {
     });
   });
 });
+
+describe('tree mark (spec 1.1) in SSR', () => {
+  it('draws boxes and links beside a nested list in depth-first order', async () => {
+    const { taxonomy, TAXONOMY_ORDER } = await import('../fixtures/taxonomy.ts');
+    const { body } = render(Chart, { props: { spec: taxonomy } });
+    expect(body).toContain('role="img"');
+    expect(body.match(/<rect /g)).toHaveLength(6);
+    expect(body.match(/<path /g)).toHaveLength(5);
+    const order = [...body.matchAll(/<li>\s*(?:<!---->)?\s*([^<,]+)/g)].map((match) =>
+      (match[1] ?? '').trim(),
+    );
+    expect(order).toEqual([...TAXONOMY_ORDER]);
+  });
+});

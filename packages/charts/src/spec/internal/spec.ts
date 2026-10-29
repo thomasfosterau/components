@@ -3,7 +3,7 @@ import { Config } from './config.ts';
 import { Data } from './data.ts';
 import { Encoding } from './encoding.ts';
 import { Extensions } from './extensions.ts';
-import { Mark } from './mark.ts';
+import { Mark, TreeOptions } from './mark.ts';
 import { Scales } from './scales.ts';
 
 // The `typeof X.Type` aliases below deliberately share their names with the
@@ -11,7 +11,7 @@ import { Scales } from './scales.ts';
 // asserts each pair equal. Neither barrel re-exports this module.
 // fallow-ignore-file duplicate-export
 
-/** The spec versions this interpreter accepts (`'1.1'` adds the `x2` / `y2` channels). */
+/** The spec versions this interpreter accepts (`'1.1'` adds the `x2` / `y2` channels and the `tree` mark). */
 const SpecVersion = Schema.Literals(['1', '1.1']).annotate({
   identifier: 'SpecVersion',
   description: 'The portable chart spec version this document conforms to.',
@@ -31,6 +31,7 @@ export const ChartSpec = Schema.Struct({
   scales: Schema.optionalKey(Scales),
   config: Schema.optionalKey(Config),
   extensions: Schema.optionalKey(Extensions),
+  tree: Schema.optionalKey(TreeOptions),
 }).annotate({
   identifier: 'ChartSpec',
   title: 'Portable Chart Specification',

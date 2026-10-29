@@ -22,7 +22,10 @@ import type {
   Encoding as SchemaEncoding,
 } from '../../src/spec/internal/encoding.ts';
 import type { Extensions as SchemaExtensions } from '../../src/spec/internal/extensions.ts';
-import type { Mark as SchemaMark } from '../../src/spec/internal/mark.ts';
+import type {
+  Mark as SchemaMark,
+  TreeOptions as SchemaTreeOptions,
+} from '../../src/spec/internal/mark.ts';
 import type {
   ScaleHint as SchemaScaleHint,
   Scales as SchemaScales,
@@ -40,6 +43,7 @@ type Assert<T extends true> = T;
 
 // Parity assertions (compile-time only), against each schema's `typeof X.Type` alias.
 type _MarkParity = Assert<Equals<Public.Mark, SchemaMark>>;
+type _TreeOptionsParity = Assert<Equals<Public.TreeOptions, SchemaTreeOptions>>;
 type _FieldTypeParity = Assert<Equals<Public.FieldType, SchemaFieldType>>;
 type _ChannelParity = Assert<Equals<Public.Channel, SchemaChannel>>;
 type _EncodingParity = Assert<Equals<Public.Encoding, SchemaEncoding>>;
@@ -61,6 +65,7 @@ describe('type parity', () => {
     // The assertions above are the real test; this keeps vitest happy.
     const witnesses: [
       _MarkParity,
+      _TreeOptionsParity,
       _FieldTypeParity,
       _ChannelParity,
       _EncodingParity,
@@ -77,6 +82,7 @@ describe('type parity', () => {
       _SpecVersionParity,
       _ChartSpecParity,
     ] = [
+      true,
       true,
       true,
       true,

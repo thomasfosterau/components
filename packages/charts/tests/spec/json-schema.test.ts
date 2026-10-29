@@ -63,7 +63,7 @@ describe('JSON Schema artifact', () => {
     it('mark and field type are plain string enums', () => {
       expect(emitted.$defs['Mark']).toMatchObject({
         type: 'string',
-        enum: ['bar', 'line', 'point', 'area'],
+        enum: ['bar', 'line', 'point', 'area', 'tree'],
       });
       expect(emitted.$defs['FieldType']).toMatchObject({
         type: 'string',

@@ -17,9 +17,10 @@
         "bar",
         "line",
         "point",
-        "area"
+        "area",
+        "tree"
       ],
-      "description": "The mark (geometric primitive) used to render the chart. Restricted to the intersection of native charting vocabularies."
+      "description": "The mark (geometric primitive) used to render the chart. The native-charting intersection, plus \"tree\" (spec 1.1): a hierarchy laid out by the interpreter."
     },
     "FieldType": {
       "type": "string",
@@ -85,6 +86,60 @@
       "additionalProperties": false,
       "description": "Spec 1.1: the end of a range on y. With mark \"bar\", each bar spans y to y2. Same type as y, quantitative or temporal."
     },
+    "Channel_3": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "The name of the field in each datum that this channel reads."
+        },
+        "type": {
+          "$ref": "#/$defs/FieldType"
+        }
+      },
+      "required": [
+        "field",
+        "type"
+      ],
+      "additionalProperties": false,
+      "description": "Spec 1.1, mark \"tree\": the field naming each row; ids are unique."
+    },
+    "Channel_4": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "The name of the field in each datum that this channel reads."
+        },
+        "type": {
+          "$ref": "#/$defs/FieldType"
+        }
+      },
+      "required": [
+        "field",
+        "type"
+      ],
+      "additionalProperties": false,
+      "description": "Spec 1.1, mark \"tree\": the field holding the parent row's id; null (or absent) for a root."
+    },
+    "Channel_5": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "The name of the field in each datum that this channel reads."
+        },
+        "type": {
+          "$ref": "#/$defs/FieldType"
+        }
+      },
+      "required": [
+        "field",
+        "type"
+      ],
+      "additionalProperties": false,
+      "description": "Spec 1.1, mark \"tree\": the text of each node; defaults to its id."
+    },
     "Encoding": {
       "type": "object",
       "properties": {
@@ -99,6 +154,15 @@
         },
         "y2": {
           "$ref": "#/$defs/Channel_2"
+        },
+        "id": {
+          "$ref": "#/$defs/Channel_3"
+        },
+        "parent": {
+          "$ref": "#/$defs/Channel_4"
+        },
+        "label": {
+          "$ref": "#/$defs/Channel_5"
         },
         "color": {
           "$ref": "#/$defs/Channel"
@@ -264,6 +328,29 @@
       "type": "object",
       "description": "Web-only, non-portable hints. Native interpreters ignore this entirely."
     },
+    "TreeOptions": {
+      "type": "object",
+      "properties": {
+        "orientation": {
+          "type": "string",
+          "enum": [
+            "vertical",
+            "horizontal"
+          ],
+          "description": "Vertical: roots at the top. Horizontal: roots at the start edge."
+        },
+        "linkStyle": {
+          "type": "string",
+          "enum": [
+            "orthogonal",
+            "curved"
+          ],
+          "description": "How a parent joins its children."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Spec 1.1: layout options of the \"tree\" mark. Only valid with mark \"tree\"."
+    },
     "ChartSpec": {
       "type": "object",
       "properties": {
@@ -287,6 +374,9 @@
         },
         "extensions": {
           "$ref": "#/$defs/Extensions"
+        },
+        "tree": {
+          "$ref": "#/$defs/TreeOptions"
         }
       },
       "required": [

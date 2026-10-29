@@ -11,6 +11,7 @@ export {
   VEGA_LITE_SCHEMA,
   VegaLiteEmitError,
   type EmitVegaLiteOptions,
+  type VegaLiteEmitErrorReason,
 } from './emit.ts';
 
 export type {

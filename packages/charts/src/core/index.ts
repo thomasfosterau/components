@@ -35,6 +35,7 @@ export { buildLineGeometry } from './geometry/line.ts';
 export { buildAreaGeometry } from './geometry/area.ts';
 export { buildBarGeometry } from './geometry/bar.ts';
 export { buildPointGeometry } from './geometry/point.ts';
+export { buildTreeGeometry, outlineText, VISUALLY_HIDDEN_STYLE } from './geometry/tree.ts';
 
 export type {
   Box,
@@ -58,6 +59,10 @@ export type {
   Geometry,
   LineGeometry,
   PointCircle,
+  TreeGeometry,
+  TreeLink,
+  TreeNodeBox,
+  TreeOutlineNode,
   PointGeometry,
   Series,
   SeriesPoint,

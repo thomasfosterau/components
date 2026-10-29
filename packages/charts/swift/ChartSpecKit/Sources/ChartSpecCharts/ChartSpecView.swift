@@ -44,7 +44,16 @@ public struct ChartSpecView: View {
 
     @ViewBuilder
     private var chart: some View {
-        if spec.mark == .bar, let x = spec.encoding.x, let y = spec.encoding.y,
+        if spec.mark == .tree {
+            // Spec 1.1: laid out by TreeLayout and drawn outside Swift Charts,
+            // which has no tree layout. Invalid rows render an empty plot.
+            if let layout = try? TreeLayout.layout(spec: spec, rows: rows) {
+                TreeChart(layout: layout, vertical: spec.tree?.orientation != .horizontal,
+                          curved: spec.tree?.linkStyle == .curved, title: spec.config?.title)
+            } else {
+                Chart {}
+            }
+        } else if spec.mark == .bar, let x = spec.encoding.x, let y = spec.encoding.y,
            let end = spec.encoding.x2 ?? spec.encoding.y2 {
             // Spec 1.1 range bars: x2 spans along x in y's bands, y2 along y in x's.
             let horizontal = spec.encoding.x2 != nil
@@ -171,7 +180,8 @@ public struct ChartSpecView: View {
         case .point:
             buildMark(PointMarkBuilder.self, xLabel: xLabel, x: x, yLabel: yLabel, y: y)
                 .foregroundStyleIfPresent(colorLabel: colorLabel, category: colorCategory)
-        case .area:
+        case .area, .tree:
+            // `tree` never reaches here (it is drawn by TreeChart); area is the fallback shape.
             buildMark(AreaMarkBuilder.self, xLabel: xLabel, x: x, yLabel: yLabel, y: y)
                 .foregroundStyleIfPresent(colorLabel: colorLabel, category: colorCategory)
         }
@@ -206,6 +216,97 @@ public struct ChartSpecView: View {
         case let (.categorical(xv), .categorical(yv)):
             return Builder.make(x: .value(xLabel, xv), y: .value(yLabel, yv))
         }
+    }
+}
+
+// MARK: - Tree (spec 1.1)
+
+/// Draws a ``TreeLayout``: links under labelled node boxes, scaled to the view.
+/// Assistive technology gets the hierarchy itself as the view's accessibility
+/// children, depth-first, each named by its label and colour category.
+@available(iOS 16.0, macOS 13.0, watchOS 9.0, tvOS 16.0, *)
+private struct TreeChart: View {
+    let layout: TreeLayout
+    let vertical: Bool
+    let curved: Bool
+    let title: String?
+
+    private let nodeHeight: CGFloat = 28
+
+    var body: some View {
+        Canvas { context, size in
+            let frames = nodeFrames(in: size)
+            for node in layout.nodes {
+                guard let parentId = node.parentId, let from = frames[parentId], let to = frames[node.id] else { continue }
+                context.stroke(linkPath(from: from, to: to), with: .color(.gray), lineWidth: 1)
+            }
+            for node in layout.nodes {
+                guard let frame = frames[node.id] else { continue }
+                let box = Path(roundedRect: frame, cornerRadius: 4)
+                context.fill(box, with: .color(.white))
+                context.stroke(box, with: .color(.accentColor), lineWidth: 1.5)
+                context.draw(Text(node.label).font(.caption), at: CGPoint(x: frame.midX, y: frame.midY))
+            }
+        }
+        .frame(minHeight: 200)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(title ?? "Tree")
+        .accessibilityChildren {
+            ForEach(layout.nodes) { node in
+                Text(node.category.map { "\(node.label), \($0)" } ?? node.label)
+                    .accessibilityValue("Level \(node.depth + 1)")
+            }
+        }
+    }
+
+    private func nodeFrames(in size: CGSize) -> [String: CGRect] {
+        let breadth = vertical ? size.width : size.height
+        let length = vertical ? size.height : size.width
+        let slotSize = breadth / CGFloat(layout.leaves)
+        var frames: [String: CGRect] = [:]
+        for node in layout.nodes {
+            let estimate = CGFloat(node.label.count) * 7 + 16
+            let width = max(min(estimate, vertical ? slotSize - 4 : length / CGFloat(max(layout.maxDepth, 1)) - 16), 24)
+            let height = vertical ? nodeHeight : min(nodeHeight, slotSize - 4)
+            let centre = (CGFloat(node.slot) + 0.5) * slotSize
+            let depthStart = layout.maxDepth == 0
+                ? 0
+                : CGFloat(node.depth) / CGFloat(layout.maxDepth) * (length - (vertical ? height : width))
+            frames[node.id] = vertical
+                ? CGRect(x: centre - width / 2, y: depthStart, width: width, height: height)
+                : CGRect(x: depthStart, y: centre - height / 2, width: width, height: height)
+        }
+        return frames
+    }
+
+    private func linkPath(from: CGRect, to: CGRect) -> Path {
+        var path = Path()
+        if vertical {
+            let start = CGPoint(x: from.midX, y: from.maxY)
+            let end = CGPoint(x: to.midX, y: to.minY)
+            let mid = (start.y + end.y) / 2
+            path.move(to: start)
+            if curved {
+                path.addCurve(to: end, control1: CGPoint(x: start.x, y: mid), control2: CGPoint(x: end.x, y: mid))
+            } else {
+                path.addLine(to: CGPoint(x: start.x, y: mid))
+                path.addLine(to: CGPoint(x: end.x, y: mid))
+                path.addLine(to: end)
+            }
+        } else {
+            let start = CGPoint(x: from.maxX, y: from.midY)
+            let end = CGPoint(x: to.minX, y: to.midY)
+            let mid = (start.x + end.x) / 2
+            path.move(to: start)
+            if curved {
+                path.addCurve(to: end, control1: CGPoint(x: mid, y: start.y), control2: CGPoint(x: mid, y: end.y))
+            } else {
+                path.addLine(to: CGPoint(x: mid, y: start.y))
+                path.addLine(to: CGPoint(x: mid, y: end.y))
+                path.addLine(to: end)
+            }
+        }
+        return path
     }
 }
 

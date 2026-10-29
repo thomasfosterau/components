@@ -25,9 +25,24 @@ export interface EmitVegaLiteOptions {
   readonly height?: number | undefined;
 }
 
-/** Thrown when a spec cannot be represented in Vega-Lite. */
+/** Why a spec could not be emitted: a mark Vega-Lite has no equivalent for, or data the host must resolve. */
+export type VegaLiteEmitErrorReason = 'unsupported-mark' | 'unresolved-data';
+
+/**
+ * Thrown when a spec cannot be represented in Vega-Lite. `reason` says
+ * which way, so a host can fall back without parsing the message: on
+ * `'unsupported-mark'` (the `tree` mark, ⛔ in the capability matrix) render
+ * the spec with a TS interpreter instead, which also carries the
+ * nested-list text alternative.
+ */
 export class VegaLiteEmitError extends Error {
   override readonly name = 'VegaLiteEmitError';
+  readonly reason: VegaLiteEmitErrorReason;
+
+  constructor(message: string, reason: VegaLiteEmitErrorReason = 'unresolved-data') {
+    super(message);
+    this.reason = reason;
+  }
 }
 
 /**
@@ -40,6 +55,12 @@ export class VegaLiteEmitError extends Error {
  * Web-only `extensions` are ignored, per the capability matrix.
  */
 export function emitVegaLite(spec: ChartSpec, options?: EmitVegaLiteOptions): VegaLiteSpec {
+  if (spec.mark === 'tree') {
+    throw new VegaLiteEmitError(
+      'Vega-Lite has no tree layout (that is full Vega); render a "tree" spec with a TS interpreter',
+      'unsupported-mark',
+    );
+  }
   return {
     $schema: VEGA_LITE_SCHEMA,
     ...(spec.config?.title !== undefined ? { title: spec.config.title } : {}),

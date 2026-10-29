@@ -127,6 +127,64 @@ final class ChartSpecTests: XCTestCase {
         XCTAssertNil(spec.encoding.y2)
     }
 
+    func testLaysOutATreeDepthFirstWithParentsCentred() throws {
+        let json = """
+        {
+          "specVersion": "1.1",
+          "mark": "tree",
+          "encoding": {
+            "id": { "field": "id", "type": "nominal" },
+            "parent": { "field": "parent", "type": "nominal" },
+            "label": { "field": "name", "type": "nominal" }
+          },
+          "data": {
+            "values": [
+              { "id": "solanaceae", "parent": null, "name": "Solanaceae" },
+              { "id": "solanum", "parent": "solanaceae", "name": "Solanum" },
+              { "id": "tomato", "parent": "solanum", "name": "S. lycopersicum" },
+              { "id": "aubergine", "parent": "solanum", "name": "S. melongena" },
+              { "id": "capsicum", "parent": "solanaceae", "name": "Capsicum" },
+              { "id": "chilli", "parent": "capsicum", "name": "C. annuum" }
+            ]
+          },
+          "tree": { "orientation": "vertical", "linkStyle": "curved" }
+        }
+        """.data(using: .utf8)!
+
+        let spec = try ChartSpec.decode(from: json)
+        XCTAssertEqual(spec.mark, .tree)
+        XCTAssertEqual(spec.tree?.linkStyle, .curved)
+        guard case .inline(let rows) = spec.data else { return XCTFail("Expected inline data") }
+
+        let layout = try TreeLayout.layout(spec: spec, rows: rows)
+        XCTAssertEqual(layout.nodes.map(\.label),
+                       ["Solanaceae", "Solanum", "S. lycopersicum", "S. melongena", "Capsicum", "C. annuum"])
+        XCTAssertEqual(layout.leaves, 3)
+        XCTAssertEqual(layout.maxDepth, 2)
+        let slot = Dictionary(uniqueKeysWithValues: layout.nodes.map { ($0.id, $0.slot) })
+        XCTAssertEqual(slot["solanum"], 0.5)
+        XCTAssertEqual(slot["solanaceae"], 1.25)
+    }
+
+    func testTreeLayoutNamesTheBadRow() throws {
+        let json = """
+        {
+          "specVersion": "1.1",
+          "mark": "tree",
+          "encoding": {
+            "id": { "field": "id", "type": "nominal" },
+            "parent": { "field": "parent", "type": "nominal" }
+          },
+          "data": { "values": [ { "id": "a", "parent": "ghost" } ] }
+        }
+        """.data(using: .utf8)!
+        let spec = try ChartSpec.decode(from: json)
+        guard case .inline(let rows) = spec.data else { return XCTFail("Expected inline data") }
+        XCTAssertThrowsError(try TreeLayout.layout(spec: spec, rows: rows)) { error in
+            XCTAssertEqual(error as? TreeLayoutError, .unknownParent(row: 1, parent: "ghost"))
+        }
+    }
+
     // MARK: Rejecting invalid specs
 
     func testRejectsUnknownSpecVersion() {

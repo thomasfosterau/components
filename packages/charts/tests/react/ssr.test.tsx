@@ -194,3 +194,17 @@ describe('range bars (spec 1.1) in SSR', () => {
     expect(html).toContain('Planting calendar');
   });
 });
+
+describe('tree mark (spec 1.1) in SSR', () => {
+  it('draws a box per node and a link per child, and a nested list in depth-first order', async () => {
+    const { taxonomy, TAXONOMY_ORDER, listOrder } = await import('../fixtures/taxonomy.ts');
+    const html = renderToStaticMarkup(<Chart spec={taxonomy} />);
+    expect(html).toContain('role="img" aria-label="Nightshades"');
+    expect(html.match(/<rect /g)).toHaveLength(6);
+    expect(html.match(/<path /g)).toHaveLength(5);
+    expect(html).not.toContain('data-axes');
+    expect(listOrder(html)).toEqual([...TAXONOMY_ORDER]);
+    expect(html).toContain('S. lycopersicum, grown');
+    expect(html).toMatch(/<\/svg><div style="[^"]*clip:rect\(0,0,0,0\)/);
+  });
+});

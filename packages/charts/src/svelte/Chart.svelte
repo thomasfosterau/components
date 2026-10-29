@@ -11,7 +11,8 @@
 <script lang="ts">
   import type { ChartSpec } from '@thomasfosterau/charts';
   import type { DataRows, Margins } from '@thomasfosterau/charts/core';
-  import { resolveChart } from '@thomasfosterau/charts/core';
+  import { outlineText, resolveChart, VISUALLY_HIDDEN_STYLE } from '@thomasfosterau/charts/core';
+  import type { TreeOutlineNode } from '@thomasfosterau/charts/core';
   import type { Snippet } from 'svelte';
   import type { SVGAttributes } from 'svelte/elements';
   import ChartAxes from './ChartAxes.svelte';
@@ -85,8 +86,24 @@
       >
     {/if}
     <g transform="translate({dimensions.margins.left},{dimensions.margins.top})">
-      <ChartAxes {ticks} plot={dimensions.plot} />
+      {#if geometry.mark !== 'tree'}<ChartAxes {ticks} plot={dimensions.plot} />{/if}
       <ChartMarks {geometry} />
     </g>
   </svg>
+  {#if geometry.mark === 'tree'}
+    <!-- A tree's children are presentational inside role="img", so its text
+         alternative (the nested outline) is a sibling of the SVG. -->
+    <div style={VISUALLY_HIDDEN_STYLE} data-chart-outline="">{@render outlineList(geometry.outline)}</div>
+  {/if}
 {/if}
+
+{#snippet outlineList(nodes: ReadonlyArray<TreeOutlineNode>)}
+  <ul>
+    {#each nodes as node (node.id)}
+      <li>
+        {outlineText(node)}
+        {#if node.children.length > 0}{@render outlineList(node.children)}{/if}
+      </li>
+    {/each}
+  </ul>
+{/snippet}
