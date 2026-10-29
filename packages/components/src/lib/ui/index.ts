@@ -27,6 +27,7 @@ export { default as Card } from './Card.svelte';
 export { default as Chip } from './Chip.svelte';
 export { default as ConfirmButton } from './ConfirmButton.svelte';
 export { default as Disclosure } from './Disclosure.svelte';
+export { default as Divider } from './Divider.svelte';
 export { default as DropdownMenu } from './DropdownMenu.svelte';
 export { default as EmptyState } from './EmptyState.svelte';
 export { default as ExternalLink } from './ExternalLink.svelte';
