@@ -154,6 +154,39 @@ export const rangeTone: Record<Tone, string> = {
   error: 'range-error',
 };
 
+/** Where a `Divider`'s label sits along the rule. */
+export type DividerAlign = 'start' | 'center' | 'end';
+
+/** Literal daisyUI class per `Tone` for `Divider`; a lookup table so Tailwind's scanner sees every class. */
+export const dividerTone: Record<Tone, string> = {
+  neutral: 'divider-neutral',
+  primary: 'divider-primary',
+  secondary: 'divider-secondary',
+  accent: 'divider-accent',
+  info: 'divider-info',
+  success: 'divider-success',
+  warning: 'divider-warning',
+  error: 'divider-error',
+};
+
+/** Literal daisyUI class per `DividerAlign` for `Divider`; a lookup table so Tailwind's scanner sees every class. */
+export const dividerAlign: Record<DividerAlign, string> = {
+  start: 'divider-start',
+  center: '',
+  end: 'divider-end',
+};
+
+/**
+ * Literal daisyUI class per rule direction for `Divider`. daisyUI names the
+ * LAYOUT, not the rule: `divider-horizontal` sits between side-by-side items
+ * and so draws a vertical rule. This table hides the inversion behind the
+ * direction the rule actually runs.
+ */
+export const dividerOrientation: Record<'horizontal' | 'vertical', string> = {
+  horizontal: 'divider-vertical',
+  vertical: 'divider-horizontal',
+};
+
 /** Plain background classes, for a segment or swatch without a component prefix. */
 export const backgroundTone: Record<Tone, string> = {
   neutral: 'bg-neutral',
