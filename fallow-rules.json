@@ -85,6 +85,7 @@
         "@thomasfosterau/components/charts",
         "@thomasfosterau/components/tips",
         "@thomasfosterau/components/hotkeys",
+        "@thomasfosterau/components/dates",
         "@thomasfosterau/components/seo",
         "@thomasfosterau/components/entity-form",
         "@thomasfosterau/components/theme.css"

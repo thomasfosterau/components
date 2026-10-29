@@ -12,6 +12,7 @@
     "packages/components/src/lib/charts/index.ts",
     "packages/components/src/lib/tips/index.ts",
     "packages/components/src/lib/hotkeys/index.ts",
+    "packages/components/src/lib/fields/dates.ts",
     "packages/components/src/lib/seo/index.ts",
     "packages/components/src/lib/forms/entity-form.ts",
     "packages/components/src/lib/ui/context-menu.ts",
