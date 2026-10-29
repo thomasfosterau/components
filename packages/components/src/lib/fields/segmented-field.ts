@@ -6,7 +6,7 @@
  * @module
  */
 
-import type { CalendarDateTime, Time, ZonedDateTime } from '@internationalized/date';
+import type { CalendarDateTime, DateValue, Time, ZonedDateTime } from '@internationalized/date';
 import type { HTMLAttributes } from 'svelte/elements';
 import { definedProps, firstLocale } from './calendar-props.ts';
 import type { FieldSize } from './field-types.ts';
@@ -102,5 +102,96 @@ export function segmentedField(
       required,
     },
     group: { id, name, labelId, describedBy, invalid, disabled, size, attributes },
+  };
+}
+
+/** The props `DatePicker` and `DateRangePicker` add to the segmented field: the calendar popover's. */
+export interface PickerProps {
+  /** Whether the calendar popover is open. Bindable. */
+  open?: boolean | undefined;
+  /** Days that cannot be chosen at all; rendered disabled. */
+  isDateDisabled?: ((date: DateValue) => boolean) | undefined;
+  /** Days shown but marked unavailable: booked, frost, closed. */
+  isDateUnavailable?: ((date: DateValue) => boolean) | undefined;
+  /** 0 = Sunday … 6 = Saturday; omitted, the locale's own week start. */
+  weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | undefined;
+  /**
+   * Months shown side by side in the popover.
+   * @defaultValue `1`
+   */
+  numberOfMonths?: number | undefined;
+  /**
+   * Accessible name of the calendar trigger button.
+   * @defaultValue `'Choose date'`
+   */
+  triggerLabel?: string | undefined;
+  /**
+   * Accessible name of the popover's calendar.
+   * @defaultValue `'Calendar'`
+   */
+  calendarLabel?: string | undefined;
+  /**
+   * Accessible name of the previous-month button.
+   * @defaultValue `'Previous month'`
+   */
+  previousLabel?: string | undefined;
+  /**
+   * Accessible name of the next-month button.
+   * @defaultValue `'Next month'`
+   */
+  nextLabel?: string | undefined;
+}
+
+/** What `pickerField` hands a picker: the bits-ui root's options, the segment group's, and the popover's labels. */
+export interface PickerField {
+  readonly root: Record<string, unknown>;
+  readonly group: SegmentGroupOptions;
+  readonly triggerLabel: string;
+  readonly calendarLabel: string;
+  readonly months: {
+    readonly locale: string;
+    readonly previousLabel: string;
+    readonly nextLabel: string;
+  };
+}
+
+/**
+ * Split a picker's props (the segmented field's plus the popover's) into
+ * what the bits-ui root, `SegmentGroup` and `PickerPopover` take, defaults
+ * applied. One function, so `DatePicker` and `DateRangePicker` cannot
+ * disagree about a default.
+ */
+export function pickerField(
+  props: SegmentedFieldProps & Omit<PickerProps, 'open'>,
+  contextLocale: string | readonly string[] | undefined,
+): PickerField {
+  const {
+    isDateDisabled,
+    isDateUnavailable,
+    weekStartsOn,
+    numberOfMonths = 1,
+    triggerLabel = 'Choose date',
+    calendarLabel = 'Calendar',
+    previousLabel = 'Previous month',
+    nextLabel = 'Next month',
+    ...fieldProps
+  } = props;
+  const field = segmentedField(fieldProps, contextLocale);
+  return {
+    root: {
+      ...field.root,
+      ...definedProps({ isDateDisabled, isDateUnavailable, weekStartsOn }),
+      numberOfMonths,
+      calendarLabel,
+      weekdayFormat: 'short',
+    },
+    group: field.group,
+    triggerLabel,
+    calendarLabel,
+    months: {
+      locale: firstLocale(fieldProps.locales ?? contextLocale) ?? 'en',
+      previousLabel,
+      nextLabel,
+    },
   };
 }
