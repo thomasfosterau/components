@@ -10,14 +10,18 @@
  * #129 failure mode). `DateInput`, the native control, stays in the barrel
  * and remains the default for a single date on a form.
  *
- * `parseDate` and the `DateValue` type are re-exported so a caller converts
- * at the edge without a direct dependency: `parseDate('2026-10-23')` in,
- * `value.toString()` (ISO `YYYY-MM-DD`) out.
+ * `parseDate`, `parseTime`, `Time` and the `DateValue` type are re-exported
+ * so a caller converts at the edge without a direct dependency:
+ * `parseDate('2026-10-23')` / `parseTime('14:30')` in, `value.toString()`
+ * (ISO) out.
  *
  * @module
  */
 
 export { default as Calendar } from './Calendar.svelte';
+export { default as DateField } from './DateField.svelte';
 export { default as RangeCalendar } from './RangeCalendar.svelte';
+export { default as TimeField } from './TimeField.svelte';
 export type { CalendarBaseProps } from './calendar-props.ts';
-export { parseDate, type DateValue } from '@internationalized/date';
+export type { SegmentedFieldProps, TimeValue } from './segmented-field.ts';
+export { parseDate, parseTime, Time, type DateValue } from '@internationalized/date';
