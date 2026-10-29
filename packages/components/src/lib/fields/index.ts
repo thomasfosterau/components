@@ -19,6 +19,7 @@ export { default as Checkbox } from './Checkbox.svelte';
 export { default as CheckboxGroup } from './CheckboxGroup.svelte';
 export { default as Combobox } from './Combobox.svelte';
 export { default as DateInput } from './DateInput.svelte';
+export { default as Dropzone } from './Dropzone.svelte';
 export { default as FieldErrors } from './FieldErrors.svelte';
 export { default as Fieldset } from './Fieldset.svelte';
 export { default as FileInput } from './FileInput.svelte';
@@ -45,3 +46,4 @@ export {
 export { default as VideoInput } from './VideoInput.svelte';
 
 export * from './field-types.ts';
+export type { FileRejection } from './file-validation.ts';

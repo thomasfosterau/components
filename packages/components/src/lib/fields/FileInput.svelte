@@ -25,6 +25,7 @@ A native file input in daisyUI `file-input` styling, with the chosen `File` bind
   import type { HTMLInputAttributes } from 'svelte/elements';
   import FieldErrors from './FieldErrors.svelte';
   import { fileInputSize, type FieldSize } from './field-types.ts';
+  import { exceedsSize } from './file-validation.ts';
 
   interface Props extends Omit<HTMLInputAttributes, 'type' | 'value' | 'files' | 'size'> {
     /** The chosen file; `undefined` when the control is empty. */
@@ -91,7 +92,7 @@ A native file input in daisyUI `file-input` styling, with the chosen `File` bind
       onSelect?.(undefined);
       return;
     }
-    if (maxBytes !== undefined && chosen.size > maxBytes) {
+    if (exceedsSize(chosen, maxBytes)) {
       tooLarge = true;
       // Clear the control too: leaving the name of a file that was refused
       // showing in the field is how someone submits and wonders what happened.
