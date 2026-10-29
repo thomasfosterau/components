@@ -1,0 +1,4 @@
+/* Tailwind for the Drawer placement tests only: the unit suite otherwise
+   loads no CSS. Scoped by @source to the feedback family's tables. */
+@import 'tailwindcss' source(none);
+@source '../../../src/lib/feedback';

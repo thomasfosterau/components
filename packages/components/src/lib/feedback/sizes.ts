@@ -72,3 +72,33 @@ export const stepsOrientation: Record<StepsOrientation, string> = {
   // A column on a phone, a row from `sm` up, as `statsOrientation` does.
   responsive: 'steps-vertical sm:steps-horizontal',
 };
+
+/** The edge a `Drawer` enters from; `start` / `end` follow the writing direction. */
+export type DrawerSide = 'start' | 'end' | 'top' | 'bottom';
+
+/** Literal placement classes per `DrawerSide`; a lookup table so Tailwind's scanner sees every class. */
+export const drawerSide: Record<DrawerSide, string> = {
+  start: 'inset-y-0 start-0 h-full max-w-[calc(100vw-2rem)]',
+  end: 'inset-y-0 end-0 h-full max-w-[calc(100vw-2rem)]',
+  top: 'inset-x-0 top-0 max-h-[85dvh] rounded-b-box',
+  bottom: 'inset-x-0 bottom-0 max-h-[85dvh] rounded-t-box',
+};
+
+/** Size steps of a `Drawer`: its width at `start` / `end`, its height at `top` / `bottom`. */
+export type DrawerSize = 'sm' | 'md' | 'lg' | 'full';
+
+/** Literal width class per `DrawerSize` for a `start` / `end` drawer. */
+export const drawerWidth: Record<DrawerSize, string> = {
+  sm: 'w-72',
+  md: 'w-96',
+  lg: 'w-[32rem]',
+  full: 'w-screen max-w-none',
+};
+
+/** Literal height class per `DrawerSize` for a `top` / `bottom` drawer. */
+export const drawerHeight: Record<DrawerSize, string> = {
+  sm: 'h-[33dvh]',
+  md: 'h-[50dvh]',
+  lg: 'h-[75dvh]',
+  full: 'h-dvh max-h-none rounded-none',
+};
