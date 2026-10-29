@@ -289,3 +289,14 @@ export const chipSwatchSize: Record<ChipSize, string> = {
   sm: 'size-2',
   md: 'size-2.5',
 };
+
+/** Which side the items behind a `Stack`'s top item peek out from. */
+export type StackDirection = 'top' | 'bottom' | 'start' | 'end';
+
+/** Literal daisyUI class per `StackDirection` for `Stack`; a lookup table so Tailwind's scanner sees every class. */
+export const stackDirection: Record<StackDirection, string> = {
+  top: 'stack-top',
+  bottom: 'stack-bottom',
+  start: 'stack-start',
+  end: 'stack-end',
+};
