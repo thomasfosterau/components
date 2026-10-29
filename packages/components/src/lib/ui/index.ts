@@ -45,6 +45,8 @@ export { default as Popover } from './Popover.svelte';
 export { default as ShareButton } from './ShareButton.svelte';
 export { default as Skeleton } from './Skeleton.svelte';
 export { default as ThemeToggle } from './ThemeToggle.svelte';
+export { default as ToggleButton } from './ToggleButton.svelte';
+export { default as ToggleGroup } from './ToggleGroup.svelte';
 export { default as Tooltip } from './Tooltip.svelte';
 export { default as VisuallyHidden } from './VisuallyHidden.svelte';
 
@@ -52,3 +54,4 @@ export * from './colour-token.ts';
 export * from './menu-context.ts';
 export * from './slug.ts';
 export * from './tones.ts';
+export type { ToggleGroupItem } from './toggle-classes.ts';
