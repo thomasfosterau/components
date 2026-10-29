@@ -27,3 +27,29 @@ export interface ToggleGroupItem<Value extends string = string> {
   readonly iconOnly?: boolean | undefined;
   readonly disabled?: boolean | undefined;
 }
+
+/**
+ * The two writers bits-ui's toggle-group `bind:value` needs, for single and
+ * multiple mode. In single mode `''` (the selected item pressed off) is
+ * refused when `required()`. Otherwise the value goes to `assign` and then
+ * to `notify()`. `ToggleGroup` and `ToolbarToggleGroup` share it, so
+ * `required` means the same in both.
+ */
+export function toggleSetters<V extends string>(options: {
+  readonly required: () => boolean;
+  readonly assign: (value: V | '' | V[]) => void;
+  readonly notify: () => ((value: never) => void) | undefined;
+}): { readonly single: (next: string) => void; readonly multiple: (next: string[]) => void } {
+  // SAFETY: bits-ui only ever reports values of the group's own items, or ''.
+  const write = (next: V | '' | V[]): void => {
+    options.assign(next);
+    (options.notify() as ((value: V | '' | V[]) => void) | undefined)?.(next);
+  };
+  return {
+    single: (next) => {
+      if (options.required() && next === '') return;
+      write(next as V | '');
+    },
+    multiple: (next) => write(next as V[]),
+  };
+}
