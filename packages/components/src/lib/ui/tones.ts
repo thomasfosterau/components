@@ -300,3 +300,15 @@ export const stackDirection: Record<StackDirection, string> = {
   start: 'stack-start',
   end: 'stack-end',
 };
+
+/** Literal daisyUI class per `Tone` for `ChatBubble`; a lookup table so Tailwind's scanner sees every class. */
+export const chatBubbleTone: Record<Tone, string> = {
+  neutral: 'chat-bubble-neutral',
+  primary: 'chat-bubble-primary',
+  secondary: 'chat-bubble-secondary',
+  accent: 'chat-bubble-accent',
+  info: 'chat-bubble-info',
+  success: 'chat-bubble-success',
+  warning: 'chat-bubble-warning',
+  error: 'chat-bubble-error',
+};
