@@ -17,12 +17,14 @@
  * @module
  */
 
+export { default as ChatBubble } from './ChatBubble.svelte';
 export { default as DataGrid } from './DataGrid.svelte';
 export { default as DescriptionList } from './DescriptionList.svelte';
 export { default as DescriptionRow } from './DescriptionRow.svelte';
 export { default as DiffText } from './DiffText.svelte';
 export { default as ItemList } from './ItemList.svelte';
 export { default as LinkListItem } from './LinkListItem.svelte';
+export { default as MessageThread } from './MessageThread.svelte';
 export { default as Pagination } from './Pagination.svelte';
 export { default as PaginationFooter } from './PaginationFooter.svelte';
 export { default as ResultCount } from './ResultCount.svelte';
