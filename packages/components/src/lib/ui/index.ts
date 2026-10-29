@@ -18,6 +18,8 @@
  * @module
  */
 
+export { default as Accordion } from './Accordion.svelte';
+export { default as AccordionItem } from './AccordionItem.svelte';
 export { default as Alert } from './Alert.svelte';
 export { default as Badge } from './Badge.svelte';
 export { default as Button } from './Button.svelte';
