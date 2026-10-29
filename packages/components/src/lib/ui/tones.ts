@@ -125,6 +125,21 @@ export const progressTone: Record<Tone, string> = {
 };
 
 /**
+ * Literal daisyUI class per `Tone` for `Steps`; a lookup table so Tailwind's scanner sees every class.
+ * Two adjacent toned steps colour the connector between them too.
+ */
+export const stepTone: Record<Tone, string> = {
+  neutral: 'step-neutral',
+  primary: 'step-primary',
+  secondary: 'step-secondary',
+  accent: 'step-accent',
+  info: 'step-info',
+  success: 'step-success',
+  warning: 'step-warning',
+  error: 'step-error',
+};
+
+/**
  * Literal daisyUI class per `Tone` for `Slider`; a lookup table so Tailwind's scanner sees every class.
  * Each sets `color` (the fill, read as `currentColor`) and `--range-thumb` (the thumb face).
  */

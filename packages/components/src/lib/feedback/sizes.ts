@@ -61,3 +61,14 @@ export const statsOrientation: Record<StatsOrientation, string> = {
   // dashboard reached for by hand.
   responsive: 'stats-vertical sm:stats-horizontal',
 };
+
+/** How a `Steps` list lays its steps out. */
+export type StepsOrientation = 'horizontal' | 'vertical' | 'responsive';
+
+/** Literal daisyUI class per `StepsOrientation` for `Steps`; a lookup table so Tailwind's scanner sees every class. */
+export const stepsOrientation: Record<StepsOrientation, string> = {
+  horizontal: 'steps-horizontal',
+  vertical: 'steps-vertical',
+  // A column on a phone, a row from `sm` up, as `statsOrientation` does.
+  responsive: 'steps-vertical sm:steps-horizontal',
+};
