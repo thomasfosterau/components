@@ -147,3 +147,23 @@ test('carries the size, zebra and pin modifiers onto the table', async () => {
   await expect.element(table).toHaveClass('table-pin-rows');
   await expect.element(table).toHaveClass('mt-4');
 });
+
+test('a rowHeader column renders its cells as row headers that name the row', async () => {
+  const screen = await render(TableFixture, { caption: 'Plants', rowHeader: true });
+
+  const headers = screen.getByRole('rowheader').elements();
+  expect(headers.map((cell) => cell.textContent?.trim())).toEqual(['Basil', 'Tomato', 'Garlic']);
+  expect(
+    headers.every((cell) => cell.tagName === 'TH' && cell.getAttribute('scope') === 'row'),
+  ).toBe(true);
+  // The other column stays data cells; each row is one header plus one cell.
+  expect(screen.getByRole('cell').elements()).toHaveLength(3);
+  await expect.element(screen.getByRole('rowheader', { name: 'Basil' })).toBeInTheDocument();
+});
+
+test('without rowHeader every body cell is a data cell', async () => {
+  const screen = await render(TableFixture, { caption: 'Plants' });
+
+  expect(screen.getByRole('rowheader').elements()).toHaveLength(0);
+  expect(screen.getByRole('cell').elements()).toHaveLength(6);
+});

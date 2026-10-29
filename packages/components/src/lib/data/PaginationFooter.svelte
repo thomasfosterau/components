@@ -67,6 +67,8 @@ The count line and the pager that sit under a paginated index page.
     nextLabel?: string | undefined;
     /** How a numbered control is named; see `Pagination`. */
     pageLabel?: ((page: number) => string) | undefined;
+    /** Passed to `Pagination`: how a page number's visible digits are written. */
+    formatPage?: ((page: number) => string) | undefined;
     /** The count line, when "Showing x of y" is not the sentence wanted. */
     countLabel?: ((shown: number, total: number) => string) | undefined;
     /**
@@ -90,6 +92,7 @@ The count line and the pager that sit under a paginated index page.
     previousLabel = 'Previous',
     nextLabel = 'Next',
     pageLabel,
+    formatPage,
     countLabel,
     locales,
     class: className,
@@ -112,6 +115,7 @@ The count line and the pager that sit under a paginated index page.
     {previousLabel}
     {nextLabel}
     {pageLabel}
+    {formatPage}
     {locales}
   />
 </div>

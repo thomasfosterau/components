@@ -159,6 +159,10 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
         };
 </script>
 
+{#snippet cellBody(column: TableColumn<T>, row: T)}
+  {#if column.cell}{@render column.cell(row)}{:else}{column.value(row)}{/if}
+{/snippet}
+
 <div class={['overflow-x-auto', containerClass]}>
   <table
     {...rest}
@@ -211,9 +215,11 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
         {#each rows as row (rowKey(row))}
           <tr class="hover:bg-base-200" {...rowAttributes(row)}>
             {#each columns as column (column.key)}
-              <td class={columnClass(column)}>
-                {#if column.cell}{@render column.cell(row)}{:else}{column.value(row)}{/if}
-              </td>
+              {#if column.rowHeader}
+                <th scope="row" class={['font-normal', columnClass(column)]}>{@render cellBody(column, row)}</th>
+              {:else}
+                <td class={columnClass(column)}>{@render cellBody(column, row)}</td>
+              {/if}
             {/each}
           </tr>
         {/each}

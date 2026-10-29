@@ -159,3 +159,25 @@ test('resolves every href through the components context', async () => {
     .element(screen.getByRole('link', { name: 'Previous' }))
     .toHaveAttribute('href', '/en/p?offset=0');
 });
+
+test('formatPage writes the visible digits; the accessible name stays pageLabel', async () => {
+  const grouped = new Intl.NumberFormat('en-AU');
+  const screen = await render(Pagination, {
+    offset: 999 * 20,
+    limit: 20,
+    total: 1001 * 20,
+    href,
+    formatPage: (page: number) => grouped.format(page),
+  });
+
+  const current = screen.getByText('1,000');
+  await expect.element(current).toBeInTheDocument();
+  await expect.element(screen.getByRole('link', { name: 'Page 1001' })).toHaveTextContent('1,001');
+  await expect.element(screen.getByRole('link', { name: 'Page 999' })).toHaveTextContent('999');
+});
+
+test('page numbers are bare by default', async () => {
+  const screen = await render(Pagination, { offset: 999 * 20, limit: 20, total: 1001 * 20, href });
+
+  await expect.element(screen.getByRole('link', { name: 'Page 1001' })).toHaveTextContent('1001');
+});

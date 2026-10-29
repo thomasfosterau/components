@@ -82,6 +82,14 @@ Offset-based page navigation: numbered links with gaps or a bare Previous/Next p
      */
     pageLabel?: ((page: number) => string) | undefined;
     /**
+     * How a page number is written on its control — the visible digits only;
+     * `pageLabel` is the accessible name. Page numbers are identifiers, so they
+     * are bare by default; pass e.g. `(page) => new Intl.NumberFormat('en-AU').format(page)`
+     * to group them ("1,000").
+     * @defaultValue `String(page)`
+     */
+    formatPage?: ((page: number) => string) | undefined;
+    /**
      * daisyUI size step.
      * @defaultValue `'sm'`
      */
@@ -114,6 +122,7 @@ Offset-based page navigation: numbered links with gaps or a bare Previous/Next p
     previousLabel = 'Previous',
     nextLabel = 'Next',
     pageLabel = (page) => `Page ${page}`,
+    formatPage = (page) => String(page),
     size = 'sm',
     showRange = false,
     rangeLabel,
@@ -130,7 +139,7 @@ Offset-based page navigation: numbered links with gaps or a bare Previous/Next p
   // The formatter and the formatted string are separate `$derived`s so the
   // (relatively expensive) `Intl.NumberFormat` is not rebuilt when only the
   // offset moves. Counts are quantities and get grouped; the page NUMBERS
-  // below are identifiers and stay bare.
+  // below are identifiers and stay bare unless `formatPage` says otherwise.
   const counts = $derived(new Intl.NumberFormat(locales));
   const rangeText = $derived(
     rangeLabel === undefined
@@ -199,11 +208,11 @@ Offset-based page navigation: numbered links with gaps or a bare Previous/Next p
             {:else if item.current}
               <span class={['btn btn-active join-item', buttonSize[size]]} aria-current="page">
                 <span class="sr-only">{pageLabel(item.page)}</span>
-                <span aria-hidden="true">{item.page}</span>
+                <span aria-hidden="true">{formatPage(item.page)}</span>
               </span>
             {:else if href !== undefined}
               <a href={linkTo(item.offset)} class={itemClass} aria-label={pageLabel(item.page)}>
-                <span aria-hidden="true">{item.page}</span>
+                <span aria-hidden="true">{formatPage(item.page)}</span>
               </a>
             {:else}
               <button
@@ -214,7 +223,7 @@ Offset-based page navigation: numbered links with gaps or a bare Previous/Next p
                   onPage?.(item.offset);
                 }}
               >
-                <span aria-hidden="true">{item.page}</span>
+                <span aria-hidden="true">{formatPage(item.page)}</span>
               </button>
             {/if}
           </li>

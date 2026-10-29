@@ -30,6 +30,17 @@
   <Pagination {offset} limit={20} total={151} {href} showRange locales="en-AU" />
 </Story>
 
+<Story name="Grouped page numbers">
+  <!-- Page numbers are bare by default; `formatPage` groups the visible digits. -->
+  <Pagination
+    offset={999 * 20}
+    limit={20}
+    total={1500 * 20}
+    {href}
+    formatPage={(page) => new Intl.NumberFormat('en-AU').format(page)}
+  />
+</Story>
+
 <Story name="First page">
   <Pagination offset={0} limit={20} total={151} {href} showRange locales="en-AU" />
 </Story>
