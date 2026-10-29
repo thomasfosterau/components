@@ -17,7 +17,7 @@ The header, month grids and day cells `Calendar` and `RangeCalendar` share; inte
 <script lang="ts">
   import { DateFormatter, getLocalTimeZone, type DateValue } from '@internationalized/date';
   import { ChevronLeft, ChevronRight } from '@lucide/svelte';
-  import type { Calendar, RangeCalendar } from 'bits-ui';
+  import type { Calendar, DatePicker, DateRangePicker, RangeCalendar } from 'bits-ui';
   import type { Snippet } from 'svelte';
 
   /** One month of the calendar, as bits-ui's root snippet hands it over. */
@@ -35,7 +35,7 @@ The header, month grids and day cells `Calendar` and `RangeCalendar` share; inte
 
   interface Props {
     /** The bits-ui namespace whose parts to render. */
-    parts: typeof Calendar | typeof RangeCalendar;
+    parts: typeof Calendar | typeof RangeCalendar | typeof DatePicker | typeof DateRangePicker;
     months: readonly Month[];
     weekdays: readonly string[];
     /** The resolved single locale. */

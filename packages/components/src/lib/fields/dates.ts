@@ -20,8 +20,10 @@
 
 export { default as Calendar } from './Calendar.svelte';
 export { default as DateField } from './DateField.svelte';
+export { default as DatePicker } from './DatePicker.svelte';
+export { default as DateRangePicker } from './DateRangePicker.svelte';
 export { default as RangeCalendar } from './RangeCalendar.svelte';
 export { default as TimeField } from './TimeField.svelte';
 export type { CalendarBaseProps } from './calendar-props.ts';
-export type { SegmentedFieldProps, TimeValue } from './segmented-field.ts';
+export type { PickerProps, SegmentedFieldProps, TimeValue } from './segmented-field.ts';
 export { parseDate, parseTime, Time, type DateValue } from '@internationalized/date';
