@@ -30,7 +30,7 @@ A set of toggle buttons answering one question, exclusively or independently, on
   import { ToggleGroup } from 'bits-ui';
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
-  import { toggleClasses, type ToggleGroupItem } from './toggle-classes.ts';
+  import { toggleClasses, toggleSetters, type ToggleGroupItem } from './toggle-classes.ts';
   import { buttonSize, type ButtonVariant, type Size, type Tone } from './tones.ts';
   import Tooltip from './Tooltip.svelte';
 
@@ -122,18 +122,11 @@ A set of toggle buttons answering one question, exclusively or independently, on
     value === undefined || value === '' ? [] : typeof value === 'string' ? [value] : value,
   );
 
-  function setSingle(next: string): void {
-    if (required && next === '') return;
-    // SAFETY: bits-ui only ever reports a value of one of `items`, or ''.
-    value = next as V | '';
-    (onValueChange as ((value: V | '') => void) | undefined)?.(next as V | '');
-  }
-
-  function setMultiple(next: string[]): void {
-    // SAFETY: as above, every entry is one of `items`' values.
-    value = next as V[];
-    (onValueChange as ((value: V[]) => void) | undefined)?.(next as V[]);
-  }
+  const setters = toggleSetters<V>({
+    required: () => required,
+    assign: (next) => (value = next),
+    notify: () => onValueChange,
+  });
 
   const MOVE_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End']);
 
@@ -143,7 +136,7 @@ A set of toggle buttons answering one question, exclusively or independently, on
     const focused = document.activeElement;
     if (!(focused instanceof HTMLElement)) return;
     const next = focused.dataset['value'];
-    if (next !== undefined && next !== value && !focused.hasAttribute('data-disabled')) setSingle(next);
+    if (next !== undefined && next !== value && !focused.hasAttribute('data-disabled')) setters.single(next);
   }
 
   /** Single mode: Tab into the group lands on the checked item. */
@@ -212,7 +205,7 @@ A set of toggle buttons answering one question, exclusively or independently, on
 {#if type === 'single'}
   <ToggleGroup.Root
     type="single"
-    bind:value={() => (typeof value === 'string' ? value : ''), setSingle}
+    bind:value={() => (typeof value === 'string' ? value : ''), setters.single}
     {orientation}
     {loop}
     {disabled}
@@ -221,7 +214,7 @@ A set of toggle buttons answering one question, exclusively or independently, on
 {:else}
   <ToggleGroup.Root
     type="multiple"
-    bind:value={() => [...selected], setMultiple}
+    bind:value={() => [...selected], setters.multiple}
     {orientation}
     {loop}
     {disabled}
