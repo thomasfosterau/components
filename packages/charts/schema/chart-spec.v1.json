@@ -6,7 +6,8 @@
     "SpecVersion": {
       "type": "string",
       "enum": [
-        "1"
+        "1",
+        "1.1"
       ],
       "description": "The portable chart spec version this document conforms to."
     },
@@ -48,6 +49,42 @@
       "additionalProperties": false,
       "description": "A field-to-channel mapping with an explicit declared type."
     },
+    "Channel_1": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "The name of the field in each datum that this channel reads."
+        },
+        "type": {
+          "$ref": "#/$defs/FieldType"
+        }
+      },
+      "required": [
+        "field",
+        "type"
+      ],
+      "additionalProperties": false,
+      "description": "Spec 1.1: the end of a range on x. With mark \"bar\", each bar spans x to x2. Same type as x, quantitative or temporal."
+    },
+    "Channel_2": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "The name of the field in each datum that this channel reads."
+        },
+        "type": {
+          "$ref": "#/$defs/FieldType"
+        }
+      },
+      "required": [
+        "field",
+        "type"
+      ],
+      "additionalProperties": false,
+      "description": "Spec 1.1: the end of a range on y. With mark \"bar\", each bar spans y to y2. Same type as y, quantitative or temporal."
+    },
     "Encoding": {
       "type": "object",
       "properties": {
@@ -56,6 +93,12 @@
         },
         "y": {
           "$ref": "#/$defs/Channel"
+        },
+        "x2": {
+          "$ref": "#/$defs/Channel_1"
+        },
+        "y2": {
+          "$ref": "#/$defs/Channel_2"
         },
         "color": {
           "$ref": "#/$defs/Channel"

@@ -7,9 +7,11 @@ import Foundation
 // TypeScript and Kotlin worlds; no code crosses the language boundary, only
 // the spec schema does.
 
-/// The portable chart spec version this package understands.
+/// The portable chart spec versions this package understands. `1.1` adds the
+/// `x2` / `y2` range channels; every `1` spec is a valid `1.1` spec.
 public enum SpecVersion: String, Codable, Equatable, Sendable {
     case v1 = "1"
+    case v1_1 = "1.1"
 }
 
 /// The mark (geometric primitive) used to render the chart.
@@ -46,6 +48,10 @@ public struct Channel: Codable, Equatable, Sendable {
 public struct Encoding: Codable, Equatable, Sendable {
     public let x: Channel?
     public let y: Channel?
+    /// Spec 1.1: the end of a range on x. With mark `bar`, each bar spans `x` to `x2`.
+    public let x2: Channel?
+    /// Spec 1.1: the end of a range on y. With mark `bar`, each bar spans `y` to `y2`.
+    public let y2: Channel?
     public let color: Channel?
     public let size: Channel?
     public let opacity: Channel?
@@ -53,12 +59,16 @@ public struct Encoding: Codable, Equatable, Sendable {
     public init(
         x: Channel? = nil,
         y: Channel? = nil,
+        x2: Channel? = nil,
+        y2: Channel? = nil,
         color: Channel? = nil,
         size: Channel? = nil,
         opacity: Channel? = nil
     ) {
         self.x = x
         self.y = y
+        self.x2 = x2
+        self.y2 = y2
         self.color = color
         self.size = size
         self.opacity = opacity

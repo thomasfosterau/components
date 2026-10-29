@@ -135,3 +135,22 @@ describe('emitted specs compile with the real Vega-Lite compiler', () => {
     expect(result.spec).toBeDefined();
   });
 });
+
+describe('range bars (spec 1.1)', () => {
+  it('emit x2 and compile with the real compiler', () => {
+    const spec = parseSpec({
+      specVersion: '1.1',
+      mark: 'bar',
+      encoding: {
+        y: { field: 'task', type: 'nominal' },
+        x: { field: 'start', type: 'temporal' },
+        x2: { field: 'end', type: 'temporal' },
+      },
+      data: { values: [{ task: 'Sow tomatoes', start: '2026-09-01', end: '2026-10-15' }] },
+    });
+    expect(emitVegaLite(spec).encoding.x2).toEqual({ field: 'end' });
+    // A nominal y without a height is a discrete (step) height, which the
+    // default container width's fit cannot honour; a Gantt passes a height.
+    expect(() => compileEmitted(spec, { height: 200 })).not.toThrow();
+  });
+});

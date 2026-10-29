@@ -19,10 +19,20 @@ export interface VegaLiteFieldDef {
   };
 }
 
+/**
+ * A Vega-Lite secondary positional channel (`x2` / `y2`): a field only. It
+ * shares the type and scale of its primary channel.
+ */
+export interface VegaLiteSecondaryFieldDef {
+  readonly field: string;
+}
+
 /** The Vega-Lite encoding block. */
 export interface VegaLiteEncoding {
   readonly x?: VegaLiteFieldDef;
   readonly y?: VegaLiteFieldDef;
+  readonly x2?: VegaLiteSecondaryFieldDef;
+  readonly y2?: VegaLiteSecondaryFieldDef;
   readonly color?: VegaLiteFieldDef;
   readonly size?: VegaLiteFieldDef;
   readonly opacity?: VegaLiteFieldDef;

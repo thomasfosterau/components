@@ -165,3 +165,32 @@ describe('Chart SSR', () => {
     });
   });
 });
+
+describe('range bars (spec 1.1) in SSR', () => {
+  it('render one rect per task, each as wide as its range', () => {
+    const gantt = parseSpec({
+      specVersion: '1.1',
+      mark: 'bar',
+      encoding: {
+        y: { field: 'task', type: 'nominal' },
+        x: { field: 'start', type: 'quantitative' },
+        x2: { field: 'end', type: 'quantitative' },
+      },
+      data: {
+        values: [
+          { task: 'Sow', start: 0, end: 10 },
+          { task: 'Grow', start: 10, end: 40 },
+        ],
+      },
+      config: { title: 'Planting calendar' },
+    });
+    const html = renderToStaticMarkup(<Chart spec={gantt} width={400} height={200} />);
+    const widths = [...html.matchAll(/<rect[^>]*width="([\d.]+)"/g)].map((match) =>
+      Number(match[1]),
+    );
+    expect(widths.length).toBeGreaterThanOrEqual(2);
+    const bars = widths.slice(-2);
+    expect((bars[1] ?? 0) / (bars[0] ?? 1)).toBeCloseTo(3, 0);
+    expect(html).toContain('Planting calendar');
+  });
+});

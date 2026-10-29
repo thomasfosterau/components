@@ -13,4 +13,10 @@ export {
   type EmitVegaLiteOptions,
 } from './emit.ts';
 
-export type { VegaLiteData, VegaLiteEncoding, VegaLiteFieldDef, VegaLiteSpec } from './types.ts';
+export type {
+  VegaLiteData,
+  VegaLiteEncoding,
+  VegaLiteFieldDef,
+  VegaLiteSecondaryFieldDef,
+  VegaLiteSpec,
+} from './types.ts';

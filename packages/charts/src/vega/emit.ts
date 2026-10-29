@@ -76,6 +76,10 @@ function emitEncoding(spec: ChartSpec): VegaLiteEncoding {
   return {
     ...emitChannel('x', spec.encoding.x, spec.scales?.x),
     ...emitChannel('y', spec.encoding.y, spec.scales?.y),
+    // Range ends map straight across: Vega-Lite's x2 / y2 take the primary
+    // channel's type and scale, so only the field is emitted.
+    ...(spec.encoding.x2 ? { x2: { field: spec.encoding.x2.field } } : {}),
+    ...(spec.encoding.y2 ? { y2: { field: spec.encoding.y2.field } } : {}),
     ...emitChannel('color', spec.encoding.color),
     ...emitChannel('size', spec.encoding.size),
     ...emitChannel('opacity', spec.encoding.opacity),
@@ -83,7 +87,7 @@ function emitEncoding(spec: ChartSpec): VegaLiteEncoding {
 }
 
 function emitChannel(
-  name: keyof VegaLiteEncoding,
+  name: 'x' | 'y' | 'color' | 'size' | 'opacity',
   channel: Channel | undefined,
   hint?: ScaleHint,
 ): Partial<VegaLiteEncoding> {

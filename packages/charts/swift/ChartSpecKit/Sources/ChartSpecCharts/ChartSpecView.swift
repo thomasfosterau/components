@@ -44,7 +44,18 @@ public struct ChartSpecView: View {
 
     @ViewBuilder
     private var chart: some View {
-        if let x = spec.encoding.x, let y = spec.encoding.y {
+        if spec.mark == .bar, let x = spec.encoding.x, let y = spec.encoding.y,
+           let end = spec.encoding.x2 ?? spec.encoding.y2 {
+            // Spec 1.1 range bars: x2 spans along x in y's bands, y2 along y in x's.
+            let horizontal = spec.encoding.x2 != nil
+            let along = horizontal ? x : y
+            let band = horizontal ? y : x
+            Chart {
+                ForEach(Array(rangeRows(start: along, end: end, band: band).enumerated()), id: \.offset) { _, row in
+                    rangeMark(row, horizontal: horizontal, alongLabel: along.field, bandLabel: band.field)
+                }
+            }
+        } else if let x = spec.encoding.x, let y = spec.encoding.y {
             Chart {
                 ForEach(Array(plottableRows(x: x, y: y).enumerated()), id: \.offset) { _, row in
                     markContent(x: row.x, y: row.y, colorCategory: row.color)
@@ -75,12 +86,70 @@ public struct ChartSpecView: View {
                 let yValue = try? y.typedValue(from: datum)
             else { return nil }
 
-            var colorCategory: String?
-            if let colorChannel = spec.encoding.color,
-               case .categorical(let category)? = try? colorChannel.typedValue(from: datum) {
-                colorCategory = category
+            return PlottableRow(x: xValue, y: yValue, color: colorCategory(of: datum))
+        }
+    }
+
+    private func colorCategory(of datum: Datum) -> String? {
+        if let colorChannel = spec.encoding.color,
+           case .categorical(let category)? = try? colorChannel.typedValue(from: datum) {
+            return category
+        }
+        return nil
+    }
+
+    // MARK: Range bars (spec 1.1)
+
+    /// A range's two ends, ordered low to high, in the one type both share.
+    private enum RangeSpan {
+        case temporal(Date, Date)
+        case quantitative(Double, Double)
+    }
+
+    private struct RangeRow {
+        let span: RangeSpan
+        let band: String
+        let color: String?
+    }
+
+    private func rangeRows(start: Channel, end: Channel, band: Channel) -> [RangeRow] {
+        rows.compactMap { datum -> RangeRow? in
+            guard
+                let startValue = try? start.typedValue(from: datum),
+                let endValue = try? end.typedValue(from: datum),
+                case .categorical(let bandValue)? = try? band.typedValue(from: datum)
+            else { return nil }
+
+            // An end before its start is normalised, as in the TypeScript core.
+            let span: RangeSpan
+            switch (startValue, endValue) {
+            case let (.temporal(from), .temporal(to)):
+                span = .temporal(min(from, to), max(from, to))
+            case let (.quantitative(from), .quantitative(to)):
+                span = .quantitative(min(from, to), max(from, to))
+            default:
+                return nil
             }
-            return PlottableRow(x: xValue, y: yValue, color: colorCategory)
+            return RangeRow(span: span, band: bandValue, color: colorCategory(of: datum))
+        }
+    }
+
+    @ChartContentBuilder
+    private func rangeMark(_ row: RangeRow, horizontal: Bool, alongLabel: String, bandLabel: String) -> some ChartContent {
+        let colorLabel = spec.encoding.color?.field ?? "series"
+        switch (row.span, horizontal) {
+        case let (.temporal(from, to), true):
+            BarMark(xStart: .value(alongLabel, from), xEnd: .value(alongLabel, to), y: .value(bandLabel, row.band))
+                .foregroundStyleIfPresent(colorLabel: colorLabel, category: row.color)
+        case let (.temporal(from, to), false):
+            BarMark(x: .value(bandLabel, row.band), yStart: .value(alongLabel, from), yEnd: .value(alongLabel, to))
+                .foregroundStyleIfPresent(colorLabel: colorLabel, category: row.color)
+        case let (.quantitative(from, to), true):
+            BarMark(xStart: .value(alongLabel, from), xEnd: .value(alongLabel, to), y: .value(bandLabel, row.band))
+                .foregroundStyleIfPresent(colorLabel: colorLabel, category: row.color)
+        case let (.quantitative(from, to), false):
+            BarMark(x: .value(bandLabel, row.band), yStart: .value(alongLabel, from), yEnd: .value(alongLabel, to))
+                .foregroundStyleIfPresent(colorLabel: colorLabel, category: row.color)
         }
     }
 

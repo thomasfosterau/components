@@ -57,6 +57,7 @@ export function computeContext(
         [0, dimensions.plot.width],
         rows,
         spec.scales?.x,
+        spec.encoding.x2,
       )
     : undefined;
   const yPositional = spec.encoding.y
@@ -66,6 +67,7 @@ export function computeContext(
         [dimensions.plot.height, 0],
         rows,
         spec.scales?.y,
+        spec.encoding.y2,
       )
     : undefined;
 
@@ -139,7 +141,7 @@ function buildGeometry(
     case 'area':
       return buildAreaGeometry(args);
     case 'bar':
-      return buildBarGeometry(args);
+      return buildBarGeometry({ ...args, x2: spec.encoding.x2, y2: spec.encoding.y2 });
     case 'point':
       return buildPointGeometry({ ...args, size: spec.encoding.size, sizeScale });
   }

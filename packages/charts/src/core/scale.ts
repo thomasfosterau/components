@@ -11,7 +11,7 @@ import {
   type ScalePoint,
   type ScaleTime,
 } from 'd3-scale';
-import { makeAccessor } from './accessor.ts';
+import { makeAccessor, type FieldValue } from './accessor.ts';
 import type { DataRows, DomainValue, ResolvedScale } from './types.ts';
 
 /**
@@ -69,12 +69,13 @@ export function resolvePositionalScale(
   pixelRange: readonly [number, number],
   data: DataRows,
   hint?: ScaleHint,
+  rangeEnd?: Channel,
 ): PositionalScale {
   switch (channel.type) {
     case 'quantitative':
-      return resolveLinear(channel, mark, pixelRange, data, hint);
+      return resolveLinear(channel, mark, pixelRange, data, hint, rangeEnd);
     case 'temporal':
-      return resolveUtc(channel, pixelRange, data, hint);
+      return resolveUtc(channel, pixelRange, data, hint, rangeEnd);
     case 'ordinal':
     case 'nominal':
       return resolveCategorical(channel, mark, pixelRange, data, hint);
@@ -87,25 +88,24 @@ function resolveLinear(
   pixelRange: readonly [number, number],
   data: DataRows,
   hint?: ScaleHint,
+  rangeEnd?: Channel,
 ): PositionalScale {
-  const accessor = makeAccessor(channel);
   let domain: [number, number];
 
   const hintDomain = numericHintDomain(hint);
   if (hintDomain) {
     domain = hintDomain;
   } else {
-    const values: number[] = [];
-    for (const datum of data) {
-      const value = accessor(datum);
-      if (typeof value === 'number') values.push(value);
-    }
+    const values = valuesOf(data, channel, rangeEnd).filter(
+      (value): value is number => typeof value === 'number',
+    );
     domain = values.length > 0 ? [Math.min(...values), Math.max(...values)] : [0, 1];
   }
 
   // Bars are drawn from a zero baseline, so their quantitative axis must
-  // include zero. Otherwise zero is opt-in via the spec hint.
-  const includeZero = hint?.zero ?? mark === 'bar';
+  // include zero; a range bar has its own start, so it does not. Otherwise
+  // zero is opt-in via the spec hint.
+  const includeZero = hint?.zero ?? (mark === 'bar' && rangeEnd === undefined);
   if (includeZero) {
     domain = [Math.min(domain[0], 0), Math.max(domain[1], 0)];
   }
@@ -139,19 +139,17 @@ function resolveUtc(
   pixelRange: readonly [number, number],
   data: DataRows,
   hint?: ScaleHint,
+  rangeEnd?: Channel,
 ): PositionalScale {
-  const accessor = makeAccessor(channel);
   let domain: [Date, Date];
 
   const hintDomain = temporalHintDomain(hint);
   if (hintDomain) {
     domain = hintDomain;
   } else {
-    const times: number[] = [];
-    for (const datum of data) {
-      const value = accessor(datum);
-      if (value instanceof Date) times.push(value.getTime());
-    }
+    const times = valuesOf(data, channel, rangeEnd)
+      .filter((value): value is Date => value instanceof Date)
+      .map((value) => value.getTime());
     domain =
       times.length > 0
         ? [new Date(Math.min(...times)), new Date(Math.max(...times))]
@@ -181,6 +179,15 @@ function resolveUtc(
       bandwidth: 0,
     },
   };
+}
+
+/** Every value of `channel` and, for a range, of its end channel `rangeEnd`. */
+function valuesOf(data: DataRows, channel: Channel, rangeEnd?: Channel): FieldValue[] {
+  const accessors =
+    rangeEnd === undefined
+      ? [makeAccessor(channel)]
+      : [makeAccessor(channel), makeAccessor(rangeEnd)];
+  return data.flatMap((datum) => accessors.map((accessor) => accessor(datum)));
 }
 
 function resolveCategorical(

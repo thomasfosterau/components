@@ -103,6 +103,30 @@ final class ChartSpecTests: XCTestCase {
         XCTAssertEqual(spec.mark, .point)
     }
 
+    func testDecodesRangeBarSpecVersion1_1() throws {
+        let json = """
+        {
+          "specVersion": "1.1",
+          "mark": "bar",
+          "encoding": {
+            "y": { "field": "task", "type": "nominal" },
+            "x": { "field": "start", "type": "temporal" },
+            "x2": { "field": "end", "type": "temporal" }
+          },
+          "data": {
+            "values": [
+              { "task": "Sow tomatoes", "start": "2026-09-01", "end": "2026-10-15" }
+            ]
+          }
+        }
+        """.data(using: .utf8)!
+
+        let spec = try ChartSpec.decode(from: json)
+        XCTAssertEqual(spec.specVersion, .v1_1)
+        XCTAssertEqual(spec.encoding.x2, Channel(field: "end", type: .temporal))
+        XCTAssertNil(spec.encoding.y2)
+    }
+
     // MARK: Rejecting invalid specs
 
     func testRejectsUnknownSpecVersion() {

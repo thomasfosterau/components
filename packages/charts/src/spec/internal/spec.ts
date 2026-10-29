@@ -11,8 +11,8 @@ import { Scales } from './scales.ts';
 // asserts each pair equal. Neither barrel re-exports this module.
 // fallow-ignore-file duplicate-export
 
-/** The spec version literal accepted by v1 interpreters. */
-const SpecVersion = Schema.Literal('1').annotate({
+/** The spec versions this interpreter accepts (`'1.1'` adds the `x2` / `y2` channels). */
+const SpecVersion = Schema.Literals(['1', '1.1']).annotate({
   identifier: 'SpecVersion',
   description: 'The portable chart spec version this document conforms to.',
 });

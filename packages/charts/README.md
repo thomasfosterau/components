@@ -87,6 +87,31 @@ Each layer is its own entry, so a consumer loads only the interpreter it uses. T
 }
 ```
 
+### Example: a planting-calendar Gantt (spec 1.1)
+
+A range bar is a `bar` with an end channel: one row per task (`y`), a bar from its start (`x`) to its end (`x2`).
+
+```json
+{
+  "specVersion": "1.1",
+  "mark": "bar",
+  "encoding": {
+    "y": { "field": "task", "type": "nominal" },
+    "x": { "field": "start", "type": "temporal" },
+    "x2": { "field": "end", "type": "temporal" },
+    "color": { "field": "bed", "type": "nominal" }
+  },
+  "data": {
+    "values": [
+      { "task": "Sow tomatoes", "start": "2026-09-01", "end": "2026-10-15", "bed": "Glasshouse" },
+      { "task": "Transplant", "start": "2026-10-15", "end": "2026-11-01", "bed": "North bed" },
+      { "task": "Harvest", "start": "2026-12-20", "end": "2027-03-01", "bed": "North bed" }
+    ]
+  },
+  "config": { "title": "Planting calendar" }
+}
+```
+
 ## API reference
 
 Every exported symbol, grouped by the entry that exports it. Signatures are the published TypeScript ones; all object types are `readonly`.
@@ -147,18 +172,18 @@ if (result.ok) {
 | Export | Description |
 | --- | --- |
 | `SpecValidationError` | `Error` subclass (`name: 'SpecValidationError'`) thrown by `parseSpec`. |
-| `SPEC_VERSION` | `'1'` — the current portable spec version. `parseSpec` rejects any other `specVersion`. |
+| `SPEC_VERSION` | `'1.1'`: the version a new spec should declare. `parseSpec` accepts `'1'` and `'1.1'` and rejects any other `specVersion` (see [§ Spec versioning](#spec-versioning)). |
 
 #### Types
 
 | Type | Shape and role |
 | --- | --- |
 | `ChartSpec` | The portable spec: `{ specVersion: SpecVersion; mark: Mark; encoding: Encoding; data: Data; scales?: Scales; config?: Config; extensions?: Extensions }`. |
-| `SpecVersion` | `typeof SPEC_VERSION`, i.e. the literal `'1'`. |
+| `SpecVersion` | `'1' \| '1.1'`. |
 | `Mark` | `'bar' \| 'line' \| 'point' \| 'area'` — the intersection of the native charting vocabularies. |
 | `FieldType` | `'quantitative' \| 'ordinal' \| 'nominal' \| 'temporal'` — the declared type of an encoded field. Temporal values are ISO 8601 strings or epoch milliseconds. |
 | `Channel` | `{ field: string; type: FieldType }` — maps a data field to a visual channel. Interpreters read values by the declared `type`, never by sniffing. |
-| `Encoding` | `{ x?, y?, color?, size?, opacity?: Channel }`. Every v1 mark needs `x` and `y` to draw anything. |
+| `Encoding` | `{ x?, y?, x2?, y2?, color?, size?, opacity?: Channel }`. Every v1 mark needs `x` and `y` to draw anything; `x2` / `y2` (spec 1.1) make a `bar` a range bar. |
 | `DatumValue` | `string \| number \| boolean \| null` — one value in a row. |
 | `Datum` | `{ [field: string]: DatumValue }` — one flat data row. |
 | `InlineData` | `{ values: ReadonlyArray<Datum> }` — rows embedded in the spec. |
@@ -459,7 +484,8 @@ try {
 | `EmitVegaLiteOptions` | `{ rows?: ReadonlyArray<Datum>; width?: number \| 'container'; height?: number }` — pre-resolved rows, width (default `'container'`, responsive) and height in pixels. |
 | `VegaLiteSpec` | `{ $schema: string; title?: string; mark: { type: Mark; tooltip?: boolean }; data: VegaLiteData; encoding: VegaLiteEncoding; width?: number \| 'container'; height?: number }` — the single-view subset the emitter produces, typed structurally rather than imported from `vega-lite`. |
 | `VegaLiteData` | `{ values: ReadonlyArray<Record<string, unknown>> } \| { url: string }`. |
-| `VegaLiteEncoding` | `{ x?, y?, color?, size?, opacity?: VegaLiteFieldDef }`. |
+| `VegaLiteEncoding` | `{ x?, y?, color?, size?, opacity?: VegaLiteFieldDef; x2?, y2?: VegaLiteSecondaryFieldDef }`. |
+| `VegaLiteSecondaryFieldDef` | `{ field }`: a range end, sharing its primary channel's type and scale. |
 | `VegaLiteFieldDef` | `{ field: string; type: FieldType; scale?: { domain?: ReadonlyArray<number \| string>; nice?: boolean; zero?: boolean } }`. |
 
 ### `@thomasfosterau/charts/schema.json`
@@ -499,7 +525,7 @@ For every spec field and mark type, this records which interpreters honour it an
 | `point` | ✅ | ✅ `point`/`circle` | 🔵 `PointMark` | 🔵 | 🔵 | n/a — part of the portable intersection |
 | `area` | ✅ | ✅ `area` | 🔵 `AreaMark` | 🔵 | 🔵 | n/a — part of the portable intersection |
 
-The v1 mark set is deliberately the intersection of the native charting vocabularies. New marks (e.g. `rect`, `rule`, `arc`) require a `specVersion` bump and a row here **before** implementation.
+The v1 mark set is deliberately the intersection of the native charting vocabularies. New marks (e.g. `rect`, `rule`, `arc`) require a minor `specVersion` bump (see [§ Spec versioning](#spec-versioning)) and a row here **before** implementation.
 
 ### Encoding channels
 
@@ -507,6 +533,8 @@ The v1 mark set is deliberately the intersection of the native charting vocabula
 | --- | --- | --- | --- | --- | --- | --- |
 | `encoding.x` | ✅ | ✅ | 🔵 `.value(x:)` | 🔵 | 🔵 | Required for all v1 marks; a spec without `x`/`y` renders an empty plot |
 | `encoding.y` | ✅ | ✅ | 🔵 `.value(y:)` | 🔵 | 🔵 | Same as `x` |
+| `encoding.x2` (spec 1.1) | ✅ range bars: each bar spans `x` to `x2` in `y`'s bands; an end before its start is normalised; the domain covers both ends and is not forced through zero | ✅ `x2` (field only; shares `x`'s type and scale) | 🔵 `BarMark(xStart:xEnd:y:)` | 🟡 floating bars via a custom column layer; where unavailable, a bar from the axis origin to `x2` | 🔵 | Only with `mark: "bar"` and an `x` of the same `quantitative` or `temporal` type (`parseSpec` rejects anything else). The Gantt / timeline basis |
+| `encoding.y2` (spec 1.1) | ✅ vertical range bars, as `x2` | ✅ `y2` | 🔵 `BarMark(x:yStart:yEnd:)` | 🟡 as `x2` | 🔵 | As `x2`, on y |
 | `encoding.color` | ✅ | ✅ | 🔵 `.foregroundStyle(by:)` | 🔵 | 🔵 | Ignored → single default series colour |
 | `encoding.size` | ✅ point only | ✅ | 🟡 `.symbolSize(by:)` (point only) | 🟡 | 🔵 | Ignored → default mark size |
 | `encoding.opacity` | 🟡 parsed, not resolved | ✅ | 🟡 limited | 🟡 | 🔵 | Ignored → fully opaque marks |
@@ -556,7 +584,13 @@ The TS core never resolves references itself: `computeContext` takes already-res
 
 | Field | TS core | Vega-Lite | Swift Charts | Compose | Media | Behaviour |
 | --- | --- | --- | --- | --- | --- | --- |
-| `specVersion` | ✅ enforced (`'1'`) | ✅ | 🔵 enforced by decoder | 🔵 | 🔵 | Every interpreter must reject spec versions it does not understand, with a clear error — never best-effort rendering |
+| `specVersion` | ✅ accepts `'1'` and `'1.1'` | ✅ | 🔵 enforced by decoder (`.v1`, `.v1_1`) | 🔵 | 🔵 | See the rule below |
+
+**The rule (owner decision on #255 / #256):** versions are `major.minor`, and `SPEC_VERSION` is the one a new spec should declare (`'1.1'`).
+
+- **A minor version only adds.** Every `'1'` spec is a valid `'1.1'` spec and renders the same. New channels and marks come in a minor version and need a row in this matrix first. `'1.1'` adds `encoding.x2` / `encoding.y2`, and `parseSpec` rejects them in a `'1'` spec.
+- **Degradation across minors is defined:** an interpreter given a newer `1.x` spec ignores channels it does not know, and renders a mark it does not know through the data-table fallback, never an empty plot. A new major version is a break, and an interpreter rejects it with a clear error.
+- **What is implemented today:** this release accepts `'1'` and `'1.1'` exactly. Interpreters published before it (spec `'1'` only) close every object, so they reject a `'1.1'` document rather than ignore its range channels. Accepting newer `1.x` minors and the data-table fallback are tracked in #304.
 
 ### Rules for changing this matrix
 

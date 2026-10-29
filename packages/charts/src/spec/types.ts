@@ -22,11 +22,15 @@
  *   the emitted JSON Schema admit `null`.
  */
 
-/** The current portable chart spec version. */
-export const SPEC_VERSION = '1';
+/** The current portable chart spec version; what a new spec should declare. */
+export const SPEC_VERSION = '1.1';
 
-/** The spec version literal accepted by v1 interpreters. */
-export type SpecVersion = typeof SPEC_VERSION;
+/**
+ * The spec versions this interpreter accepts. `'1.1'` adds the `x2` / `y2`
+ * range channels; every `'1'` spec is a valid `'1.1'` spec. See the README
+ * § Versioning for the minor-version degradation rule.
+ */
+export type SpecVersion = '1' | '1.1';
 
 /**
  * The mark (geometric primitive) used to render the chart.
@@ -59,6 +63,14 @@ export interface Channel {
 export interface Encoding {
   readonly x?: Channel;
   readonly y?: Channel;
+  /**
+   * The end of a range on the x axis (spec 1.1): with `mark: 'bar'`, each
+   * bar spans `x` to `x2`, a range bar (a Gantt row). Same `type` as `x`,
+   * `quantitative` or `temporal`.
+   */
+  readonly x2?: Channel;
+  /** The end of a range on the y axis (spec 1.1), as `x2` is for x. */
+  readonly y2?: Channel;
   readonly color?: Channel;
   readonly size?: Channel;
   readonly opacity?: Channel;
