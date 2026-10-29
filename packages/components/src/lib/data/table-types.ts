@@ -36,6 +36,13 @@ export interface TableColumn<T> {
   readonly cell?: Snippet<[T]> | undefined;
   /** Whether the header offers a sort control on this column. */
   readonly sortable?: boolean | undefined;
+  /**
+   * Render this column's body cells as `<th scope="row">` — the row's header,
+   * so a screen reader moving down another column announces it with each cell
+   * ("Jane Smith, 48,000"). Give it to the column that names the row, usually
+   * one per table.
+   */
+  readonly rowHeader?: boolean | undefined;
   /** Right-align numeric columns. */
   readonly align?: 'start' | 'end' | undefined;
   /** Extra classes on this column's header and body cells. */

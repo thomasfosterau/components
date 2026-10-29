@@ -73,6 +73,17 @@
   <Table rows={plants} {columns} {rowKey} bind:sort caption="Everything sown this season" />
 </Story>
 
+<Story name="Row headers">
+  <!-- The plant column names each row, so a screen reader moving down
+       "Seedlings" hears "Basil ‘Genovese’, 30" rather than a bare "30". -->
+  <Table
+    rows={plants}
+    columns={plainColumns.map((column) => (column.key === 'name' ? { ...column, rowHeader: true } : column))}
+    {rowKey}
+    caption="Seedlings per plant"
+  />
+</Story>
+
 <Story name="Caption hidden">
   <section>
     <h2 class="mb-2 text-xl font-semibold">Everything sown this season</h2>

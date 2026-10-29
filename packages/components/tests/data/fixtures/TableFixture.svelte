@@ -25,6 +25,8 @@
     onSelect?: ((row: Row) => void) | undefined;
     withEmptyState?: boolean;
     withFoot?: boolean;
+    /** Make the first column the row header. */
+    rowHeader?: boolean;
   }
 
   let {
@@ -41,7 +43,13 @@
     onSelect,
     withEmptyState = false,
     withFoot = false,
+    rowHeader = false,
   }: Props = $props();
+
+  const baseColumns = $derived(sortable ? columns : plainColumns);
+  const shownColumns = $derived(
+    rowHeader ? baseColumns.map((column, index) => (index === 0 ? { ...column, rowHeader: true } : column)) : baseColumns,
+  );
 </script>
 
 {#snippet emptyState()}
@@ -54,7 +62,7 @@
 
 <Table
   {rows}
-  columns={sortable ? columns : plainColumns}
+  columns={shownColumns}
   {rowKey}
   {caption}
   {captionHidden}
