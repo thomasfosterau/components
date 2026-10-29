@@ -22,12 +22,14 @@ export { default as ProgressBar } from './ProgressBar.svelte';
 export { default as SegmentBar } from './SegmentBar.svelte';
 export { default as StatTile } from './StatTile.svelte';
 export { default as Stats } from './Stats.svelte';
+export { default as Steps } from './Steps.svelte';
 export { default as Timeline } from './Timeline.svelte';
 export { default as Toaster } from './Toaster.svelte';
 
 export type { ConfirmForm } from './ConfirmDialog.svelte';
 export type { BarSegment } from './SegmentBar.svelte';
 export type { StatDelta } from './StatTile.svelte';
+export type { StepItem, StepState } from './Steps.svelte';
 export type { TimelineDate, TimelineEntry } from './Timeline.svelte';
 
 export * from './sizes.ts';
