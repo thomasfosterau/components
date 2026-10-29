@@ -187,6 +187,28 @@ export const dividerOrientation: Record<'horizontal' | 'vertical', string> = {
   vertical: 'divider-horizontal',
 };
 
+/** The daisyUI `loading` shapes `Spinner` draws. */
+export type SpinnerVariant = 'spinner' | 'dots' | 'ring' | 'ball' | 'bars' | 'infinity';
+
+/** Literal daisyUI class per `SpinnerVariant` for `Spinner`; a lookup table so Tailwind's scanner sees every class. */
+export const loadingVariant: Record<SpinnerVariant, string> = {
+  spinner: 'loading-spinner',
+  dots: 'loading-dots',
+  ring: 'loading-ring',
+  ball: 'loading-ball',
+  bars: 'loading-bars',
+  infinity: 'loading-infinity',
+};
+
+/** Literal daisyUI class per `Size` for `Spinner`; a lookup table so Tailwind's scanner sees every class. */
+export const loadingSize: Record<Size, string> = {
+  xs: 'loading-xs',
+  sm: 'loading-sm',
+  md: 'loading-md',
+  lg: 'loading-lg',
+  xl: 'loading-xl',
+};
+
 /** Plain background classes, for a segment or swatch without a component prefix. */
 export const backgroundTone: Record<Tone, string> = {
   neutral: 'bg-neutral',

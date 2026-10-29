@@ -22,6 +22,7 @@ A `type="search"` field with a leading icon, a clear button while there is text,
 <script lang="ts">
   import { Search, X } from '@lucide/svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
+  import Spinner from '../ui/Spinner.svelte';
   import { inputSize, type FieldSize } from './field-types.ts';
 
   interface Props extends Omit<HTMLInputAttributes, 'type' | 'value' | 'size'> {
@@ -92,7 +93,7 @@ A `type="search"` field with a leading icon, a clear button while there is text,
     }}
   />
   {#if pending}
-    <span class="loading loading-spinner loading-xs" aria-hidden="true"></span>
+    <Spinner decorative size="xs" />
   {:else if value !== ''}
     <button type="button" class="btn btn-ghost btn-xs btn-circle" onclick={clear}>
       <X class="size-3.5" aria-hidden="true" />
