@@ -1,4 +1,12 @@
-import { CATEGORICAL_PALETTE, type ChartContext, type Tick } from '../core/index.ts';
+import {
+  CATEGORICAL_PALETTE,
+  outlineText,
+  VISUALLY_HIDDEN_STYLE,
+  type ChartContext,
+  type Tick,
+  type TreeGeometry,
+  type TreeOutlineNode,
+} from '../core/index.ts';
 
 /** Options for {@link renderContextToSvg}. */
 export interface RenderSvgOptions {
@@ -39,7 +47,7 @@ export function renderContextToSvg(context: ChartContext, options?: RenderSvgOpt
 
   // Plot group: geometry and axes are in plot coordinates.
   parts.push(`<g transform="translate(${margins.left},${margins.top})">`);
-  parts.push(renderAxes(context));
+  if (context.geometry.mark !== 'tree') parts.push(renderAxes(context));
   parts.push(renderGeometry(context));
   parts.push('</g>');
 
@@ -113,6 +121,8 @@ function renderGeometry(context: ChartContext): string {
             `<rect x="${bar.x}" y="${bar.y}" width="${bar.width}" height="${bar.height}" fill="${bar.color ?? DEFAULT_COLOR}"/>`,
         )
         .join('');
+    case 'tree':
+      return renderTree(geometry);
     case 'point':
       return geometry.points
         .map(
@@ -121,6 +131,42 @@ function renderGeometry(context: ChartContext): string {
         )
         .join('');
   }
+}
+
+const LINK_COLOR = '#9ca3af';
+
+/** A `tree` mark (spec 1.1): links under the node boxes, each box labelled. */
+function renderTree(geometry: TreeGeometry): string {
+  const links = geometry.links.map(
+    (link) => `<path d="${link.path}" fill="none" stroke="${LINK_COLOR}"/>`,
+  );
+  const nodes = geometry.nodes.map(
+    (node) =>
+      `<g><rect x="${node.x}" y="${node.y}" width="${node.width}" height="${node.height}" rx="4" fill="#ffffff" ` +
+      `stroke="${node.color ?? DEFAULT_COLOR}" stroke-width="1.5"/>` +
+      `<text x="${node.x + node.width / 2}" y="${node.y + node.height / 2}" text-anchor="middle" dominant-baseline="middle" ` +
+      `${FONT} font-size="11" fill="${TITLE_COLOR}">${escapeXml(node.label)}</text></g>`,
+  );
+  return [...links, ...nodes].join('');
+}
+
+function outlineList(nodes: ReadonlyArray<TreeOutlineNode>): string {
+  const items = nodes.map(
+    (node) =>
+      `<li>${escapeXml(outlineText(node))}${node.children.length > 0 ? outlineList(node.children) : ''}</li>`,
+  );
+  return `<ul>${items.join('')}</ul>`;
+}
+
+/**
+ * A tree's text alternative as an HTML string: the hierarchy as a nested
+ * list in depth-first order, visually hidden. Place it after the SVG from
+ * {@link renderContextToSvg}: the SVG is `role="img"`, whose children are
+ * presentational. Empty for every other mark.
+ */
+export function renderTreeOutline(context: ChartContext): string {
+  if (context.geometry.mark !== 'tree') return '';
+  return `<div style="${VISUALLY_HIDDEN_STYLE}" data-chart-outline="">${outlineList(context.geometry.outline)}</div>`;
 }
 
 function escapeXml(value: string): string {

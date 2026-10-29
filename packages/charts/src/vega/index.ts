@@ -11,6 +11,13 @@ export {
   VEGA_LITE_SCHEMA,
   VegaLiteEmitError,
   type EmitVegaLiteOptions,
+  type VegaLiteEmitErrorReason,
 } from './emit.ts';
 
-export type { VegaLiteData, VegaLiteEncoding, VegaLiteFieldDef, VegaLiteSpec } from './types.ts';
+export type {
+  VegaLiteData,
+  VegaLiteEncoding,
+  VegaLiteFieldDef,
+  VegaLiteSecondaryFieldDef,
+  VegaLiteSpec,
+} from './types.ts';

@@ -1,7 +1,7 @@
 import { resolveChart, type DataRows, type Margins } from '../core/index.ts';
 import type { ChartSpec } from '../spec/index.ts';
 import { computed, defineComponent, h, type PropType, type VNode } from 'vue';
-import { renderAxes, renderMarks } from './render.ts';
+import { renderAxes, renderMarks, renderTreeOutline } from './render.ts';
 
 const TITLE_COLOR = '#111827';
 const FONT_FAMILY = 'system-ui, sans-serif';
@@ -71,12 +71,14 @@ export const Chart = defineComponent({
 
       children.push(
         h('g', { transform: `translate(${dimensions.margins.left},${dimensions.margins.top})` }, [
-          renderAxes(current.context.ticks, dimensions.plot),
+          ...(current.context.geometry.mark === 'tree'
+            ? []
+            : [renderAxes(current.context.ticks, dimensions.plot)]),
           renderMarks(current.context.geometry),
         ]),
       );
 
-      return h(
+      const svg = h(
         'svg',
         {
           xmlns: 'http://www.w3.org/2000/svg',
@@ -86,6 +88,10 @@ export const Chart = defineComponent({
         },
         children,
       );
+      // A tree's children are presentational inside role="img", so its text
+      // alternative (the nested outline) is a sibling of the SVG.
+      const geometry = current.context.geometry;
+      return geometry.mark === 'tree' ? [svg, renderTreeOutline(geometry)] : svg;
     };
   },
 });

@@ -34,6 +34,34 @@ const Channel = Schema.Struct({
 export const Encoding = Schema.Struct({
   x: Schema.optionalKey(Channel),
   y: Schema.optionalKey(Channel),
+  x2: Schema.optionalKey(
+    Channel.annotate({
+      description:
+        'Spec 1.1: the end of a range on x. With mark "bar", each bar spans x to x2. Same type as x, quantitative or temporal.',
+    }),
+  ),
+  y2: Schema.optionalKey(
+    Channel.annotate({
+      description:
+        'Spec 1.1: the end of a range on y. With mark "bar", each bar spans y to y2. Same type as y, quantitative or temporal.',
+    }),
+  ),
+  id: Schema.optionalKey(
+    Channel.annotate({
+      description: 'Spec 1.1, mark "tree": the field naming each row; ids are unique.',
+    }),
+  ),
+  parent: Schema.optionalKey(
+    Channel.annotate({
+      description:
+        'Spec 1.1, mark "tree": the field holding the parent row\'s id; null (or absent) for a root.',
+    }),
+  ),
+  label: Schema.optionalKey(
+    Channel.annotate({
+      description: 'Spec 1.1, mark "tree": the text of each node; defaults to its id.',
+    }),
+  ),
   color: Schema.optionalKey(Channel),
   size: Schema.optionalKey(Channel),
   opacity: Schema.optionalKey(Channel),

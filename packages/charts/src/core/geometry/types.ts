@@ -63,5 +63,49 @@ export interface PointGeometry {
   readonly points: ReadonlyArray<PointCircle>;
 }
 
+/** A node of a `tree` mark (spec 1.1), as a box in plot pixels, in depth-first order. */
+export interface TreeNodeBox {
+  /** The row's id. */
+  readonly id: string;
+  /** The text drawn in the box (the label channel, else the id). */
+  readonly label: string;
+  /** Depth from the root, 0 for a root. */
+  readonly depth: number;
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+  /** Resolved node colour, or undefined when no colour encoding is present. */
+  readonly color: string | undefined;
+  readonly datum: Datum;
+}
+
+/** A link from a parent node to a child, as SVG path data in plot pixels. */
+export interface TreeLink {
+  readonly from: string;
+  readonly to: string;
+  readonly path: string;
+}
+
+/** One entry of a tree's outline: the nested, depth-first text alternative. */
+export interface TreeOutlineNode {
+  readonly id: string;
+  readonly label: string;
+  /** The colour-channel category named in words, so colour is never the only carrier. */
+  readonly category: string | undefined;
+  readonly children: ReadonlyArray<TreeOutlineNode>;
+}
+
+/** Geometry for a `tree` mark (spec 1.1). */
+export interface TreeGeometry {
+  readonly mark: 'tree';
+  /** Node boxes, in depth-first order. */
+  readonly nodes: ReadonlyArray<TreeNodeBox>;
+  /** One link per non-root node. */
+  readonly links: ReadonlyArray<TreeLink>;
+  /** The hierarchy as nested entries, for a nested-list text alternative. */
+  readonly outline: ReadonlyArray<TreeOutlineNode>;
+}
+
 /** Chart geometry, discriminated by mark. */
-export type Geometry = LineGeometry | BarGeometry | PointGeometry | AreaGeometry;
+export type Geometry = LineGeometry | BarGeometry | PointGeometry | AreaGeometry | TreeGeometry;

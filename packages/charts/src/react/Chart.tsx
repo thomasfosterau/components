@@ -2,7 +2,7 @@ import { resolveChart, type DataRows, type Margins } from '../core/index.ts';
 import type { ChartSpec } from '../spec/index.ts';
 import { useMemo, type ReactNode } from 'react';
 import { Axes } from './axes.tsx';
-import { Marks } from './marks.tsx';
+import { Marks, TreeOutline } from './marks.tsx';
 
 const TITLE_COLOR = '#111827';
 const FONT_FAMILY = 'system-ui, sans-serif';
@@ -51,10 +51,10 @@ export function Chart({
     return <ChartFallback message={state.message} fallback={fallback} className={className} />;
   }
 
-  const { dimensions } = state.context;
+  const { dimensions, geometry } = state.context;
   const title = state.spec.config?.title;
 
-  return (
+  const svg = (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox={`0 0 ${dimensions.outer.width} ${dimensions.outer.height}`}
@@ -77,10 +77,22 @@ export function Chart({
         </text>
       ) : null}
       <g transform={`translate(${dimensions.margins.left},${dimensions.margins.top})`}>
-        <Axes ticks={state.context.ticks} plot={dimensions.plot} />
-        <Marks geometry={state.context.geometry} />
+        {geometry.mark === 'tree' ? null : (
+          <Axes ticks={state.context.ticks} plot={dimensions.plot} />
+        )}
+        <Marks geometry={geometry} />
       </g>
     </svg>
+  );
+  // A tree's children are presentational inside role="img", so its text
+  // alternative (the nested outline) is a sibling of the SVG.
+  return geometry.mark === 'tree' ? (
+    <>
+      {svg}
+      <TreeOutline geometry={geometry} />
+    </>
+  ) : (
+    svg
   );
 }
 

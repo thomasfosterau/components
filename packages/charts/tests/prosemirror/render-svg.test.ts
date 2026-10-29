@@ -94,3 +94,16 @@ describe('renderContextToSvg', () => {
     expect(svg).not.toContain('<path d=""');
   });
 });
+
+describe('tree mark (spec 1.1)', () => {
+  it('renders boxes and links, and renderTreeOutline the nested list', async () => {
+    const { taxonomy, TAXONOMY_ORDER, listOrder } = await import('../fixtures/taxonomy.ts');
+    const { renderTreeOutline } = await import('../../src/prosemirror/index.ts');
+    const context = computeContext(taxonomy, { width: 640, height: 360 });
+    const svg = renderContextToSvg(context, { title: 'Nightshades' });
+    expect(svg.match(/<rect /g)).toHaveLength(6);
+    expect(svg.match(/<path /g)).toHaveLength(5);
+    expect(listOrder(renderTreeOutline(context))).toEqual([...TAXONOMY_ORDER]);
+    expect(renderTreeOutline(contextFor('bar'))).toBe('');
+  });
+});

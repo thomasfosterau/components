@@ -22,20 +22,35 @@
  *   the emitted JSON Schema admit `null`.
  */
 
-/** The current portable chart spec version. */
-export const SPEC_VERSION = '1';
+/** The current portable chart spec version; what a new spec should declare. */
+export const SPEC_VERSION = '1.1';
 
-/** The spec version literal accepted by v1 interpreters. */
-export type SpecVersion = typeof SPEC_VERSION;
+/**
+ * The spec versions this interpreter accepts. `'1.1'` adds the `x2` / `y2`
+ * range channels and the `tree` mark; every `'1'` spec is a valid `'1.1'`
+ * spec. See the README § Spec versioning for the minor-version rule.
+ */
+export type SpecVersion = '1' | '1.1';
 
 /**
  * The mark (geometric primitive) used to render the chart.
  *
- * Restricted to the intersection of the native charting vocabularies
- * (Swift Charts BarMark/LineMark/PointMark/AreaMark and their Compose
- * equivalents).
+ * The intersection of the native charting vocabularies (Swift Charts
+ * BarMark/LineMark/PointMark/AreaMark and their Compose equivalents), plus
+ * `tree` (spec 1.1): a hierarchy of labelled nodes joined by links, laid
+ * out by the core. It is the first mark outside the intersection, allowed
+ * because the core lays it out with no renderer dependency and every
+ * interpreter column has a normative degradation (README § Capability matrix).
  */
-export type Mark = 'bar' | 'line' | 'point' | 'area';
+export type Mark = 'bar' | 'line' | 'point' | 'area' | 'tree';
+
+/** Layout options of the `tree` mark (spec 1.1). Grammar-level only: no pixels. */
+export interface TreeOptions {
+  /** `vertical`: roots at the top (default). `horizontal`: roots at the start edge. */
+  readonly orientation?: 'vertical' | 'horizontal';
+  /** How a parent joins its children (default `orthogonal`). */
+  readonly linkStyle?: 'orthogonal' | 'curved';
+}
 
 /**
  * The declared type of an encoded field.
@@ -59,6 +74,20 @@ export interface Channel {
 export interface Encoding {
   readonly x?: Channel;
   readonly y?: Channel;
+  /**
+   * The end of a range on the x axis (spec 1.1): with `mark: 'bar'`, each
+   * bar spans `x` to `x2`, a range bar (a Gantt row). Same `type` as `x`,
+   * `quantitative` or `temporal`.
+   */
+  readonly x2?: Channel;
+  /** The end of a range on the y axis (spec 1.1), as `x2` is for x. */
+  readonly y2?: Channel;
+  /** Spec 1.1, mark `tree`: the field naming each row. Ids are unique. */
+  readonly id?: Channel;
+  /** Spec 1.1, mark `tree`: the field holding the parent row's id; `null` or absent for a root. */
+  readonly parent?: Channel;
+  /** Spec 1.1, mark `tree`: the text of each node; defaults to its id. */
+  readonly label?: Channel;
   readonly color?: Channel;
   readonly size?: Channel;
   readonly opacity?: Channel;
@@ -145,4 +174,6 @@ export interface ChartSpec {
   readonly scales?: Scales;
   readonly config?: Config;
   readonly extensions?: Extensions;
+  /** Spec 1.1: layout options of the `tree` mark; only valid with it. */
+  readonly tree?: TreeOptions;
 }

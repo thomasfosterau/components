@@ -7,9 +7,11 @@ import Foundation
 // TypeScript and Kotlin worlds; no code crosses the language boundary, only
 // the spec schema does.
 
-/// The portable chart spec version this package understands.
+/// The portable chart spec versions this package understands. `1.1` adds the
+/// `x2` / `y2` range channels; every `1` spec is a valid `1.1` spec.
 public enum SpecVersion: String, Codable, Equatable, Sendable {
     case v1 = "1"
+    case v1_1 = "1.1"
 }
 
 /// The mark (geometric primitive) used to render the chart.
@@ -18,6 +20,30 @@ public enum Mark: String, Codable, Equatable, Sendable {
     case line
     case point
     case area
+    /// Spec 1.1: a hierarchy of labelled nodes joined by links, laid out by
+    /// ``TreeLayout`` (not Swift Charts, which has no tree layout).
+    case tree
+}
+
+/// Spec 1.1: layout options of the `tree` mark. Grammar-level only: no pixels.
+public struct TreeOptions: Codable, Equatable, Sendable {
+    public enum Orientation: String, Codable, Equatable, Sendable {
+        case vertical
+        case horizontal
+    }
+
+    public enum LinkStyle: String, Codable, Equatable, Sendable {
+        case orthogonal
+        case curved
+    }
+
+    public let orientation: Orientation?
+    public let linkStyle: LinkStyle?
+
+    public init(orientation: Orientation? = nil, linkStyle: LinkStyle? = nil) {
+        self.orientation = orientation
+        self.linkStyle = linkStyle
+    }
 }
 
 /// The declared type of an encoded field.
@@ -46,6 +72,16 @@ public struct Channel: Codable, Equatable, Sendable {
 public struct Encoding: Codable, Equatable, Sendable {
     public let x: Channel?
     public let y: Channel?
+    /// Spec 1.1: the end of a range on x. With mark `bar`, each bar spans `x` to `x2`.
+    public let x2: Channel?
+    /// Spec 1.1: the end of a range on y. With mark `bar`, each bar spans `y` to `y2`.
+    public let y2: Channel?
+    /// Spec 1.1, mark `tree`: the field naming each row.
+    public let id: Channel?
+    /// Spec 1.1, mark `tree`: the field holding the parent row's id; null for a root.
+    public let parent: Channel?
+    /// Spec 1.1, mark `tree`: the text of each node; defaults to its id.
+    public let label: Channel?
     public let color: Channel?
     public let size: Channel?
     public let opacity: Channel?
@@ -53,12 +89,22 @@ public struct Encoding: Codable, Equatable, Sendable {
     public init(
         x: Channel? = nil,
         y: Channel? = nil,
+        x2: Channel? = nil,
+        y2: Channel? = nil,
+        id: Channel? = nil,
+        parent: Channel? = nil,
+        label: Channel? = nil,
         color: Channel? = nil,
         size: Channel? = nil,
         opacity: Channel? = nil
     ) {
         self.x = x
         self.y = y
+        self.x2 = x2
+        self.y2 = y2
+        self.id = id
+        self.parent = parent
+        self.label = label
         self.color = color
         self.size = size
         self.opacity = opacity
@@ -230,6 +276,8 @@ public struct ChartSpec: Codable, Equatable, Sendable {
     public let data: ChartData
     public let scales: Scales?
     public let config: Config?
+    /// Spec 1.1: layout options of the `tree` mark.
+    public let tree: TreeOptions?
 
     public init(
         specVersion: SpecVersion,
@@ -237,7 +285,8 @@ public struct ChartSpec: Codable, Equatable, Sendable {
         encoding: Encoding,
         data: ChartData,
         scales: Scales? = nil,
-        config: Config? = nil
+        config: Config? = nil,
+        tree: TreeOptions? = nil
     ) {
         self.specVersion = specVersion
         self.mark = mark
@@ -245,6 +294,7 @@ public struct ChartSpec: Codable, Equatable, Sendable {
         self.data = data
         self.scales = scales
         self.config = config
+        self.tree = tree
     }
 
     /// Decodes a spec from JSON data, rejecting unknown spec versions.

@@ -140,3 +140,14 @@ describe('Chart SSR', () => {
     });
   });
 });
+
+describe('tree mark (spec 1.1) in SSR', () => {
+  it('draws boxes and links beside a nested list in depth-first order', async () => {
+    const { taxonomy, TAXONOMY_ORDER, listOrder } = await import('../fixtures/taxonomy.ts');
+    const html = await ssr({ spec: taxonomy });
+    expect(html).toContain('role="img"');
+    expect(html.match(/<rect /g)).toHaveLength(6);
+    expect(html.match(/<path /g)).toHaveLength(5);
+    expect(listOrder(html)).toEqual([...TAXONOMY_ORDER]);
+  });
+});

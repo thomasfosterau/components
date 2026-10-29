@@ -25,9 +25,24 @@ export interface EmitVegaLiteOptions {
   readonly height?: number | undefined;
 }
 
-/** Thrown when a spec cannot be represented in Vega-Lite. */
+/** Why a spec could not be emitted: a mark Vega-Lite has no equivalent for, or data the host must resolve. */
+export type VegaLiteEmitErrorReason = 'unsupported-mark' | 'unresolved-data';
+
+/**
+ * Thrown when a spec cannot be represented in Vega-Lite. `reason` says
+ * which way, so a host can fall back without parsing the message: on
+ * `'unsupported-mark'` (the `tree` mark, ⛔ in the capability matrix) render
+ * the spec with a TS interpreter instead, which also carries the
+ * nested-list text alternative.
+ */
 export class VegaLiteEmitError extends Error {
   override readonly name = 'VegaLiteEmitError';
+  readonly reason: VegaLiteEmitErrorReason;
+
+  constructor(message: string, reason: VegaLiteEmitErrorReason = 'unresolved-data') {
+    super(message);
+    this.reason = reason;
+  }
 }
 
 /**
@@ -40,6 +55,12 @@ export class VegaLiteEmitError extends Error {
  * Web-only `extensions` are ignored, per the capability matrix.
  */
 export function emitVegaLite(spec: ChartSpec, options?: EmitVegaLiteOptions): VegaLiteSpec {
+  if (spec.mark === 'tree') {
+    throw new VegaLiteEmitError(
+      'Vega-Lite has no tree layout (that is full Vega); render a "tree" spec with a TS interpreter',
+      'unsupported-mark',
+    );
+  }
   return {
     $schema: VEGA_LITE_SCHEMA,
     ...(spec.config?.title !== undefined ? { title: spec.config.title } : {}),
@@ -76,6 +97,10 @@ function emitEncoding(spec: ChartSpec): VegaLiteEncoding {
   return {
     ...emitChannel('x', spec.encoding.x, spec.scales?.x),
     ...emitChannel('y', spec.encoding.y, spec.scales?.y),
+    // Range ends map straight across: Vega-Lite's x2 / y2 take the primary
+    // channel's type and scale, so only the field is emitted.
+    ...(spec.encoding.x2 ? { x2: { field: spec.encoding.x2.field } } : {}),
+    ...(spec.encoding.y2 ? { y2: { field: spec.encoding.y2.field } } : {}),
     ...emitChannel('color', spec.encoding.color),
     ...emitChannel('size', spec.encoding.size),
     ...emitChannel('opacity', spec.encoding.opacity),
@@ -83,7 +108,7 @@ function emitEncoding(spec: ChartSpec): VegaLiteEncoding {
 }
 
 function emitChannel(
-  name: keyof VegaLiteEncoding,
+  name: 'x' | 'y' | 'color' | 'size' | 'opacity',
   channel: Channel | undefined,
   hint?: ScaleHint,
 ): Partial<VegaLiteEncoding> {

@@ -26,4 +26,4 @@ export {
   type DataResolver,
 } from './node-view.ts';
 
-export { renderContextToSvg, type RenderSvgOptions } from './render-svg.ts';
+export { renderContextToSvg, renderTreeOutline, type RenderSvgOptions } from './render-svg.ts';

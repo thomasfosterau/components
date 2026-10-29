@@ -1,3 +1,5 @@
+import * as Arr from 'effect/Array';
+import * as Option from 'effect/Option';
 import * as Result from 'effect/Result';
 import * as Schema from 'effect/Schema';
 import { ChartSpec as ChartSpecSchema } from './internal/spec.ts';
@@ -18,8 +20,102 @@ import type { ChartSpec } from './types.ts';
  */
 const parseOptions = { onExcessProperty: 'error', errors: 'all' } as const;
 
-const decode = Schema.decodeUnknownResult(ChartSpecSchema, parseOptions);
+const decodeChartSpec = Schema.decodeUnknownResult(ChartSpecSchema, parseOptions);
 const encode = Schema.encodeUnknownSync(ChartSpecSchema, parseOptions);
+
+/** A range channel and the start channel it pairs with. */
+const RANGE_PAIRS = [
+  ['x2', 'x'],
+  ['y2', 'y'],
+] as const;
+
+/** The errors of one range channel, `end`, against its start channel. */
+function rangePairErrors(
+  spec: ChartSpec,
+  end: 'x2' | 'y2',
+  start: 'x' | 'y',
+): ReadonlyArray<string> {
+  const channel = spec.encoding[end];
+  if (channel === undefined) return [];
+  const startChannel = spec.encoding[start];
+  const at = `["encoding"]["${end}"]`;
+  return Arr.getSomes([
+    spec.specVersion === '1'
+      ? Option.some(`${at}: range channels need specVersion "1.1"`)
+      : Option.none(),
+    spec.mark === 'bar'
+      ? Option.none()
+      : Option.some(`${at}: range channels are only valid with mark "bar"`),
+    startChannel === undefined
+      ? Option.some(`${at}: needs "${start}" as the start of the range`)
+      : startChannel.type === channel.type
+        ? Option.none()
+        : Option.some(`${at}: type must match "${start}" (${startChannel.type})`),
+    channel.type === 'quantitative' || channel.type === 'temporal'
+      ? Option.none()
+      : Option.some(`${at}: must be quantitative or temporal`),
+  ]);
+}
+
+/**
+ * The cross-field rules the schema cannot express (and the JSON Schema
+ * therefore does not carry): a range channel (`x2` / `y2`) needs spec
+ * version `'1.1'`, `mark: 'bar'`, and its start channel with the same
+ * `quantitative` or `temporal` type.
+ */
+function rangeErrors(spec: ChartSpec): ReadonlyArray<string> {
+  return Arr.flatMap(RANGE_PAIRS, ([end, start]) => rangePairErrors(spec, end, start));
+}
+
+/** The channels only the `tree` mark takes, and the positional ones it does not. */
+const TREE_CHANNELS = ['id', 'parent', 'label'] as const;
+const POSITIONAL_CHANNELS = ['x', 'y', 'x2', 'y2'] as const;
+
+/**
+ * The `tree` mark's rules (spec 1.1): it needs `'1.1'` and `id` + `parent`,
+ * takes no positional channel (position is laid out, not encoded), and its
+ * channels and `tree` options are invalid on any other mark. The row-level
+ * rules (unique ids, known parents, no cycles) need the rows, so the core
+ * checks them when it lays the tree out.
+ */
+function treeErrors(spec: ChartSpec): ReadonlyArray<string> {
+  const present = (names: ReadonlyArray<keyof ChartSpec['encoding']>) =>
+    Arr.filter(names, (name) => spec.encoding[name] !== undefined);
+  if (spec.mark !== 'tree') {
+    return Arr.appendAll(
+      Arr.map(
+        present(TREE_CHANNELS),
+        (name) => `["encoding"]["${name}"]: only valid with mark "tree"`,
+      ),
+      spec.tree === undefined ? [] : ['["tree"]: only valid with mark "tree"'],
+    );
+  }
+  return Arr.getSomes([
+    spec.specVersion === '1'
+      ? Option.some('["mark"]: "tree" needs specVersion "1.1"')
+      : Option.none(),
+    spec.encoding.id === undefined
+      ? Option.some('["encoding"]["id"]: mark "tree" needs an id channel')
+      : Option.none(),
+    spec.encoding.parent === undefined
+      ? Option.some('["encoding"]["parent"]: mark "tree" needs a parent channel')
+      : Option.none(),
+    ...Arr.map(present(POSITIONAL_CHANNELS), (name) =>
+      Option.some(`["encoding"]["${name}"]: mark "tree" lays out position; it takes no "${name}"`),
+    ),
+  ]);
+}
+
+function decode(input: unknown): ValidationResult {
+  return Result.match(decodeChartSpec(input), {
+    onSuccess: (value): ValidationResult =>
+      Arr.match(Arr.appendAll(rangeErrors(value), treeErrors(value)), {
+        onEmpty: (): ValidationResult => ({ ok: true, value }),
+        onNonEmpty: (errors): ValidationResult => ({ ok: false, errors }),
+      }),
+    onFailure: (error): ValidationResult => ({ ok: false, errors: [error.message] }),
+  });
+}
 
 /** Thrown when a value is not a valid portable chart spec. */
 export class SpecValidationError extends Error {
@@ -41,7 +137,9 @@ export type ValidationResult =
  * @throws {SpecValidationError} when the value is not a valid spec.
  */
 export function parseSpec(input: unknown): ChartSpec {
-  return Result.getOrThrowWith(decode(input), (error) => new SpecValidationError(error.message));
+  const result = decode(input);
+  if (!result.ok) throw new SpecValidationError(result.errors.join('\n'));
+  return result.value;
 }
 
 /**
@@ -49,10 +147,7 @@ export function parseSpec(input: unknown): ChartSpec {
  * returning a result instead of throwing.
  */
 export function validateSpec(input: unknown): ValidationResult {
-  return Result.match(decode(input), {
-    onSuccess: (value): ValidationResult => ({ ok: true, value }),
-    onFailure: (error): ValidationResult => ({ ok: false, errors: [error.message] }),
-  });
+  return decode(input);
 }
 
 /**
