@@ -39,7 +39,7 @@ catalog:
   # here as a devDependency of packages/mapbox too, so that package's own browser
   # suite and its stories load the real module. The range is what consumers
   # must satisfy.
-  'mapbox-gl': ^3.33.0
+  'mapbox-gl': ^3.34.1
   '@changesets/cli': ^3.0.3
   # The OPTIONAL peer of `@thomasfosterau/components/entity-form`, and a
   # devDependency so that entry's browser suite and story run the real store.
