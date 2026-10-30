@@ -53,7 +53,7 @@ catalog:
   # its first consumer: the real components land on top of this scaffold and
   # every one that needs an affordance icon reaches for this rather than
   # inlining an `<svg>`.
-  '@lucide/svelte': ^1.61.0
+  '@lucide/svelte': ^1.64.0
   # `@thomasfosterau/charts` (packages/charts) — the portable chart spec, its
   # geometry core and its non-Svelte interpreters, merged in from the former
   # `thomasfosterau/charts` repo. `d3-scale` / `d3-shape` are the core's
@@ -97,7 +97,7 @@ catalog:
   '@sveltejs/vite-plugin-svelte': ^7.3.1
   '@tailwindcss/vite': ^4.3.3
   '@testing-library/jest-dom': ^7.0.1
-  '@types/node': ^26.6.5
+  '@types/node': ^26.6.6
   # Vitest browser mode: the Playwright provider is its own package as of
   # v4 and pins `vitest` EXACTLY, so it must track the `vitest` entry below,
   # which in turn tracks vite-plus's own pin (vite-plus also peers this
