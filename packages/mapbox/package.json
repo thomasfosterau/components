@@ -50,6 +50,7 @@
     "playwright": "catalog:",
     "svelte": "catalog:",
     "svelte-check": "catalog:",
+    "vitest": "catalog:",
     "vitest-browser-svelte": "catalog:"
   },
   "peerDependencies": {

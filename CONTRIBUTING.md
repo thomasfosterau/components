@@ -15,7 +15,7 @@ The toolchain is [Vite+](https://viteplus.dev) (the `vp` CLI): `vp check` format
 
 ## Git hooks
 
-`pnpm install` installs the Vite+ hooks. **pre-commit** runs `vp staged`: format and lint on the staged files (`.svelte` files are linted only; they are formatted by hand, see [AGENTS.md § Conventions](./AGENTS.md#conventions)). There is no pre-push hook.
+`pnpm install` installs the Vite+ hooks. **pre-commit** runs `vp staged`: format (with fixes) and lint (without fixes, so no type-aware autofix lands unverified) on the staged files (`.svelte` files are linted only; they are formatted by hand, see [AGENTS.md § Conventions](./AGENTS.md#conventions)). There is no pre-push hook.
 
 ## Running individual checks
 
@@ -37,7 +37,7 @@ pnpm audit --audit-level high
 
 ## CI
 
-[`ci.yml`](./.github/workflows/ci.yml) runs one job whose steps are the gates in [AGENTS.md § Verification](./AGENTS.md#verification), in order. [`release.yml`](./.github/workflows/release.yml) versions and publishes (see [PUBLISHING.md](./PUBLISHING.md)); [`chartspeckit.yml`](./.github/workflows/chartspeckit.yml) runs the Swift `ChartSpecKit` tests on macOS when that package or the chart schema changes.
+[`ci.yml`](./.github/workflows/ci.yml) runs one job whose steps are the gates in [AGENTS.md § Verification](./AGENTS.md#verification), in order. [`release.yml`](./.github/workflows/release.yml) versions and publishes (see [PUBLISHING.md](./PUBLISHING.md)); [`chartspeckit.yml`](./.github/workflows/chartspeckit.yml) runs the Swift `ChartSpecKit` tests on macOS when that package or the chart schema changes. Every workflow defaults to `permissions: {}` and grants each job only what it uses, pins each action to a commit SHA, checks out without persisted credentials (except Release, whose Changesets step pushes), sets up Node as `'*'` with `check-latest` (never `latest`, which can resolve to a pre-release), and never runs the Release job (the only one holding `id-token: write`) for Dependabot; CI needs no secret, so Dependabot PRs run it safely. `uvx zizmor --offline .github` audits the workflows (config in `.github/zizmor.yml`).
 
 ## Before you open a pull request
 

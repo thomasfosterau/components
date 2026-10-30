@@ -35,3 +35,4 @@ pnpm-debug.log*
 # Swift Package Manager (packages/charts/swift/ChartSpecKit)
 .build/
 .swiftpm/
+.vitest/

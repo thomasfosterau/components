@@ -42,9 +42,7 @@ test('reports a gesture in canvas coordinates, from press to release', async () 
   await drag(screen.getByRole('application'), { x: 40, y: 30 }, { x: 60, y: 50 });
 
   // Playwright emits at least one intermediate move; the claim is the two ends.
-  const gestures = (await screen.getByTestId('canvas-state').element()).getAttribute(
-    'data-gestures',
-  );
+  const gestures = screen.getByTestId('canvas-state').element().getAttribute('data-gestures');
   expect(gestures?.startsWith('down:40,30|move:60,50')).toBe(true);
   expect(gestures?.endsWith('|up:60,50')).toBe(true);
 });
@@ -94,7 +92,7 @@ test('zooms on the wheel, in both directions', async () => {
   const screen = await render(CanvasFixture);
   const surface = screen.getByRole('application');
   const zoom = async (): Promise<number> =>
-    Number((await screen.getByTestId('canvas-state').element()).getAttribute('data-zoom'));
+    Number(screen.getByTestId('canvas-state').element().getAttribute('data-zoom'));
 
   await surface.wheel({ delta: { y: -100 } });
   expect(await zoom()).toBeCloseTo(1.1);
@@ -105,7 +103,7 @@ test('zooms on the wheel, in both directions', async () => {
 
 /** The fixture's published state, one `data-*` attribute at a time. */
 const state = async (screen: Awaited<ReturnType<typeof render>>, name: string): Promise<string> =>
-  (await screen.getByTestId('canvas-state').element()).getAttribute(`data-${name}`) ?? '';
+  screen.getByTestId('canvas-state').element().getAttribute(`data-${name}`) ?? '';
 
 /** Give the surface keyboard focus, as Tab would. */
 const focus = async (screen: Awaited<ReturnType<typeof render>>): Promise<void> => {

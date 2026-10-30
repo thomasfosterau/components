@@ -77,10 +77,10 @@ export function emitVegaLite(spec: ChartSpec, options?: EmitVegaLiteOptions): Ve
 
 function emitData(spec: ChartSpec, rows?: ReadonlyArray<Datum>): VegaLiteData {
   // Pre-resolved rows always win: they are what the chart should show.
-  if (rows) return { values: rows as ReadonlyArray<Record<string, unknown>> };
+  if (rows) return { values: rows };
 
   if (isInlineData(spec.data)) {
-    return { values: spec.data.values as ReadonlyArray<Record<string, unknown>> };
+    return { values: spec.data.values };
   }
 
   if (isDataRef(spec.data) && spec.data.ref.kind === 'url') {

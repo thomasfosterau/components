@@ -29,7 +29,7 @@ test('inside a FormField the group is named by the label and described by the hi
 test('the locale orders the segments: en-AU day/month/year, en-US month/day/year', async () => {
   const au = await render(SegmentedFieldFixture, { locales: 'en-AU' });
   expect(partsOf(au.container)).toEqual(['day', 'month', 'year']);
-  au.unmount();
+  await au.unmount();
 
   const us = await render(SegmentedFieldFixture, { locales: 'en-US' });
   expect(partsOf(us.container)).toEqual(['month', 'day', 'year']);
@@ -82,7 +82,7 @@ test('TimeField: a 24-hour clock has no AM/PM segment; a 12-hour one does', asyn
   });
   expect(partsOf(h24.container)).toEqual(['hour', 'minute']);
   await expect.element(h24.getByRole('group', { name: 'Water at' })).toBeInTheDocument();
-  h24.unmount();
+  await h24.unmount();
 
   const h12 = await render(SegmentedFieldFixture, {
     kind: 'time',

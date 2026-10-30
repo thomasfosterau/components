@@ -1,5 +1,5 @@
 /**
- * @thomasfosterau/charts/prosemirror
+ * `@thomasfosterau/charts/prosemirror`
  *
  * Layer 3 interpreter: edit-time chart rendering inside ProseMirror.
  *

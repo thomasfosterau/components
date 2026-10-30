@@ -52,7 +52,7 @@ test('side="start" sits at the inline start, and flips under RTL', async () => {
   await ltr.getByRole('button', { name: 'Filters' }).click();
   expect(Math.round(page.getByRole('dialog').element().getBoundingClientRect().left)).toBe(0);
   await userEvent.keyboard('{Escape}');
-  ltr.unmount();
+  await ltr.unmount();
 
   document.documentElement.dir = 'rtl';
   const rtl = await render(DrawerFixture, { side: 'start' });

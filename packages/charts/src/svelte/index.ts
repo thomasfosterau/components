@@ -1,5 +1,5 @@
 /**
- * @thomasfosterau/charts/svelte
+ * `@thomasfosterau/charts/svelte`
  *
  * Layer 3 interpreter: a Svelte 5 component rendering portable chart specs as
  * SVG via the chart core. Pure rendering — works identically with

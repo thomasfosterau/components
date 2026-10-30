@@ -25,7 +25,7 @@ const schema = new Schema({
   },
 });
 
-const chartType = schema.nodes[CHART_NODE_NAME]!;
+const chartType = schema.nodes[CHART_NODE_NAME];
 
 const inlineSpec: ChartSpec = {
   specVersion: '1',
@@ -144,7 +144,7 @@ describe('ChartNodeView', () => {
 
   it('rejects updates for a different node type', () => {
     const view = viewFor(inlineSpec);
-    const paragraph = schema.nodes['paragraph']!.create();
+    const paragraph = schema.nodes['paragraph'].create();
     expect(view.update(paragraph)).toBe(false);
   });
 

@@ -18,8 +18,11 @@
 #   `vitest` at one version), and the `oxlint` / `oxfmt` / `oxlint-tsgolint` it
 #   carries. `@effect/tsgo`'s patch (the root `prepare`) hard-errors unless its
 #   release supports that exact oxlint / tsgolint and the native TypeScript,
-#   and the Effect lint plugin loads into that oxlint. A group PR is merged
-#   only once CI is green on it; see the by-hand steps below.
+#   and the Effect lint plugin (`@enfect/oxlint`) loads into that oxlint. A
+#   group PR is merged only once CI is green on it; see the by-hand steps
+#   below.
+# - `fallow`: alone, so a bump is checked against the agent gate
+#   (.claude/hooks/fallow-gate.sh) and .fallowrc.json on its own.
 # - `playwright`: the pinned `playwright` decides the Chromium revision CI
 #   installs (its catalog comment). `@vitest/browser*` sit in `toolchain`,
 #   because they pin `vitest`.
@@ -40,9 +43,11 @@
 # Each ignore is scoped to the `version-update:semver-*` types, so SECURITY
 # updates stay enabled.
 #
-# `cooldown` mirrors pnpm-workspace.yaml's `minimumReleaseAge` (1 day) and its
-# `minimumReleaseAgeExclude`: first-party `@thomasfosterau/*` releases are not
-# held. Cooldown applies per dependency, inside a group too.
+# `cooldown` follows pnpm-workspace.yaml's `minimumReleaseAge` (8 hours) and
+# its `minimumReleaseAgeExclude`: first-party `@thomasfosterau/*` releases are
+# not held. Dependabot counts whole days only, so it waits 1 day: longer than
+# pnpm's 8 hours, so a Dependabot PR never proposes a version pnpm would still
+# refuse to install. Cooldown applies per dependency, inside a group too.
 version: 2
 updates:
   - package-ecosystem: 'npm'
@@ -85,7 +90,12 @@ updates:
           - '@typescript/native'
           - 'typescript'
           - '@typescript/typescript6'
-          - '@mpsuesser/oxlint-plugin-effect'
+          - '@enfect/oxlint'
+      fallow:
+        applies-to: version-updates
+        update-types: ['major', 'minor', 'patch']
+        patterns:
+          - 'fallow'
       playwright:
         applies-to: version-updates
         update-types: ['major', 'minor', 'patch']
@@ -165,7 +175,7 @@ updates:
           - '@types/d3-*'
       # Everything else (`@lucide/svelte`, `@internationalized/date`,
       # `@testing-library/jest-dom`, `vitest-browser-svelte`, `happy-dom`,
-      # `fallow`, `@types/node`, …): minor and patch updates batched in one
+      # `@types/node`, …): minor and patch updates batched in one
       # PR; a major stays its own PR.
       everything-else:
         applies-to: version-updates

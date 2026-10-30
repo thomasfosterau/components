@@ -10,7 +10,7 @@
  */
 
 import { recommended as effectTsgoRecommended } from '@effect/tsgo/oxlint-presets';
-import effect from '@mpsuesser/oxlint-plugin-effect';
+import effect from '@enfect/oxlint';
 import { defineConfig } from 'vite-plus';
 
 /**
@@ -37,10 +37,18 @@ const effectFiles = [
 export default defineConfig({
   // Staged-file checks run by `vp staged` (pre-commit). Routed by type: oxfmt
   // cannot format `.svelte`, so Svelte goes through lint alone while the
-  // oxfmt-supported types get the full format+lint+fix pass.
+  // oxfmt-supported types get format (with fixes) then lint. Lint runs WITHOUT
+  // `--fix`: with type-aware lint on, `--fix` would apply type-aware autofixes
+  // (even of `warn` rules such as `no-unnecessary-type-assertion`) to staged
+  // files at commit time, so the commit would differ from the tree the gates
+  // ran on. `--no-error-on-unmatched-pattern` lets a commit of only
+  // `.md` / `.json` / `.css` pass the lint step, which selects no file there.
   staged: {
-    '*.{js,ts,css,json,md}': 'vp check --fix',
-    '*.svelte': 'vp lint --fix',
+    '*.{js,ts,css,json,md}': [
+      'vp check --fix --no-lint',
+      'vp check --no-fmt --no-error-on-unmatched-pattern',
+    ],
+    '*.svelte': 'vp lint --no-error-on-unmatched-pattern',
   },
 
   run: {
@@ -78,10 +86,8 @@ export default defineConfig({
     },
   },
 
-  // Oxlint. Type-aware linting is intentionally OFF: the package's types come
-  // from the `svelte-kit sync` output and its `.svelte` files are outside
-  // oxlint's remit either way, so type checking stays svelte-check's job via
-  // `vp run check`.
+  // Oxlint, type-aware through oxlint-tsgolint (bundled with vite-plus, and
+  // patched by `effect-tsgo patch --oxlint` so the `effecttsgo/*` rules run).
   lint: {
     ignorePatterns: [
       '**/dist/**',
@@ -92,25 +98,117 @@ export default defineConfig({
       'packages/charts/schema/**',
     ],
     options: {
-      typeAware: false,
+      typeAware: true,
+      // OFF, measured: tsgolint reads `.ts` files only, so every `.svelte`
+      // import resolves to the ambient `*.svelte` module declaration. With it
+      // on, the Svelte packages report 18 TS2614 (named `<script module>`
+      // exports it cannot see) and 21 TS7006 (callback props typed through
+      // those imports); the patched TS7 `tsc` reports the same 39 on
+      // packages/components. svelte-check, which reads `.svelte` through
+      // svelte2tsx, and packages/charts' patched `tsc` are already the type
+      // gate (`vp run check`), so `typeCheck` would only duplicate them with
+      // false errors. The type-aware RULES above still run on every `.ts`.
       typeCheck: false,
     },
     // `vite-plus/oxlint-plugin`: `prefer-vite-plus-imports` keeps tests on
     // `vite-plus/test` rather than `vitest` (one toolchain, one import path).
-    // `@mpsuesser/oxlint-plugin-effect` is registered here but enables nothing
-    // globally; its rules are switched on for `effectFiles` only, below.
+    // `@enfect/oxlint` is registered here but enables nothing globally; its
+    // rules are switched on for `effectFiles` only, below.
+    // Oxlint's `correctness`, `suspicious` and `perf` categories, over its
+    // TypeScript, unicorn, oxc, import, promise, Vitest and JSDoc plugins.
+    plugins: ['typescript', 'unicorn', 'oxc', 'import', 'promise', 'vitest', 'jsdoc'],
+    categories: { correctness: 'error', suspicious: 'error', perf: 'error' },
     jsPlugins: [
       { name: 'vite-plus', specifier: 'vite-plus/oxlint-plugin' },
       ...effect.configs.recommended.jsPlugins,
     ],
     rules: {
       'vite-plus/prefer-vite-plus-imports': 'error',
+      // TSDoc's `@defaultValue` (every defaulted prop, AGENTS.md
+      // § Conventions) and the `@module` file headers.
+      'jsdoc/check-tag-names': ['error', { definedTags: ['defaultValue', 'module'] }],
+      // Vitest's `expect(value, message)` takes the failure message second.
+      'vitest/valid-expect': ['error', { maxArgs: 2 }],
+      // `_tag` is the discriminant `@thomasfosterau/effect-forms-svelte`'s
+      // results carry; the components read it, they don't name it.
+      'no-underscore-dangle': ['error', { allow: ['_tag'] }],
+      // Imported for their side effect: stylesheets (Storybook's preview, the
+      // layout fixtures that load the theme) and the jest-dom matcher
+      // registration in each browser suite's tests/setup.ts.
+      'import/no-unassigned-import': [
+        'error',
+        { allow: ['**/*.css', '@testing-library/jest-dom/vitest'] },
+      ],
+      // Every flagged function is an exhaustive `switch` over a union, which
+      // the compiler already proves returns on every path
+      // (`noImplicitReturns` would flag a missing case); the rule cannot see
+      // exhaustiveness, so it can only report false positives here.
+      'typescript/consistent-return': 'off',
+      // `Snippet<[]>` spells out "a snippet that takes no arguments", the
+      // form AGENTS.md § Conventions documents for every `children` prop; the
+      // rule would rewrite it to a bare `Snippet`.
+      'typescript/no-unnecessary-type-arguments': 'off',
+      // `SpecValidationError`'s constructor narrows `Error`'s optional
+      // `message` to a required one: a signature change, not a redundant
+      // constructor, which is the only shape this rule reports here.
+      'no-useless-constructor': 'off',
+      // Staged adoption of the categories above (#310): the sites
+      // these rules found when they were turned on, at `warn` until the
+      // follow-up pays them down. A new site is a defect, not headroom; a rule
+      // whose count reaches zero goes back to `error` and its line is deleted.
+      'typescript/no-unsafe-type-assertion': 'warn', // 122 sites, mostly test doubles and DOM lookups
+      'vitest/require-mock-type-parameters': 'warn', // 74 sites, `vi.fn()` without a signature
+      'vitest/no-conditional-expect': 'warn', // 25 sites, packages/charts error-shape tests
+      'typescript/no-unnecessary-type-assertion': 'warn', // 4 sites; two `Intl.ListFormat` locales casts TS6 (svelte-check) still needs
+      'unicorn/consistent-function-scoping': 'warn', // 5 sites, 4 in `.svelte`
+      'unicorn/no-array-sort': 'warn', // 5 sites; `toSorted` raises the published browser baseline
+      'unicorn/no-array-reverse': 'warn', // 1 site, same reason
+      'promise/always-return': 'warn', // 4 sites
+      'no-shadow': 'warn', // 2 sites, both in `.svelte`
+      'oxc/no-accumulating-spread': 'warn', // 2 sites, hotkeys/match.ts
+      'oxc/no-map-spread': 'warn', // 1 site, a story
+      'vitest/require-to-throw-message': 'warn', // 1 site
     },
     // Nothing that ships may import a module SvelteKit only resolves inside an
     // app (AGENTS.md § Common pitfalls). The package tsconfigs extend
     // `$app/tsconfig`, whose `$app/types` declares `$app/*` ambiently, so
     // `svelte-check` no longer rejects such an import; this rule does (#55).
     overrides: [
+      // The tests drive a UI step by step, so an `await` in a loop is the
+      // point (each press must land before the next), and the `mapbox-gl`
+      // doubles are `vi.mock` classes whose only job is to exist or throw.
+      {
+        files: ['packages/*/tests/**'],
+        rules: {
+          'no-await-in-loop': 'off',
+          'typescript/no-extraneous-class': 'off',
+        },
+      },
+      // The Svelte packages' browser suites register
+      // `@testing-library/jest-dom/vitest` (tests/setup.ts), whose matcher
+      // types return `void` and shadow the `Promise<void>` that Vitest browser
+      // mode's `expect.element(...)` declares for the same names, so tsgolint
+      // reads every awaited assertion as awaiting a non-promise (1,177 sites
+      // when type-aware lint was turned on). The `await` is required: the
+      // assertion retries. Dropping jest-dom is not a type-only change,
+      // because its runtime matchers differ too (its `toHaveTextContent`
+      // matches a substring or RegExp, Vitest 5's compares the whole text).
+      {
+        files: ['packages/components/tests/**', 'packages/mapbox/tests/**'],
+        rules: { 'typescript/await-thenable': 'off' },
+      },
+      // `'<' + '/script>'` is split on purpose, so neither the Svelte compiler
+      // nor an HTML parser reading the file sees the end of its own `<script>`.
+      {
+        files: ['**/seo/JsonLd.svelte', '**/seo/JsonLd.stories.svelte'],
+        rules: { 'no-useless-concat': 'off' },
+      },
+      // A chord carries at most three modifiers, so an array's `includes`
+      // beats hashing a `Set` on every keystroke (the comment at the site).
+      {
+        files: ['packages/components/src/lib/hotkeys/match.ts'],
+        rules: { 'unicorn/prefer-set-has': 'off' },
+      },
       {
         files: ['packages/*/src/lib/**'],
         rules: {
@@ -146,25 +244,18 @@ export default defineConfig({
       },
       // The Effect presets, scoped to the files that import Effect (see
       // `effectFiles` above). `effect.configs.recommended` is
-      // `@mpsuesser/oxlint-plugin-effect`'s syntactic rule set, all `error`.
+      // `@enfect/oxlint`'s rule set (anti-slop included), all `error`.
       // `effectTsgoRecommended` is the Effect Language Service's rule set,
-      // run by the Effect-patched oxlint (`effect-tsgo patch --oxlint`, the
-      // root `prepare`); its rules are type-aware, so like the rest of
-      // type-aware linting here (`typeAware: false` above) they stay dormant,
-      // and the same diagnostics reach packages/charts through the patched
-      // `tsc` instead (its tsconfig's `@effect/language-service` plugin).
+      // run by the Effect-patched oxlint and tsgolint (`effect-tsgo patch
+      // --oxlint`, the root `prepare`) now that type-aware linting is on; the
+      // same diagnostics also reach packages/charts through the patched `tsc`
+      // (its tsconfig's `@effect/language-service` plugin).
       {
         files: effectFiles,
         plugins: effectTsgoRecommended.plugins,
         rules: {
           ...effectTsgoRecommended.rules,
           ...effect.configs.recommended.rules,
-          // Hard-codes abbreviations (`Arr`, `P`, `R`, …) with no options,
-          // so it is unsatisfiable under the full-name convention
-          // (`import * as Schema from 'effect/Schema'`) the owner's Effect
-          // repos share (effect-web's config turns it off for the same
-          // reason).
-          'effect/prefer-namespace-imports': 'off',
         },
       },
       // The `/entity-form` renderer and its story are Svelte components in the

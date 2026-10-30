@@ -13,7 +13,7 @@ const columns = (element: Element): number =>
 test('minItem="sm" (12rem) gives four columns in 900px and two in 420px', async () => {
   const wide = await render(PrimitivesFixture, { kind: 'grid', minItem: 'sm', gap: 'none' });
   expect(columns(wide.getByTestId('root').element())).toBe(4);
-  wide.unmount();
+  await wide.unmount();
 
   const narrow = await render(PrimitivesFixture, {
     kind: 'grid',

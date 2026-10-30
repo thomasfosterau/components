@@ -19,7 +19,7 @@ test('VStack is a flex column with the default md gap; class merges last', async
 test('HStack is a row; responsive is a column below sm', async () => {
   const row = await render(PrimitivesFixture, { kind: 'hstack', gap: 'lg' });
   expect(row.getByTestId('root').element().className).toBe('flex flex-row gap-8');
-  row.unmount();
+  await row.unmount();
 
   const responsive = await render(PrimitivesFixture, { kind: 'hstack', responsive: true });
   expect(responsive.getByTestId('root').element().className).toContain('flex-col sm:flex-row');

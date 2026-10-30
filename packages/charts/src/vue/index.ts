@@ -1,5 +1,5 @@
 /**
- * @thomasfosterau/charts/vue
+ * `@thomasfosterau/charts/vue`
  *
  * Layer 3 interpreter: Vue 3 components rendering portable chart specs as
  * SVG via the chart core. Written as plain render functions (no SFC
