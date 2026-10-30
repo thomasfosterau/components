@@ -39,7 +39,7 @@ test('items after the first are inert and aria-hidden', async () => {
 test('the top item reads the depth: three items, or the given count', async () => {
   const three = await render(StackFixture, {});
   expect(three.getByTestId('stack').element().children[0]?.textContent).toContain('3 items');
-  three.unmount();
+  await three.unmount();
 
   const twelve = await render(StackFixture, { count: 12 });
   expect(twelve.getByTestId('stack').element().children[0]?.textContent).toContain('12 items');

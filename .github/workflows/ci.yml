@@ -55,20 +55,28 @@ jobs:
       - name: Install Chromium for the browser suites
         run: pnpm exec playwright install --with-deps chromium
 
+      # The type-aware lint below reads the Svelte packages' tsconfigs, which
+      # extend the `$app/tsconfig` that `svelte-kit sync` writes; without it
+      # tsgolint reports `tsconfig-error` and types those packages as nothing.
+      - name: Generate the SvelteKit types
+        run: pnpm exec vp run -r sync
+
+      # Format and lint; lint is type-aware through oxlint-tsgolint
+      # (`lint.options.typeAware` in vite.config.ts).
       - name: Format and lint
-        run: vp check
+        run: pnpm exec vp check
 
       - name: Type check
-        run: vp run check
+        run: pnpm exec vp run check
 
       - name: Unit tests
-        run: vp run -r test:unit
+        run: pnpm exec vp run -r test:unit
 
       - name: Build the packages
-        run: vp run -r build
+        run: pnpm exec vp run -r build
 
       - name: Build Storybook
-        run: vp run --filter ./packages/components storybook:build
+        run: pnpm exec vp run --filter ./packages/components storybook:build
 
       - name: Audit dependencies
         run: pnpm audit --audit-level high

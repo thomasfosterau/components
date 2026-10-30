@@ -16,7 +16,7 @@ const shown = async (width: number): Promise<string[]> => {
   );
   // One copy of each control in the accessibility tree.
   expect(screen.getByRole('button', { name: 'Save' }).elements()).toHaveLength(1);
-  screen.unmount();
+  await screen.unmount();
   return visible;
 };
 

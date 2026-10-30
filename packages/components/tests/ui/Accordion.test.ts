@@ -90,7 +90,7 @@ test('searchable: a closed panel is hidden="until-found"; off, it is plain hidde
   const content = screen.container.querySelector('[aria-labelledby]');
   expect(content?.getAttribute('hidden')).toBe('until-found');
 
-  screen.unmount();
+  await screen.unmount();
   const plain = await render(AccordionFixture, { searchable: false });
   const closed = plain.container.querySelector('[data-accordion-content]');
   expect(closed?.getAttribute('hidden')).not.toBe('until-found');

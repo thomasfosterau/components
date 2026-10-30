@@ -40,7 +40,7 @@ const chartSpec: ChartSpec = {
 
 describe('createChartNodeSpec', () => {
   it('creates an atom block node with a null default spec', () => {
-    const nodeType = schema.nodes[CHART_NODE_NAME]!;
+    const nodeType = schema.nodes[CHART_NODE_NAME];
     expect(nodeType.isAtom).toBe(true);
     expect(nodeType.isBlock).toBe(true);
     const node = nodeType.create();
@@ -49,8 +49,8 @@ describe('createChartNodeSpec', () => {
 
   describe('document JSON persistence (the Layer 1 round-trip)', () => {
     it('preserves the spec through doc.toJSON() → Node.fromJSON()', () => {
-      const doc = schema.nodes['doc']!.create(null, [
-        schema.nodes[CHART_NODE_NAME]!.create({ spec: chartSpec }),
+      const doc = schema.nodes['doc'].create(null, [
+        schema.nodes[CHART_NODE_NAME].create({ spec: chartSpec }),
       ]);
 
       const json = doc.toJSON();
@@ -64,7 +64,7 @@ describe('createChartNodeSpec', () => {
 
   describe('DOM serialisation (copy/paste and HTML round-trips)', () => {
     it('toDOM stores the encoded spec in the data attribute', () => {
-      const node = schema.nodes[CHART_NODE_NAME]!.create({ spec: chartSpec });
+      const node = schema.nodes[CHART_NODE_NAME].create({ spec: chartSpec });
       const rendered = DOMSerializer.fromSchema(schema).serializeNode(node) as HTMLElement;
 
       expect(rendered.tagName).toBe('DIV');
@@ -74,8 +74,8 @@ describe('createChartNodeSpec', () => {
     });
 
     it('round-trips a chart node through DOM serialisation and parsing', () => {
-      const doc = schema.nodes['doc']!.create(null, [
-        schema.nodes[CHART_NODE_NAME]!.create({ spec: chartSpec }),
+      const doc = schema.nodes['doc'].create(null, [
+        schema.nodes[CHART_NODE_NAME].create({ spec: chartSpec }),
       ]);
 
       const container = document.createElement('div');
@@ -117,7 +117,7 @@ describe('createChartNodeSpec', () => {
           chart: createChartNodeSpec({ className: 'cms-chart' }),
         },
       });
-      const node = customSchema.nodes['chart']!.create({ spec: chartSpec });
+      const node = customSchema.nodes['chart'].create({ spec: chartSpec });
       const rendered = DOMSerializer.fromSchema(customSchema).serializeNode(node) as HTMLElement;
       expect(rendered.className).toBe('cms-chart');
     });

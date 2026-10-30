@@ -78,7 +78,7 @@ test('the interval stops on unmount', async () => {
   const onComplete = vi.fn();
   const screen = await render(Countdown, { until: START + 3_000, label: 'Soon', onComplete });
 
-  screen.unmount();
+  await screen.unmount();
   await vi.advanceTimersByTimeAsync(10_000);
   expect(onComplete).not.toHaveBeenCalled();
   expect(vi.getTimerCount()).toBe(0);

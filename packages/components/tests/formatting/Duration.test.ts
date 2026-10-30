@@ -32,7 +32,7 @@ test('locales and style change the spelling', async () => {
     style: 'long',
   });
   expect(german.container.querySelector('time')?.textContent).toMatch(/2 Stunden.*30 Minuten/);
-  german.unmount();
+  await german.unmount();
 
   const clock = await render(Duration, {
     value: { hours: 2, minutes: 30 },

@@ -128,7 +128,7 @@ function digital(value: DurationValue): string {
  */
 export function formatDuration(
   value: DurationValue,
-  locales?: string | readonly string[] | undefined,
+  locales?: string | readonly string[],
   style: DurationStyle = 'short',
 ): string {
   const present = presentFields(value);

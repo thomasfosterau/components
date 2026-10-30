@@ -1,5 +1,5 @@
 /**
- * @thomasfosterau/charts
+ * `@thomasfosterau/charts`
  *
  * Layer 1 of the portable chart architecture: the durable, declarative,
  * language-neutral chart specification.

@@ -1,5 +1,5 @@
 /**
- * @thomasfosterau/charts/core
+ * `@thomasfosterau/charts/core`
  *
  * Layer 2 of the portable chart architecture: the pure TypeScript geometry
  * core. Turns (spec, measured box, resolved data) into scales, dimensions,

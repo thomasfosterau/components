@@ -1,5 +1,5 @@
 /**
- * @thomasfosterau/charts/vega
+ * `@thomasfosterau/charts/vega`
  *
  * Layer 3 interpreter: emits Vega-Lite specifications from portable chart
  * specs, as an escape hatch and SSR fallback. Also serves as the living

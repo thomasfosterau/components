@@ -36,7 +36,7 @@ export interface StaticMapRequest {
   /** A public-scope Mapbox token — safe in a URL by design. */
   readonly accessToken: string;
   /** A GeoJSON overlay, serialised into the path. */
-  readonly overlay?: unknown | undefined;
+  readonly overlay?: unknown;
   /** Request the 2× raster for a high-density display. */
   readonly retina?: boolean | undefined;
 }

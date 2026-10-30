@@ -1,8 +1,10 @@
 # Composite setup shared by every workflow job that needs the toolchain: pnpm,
 # Node with the pnpm store cache (keyed on pnpm-lock.yaml by setup-node), a
-# frozen-lockfile install (retried, see that step), and node_modules/.bin on
-# PATH so later steps call `vp`, `fallow`, `playwright` directly. The shape is
-# effect-web's action.
+# frozen-lockfile install (retried, see that step). Later steps call the
+# toolchain through `pnpm exec` (`pnpm exec vp check`): writing
+# node_modules/.bin to `GITHUB_PATH` would let any file the install drops there
+# shadow a system binary for every later step (zizmor's `github-env`). The
+# shape is effect-web's action.
 #
 # Callers run `actions/checkout` BEFORE this: a local composite action needs
 # the repository on disk first.
@@ -20,7 +22,12 @@ runs:
     - name: Setup Node.js
       uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
       with:
-        node-version: latest
+        # Never `latest`: setup-node resolves it to the first entry of the
+        # nodejs.org index, pre-releases included (v27.0.0-alpha on
+        # 2026-10-29, which hangs some suites). `*` + `check-latest` is the
+        # newest STABLE release from setup-node's manifest.
+        node-version: '*'
+        check-latest: true
         cache: pnpm
 
     # Install scripts RUN: the root `prepare` applies `effect-tsgo patch
@@ -50,4 +57,3 @@ runs:
           echo "::warning::pnpm install failed (attempt ${attempt}/3); retrying in ${delay}s"
           sleep "$delay"
         done
-        echo "$PWD/node_modules/.bin" >> "$GITHUB_PATH"

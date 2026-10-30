@@ -105,6 +105,7 @@
     "svelte": "catalog:",
     "svelte-check": "catalog:",
     "tailwindcss": "catalog:",
+    "vitest": "catalog:",
     "vitest-browser-svelte": "catalog:"
   },
   "peerDependencies": {

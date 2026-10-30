@@ -27,8 +27,9 @@ permissions: {}
 jobs:
   release:
     name: Version or publish
-    # A fork that copies this workflow must not try to publish.
-    if: github.repository == 'thomasfosterau/components'
+    # A fork that copies this workflow must not try to publish, and a push
+    # made by Dependabot never reaches the job that holds `id-token: write`.
+    if: github.repository == 'thomasfosterau/components' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     # A protected environment (deployment branches: `trunk` only), named by the
@@ -56,9 +57,14 @@ jobs:
       # The job publishes with the npm this Node bundles; there is no npm
       # upgrade step (#84). Trusted Publishing needs npm >= 11.5.1, which
       # every Node release since 24.5.0 bundles.
+      #
+      # Never `latest`: setup-node resolves it to the first nodejs.org index
+      # entry, pre-releases included, so Release would publish on an alpha.
+      # `*` + `check-latest` is the newest stable release.
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: latest
+          node-version: '*'
+          check-latest: true
           cache: pnpm
 
       # `--ignore-scripts`, unlike CI's setup action: no install script runs in
@@ -67,9 +73,6 @@ jobs:
       # `effect-tsgo` patch, which only the type and lint gates use.
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
-
-      - name: Put the toolchain on PATH
-        run: echo "$GITHUB_WORKSPACE/node_modules/.bin" >> "$GITHUB_PATH"
 
       # The publish path runs `vp run -r build` first (the root `release`
       # script) — `files` is `["dist"]`, so a stale or missing build would

@@ -19,8 +19,8 @@ export type ResolvedChart =
 export function resolveChart(
   spec: unknown,
   box: Box,
-  data?: DataRows | undefined,
-  options?: ComputeContextOptions | undefined,
+  data?: DataRows,
+  options?: ComputeContextOptions,
 ): ResolvedChart {
   const validation = validateSpec(spec);
   if (!validation.ok) {

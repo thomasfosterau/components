@@ -32,7 +32,7 @@ test('ArrowRight adds a star; with allowHalf it adds half of one', async () => {
   (slider.element() as HTMLElement).focus();
   await userEvent.keyboard('{ArrowRight}');
   await expect.element(slider).toHaveAttribute('aria-valuenow', '4');
-  whole.unmount();
+  await whole.unmount();
 
   const half = await render(Rating, { label: 'Score', value: 3, allowHalf: true });
   const halfSlider = half.getByRole('slider', { name: 'Score' });
