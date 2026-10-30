@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.schemastore.org/package",
   "name": "@thomasfosterau/charts",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A portable, renderer-agnostic chart spec — its JSON Schema, a pure TypeScript geometry core, and React, Vue, Svelte, ProseMirror and Vega-Lite interpreters",
   "keywords": [
     "charts",

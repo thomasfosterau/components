@@ -1,5 +1,57 @@
 # @thomasfosterau/components-mapbox
 
+## 0.2.0
+
+### Minor Changes
+
+- b160b83: `MapEditor` has a keyboard path to every pointer edit (#135, upstreamed from the owner's app). `]` / `[` step between shapes and, inside a shape, between its vertices and edge midpoints. Arrows move the shape or vertex a grid step, five with Shift; on a midpoint they add a vertex and move it. Enter / Space go into a shape's handles or add a vertex at a midpoint. Delete / Backspace remove a vertex. Escape steps back out, and with a drawing tool it finishes the outline at once. With a drawing tool, a cursor moved by the arrows places vertices on Enter. A held arrow is one undo step, with the same transform the matching pointer drag commits. The focused part is named through `aria-activedescendant`, and edits are announced in a polite status region.
+
+  The copy is new props with English defaults: `keysDescription`, `shapeLabel`, `vertexLabel`, `midpointLabel`, `cursorLabel` and the `…Message` announcements. Coordinates are formatted with the new `locales` prop. `MapShapeView` gains `focus`, `focusId`, `focusLabel` and `focusVisible`.
+
+  Also fixed: switching tool mid-outline now finishes the outline straight away instead of on the next press, and an Alt-click refused by the minimum-vertex rule no longer reports a no-op committed edit.
+
+### Patch Changes
+
+- bbabaef: Doc comments: every export's first sentence now stands alone in a hover, `MapShapeView`'s `selected` / `editable` state their `false` default, and `Map`'s `width` says it sizes the raster while the live map fills its container. The README is now a full API reference (shape geometry, the GeoJSON seam, static map URLs, every type), and its peer range and defaults match the source.
+- 859327d: `package.json`'s `repository.directory` now names `packages/mapbox`, the directory the package actually lives in; it named one that does not exist.
+- d729e10: Drop the redundant `| undefined` the type-aware lint flagged on optional parameters and on `StaticMapRequest.overlay` (`unknown` already includes it), and quote the package names that opened the `@thomasfosterau/charts` entry modules' doc comments, which a JSDoc reader took for tags. The declared types are unchanged.
+- Updated dependencies [b160b83]
+- Updated dependencies [f76d83f]
+- Updated dependencies [bbabaef]
+- Updated dependencies [9ced607]
+- Updated dependencies [ce08e97]
+- Updated dependencies [5da5d9e]
+- Updated dependencies [d1ec8d4]
+- Updated dependencies [fc2aca9]
+- Updated dependencies [bbbd37f]
+- Updated dependencies [1db2d3d]
+- Updated dependencies [021f9e7]
+- Updated dependencies [bbabaef]
+- Updated dependencies [1de9ef8]
+- Updated dependencies [0e6558e]
+- Updated dependencies [fcd0f37]
+- Updated dependencies [a2778bc]
+- Updated dependencies [12d015e]
+- Updated dependencies [1d66b79]
+- Updated dependencies [3f71b80]
+- Updated dependencies [088ea40]
+- Updated dependencies [63b3124]
+- Updated dependencies [5ad51fa]
+- Updated dependencies [0741231]
+- Updated dependencies [38f0c1c]
+- Updated dependencies [42acc6a]
+- Updated dependencies [6e647d0]
+- Updated dependencies [8017613]
+- Updated dependencies [123af69]
+- Updated dependencies [d729e10]
+- Updated dependencies [7343c77]
+- Updated dependencies [1f00aaa]
+- Updated dependencies [fcacde9]
+- Updated dependencies [7df9874]
+- Updated dependencies [e37a373]
+- Updated dependencies [e930050]
+  - @thomasfosterau/components@0.2.0
+
 ## 0.1.0
 
 ### Minor Changes
