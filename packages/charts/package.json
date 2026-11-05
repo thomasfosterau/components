@@ -19,7 +19,7 @@
   "author": "Thomas Foster <me@thomasfoster.au>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/thomasfosterau/components.git",
+    "url": "git+https://github.com/thomasfosterau/components.git",
     "directory": "packages/charts"
   },
   "files": [
@@ -60,6 +60,9 @@
       "default": "./dist/vue.mjs"
     },
     "./schema.json": "./schema/chart-spec.v1.json"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "d3-scale": "catalog:",
