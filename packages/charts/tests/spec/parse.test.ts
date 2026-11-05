@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test';
+import { errorsOf } from './errors-of.ts';
 import {
   encodeSpec,
   parseSpec,
@@ -108,19 +109,12 @@ describe('parseSpec', () => {
 describe('validateSpec', () => {
   it('returns ok for a valid spec', () => {
     const result = validateSpec(validSpec);
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(result.value.mark).toBe('line');
-    }
+    expect(result).toMatchObject({ ok: true, value: { mark: 'line' } });
   });
 
   it('returns errors for an invalid spec without throwing', () => {
     const result = validateSpec({ specVersion: '1', mark: 'donut' });
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.errors.length).toBeGreaterThan(0);
-      expect(result.errors[0]).toContain('Mark');
-    }
+    expect(errorsOf(result)[0]).toContain('Mark');
   });
 
   it('collects all errors, not just the first', () => {
@@ -130,12 +124,10 @@ describe('validateSpec', () => {
       encoding: {},
       data: { values: [] },
     });
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      // both the bad version and the bad mark are reported
-      expect(result.errors.join('\n')).toContain('"specVersion"');
-      expect(result.errors.join('\n')).toContain('"mark"');
-    }
+    // both the bad version and the bad mark are reported
+    const errors = errorsOf(result).join('\n');
+    expect(errors).toContain('"specVersion"');
+    expect(errors).toContain('"mark"');
   });
 });
 

@@ -163,10 +163,8 @@ describe('tree mark (spec 1.1)', () => {
   it('is an unsupported-mark error, not a malformed emit', async () => {
     const { taxonomy } = await import('../fixtures/taxonomy.ts');
     expect(() => emitVegaLite(taxonomy)).toThrow(VegaLiteEmitError);
-    try {
-      emitVegaLite(taxonomy);
-    } catch (error) {
-      expect((error as VegaLiteEmitError).reason).toBe('unsupported-mark');
-    }
+    expect(() => emitVegaLite(taxonomy)).toThrow(
+      expect.objectContaining({ reason: 'unsupported-mark' }),
+    );
   });
 });

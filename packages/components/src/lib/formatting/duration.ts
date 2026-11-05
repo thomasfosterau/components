@@ -138,20 +138,22 @@ export function formatDuration(
   }
   if (style === 'digital') return digital(value);
   const unitDisplay = style;
+  // A mutable copy: TS6's `Intl.ListFormat` (svelte-check) takes no readonly array.
+  const tags = typeof locales === 'object' ? [...locales] : locales;
   const pieces = FIELDS.filter(({ field }) => present[field] !== undefined).map(({ field, unit }) =>
-    new Intl.NumberFormat(locales as string | string[] | undefined, {
+    new Intl.NumberFormat(tags, {
       style: 'unit',
       unit,
       unitDisplay,
     }).format(present[field] ?? 0),
   );
-  return new Intl.ListFormat(locales as string | string[] | undefined, {
+  return new Intl.ListFormat(tags, {
     type: 'unit',
     style: style === 'long' ? 'long' : style === 'short' ? 'short' : 'narrow',
   }).format(
     pieces.length === 0
       ? [
-          new Intl.NumberFormat(locales as string | string[] | undefined, {
+          new Intl.NumberFormat(tags, {
             style: 'unit',
             unit: 'second',
             unitDisplay,

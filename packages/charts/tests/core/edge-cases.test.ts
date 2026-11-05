@@ -1,6 +1,7 @@
 import { parseSpec } from '../../src/spec/index.ts';
 import { describe, expect, it } from 'vite-plus/test';
-import { computeContext } from '../../src/core/index.ts';
+import { geometryOf } from './geometry-of.ts';
+import { computeContext, type Geometry } from '../../src/core/index.ts';
 
 const box = { width: 100, height: 100 };
 const noMargins = { margins: { top: 0, right: 0, bottom: 0, left: 0 } };
@@ -17,25 +18,28 @@ function specFor(mark: 'bar' | 'line' | 'point' | 'area', values: unknown[]) {
   });
 }
 
+/** Every drawn item of a geometry: a line or area's points (one empty series when there is no colour split), bars, points or nodes. */
+function drawn(geometry: Geometry): ReadonlyArray<unknown> {
+  switch (geometry.mark) {
+    case 'line':
+    case 'area':
+      return geometry.series.flatMap((series) => series.points);
+    case 'bar':
+      return geometry.bars;
+    case 'point':
+      return geometry.points;
+    case 'tree':
+      return geometry.nodes;
+  }
+}
+
 describe('edge cases', () => {
   describe('empty data', () => {
     it.each(['bar', 'line', 'point', 'area'] as const)(
       '%s mark produces empty geometry without throwing',
       (mark) => {
         const context = computeContext(specFor(mark, []), box, undefined, noMargins);
-        switch (context.geometry.mark) {
-          case 'line':
-          case 'area':
-            // a single empty series (no colour split)
-            expect(context.geometry.series.flatMap((s) => s.points)).toHaveLength(0);
-            break;
-          case 'bar':
-            expect(context.geometry.bars).toHaveLength(0);
-            break;
-          case 'point':
-            expect(context.geometry.points).toHaveLength(0);
-            break;
-        }
+        expect(drawn(geometryOf(context, mark))).toHaveLength(0);
       },
     );
 
@@ -65,10 +69,7 @@ describe('edge cases', () => {
       const context = computeContext(specFor('point', [{ x: 5, y: 5 }]), box, undefined, noMargins);
       expect(context.scales.x?.domain).toEqual([4, 6]);
       // the single point sits in the middle of the padded domain
-      if (context.geometry.mark === 'point') {
-        expect(context.geometry.points[0]!.cx).toBe(50);
-        expect(context.geometry.points[0]!.cy).toBe(50);
-      }
+      expect(geometryOf(context, 'point').points[0]).toMatchObject({ cx: 50, cy: 50 });
     });
 
     it('pads degenerate temporal domains by a day either side', () => {
@@ -88,10 +89,9 @@ describe('edge cases', () => {
 
     it('renders a single-point line as one point with a move-to path', () => {
       const context = computeContext(specFor('line', [{ x: 5, y: 5 }]), box, undefined, noMargins);
-      if (context.geometry.mark === 'line') {
-        expect(context.geometry.series[0]!.points).toHaveLength(1);
-        expect(context.geometry.series[0]!.path).toMatch(/^M/);
-      }
+      const [series] = geometryOf(context, 'line').series;
+      expect(series?.points).toHaveLength(1);
+      expect(series?.path).toMatch(/^M/);
     });
   });
 
@@ -104,9 +104,7 @@ describe('edge cases', () => {
         data: { values: [{ x: 1 }] },
       });
       const context = computeContext(spec, box, undefined, noMargins);
-      if (context.geometry.mark === 'line') {
-        expect(context.geometry.series).toHaveLength(0);
-      }
+      expect(geometryOf(context, 'line').series).toHaveLength(0);
       // the x scale still resolves (e.g. for axis rendering)
       expect(context.scales.x).toBeDefined();
       expect(context.scales.y).toBeUndefined();
@@ -120,9 +118,7 @@ describe('edge cases', () => {
         undefined,
         noMargins,
       );
-      if (context.geometry.mark === 'point') {
-        expect(context.geometry.points).toHaveLength(2);
-      }
+      expect(geometryOf(context, 'point').points).toHaveLength(2);
     });
   });
 

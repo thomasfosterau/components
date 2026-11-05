@@ -1,5 +1,6 @@
 import { parseSpec } from '../../src/spec/index.ts';
 import { describe, expect, it } from 'vite-plus/test';
+import { geometryOf } from './geometry-of.ts';
 import { computeContext, DEFAULT_MARGINS } from '../../src/core/index.ts';
 
 const box = { width: 600, height: 400 };
@@ -43,10 +44,7 @@ describe('computeContext', () => {
       },
     });
     const context = computeContext(spec, square.box, undefined, square.options);
-    expect(context.geometry.mark).toBe('point');
-    if (context.geometry.mark === 'point') {
-      expect(context.geometry.points).toHaveLength(2);
-    }
+    expect(geometryOf(context, 'point').points).toHaveLength(2);
   });
 
   it('prefers passed rows over inline values', () => {
@@ -65,9 +63,7 @@ describe('computeContext', () => {
       { x: 2, y: 2 },
     ];
     const context = computeContext(spec, square.box, rows, square.options);
-    if (context.geometry.mark === 'point') {
-      expect(context.geometry.points).toHaveLength(3);
-    }
+    expect(geometryOf(context, 'point').points).toHaveLength(3);
   });
 
   it('throws a clear error for ref data when no rows are passed', () => {
@@ -98,9 +94,7 @@ describe('computeContext', () => {
       { cat: 'b', v: 2 },
     ];
     const context = computeContext(spec, box, rows);
-    if (context.geometry.mark === 'bar') {
-      expect(context.geometry.bars).toHaveLength(2);
-    }
+    expect(geometryOf(context, 'bar').bars).toHaveLength(2);
   });
 
   describe('produces complete contexts for every v1 mark', () => {
@@ -178,14 +172,12 @@ describe('computeContext', () => {
 
     expect(context.scales.x?.kind).toBe('utc');
     expect(context.scales.color?.kind).toBe('ordinal');
-    if (context.geometry.mark === 'line') {
-      expect(context.geometry.series).toHaveLength(2);
-      expect(context.geometry.series.map((s) => s.key)).toEqual(['AAPL', 'GOOG']);
-      for (const series of context.geometry.series) {
-        expect(series.points).toHaveLength(2);
-        expect(series.path).toMatch(/^M/);
-        expect(series.color).toBeDefined();
-      }
+    const { series } = geometryOf(context, 'line');
+    expect(series.map((s) => s.key)).toEqual(['AAPL', 'GOOG']);
+    for (const { points, path, color } of series) {
+      expect(points).toHaveLength(2);
+      expect(path).toMatch(/^M/);
+      expect(color).toBeDefined();
     }
   });
 

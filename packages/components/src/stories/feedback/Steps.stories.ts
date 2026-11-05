@@ -38,7 +38,12 @@ export const Responsive: Story = { args: { orientation: 'responsive' } };
 export const ErrorStep: Story = {
   args: {
     current: 2,
-    items: season.map((step) => (step.id === 'transplant' ? { ...step, state: 'error' } : step)),
+    items: [
+      { id: 'plan', label: 'Plan' },
+      { id: 'sow', label: 'Sow' },
+      { id: 'transplant', label: 'Transplant', state: 'error' },
+      { id: 'harvest', label: 'Harvest' },
+    ],
   },
 };
 
