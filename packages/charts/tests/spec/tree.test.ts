@@ -2,6 +2,7 @@
  * Spec 1.1 `tree` mark: the channels it needs and the ones it refuses.
  */
 import { describe, expect, it } from 'vite-plus/test';
+import { errorsOf } from './errors-of.ts';
 import { validateSpec } from '../../src/spec/index.ts';
 
 const tree = {
@@ -61,7 +62,6 @@ describe('tree mark', () => {
       Object.entries(spec).filter(([, value]) => value !== undefined),
     );
     const result = validateSpec(input);
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.errors.join('\n')).toContain(message);
+    expect(errorsOf(result).join('\n')).toContain(message);
   });
 });

@@ -12,7 +12,7 @@ test('reads the intrinsic pixel size of an image file', async () => {
 });
 
 test('rejects a file that does not decode as an image', async () => {
-  await expect(
-    imageDimensions(new Blob(['not an image'], { type: 'text/plain' })),
-  ).rejects.toThrow();
+  await expect(imageDimensions(new Blob(['not an image'], { type: 'text/plain' }))).rejects.toThrow(
+    DOMException,
+  );
 });

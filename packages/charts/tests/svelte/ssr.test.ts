@@ -127,7 +127,9 @@ describe('Chart SSR', () => {
 
   describe('fallback states', () => {
     it('renders an alert for invalid specs', () => {
-      const html = ssr({ spec: { bogus: true } as unknown as ChartSpec, class: 'sales-chart' });
+      // A document from outside, as a caller holding unchecked JSON would pass it.
+      const bogus: ChartSpec = JSON.parse('{"bogus":true}');
+      const html = ssr({ spec: bogus, class: 'sales-chart' });
       expect(html).toContain('role="alert"');
       expect(html).toContain('data-chart-error');
       expect(html).toContain('class="sales-chart"');

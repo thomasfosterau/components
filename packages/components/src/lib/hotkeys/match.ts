@@ -128,24 +128,21 @@ export function matchSequence(
   buffer: readonly string[],
   actions: readonly RegisteredAction[],
 ): SequenceMatch {
-  return actions.reduce<SequenceMatch>(
-    (match, { action }) => {
-      const trigger = action.trigger;
-      if (trigger === undefined) return match;
-      const sequence = asSequence(trigger);
-      if (sequence === undefined) return match;
+  let exact: CommandAction | undefined;
+  let isPrefix = false;
+  for (const { action } of actions) {
+    const trigger = action.trigger;
+    if (trigger === undefined) continue;
+    const sequence = asSequence(trigger);
+    if (sequence === undefined) continue;
 
-      if (sequence.length === buffer.length) {
-        return match.exact === undefined && sequence.every((key, i) => key === buffer[i])
-          ? { ...match, exact: action }
-          : match;
-      }
-      return sequence.length > buffer.length && buffer.every((key, i) => key === sequence[i])
-        ? { ...match, isPrefix: true }
-        : match;
-    },
-    { exact: undefined, isPrefix: false },
-  );
+    if (sequence.length === buffer.length) {
+      if (exact === undefined && sequence.every((key, i) => key === buffer[i])) exact = action;
+    } else if (sequence.length > buffer.length && buffer.every((key, i) => key === sequence[i])) {
+      isPrefix = true;
+    }
+  }
+  return { exact, isPrefix };
 }
 
 /** A trigger split into the keys a `HotkeyBadge` renders, and whether they are pressed in turn or together. */

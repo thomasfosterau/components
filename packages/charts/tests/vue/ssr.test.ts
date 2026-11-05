@@ -2,7 +2,7 @@
  * Server-side rendering tests: the publish path renders charts to SVG markup
  * with no DOM and no client JavaScript.
  */
-import { parseSpec, type ChartSpec } from '../../src/spec/index.ts';
+import { parseSpec } from '../../src/spec/index.ts';
 import { describe, expect, it } from 'vite-plus/test';
 import { createSSRApp, h, type Component } from 'vue';
 import { renderToString } from 'vue/server-renderer';
@@ -120,7 +120,7 @@ describe('Chart SSR', () => {
     });
 
     it('renders an error fallback for invalid specs', async () => {
-      const html = await ssr({ spec: { bogus: true } as unknown as ChartSpec });
+      const html = await ssr({ spec: { bogus: true } });
       expect(html).toContain('role="alert"');
       expect(html).toContain('Invalid chart spec');
     });

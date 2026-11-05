@@ -34,7 +34,9 @@ export const formatListParts = <T>(
   items: readonly T[],
   options: ListFormatOptions = {},
 ): readonly ListFormatPart<T>[] => {
-  const format = new Intl.ListFormat(options.locales as string | string[] | undefined, {
+  // A mutable copy: TS6's `Intl.ListFormat` (svelte-check) takes no readonly array.
+  const { locales } = options;
+  const format = new Intl.ListFormat(typeof locales === 'object' ? [...locales] : locales, {
     style: options.style ?? 'long',
     type: options.type ?? 'conjunction',
   });

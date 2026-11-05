@@ -3,6 +3,7 @@
  * start channel, rejected everywhere else, and absent from spec "1".
  */
 import { describe, expect, it } from 'vite-plus/test';
+import { errorsOf } from './errors-of.ts';
 import { parseSpec, SPEC_VERSION, validateSpec } from '../../src/spec/index.ts';
 
 const gantt = {
@@ -73,7 +74,6 @@ describe('range channels', () => {
     ],
   ])('rejects %s', (_, spec, message) => {
     const result = validateSpec(spec);
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.errors.join('\n')).toContain(message);
+    expect(errorsOf(result).join('\n')).toContain(message);
   });
 });

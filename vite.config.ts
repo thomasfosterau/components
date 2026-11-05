@@ -156,18 +156,13 @@ export default defineConfig({
       // these rules found when they were turned on, at `warn` until the
       // follow-up pays them down. A new site is a defect, not headroom; a rule
       // whose count reaches zero goes back to `error` and its line is deleted.
-      'typescript/no-unsafe-type-assertion': 'warn', // 122 sites, mostly test doubles and DOM lookups
+      'typescript/no-unsafe-type-assertion': 'warn', // 115 sites, mostly test doubles and DOM lookups
       'vitest/require-mock-type-parameters': 'warn', // 74 sites, `vi.fn()` without a signature
-      'vitest/no-conditional-expect': 'warn', // 25 sites, packages/charts error-shape tests
-      'typescript/no-unnecessary-type-assertion': 'warn', // 4 sites; two `Intl.ListFormat` locales casts TS6 (svelte-check) still needs
       'unicorn/consistent-function-scoping': 'warn', // 5 sites, 4 in `.svelte`
       'unicorn/no-array-sort': 'warn', // 5 sites; `toSorted` raises the published browser baseline
       'unicorn/no-array-reverse': 'warn', // 1 site, same reason
       'promise/always-return': 'warn', // 4 sites
       'no-shadow': 'warn', // 2 sites, both in `.svelte`
-      'oxc/no-accumulating-spread': 'warn', // 2 sites, hotkeys/match.ts
-      'oxc/no-map-spread': 'warn', // 1 site, a story
-      'vitest/require-to-throw-message': 'warn', // 1 site
     },
     // Nothing that ships may import a module SvelteKit only resolves inside an
     // app (AGENTS.md § Common pitfalls). The package tsconfigs extend
