@@ -1,7 +1,7 @@
 <!--
   @component Renders a portable chart spec as an SVG named by its title, or a fallback when the spec or its data is unusable.
 
-  Pure rendering, like the React and Vue interpreters: the geometry comes from
+  Pure rendering: the geometry comes from
   `resolveChart` in a `$derived`, so the component renders the same under
   `svelte/server` and on the client. The SVG uses a viewBox, so it scales to
   its container with CSS. Colours are the core palette's and the shared

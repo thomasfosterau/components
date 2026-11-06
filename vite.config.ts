@@ -297,7 +297,7 @@ export default defineConfig({
       provider: 'istanbul',
       reporter: ['text-summary', 'json-summary', 'json'],
       reportsDirectory: './coverage',
-      include: ['packages/*/src/lib/**/*.{ts,svelte}', 'packages/charts/src/**/*.{ts,tsx,svelte}'],
+      include: ['packages/*/src/lib/**/*.{ts,svelte}', 'packages/charts/src/**/*.{ts,svelte}'],
       exclude: ['**/*.d.ts'],
     },
   },

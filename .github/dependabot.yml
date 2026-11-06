@@ -26,7 +26,7 @@
 # - `playwright`: `playwright` pins `playwright-core` exactly and decides the
 #   Chromium revision CI installs (its catalog comment). `@vitest/browser*`
 #   sit in `toolchain`, because they pin `vitest`.
-# - `svelte`, `storybook`, `tailwind`, `react`, `vue`: monorepo families
+# - `svelte`, `storybook`, `tailwind`: monorepo families
 #   whose members pin or peer one another at one version (each group's
 #   comment says how).
 #
@@ -120,20 +120,6 @@ updates:
         patterns:
           - 'tailwindcss'
           - '@tailwindcss/*'
-      # packages/charts: `react-dom` peers its own `react` release exactly.
-      react:
-        applies-to: version-updates
-        update-types: ['major', 'minor', 'patch']
-        patterns:
-          - 'react'
-          - 'react-dom'
-      # packages/charts: `vue` pins every `@vue/*` package exactly.
-      vue:
-        applies-to: version-updates
-        update-types: ['major', 'minor', 'patch']
-        patterns:
-          - 'vue'
-          - '@vue/*'
     ignore:
       - dependency-name: 'vite'
         update-types:

@@ -7,7 +7,7 @@
  * that follow from this package being mostly plain TypeScript:
  *
  * - `build` is `vp pack` first: everything but the `/svelte` entry is plain
- *   TypeScript (and TSX for the React entry), bundled into one `.mjs` +
+ *   TypeScript, bundled into one `.mjs` +
  *   `.d.mts` per entry with shared chunks between them. `svelte-package`
  *   then copies `src/svelte` into `dist/svelte` as `.svelte` source for the
  *   consumer's compiler (in that order: `vp pack` empties `dist/`). There is
@@ -84,9 +84,7 @@ export default defineConfig({
       index: 'src/spec/index.ts',
       core: 'src/core/index.ts',
       prosemirror: 'src/prosemirror/index.ts',
-      react: 'src/react/index.ts',
       vega: 'src/vega/index.ts',
-      vue: 'src/vue/index.ts',
     },
     format: ['esm'],
     dts: true,
@@ -115,6 +113,6 @@ export default defineConfig({
   },
 
   test: {
-    include: ['tests/**/*.test.{ts,tsx}'],
+    include: ['tests/**/*.test.ts'],
   },
 });
