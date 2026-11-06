@@ -88,8 +88,8 @@ catalogs:
       specifier: ^21.0.4
       version: 21.0.4
     mapbox-gl:
-      specifier: ^3.34.1
-      version: 3.34.1
+      specifier: ^3.34.2
+      version: 3.34.2
     playwright:
       specifier: 1.64.1
       version: 1.64.1
@@ -366,7 +366,7 @@ importers:
         version: 5.0.5(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(playwright@1.64.1)(vitest@5.0.5)
       mapbox-gl:
         specifier: 'catalog:'
-        version: 3.34.1
+        version: 3.34.2
       playwright:
         specifier: 'catalog:'
         version: 1.64.1
@@ -2746,8 +2746,8 @@ packages:
   magicast@0.5.5:
     resolution: {integrity: sha512-UicdXN8zQ3JHlxVq+28afMXPr1z7WNY6+7EJnzTdQWkTAlMLF5fNCCKxJHBQwGaNGR11581EiQmQzx73+MvszA==}
 
-  mapbox-gl@3.34.1:
-    resolution: {integrity: sha512-r4UbcZyEljltuMkMoHhwBSpbWnflHKFBUAfhvjEGxlR2mBjNxI0OBFzrr4AlbHsXnMVPMCWAvdHD5HWtMThWPg==}
+  mapbox-gl@3.34.2:
+    resolution: {integrity: sha512-SfuzpqjokSjv4C9/JEjxAfqVHY37B7Kky/AOFpc+9D0Sx0KuIoV3keSlvvuHuM/jxw84iQ/Nh7yIK1VxuDBBHA==}
 
   min-indent@1.0.1:
     resolution: {integrity: sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==}
@@ -5258,7 +5258,7 @@ snapshots:
       '@babel/types': 7.29.8
       source-map-js: 1.2.2
 
-  mapbox-gl@3.34.1: {}
+  mapbox-gl@3.34.2: {}
 
   min-indent@1.0.1: {}
 
