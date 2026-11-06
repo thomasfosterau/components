@@ -31,7 +31,7 @@ vp run --filter ./packages/components storybook     # Storybook dev server on po
 vp run --filter ./packages/components storybook:build
 vp run test:coverage                                # one Istanbul map, for fallow
 pnpm run fallow                                     # dead code, duplication, complexity, boundaries
-fallow audit --base origin/trunk                    # the change-set review (not a CI gate)
+vp exec fallow audit --base origin/trunk            # the change-set review (not a CI gate)
 pnpm audit --audit-level high
 ```
 
