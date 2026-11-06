@@ -11,6 +11,8 @@ pnpm install                                   # dependencies, git hooks, the ef
 pnpm exec playwright install chromium          # the browser the Svelte packages' suites drive
 ```
 
+Open in a Codespace or Dev Container: `.devcontainer/` provisions it with the same hook as agent sessions.
+
 The toolchain is [Vite+](https://viteplus.dev) (the `vp` CLI): `vp check` formats and lints, `vp run <task>` runs the task graph defined in the `vite.config.ts` files, and `vp test` is Vitest. Every external version is in the catalog in [`pnpm-workspace.yaml`](./pnpm-workspace.yaml); a `package.json` carries only `catalog:`, `catalog:peers` or `workspace:*`.
 
 ## Git hooks
