@@ -10,7 +10,7 @@ The Svelte interpreter of this spec is [`@thomasfosterau/charts/svelte`](#thomas
 pnpm add @thomasfosterau/charts
 ```
 
-The spec, core and Vega-Lite entries need nothing else: `d3-scale`, `d3-shape` and `effect` are regular dependencies and install with the package. Each framework entry needs its framework, declared as an **optional** peer, so install only the one you import:
+The spec, core and Vega-Lite entries need nothing else: `d3-scale`, `d3-shape` and `effect` (`^4.0.0`, so it shares your app's copy) are regular dependencies and install with the package. Each framework entry needs its framework, declared as an **optional** peer, so install only the one you import:
 
 | Entry | Install alongside | Peer range |
 | --- | --- | --- |

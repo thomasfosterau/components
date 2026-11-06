@@ -65,7 +65,8 @@ catalog:
   # validates that against the real compiler. `happy-dom` is that package's
   # DOM for the client-side suites, which run under Node rather than browser
   # mode (packages/charts/CLAUDE.md § Testing). The package's runtime `effect`
-  # is the `effect` entry above.
+  # is developed on the `effect` entry above and published as
+  # `catalogs.published.effect` (`^4.0.0`).
   '@types/d3-scale': ^4.0.9
   '@types/d3-shape': ^3.1.8
   '@types/react': ^19.2.16
@@ -223,6 +224,16 @@ catalogs:
     prosemirror-view: ^1.0.0
     react: ^18.0.0 || ^19.0.0
     vue: ^3.3.0
+  # Published ranges of runtime `dependencies` whose dev pin above is exact.
+  # `pnpm pack` writes these into the packed manifest, so a consumer's own
+  # `effect` dedupes with this package's instead of a second copy installing
+  # beside it. The owner's policy: `effect` is `^4.0.0`, raised only when a
+  # dependency of the package requires more, naming that dependency here.
+  # Nothing forces more for `@thomasfosterau/charts` (its other dependencies,
+  # `d3-scale` and `d3-shape`, have no Effect dependency), and its suite
+  # passes at 4.0.0.
+  published:
+    effect: ^4.0.0
 
 overrides:
   # Singletons. See the `catalog:` note at the top: `svelte` and `vite` are
