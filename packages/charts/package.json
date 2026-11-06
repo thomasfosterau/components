@@ -67,7 +67,7 @@
   "dependencies": {
     "d3-scale": "catalog:",
     "d3-shape": "catalog:",
-    "effect": "catalog:"
+    "effect": "catalog:published"
   },
   "devDependencies": {
     "@sveltejs/package": "catalog:",
