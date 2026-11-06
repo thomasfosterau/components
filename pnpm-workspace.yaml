@@ -151,7 +151,7 @@ catalog:
   # `vitest` / `@vitest/browser-playwright` to the version the new vite-plus's
   # `dependencies` / `peerDependencies` name if the group took them past it.
   # A group PR that doesn't bump vite-plus itself is closed unmerged, unless it
-  # is an `@effect/tsgo` or lint-plugin bump that CI passes on its own.
+  # is an `@effect/tsgo` bump that CI passes on its own.
   # `vite` is the same release published under its aliased core package.
   vite-plus: 1.4.0
   vite: npm:@voidzero-dev/vite-plus-core@1.4.0
@@ -189,7 +189,8 @@ catalog:
   # `@mpsuesser/oxlint-plugin-effect` under the same `effect/` rule namespace.
   # It depends on `effect` 4.1.0 exactly, but lints on whichever copy the
   # singleton override below forces; the dev pin is not raised for it. Loads
-  # into vite-plus's oxlint, so it moves in Dependabot's `toolchain` group.
+  # into vite-plus's oxlint but ranges `@oxlint/plugins`, so Dependabot
+  # proposes it on its own, outside the `toolchain` group.
   '@enfect/oxlint': 0.9.0
   # Dead code, duplication, complexity and architecture boundaries
   # (.fallowrc.json); the PreToolUse gate (.claude/hooks/fallow-gate.sh) runs
