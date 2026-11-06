@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | `@thomasfosterau/components` | `packages/components` | The core library. Peers: `svelte`; optional `@thomasfosterau/effect-forms-svelte`, reached only from `/entity-form`. Rules in [its CLAUDE.md](packages/components/CLAUDE.md). |
 | `@thomasfosterau/components-mapbox` | `packages/mapbox` | Maps and the plan editor. Required peer `mapbox-gl`; consumes the core through its published `/canvas` entry. Rules in [its CLAUDE.md](packages/mapbox/CLAUDE.md). |
-| `@thomasfosterau/charts` | `packages/charts` | The portable chart spec, its JSON Schema and geometry core, and the React / Vue / Svelte / ProseMirror / Vega-Lite interpreters (merged in from the former `thomasfosterau/charts` repo). Plain TypeScript built with `vp pack`, except the `/svelte` entry, which `svelte-package` ships as `.svelte` source; tested under Node, framework peers (`svelte` included) optional per entry; `effect` is a runtime dependency of its spec entry. Independent of the other two. Rules in [its CLAUDE.md](packages/charts/CLAUDE.md). |
+| `@thomasfosterau/charts` | `packages/charts` | The portable chart spec, its JSON Schema and geometry core, and the Svelte / ProseMirror / Vega-Lite interpreters (merged in from the former `thomasfosterau/charts` repo). Plain TypeScript built with `vp pack`, except the `/svelte` entry, which `svelte-package` ships as `.svelte` source; tested under Node, framework peers (`svelte` included) optional per entry; `effect` is a runtime dependency of its spec entry. Independent of the other two. Rules in [its CLAUDE.md](packages/charts/CLAUDE.md). |
 
 ## Common pitfalls
 

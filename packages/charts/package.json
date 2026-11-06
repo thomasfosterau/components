@@ -2,18 +2,16 @@
   "$schema": "https://www.schemastore.org/package",
   "name": "@thomasfosterau/charts",
   "version": "0.0.0",
-  "description": "A portable, renderer-agnostic chart spec — its JSON Schema, a pure TypeScript geometry core, and React, Vue, Svelte, ProseMirror and Vega-Lite interpreters",
+  "description": "A portable, renderer-agnostic chart spec — its JSON Schema, a pure TypeScript geometry core, and Svelte, ProseMirror and Vega-Lite interpreters",
   "keywords": [
     "charts",
     "grammar-of-graphics",
     "json-schema",
     "prosemirror",
-    "react",
     "svelte",
     "svelte5",
     "vega-lite",
-    "visualization",
-    "vue"
+    "visualization"
   ],
   "license": "MIT",
   "author": "Thomas Foster <me@thomasfoster.au>",
@@ -42,10 +40,6 @@
       "types": "./dist/prosemirror.d.mts",
       "default": "./dist/prosemirror.mjs"
     },
-    "./react": {
-      "types": "./dist/react.d.mts",
-      "default": "./dist/react.mjs"
-    },
     "./svelte": {
       "types": "./dist/svelte/index.d.ts",
       "svelte": "./dist/svelte/index.js",
@@ -54,10 +48,6 @@
     "./vega": {
       "types": "./dist/vega.d.mts",
       "default": "./dist/vega.mjs"
-    },
-    "./vue": {
-      "types": "./dist/vue.d.mts",
-      "default": "./dist/vue.mjs"
     },
     "./schema.json": "./schema/chart-spec.v1.json"
   },
@@ -75,26 +65,19 @@
     "@types/d3-scale": "catalog:",
     "@types/d3-shape": "catalog:",
     "@types/node": "catalog:",
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
     "happy-dom": "catalog:",
     "prosemirror-model": "catalog:",
     "prosemirror-view": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:",
     "svelte": "catalog:",
     "svelte-check": "catalog:",
     "typescript": "catalog:",
     "vega": "catalog:",
-    "vega-lite": "catalog:",
-    "vue": "catalog:"
+    "vega-lite": "catalog:"
   },
   "peerDependencies": {
     "prosemirror-model": "catalog:peers",
     "prosemirror-view": "catalog:peers",
-    "react": "catalog:peers",
-    "svelte": "catalog:peers",
-    "vue": "catalog:peers"
+    "svelte": "catalog:peers"
   },
   "peerDependenciesMeta": {
     "prosemirror-model": {
@@ -103,13 +86,7 @@
     "prosemirror-view": {
       "optional": true
     },
-    "react": {
-      "optional": true
-    },
     "svelte": {
-      "optional": true
-    },
-    "vue": {
       "optional": true
     }
   }

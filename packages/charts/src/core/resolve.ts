@@ -13,8 +13,8 @@ export type ResolvedChart =
 /**
  * Validates a spec and computes its geometry, turning every failure into a
  * message rather than a throw: an invalid spec, a data reference with no
- * resolved rows, or an error from {@link computeContext}. The bundled React,
- * Vue and Svelte `Chart` components are this function plus SVG.
+ * resolved rows, or an error from {@link computeContext}. The bundled Svelte
+ * `Chart` component is this function plus SVG.
  */
 export function resolveChart(
   spec: unknown,

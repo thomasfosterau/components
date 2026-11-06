@@ -1,6 +1,6 @@
 # @thomasfosterau/charts
 
-A portable, renderer-agnostic charting system built around a durable chart specification: the spec and its JSON Schema, a pure TypeScript geometry core, and interpreters for React, Vue, Svelte, ProseMirror and Vega-Lite — plus a Swift package, [`ChartSpecKit`](https://github.com/thomasfosterau/components/tree/trunk/packages/charts/swift/ChartSpecKit), that decodes the same JSON.
+A portable, renderer-agnostic charting system built around a durable chart specification: the spec and its JSON Schema, a pure TypeScript geometry core, and interpreters for Svelte, ProseMirror and Vega-Lite — plus a Swift package, [`ChartSpecKit`](https://github.com/thomasfosterau/components/tree/trunk/packages/charts/swift/ChartSpecKit), that decodes the same JSON.
 
 The Svelte interpreter of this spec is [`@thomasfosterau/charts/svelte`](#thomasfosterauchartssvelte). It is unrelated to `Chart` from [`@thomasfosterau/components/charts`](https://github.com/thomasfosterau/components/blob/trunk/packages/components/README.md), which takes its own series props rather than this spec.
 
@@ -15,14 +15,10 @@ The spec, core and Vega-Lite entries need nothing else: `d3-scale`, `d3-shape` a
 | Entry | Install alongside | Peer range |
 | --- | --- | --- |
 | `@thomasfosterau/charts`, `/core`, `/vega`, `/schema.json` | nothing | — |
-| `@thomasfosterau/charts/react` | `react` | `^18.0.0 \|\| ^19.0.0` |
-| `@thomasfosterau/charts/vue` | `vue` | `^3.3.0` |
 | `@thomasfosterau/charts/svelte` | `svelte` | `^5.40.0` |
 | `@thomasfosterau/charts/prosemirror` | `prosemirror-model`, `prosemirror-view` | `^1.0.0` each |
 
 ```sh
-pnpm add @thomasfosterau/charts react                                # React
-pnpm add @thomasfosterau/charts vue                                  # Vue
 pnpm add @thomasfosterau/charts svelte                               # Svelte
 pnpm add @thomasfosterau/charts prosemirror-model prosemirror-view   # ProseMirror
 ```
@@ -37,7 +33,7 @@ The system has three layers with different lifespans, languages, and owners. **T
 | --- | --- | --- |
 | **1 — Spec** | Durable, declarative, language-neutral JSON chart description. Grammar-of-graphics level: mark + encodings + declared types + data reference. Never geometry, pixels, or renderer names. | [`@thomasfosterau/charts`](#entry-points) + [`schema/chart-spec.v1.json`](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/schema/chart-spec.v1.json) |
 | **2 — Core** | Pure, synchronous TypeScript. Turns `(spec, box, data)` into scales, dimensions, and geometry. No DOM, no reactivity, no rendering. | [`@thomasfosterau/charts/core`](#entry-points) |
-| **3 — Interpreters** | Per-platform renderers: ProseMirror NodeView, React, Vue, Vega-Lite, Swift, Svelte/SvelteKit, Kotlin/Compose, media targets. Each reads the spec and renders it idiomatically. | `/prosemirror`, `/react`, `/vue`, `/svelte`, `/vega`, [`swift/ChartSpecKit`](https://github.com/thomasfosterau/components/tree/trunk/packages/charts/swift/ChartSpecKit) |
+| **3 — Interpreters** | Per-platform renderers: ProseMirror NodeView, Vega-Lite, Swift, Svelte/SvelteKit, Kotlin/Compose, media targets. Each reads the spec and renders it idiomatically. | `/prosemirror`, `/svelte`, `/vega`, [`swift/ChartSpecKit`](https://github.com/thomasfosterau/components/tree/trunk/packages/charts/swift/ChartSpecKit) |
 
 Only the spec (Layer 1) and its emitted JSON Schema may cross a language boundary. Swift and Kotlin interpreters decode the same spec JSON; they never consume the TypeScript core.
 
@@ -61,8 +57,6 @@ Each layer is its own entry, so a consumer loads only the interpreter it uses. T
 | `@thomasfosterau/charts` | The portable spec: types, `parseSpec` / `validateSpec` / `encodeSpec`, `SpecValidationError`, data guards | — |
 | `@thomasfosterau/charts/core` | Pure TS geometry core: `computeContext(spec, box, data)` → scales, layout, geometry, ticks | — |
 | `@thomasfosterau/charts/prosemirror` | ProseMirror integration: chart node schema + edit-time NodeView rendering SVG via the core, and a DOM-free SVG string renderer | `prosemirror-model`, `prosemirror-view` (1.x) |
-| `@thomasfosterau/charts/react` | React `Chart` component: SSR-compatible SVG rendering via the core, hydration-safe | `react` (18 or 19) |
-| `@thomasfosterau/charts/vue` | Vue 3 `Chart` component and its render helpers: SSR-compatible SVG rendering via the core, plain render functions | `vue` (3.3+) |
 | `@thomasfosterau/charts/svelte` | Svelte 5 `Chart` component: SSR-compatible SVG rendering via the core, shipped as `.svelte` source | `svelte` (5.40+) |
 | `@thomasfosterau/charts/vega` | Spec → Vega-Lite emitter: escape hatch / SSR fallback, validated against the real compiler | — (emits a plain object; bring your own `vega-embed`) |
 | `@thomasfosterau/charts/schema.json` | The JSON Schema artifact (draft 2020-12), for codegen and non-TS validators | — |
@@ -147,8 +141,6 @@ Every exported symbol, grouped by the entry that exports it. Signatures are the 
 
 - [`@thomasfosterau/charts`](#thomasfosteraucharts) — the spec
 - [`@thomasfosterau/charts/core`](#thomasfosterauchartscore) — geometry
-- [`@thomasfosterau/charts/react`](#thomasfosterauchartsreact)
-- [`@thomasfosterau/charts/vue`](#thomasfosterauchartsvue)
 - [`@thomasfosterau/charts/svelte`](#thomasfosterauchartssvelte)
 - [`@thomasfosterau/charts/prosemirror`](#thomasfosterauchartsprosemirror)
 - [`@thomasfosterau/charts/vega`](#thomasfosterauchartsvega)
@@ -267,7 +259,7 @@ Geometry is in **plot** coordinates: translate by `dimensions.margins.left` / `.
 
 | Function | Description |
 | --- | --- |
-| `resolveChart(spec: unknown, box: Box, data?: DataRows, options?: ComputeContextOptions): ResolvedChart` | `validateSpec` then `computeContext`, with every failure returned as a message instead of thrown: `Invalid chart spec: …`, a data `ref` with no `data` passed, or the error `computeContext` threw. The bundled React, Vue and Svelte `Chart` components render its `error` message as their fallback. |
+| `resolveChart(spec: unknown, box: Box, data?: DataRows, options?: ComputeContextOptions): ResolvedChart` | `validateSpec` then `computeContext`, with every failure returned as a message instead of thrown: `Invalid chart spec: …`, a data `ref` with no `data` passed, or the error `computeContext` threw. The bundled Svelte `Chart` component renders its `error` message as its fallback. |
 | `computeContext(spec: ChartSpec, box: Box, data?: DataRows, options?: ComputeContextOptions): ChartContext` | Turns a parsed spec, the measured outer box and resolved rows into a `ChartContext`. `data`, when passed, is used instead of the spec's inline values; it is required when the spec's data is a `ref` (otherwise throws `Error`). Throws `TypeError` when a value contradicts its channel's declared type. x maps onto `[0, plot.width]` and y onto `[plot.height, 0]`, so larger values sit higher. Without both `x` and `y` encodings the geometry is empty. |
 | `computeDimensions(outer: Box, margins?: Partial<Margins>): Dimensions` | Fills missing margins from `DEFAULT_MARGINS` and subtracts them from the box; the plot width and height are clamped at zero. |
 | `makeAccessor(channel: Channel): (datum: Datum) => FieldValue` | A typed reader for one channel: `quantitative` → finite number, `temporal` → `Date` (ISO 8601 string or epoch ms), `ordinal` / `nominal` → string (numbers and booleans stringified). Missing and `null` values read as `null`; a value contradicting the declared type throws `TypeError`. |
@@ -330,76 +322,9 @@ The four builders take `args: { data: DataRows; x: Channel; y: Channel; xScale: 
 
 `color` is `undefined` wherever there is no colour encoding; renderers pick their own default.
 
-### `@thomasfosterau/charts/react`
-
-Peer: `react`. One component that validates the spec, runs `computeContext` in a `useMemo` and returns SVG elements, so it renders the same under `renderToString` / `renderToStaticMarkup` and on the client.
-
-```tsx
-import type { ChartSpec } from '@thomasfosterau/charts';
-import type { DataRows } from '@thomasfosterau/charts/core';
-import { Chart } from '@thomasfosterau/charts/react';
-
-export function SalesChart({ spec, rows }: { spec: ChartSpec; rows: DataRows }) {
-  return (
-    <Chart
-      spec={spec}
-      data={rows}
-      width={800}
-      height={400}
-      className="sales-chart"
-      fallback={(message) => <p role="alert">{message}</p>}
-    />
-  );
-}
-```
-
-#### `Chart(props: ChartProps)`
-
-Renders `<svg role="img" viewBox="0 0 {width} {height}">`, named by `aria-label` from `config.title`, with the title drawn above the plot when set. The SVG has no fixed size, so it scales to its container with CSS. When the spec is invalid, its data is a reference and no `data` was passed, or `computeContext` throws, it renders `fallback` instead, or by default `<div role="alert" data-chart-error>` with the message.
-
-#### `ChartProps`
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `spec` | `ChartSpec` | required | The spec; validated again at render time, since specs come from documents. |
-| `data` | `DataRows` | — | Resolved rows. Required when the spec's data is a `ref`; replaces inline values when given. |
-| `width` | `number` | `640` | Outer width in pixels (sets the `viewBox`, and with it the aspect ratio). |
-| `height` | `number` | `360` | Outer height in pixels. |
-| `margins` | `Partial<Margins>` | `DEFAULT_MARGINS` | Margin overrides. |
-| `className` | `string` | — | Class for the `<svg>`, and for the default fallback `<div>`. |
-| `fallback` | `ReactNode \| ((message: string) => ReactNode)` | alert `<div>` | What to render on an error; the function form receives the message. |
-
-### `@thomasfosterau/charts/vue`
-
-Peer: `vue`. A `Chart` component written as a plain render function (no SFC compiler needed) with the same behaviour as the React one, and the two render helpers it is built from.
-
-```ts
-import type { ChartSpec } from '@thomasfosterau/charts';
-import { Chart } from '@thomasfosterau/charts/vue';
-import { defineComponent, h, type PropType } from 'vue';
-
-export const SalesChart = defineComponent({
-  props: { spec: { type: Object as PropType<ChartSpec>, required: true } },
-  setup: (props) => () =>
-    h(
-      Chart,
-      { spec: props.spec, width: 800, height: 400, class: 'sales-chart' },
-      { fallback: ({ message }: { message: string }) => h('p', { role: 'alert' }, message) },
-    ),
-});
-```
-
-In a template: `<Chart :spec="spec" :data="rows"><template #fallback="{ message }">…</template></Chart>`.
-
-| Export | Description |
-| --- | --- |
-| `Chart` | Component with props `spec: ChartSpec` (required), `data?: DataRows`, `width = 640`, `height = 360`, `margins?: Partial<Margins>`, matching the React props. Renders `<svg role="img">` named by `config.title`. On an error it renders the `fallback` slot, which receives `{ message }`, or by default `<div role="alert" data-chart-error>`. There is no `className` prop: `class` and other attributes fall through to the root element. Works with `vue/server-renderer`. |
-| `renderMarks(geometry: Geometry): VNode` | A `<g data-mark="…">` of paths, rects or circles for the geometry. |
-| `renderAxes(ticks: ChartTicks, plot: Box): VNode` | A `<g data-axes>` with the x and y axis lines, tick marks and labels. |
-
 ### `@thomasfosterau/charts/svelte`
 
-Peer: `svelte` (5.40+). A Svelte 5 `Chart` component with the same behaviour as the React and Vue ones. It is published as `.svelte` source (`svelte-package`), so your app's Svelte compiles it; it renders the same under `svelte/server` and on the client.
+Peer: `svelte` (5.40+). A Svelte 5 `Chart` component. It is published as `.svelte` source (`svelte-package`), so your app's Svelte compiles it; it renders the same under `svelte/server` and on the client.
 
 ```svelte
 <script lang="ts">
@@ -549,7 +474,7 @@ For every spec field and mark type, this records which interpreters honour it an
 
 **Interpreter columns**
 
-- **TS core** — `@thomasfosterau/charts/core` (`computeContext`). Web interpreters that sit on the core — the ProseMirror NodeView (`/prosemirror`), the React components (`/react`), the Vue components (`/vue`), and the Svelte component (`/svelte`) — inherit this column.
+- **TS core** — `@thomasfosterau/charts/core` (`computeContext`). Web interpreters that sit on the core — the ProseMirror NodeView (`/prosemirror`) and the Svelte component (`/svelte`) — inherit this column.
 - **Vega-Lite** — `@thomasfosterau/charts/vega` (`emitVegaLite`), the spec → Vega-Lite emitter (escape hatch / SSR fallback), validated against the real Vega-Lite compiler
 - **Swift Charts** — `swift/ChartSpecKit`: the `ChartSpec` Codable decoder plus a swappable SwiftUI renderer whose default backend is Apple Swift Charts. Compiled and tested in CI (`.github/workflows/chartspeckit.yml`); renderer statuses stay 🔵 until each is verified on device
 - **Compose** — the planned Kotlin/Android interpreter (charting approach not yet chosen; envelope may constrain further)
@@ -622,7 +547,7 @@ The TS core never resolves references itself: `computeContext` takes already-res
 
 | Field | TS core | Vega-Lite | Swift Charts | Compose | Media | Degradation when unsupported |
 | --- | --- | --- | --- | --- | --- | --- |
-| `config.title` | 🟡 not in `ChartContext`; the React, Vue and ProseMirror interpreters draw it (rendering is the interpreter's job) | ✅ `title` | 🔵 SwiftUI label | 🔵 | 🔵 | Ignored → untitled chart |
+| `config.title` | 🟡 not in `ChartContext`; the Svelte and ProseMirror interpreters draw it (rendering is the interpreter's job) | ✅ `title` | 🔵 SwiftUI label | 🔵 | 🔵 | Ignored → untitled chart |
 | `config.tooltip` | — (interaction is per-platform) | ✅ `tooltip` | 🟡 maps to selection/`chartOverlay` if the app implements it | 🟡 | ⛔ static output has no tooltips | Ignored entirely; never an error |
 
 ### Extensions
