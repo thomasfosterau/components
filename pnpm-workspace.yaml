@@ -191,7 +191,7 @@ catalog:
   # singleton override below forces; the dev pin is not raised for it. Loads
   # into vite-plus's oxlint but ranges `@oxlint/plugins`, so Dependabot
   # proposes it on its own, outside the `toolchain` group.
-  '@enfect/oxlint': 0.9.0
+  '@enfect/oxlint': 0.10.0
   # Dead code, duplication, complexity and architecture boundaries
   # (.fallowrc.json); the PreToolUse gate (.claude/hooks/fallow-gate.sh) runs
   # its audit before every agent `git commit` / `git push`.
