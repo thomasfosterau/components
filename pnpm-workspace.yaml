@@ -48,12 +48,12 @@ catalog:
   # the app catalog's exact release so the store here is
   # the one the apps run. Nothing else in this workspace touches Effect.
   '@thomasfosterau/effect-forms-svelte': ^0.3.1
-  effect: 4.1.0
+  effect: 4.1.2
   # Lucide icon set as Svelte 5 components. Catalogued and installed ahead of
   # its first consumer: the real components land on top of this scaffold and
   # every one that needs an affordance icon reaches for this rather than
   # inlining an `<svg>`.
-  '@lucide/svelte': ^1.65.0
+  '@lucide/svelte': ^1.69.0
   # `@thomasfosterau/charts` (packages/charts) — the portable chart spec, its
   # geometry core and its non-Svelte interpreters, merged in from the former
   # `thomasfosterau/charts` repo. `d3-scale` / `d3-shape` are the core's
@@ -74,7 +74,7 @@ catalog:
   d3-shape: ^3.2.0
   happy-dom: ^21.0.4
   prosemirror-model: ^1.25.7
-  prosemirror-view: ^1.42.8
+  prosemirror-view: ^1.42.9
   react: ^19.3.1
   react-dom: ^19.3.1
   vega: ^6.2.0
@@ -151,7 +151,7 @@ catalog:
   # `vitest` / `@vitest/browser-playwright` to the version the new vite-plus's
   # `dependencies` / `peerDependencies` name if the group took them past it.
   # A group PR that doesn't bump vite-plus itself is closed unmerged, unless it
-  # is an `@effect/tsgo` or lint-plugin bump that CI passes on its own.
+  # is an `@effect/tsgo` bump that CI passes on its own.
   # `vite` is the same release published under its aliased core package.
   vite-plus: 1.4.0
   vite: npm:@voidzero-dev/vite-plus-core@1.4.0
@@ -189,12 +189,13 @@ catalog:
   # `@mpsuesser/oxlint-plugin-effect` under the same `effect/` rule namespace.
   # It depends on `effect` 4.1.0 exactly, but lints on whichever copy the
   # singleton override below forces; the dev pin is not raised for it. Loads
-  # into vite-plus's oxlint, so it moves in Dependabot's `toolchain` group.
+  # into vite-plus's oxlint but ranges `@oxlint/plugins`, so Dependabot
+  # proposes it on its own, outside the `toolchain` group.
   '@enfect/oxlint': 0.9.0
   # Dead code, duplication, complexity and architecture boundaries
   # (.fallowrc.json); the PreToolUse gate (.claude/hooks/fallow-gate.sh) runs
   # its audit before every agent `git commit` / `git push`.
-  fallow: 3.37.0
+  fallow: 3.40.0
   # `render` + locators for Svelte components under Vitest browser mode. The
   # app repos use @testing-library/svelte under happy-dom instead; this repo
   # runs the real browser, and this is the renderer Vitest browser mode

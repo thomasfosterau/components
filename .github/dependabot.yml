@@ -2,33 +2,33 @@
 # workspace and its catalogs (pnpm-workspace.yaml), so every bump is a catalog
 # edit plus a regenerated lockfile.
 #
-# `groups` are the sets that MUST move together, taken from the catalog
-# comments, then a catch-all for the remaining minor and patch updates (majors
-# outside a lockstep set stay individual PRs). Dependabot puts a dependency in
-# the FIRST group that matches, so the order runs specific -> general and
-# `exclude-patterns` keeps each package out of a group it would otherwise also
-# match. Every lockstep group takes all update types, majors included.
+# `groups` are only the sets whose members must move at the same time:
+# released together from one monorepo with exact cross-pins, or tied by a
+# hard compatibility table, so one bumped alone breaks the install or the
+# build. Everything else (`fallow`, `bits-ui`, `@changesets/*`, the
+# ProseMirror, vega and d3 packages, mapbox, …) updates in its own PR; there
+# is no catch-all. Dependabot puts a dependency in the FIRST group that
+# matches, so `exclude-patterns` keeps each package out of a group it would
+# otherwise also match. Every group takes all update types, majors included.
 #
-# - `effect`: `effect` (also forced to one copy by `overrides`), every
-#   `@effect/*` package except `@effect/tsgo` (a toolchain member), and the
-#   form library that peers it.
-# - `toolchain`: `vite-plus` and everything it pins or patches against. It
-#   pins `vitest` and the `@vitest/*` packages EXACTLY (and so do
+# - `effect`: `effect` (also forced to one copy by `overrides`) and every
+#   `@effect/*` package on its release train; `@effect/tsgo` is a toolchain
+#   member.
+# - `toolchain`: `vite-plus` and what it pins or is patched against. It pins
+#   `vitest` and the `@vitest/*` packages EXACTLY (and so do
 #   `@vitest/browser-playwright` and `@vitest/coverage-istanbul`, which peer
 #   `vitest` at one version), and the `oxlint` / `oxfmt` / `oxlint-tsgolint` it
-#   carries. `@effect/tsgo`'s patch (the root `prepare`) hard-errors unless its
-#   release supports that exact oxlint / tsgolint and the native TypeScript,
-#   and the Effect lint plugin (`@enfect/oxlint`) loads into that oxlint. A
-#   group PR is merged only once CI is green on it; see the by-hand steps
-#   below.
-# - `fallow`: alone, so a bump is checked against the agent gate
-#   (.claude/hooks/fallow-gate.sh) and .fallowrc.json on its own.
-# - `playwright`: the pinned `playwright` decides the Chromium revision CI
-#   installs (its catalog comment). `@vitest/browser*` sit in `toolchain`,
-#   because they pin `vitest`.
-# - the framework sets (`svelte`, `storybook`, `tailwind`) and the charts
-#   interpreters' sets (`react`, `vue`, `prosemirror`, `vega`, `d3`), whose
-#   members are versioned or typed in lockstep.
+#   carries (transitive pins). `@effect/tsgo`'s patch (the root `prepare`)
+#   hard-errors unless its release supports that exact oxlint / tsgolint and
+#   the native TypeScript. `@enfect/oxlint` ranges its oxlint dependency, so
+#   it is not in the set. A group PR is merged only once CI is green on it;
+#   see the by-hand steps below.
+# - `playwright`: `playwright` pins `playwright-core` exactly and decides the
+#   Chromium revision CI installs (its catalog comment). `@vitest/browser*`
+#   sit in `toolchain`, because they pin `vitest`.
+# - `svelte`, `storybook`, `tailwind`, `react`, `vue`: monorepo families
+#   whose members pin or peer one another at one version (each group's
+#   comment says how).
 #
 # `ignore` covers the npm ALIASES, which Dependabot cannot bump correctly;
 # they move by hand, in the PR of the group they belong to (AGENTS.md
@@ -66,42 +66,35 @@ updates:
       exclude:
         - '@thomasfosterau/*'
     groups:
+      # One release train: `effect` and `@effect/*` publish on one version.
       effect:
         applies-to: version-updates
         update-types: ['major', 'minor', 'patch']
         patterns:
           - 'effect'
           - '@effect/*'
-          - '@thomasfosterau/effect-forms-svelte'
         exclude-patterns:
           - '@effect/tsgo'
+      # vite-plus pins vitest / @vitest/*; @effect/tsgo's patch supports only
+      # the oxlint / tsgolint / TypeScript its components table lists.
       toolchain:
         applies-to: version-updates
         update-types: ['major', 'minor', 'patch']
         patterns:
           - 'vite-plus'
-          - 'vite'
           - 'vitest'
           - '@vitest/*'
-          - 'oxlint'
-          - 'oxfmt'
-          - 'oxlint-tsgolint'
           - '@effect/tsgo'
-          - '@typescript/native'
-          - 'typescript'
-          - '@typescript/typescript6'
-          - '@enfect/oxlint'
-      fallow:
-        applies-to: version-updates
-        update-types: ['major', 'minor', 'patch']
-        patterns:
-          - 'fallow'
+      # `playwright` pins `playwright-core` exactly; `@playwright/test` pins both.
       playwright:
         applies-to: version-updates
         update-types: ['major', 'minor', 'patch']
         patterns:
           - 'playwright'
+          - 'playwright-core'
           - '@playwright/*'
+      # Svelte 5, SvelteKit, svelte-package, the vite plugin and svelte-check
+      # peer one another's majors and move together.
       svelte:
         applies-to: version-updates
         update-types: ['major', 'minor', 'patch']
@@ -109,36 +102,24 @@ updates:
           - 'svelte'
           - '@sveltejs/*'
           - 'svelte-check'
-          - 'svelte2tsx'
+      # One monorepo: `@storybook/sveltekit` pins its framework packages at
+      # the `storybook` version. `@storybook/addon-svelte-csf` is versioned
+      # separately.
       storybook:
         applies-to: version-updates
         update-types: ['major', 'minor', 'patch']
         patterns:
           - 'storybook'
           - '@storybook/*'
+        exclude-patterns:
+          - '@storybook/addon-svelte-csf'
+      # `@tailwindcss/vite` pins `tailwindcss` exactly.
       tailwind:
         applies-to: version-updates
         update-types: ['major', 'minor', 'patch']
         patterns:
           - 'tailwindcss'
           - '@tailwindcss/*'
-          - 'daisyui'
-      bits-ui:
-        applies-to: version-updates
-        update-types: ['major', 'minor', 'patch']
-        patterns:
-          - 'bits-ui'
-      changesets:
-        applies-to: version-updates
-        update-types: ['major', 'minor', 'patch']
-        patterns:
-          - '@changesets/*'
-      mapbox:
-        applies-to: version-updates
-        update-types: ['major', 'minor', 'patch']
-        patterns:
-          - 'mapbox-gl'
-          - '@types/mapbox-gl'
       # packages/charts: `react-dom` peers its own `react` release exactly.
       react:
         applies-to: version-updates
@@ -146,42 +127,13 @@ updates:
         patterns:
           - 'react'
           - 'react-dom'
-          - '@types/react'
-          - '@types/react-dom'
+      # packages/charts: `vue` pins every `@vue/*` package exactly.
       vue:
         applies-to: version-updates
         update-types: ['major', 'minor', 'patch']
         patterns:
           - 'vue'
           - '@vue/*'
-      prosemirror:
-        applies-to: version-updates
-        update-types: ['major', 'minor', 'patch']
-        patterns:
-          - 'prosemirror-*'
-      # packages/charts: the `/vega` suite compiles through both.
-      vega:
-        applies-to: version-updates
-        update-types: ['major', 'minor', 'patch']
-        patterns:
-          - 'vega'
-          - 'vega-lite'
-      # packages/charts' core: the runtime and its type packages.
-      d3:
-        applies-to: version-updates
-        update-types: ['major', 'minor', 'patch']
-        patterns:
-          - 'd3-*'
-          - '@types/d3-*'
-      # Everything else (`@lucide/svelte`, `@internationalized/date`,
-      # `@testing-library/jest-dom`, `vitest-browser-svelte`, `happy-dom`,
-      # `@types/node`, …): minor and patch updates batched in one
-      # PR; a major stays its own PR.
-      everything-else:
-        applies-to: version-updates
-        update-types: ['minor', 'patch']
-        patterns:
-          - '*'
     ignore:
       - dependency-name: 'vite'
         update-types:
@@ -205,7 +157,7 @@ updates:
             'version-update:semver-patch',
           ]
 
-  # All GitHub Actions in one PR. `directories`, not `directory: '/'`: the
+  # Each action updates in its own PR (no group). `directories`, not `directory: '/'`: the
   # local composite action under .github/actions/setup pins actions too, and
   # `/` covers only .github/workflows (the Swift workflow included).
   - package-ecosystem: 'github-actions'
@@ -222,7 +174,3 @@ updates:
       prefix: 'chore'
     cooldown:
       default-days: 1
-    groups:
-      github-actions:
-        patterns:
-          - '*'
