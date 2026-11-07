@@ -54,3 +54,21 @@ test('a colourToken that is not a custom property name cannot escape the var()',
   expect(style).toContain('--badge-colour: var(--color-neutral, var(--color-neutral))');
   expect(style).not.toContain('position');
 });
+
+test('tone="none" is the bare daisyUI badge, with no colour class', async () => {
+  const screen = await render(Badge, {
+    children: textSnippet('Disabled'),
+    tone: 'none',
+    variant: 'outline',
+    'data-testid': 'b',
+  });
+
+  const badge = screen.getByTestId('b');
+  await expect.element(badge).toHaveClass('badge');
+  await expect.element(badge).toHaveClass('badge-outline');
+  for (const token of badge.element().classList) {
+    expect(token).not.toMatch(
+      /^badge-(neutral|primary|secondary|accent|info|success|warning|error)$/,
+    );
+  }
+});
