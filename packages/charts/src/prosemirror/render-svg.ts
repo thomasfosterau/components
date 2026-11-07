@@ -3,6 +3,7 @@ import {
   outlineText,
   VISUALLY_HIDDEN_STYLE,
   type ChartContext,
+  type DataTable,
   type Tick,
   type TreeGeometry,
   type TreeOutlineNode,
@@ -167,6 +168,37 @@ function outlineList(nodes: ReadonlyArray<TreeOutlineNode>): string {
 export function renderTreeOutline(context: ChartContext): string {
   if (context.geometry.mark !== 'tree') return '';
   return `<div style="${VISUALLY_HIDDEN_STYLE}" data-chart-outline="">${outlineList(context.geometry.outline)}</div>`;
+}
+
+/** Options for {@link renderDataTable}. */
+export interface RenderDataTableOptions {
+  /**
+   * Visually hide the table (the text alternative beside a drawing) rather
+   * than show it (the fallback for a mark this interpreter does not know).
+   * @defaultValue false
+   */
+  readonly hidden?: boolean | undefined;
+}
+
+/**
+ * A chart's data table (from `buildDataTable`, or `resolveChart`'s `table`)
+ * as an HTML string: a `<table data-chart-table>` with the caption, a
+ * header row of `<th scope="col">` and one row per datum, every text
+ * escaped. Place the hidden form after the SVG from
+ * {@link renderContextToSvg}, whose `role="img"` hides its children.
+ */
+export function renderDataTable(table: DataTable, options?: RenderDataTableOptions): string {
+  const style = options?.hidden ? ` style="${VISUALLY_HIDDEN_STYLE}"` : '';
+  const caption =
+    table.caption === undefined ? '' : `<caption>${escapeXml(table.caption)}</caption>`;
+  const head = table.columns.map((column) => `<th scope="col">${escapeXml(column.header)}</th>`);
+  const body = table.rows.map(
+    (row) => `<tr>${row.map((cell) => `<td>${escapeXml(cell)}</td>`).join('')}</tr>`,
+  );
+  return (
+    `<table${style} data-chart-table="">${caption}` +
+    `<thead><tr>${head.join('')}</tr></thead><tbody>${body.join('')}</tbody></table>`
+  );
 }
 
 function escapeXml(value: string): string {

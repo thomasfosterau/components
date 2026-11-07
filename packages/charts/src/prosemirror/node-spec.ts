@@ -51,7 +51,10 @@ export function createChartNodeSpec(options?: ChartNodeSpecOptions): NodeSpec {
           if (parsed === undefined) return false;
           const result = validateSpec(parsed);
           // An unparseable spec is not a chart node; let other rules try.
-          return result.ok ? { spec: result.value } : false;
+          // Nor is a newer 1.N one: its parsed value drops what this
+          // version does not know, and storing it would rewrite the
+          // document on paste.
+          return result.ok && result.degradation === undefined ? { spec: result.value } : false;
         },
       },
     ],

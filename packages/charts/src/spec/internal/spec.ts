@@ -1,4 +1,5 @@
 import * as Schema from 'effect/Schema';
+import * as Struct from 'effect/Struct';
 import { Config } from './config.ts';
 import { Data } from './data.ts';
 import { Encoding } from './encoding.ts';
@@ -39,6 +40,20 @@ export const ChartSpec = Schema.Struct({
     'A renderer-agnostic, framework-agnostic, language-neutral chart description. ' +
     'Grammar-of-graphics level: mark + encodings + declared data types + data reference.',
 });
+
+/**
+ * A newer `1.N` document whose `mark` this interpreter does not know: the
+ * spec's known fields, with `mark` any string and no `tree` options (they
+ * belong to the `tree` mark). Decoded only by the degrading parse, never by
+ * the strict one, and not part of the JSON Schema.
+ */
+export const UnsupportedMarkSpec = Schema.Struct({
+  ...Struct.omit(ChartSpec.fields, ['mark', 'tree']),
+  mark: Schema.String,
+});
+
+/** The decoded type of {@link UnsupportedMarkSpec}; the public mirror is `UnsupportedMarkSpec` in `../types.ts`. */
+export type UnsupportedMarkSpec = typeof UnsupportedMarkSpec.Type;
 
 /** The decoded type of {@link SpecVersion}; the public mirror is `SpecVersion` in `../types.ts`. */
 export type SpecVersion = typeof SpecVersion.Type;

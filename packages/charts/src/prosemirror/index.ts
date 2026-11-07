@@ -9,6 +9,7 @@
  * - {@link ChartNodeView} / {@link chartNodeViewFactory} — imperative DOM
  *   NodeView that computes geometry via the `/core` entry and draws SVG
  * - {@link renderContextToSvg} — pure ChartContext → SVG string rendering
+ * - {@link renderDataTable} — a chart's data table as an HTML string
  */
 
 export {
@@ -26,4 +27,10 @@ export {
   type DataResolver,
 } from './node-view.ts';
 
-export { renderContextToSvg, renderTreeOutline, type RenderSvgOptions } from './render-svg.ts';
+export {
+  renderContextToSvg,
+  renderDataTable,
+  renderTreeOutline,
+  type RenderDataTableOptions,
+  type RenderSvgOptions,
+} from './render-svg.ts';

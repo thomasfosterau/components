@@ -33,6 +33,7 @@ import type {
 import type {
   SpecVersion as SchemaSpecVersion,
   ChartSpec as SchemaChartSpec,
+  UnsupportedMarkSpec as SchemaUnsupportedMarkSpec,
 } from '../../src/spec/internal/spec.ts';
 import type * as Public from '../../src/spec/types.ts';
 
@@ -59,6 +60,9 @@ type _ConfigParity = Assert<Equals<Public.Config, SchemaConfig>>;
 type _ExtensionsParity = Assert<Equals<Public.Extensions, SchemaExtensions>>;
 type _SpecVersionParity = Assert<Equals<Public.SpecVersion, SchemaSpecVersion>>;
 type _ChartSpecParity = Assert<Equals<Public.ChartSpec, SchemaChartSpec>>;
+type _UnsupportedMarkSpecParity = Assert<
+  Equals<Public.UnsupportedMarkSpec, SchemaUnsupportedMarkSpec>
+>;
 
 describe('type parity', () => {
   it('public mirror types are structurally identical to schema types (compile-time)', () => {
@@ -81,7 +85,9 @@ describe('type parity', () => {
       _ExtensionsParity,
       _SpecVersionParity,
       _ChartSpecParity,
+      _UnsupportedMarkSpecParity,
     ] = [
+      true,
       true,
       true,
       true,

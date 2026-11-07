@@ -107,3 +107,29 @@ describe('tree mark (spec 1.1)', () => {
     expect(renderTreeOutline(contextFor('bar'))).toBe('');
   });
 });
+
+describe('renderDataTable', () => {
+  it('renders the table, escaped, visible or visually hidden', async () => {
+    const { buildDataTable } = await import('../../src/core/index.ts');
+    const { renderDataTable } = await import('../../src/prosemirror/index.ts');
+    const spec = parseSpec({
+      specVersion: '1',
+      mark: 'bar',
+      encoding: {
+        x: { field: 'a<b', type: 'nominal' },
+        y: { field: 'v', type: 'quantitative' },
+      },
+      data: { values: [{ 'a<b': 'x & y', v: 1 }] },
+      config: { title: 'T"' },
+    });
+    const table = buildDataTable(spec, [{ 'a<b': 'x & y', v: 1 }]);
+    expect(renderDataTable(table)).toBe(
+      '<table data-chart-table=""><caption>T&quot;</caption>' +
+        '<thead><tr><th scope="col">a&lt;b</th><th scope="col">v</th></tr></thead>' +
+        '<tbody><tr><td>x &amp; y</td><td>1</td></tr></tbody></table>',
+    );
+    expect(renderDataTable(table, { hidden: true })).toMatch(
+      /^<table style="position:absolute;[^"]*" data-chart-table="">/,
+    );
+  });
+});

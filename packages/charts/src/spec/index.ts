@@ -28,6 +28,7 @@ export {
   type Config,
   type Extensions,
   type ChartSpec,
+  type UnsupportedMarkSpec,
 } from './types.ts';
 
 export { isInlineData, isDataRef } from './guards.ts';
@@ -37,5 +38,8 @@ export {
   validateSpec,
   encodeSpec,
   SpecValidationError,
+  UnsupportedMarkError,
+  type SpecDegradation,
+  type UnsupportedMark,
   type ValidationResult,
 } from './parse.ts';

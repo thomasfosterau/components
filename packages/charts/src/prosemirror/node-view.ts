@@ -1,9 +1,9 @@
-import { computeContext, type Box, type DataRows } from '../core/index.ts';
+import { resolveChart, type Box, type DataRows } from '../core/index.ts';
 import { isDataRef, validateSpec, type ChartSpec } from '../spec/index.ts';
 import type { Node as ProseMirrorNode } from 'prosemirror-model';
 import type { EditorView, NodeView } from 'prosemirror-view';
 import type { ChartNodeAttrs } from './node-spec.ts';
-import { renderContextToSvg, renderTreeOutline } from './render-svg.ts';
+import { renderContextToSvg, renderDataTable, renderTreeOutline } from './render-svg.ts';
 
 /** Resolves a data reference to rows. The host (CMS) owns how refs are fetched. */
 export type DataResolver = (spec: ChartSpec) => DataRows | Promise<DataRows>;
@@ -79,7 +79,12 @@ export class ChartNodeView implements NodeView {
     // Re-validate: node attrs may come from collaborative peers or pasted docs.
     const validation = validateSpec(spec);
     if (!validation.ok) {
-      this.renderMessage('Invalid chart spec');
+      const unsupported = validation.unsupported;
+      if (unsupported === undefined) this.renderMessage('Invalid chart spec');
+      // A newer mark: its data as a visible table. `resolveData` takes a
+      // `ChartSpec`, which this is not, so a ref-data one stays a message.
+      else if (isDataRef(unsupported.spec.data)) this.renderMessage('Unsupported chart type');
+      else this.renderChart(spec, undefined);
       return;
     }
 
@@ -114,14 +119,34 @@ export class ChartNodeView implements NodeView {
     this.renderChart(spec, resolved);
   }
 
-  private renderChart(spec: ChartSpec, rows: DataRows | undefined): void {
-    const box = this.measureBox();
-    try {
-      const context = computeContext(spec, box, rows);
-      this.dom.innerHTML =
-        renderContextToSvg(context, { title: spec.config?.title }) + renderTreeOutline(context);
-    } catch (error) {
-      this.renderMessage(error instanceof Error ? error.message : 'Failed to render chart');
+  /**
+   * Draws the chart, then its data table visually hidden; or, for a newer
+   * mark this interpreter does not know, the table visible.
+   */
+  private renderChart(spec: unknown, rows: DataRows | undefined): void {
+    const resolved = resolveChart(spec, this.measureBox(), rows);
+    switch (resolved.kind) {
+      case 'error':
+        this.renderMessage(resolved.message);
+        return;
+      case 'unsupported': {
+        const fallback = document.createElement('div');
+        fallback.className = 'chart-node-view__unsupported';
+        fallback.dataset['chartUnsupported'] = '';
+        const message = document.createElement('p');
+        message.textContent = resolved.message;
+        fallback.append(message);
+        fallback.insertAdjacentHTML('beforeend', renderDataTable(resolved.table));
+        this.dom.replaceChildren(fallback);
+        return;
+      }
+      case 'ready': {
+        const { context, table } = resolved;
+        this.dom.innerHTML =
+          renderContextToSvg(context, { title: resolved.spec.config?.title }) +
+          renderTreeOutline(context) +
+          renderDataTable(table, { hidden: true });
+      }
     }
   }
 

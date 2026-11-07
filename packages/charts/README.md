@@ -148,7 +148,7 @@ Every exported symbol, grouped by the entry that exports it. Signatures are the 
 
 ### `@thomasfosterau/charts`
 
-The portable spec (Layer 1): plain types, the parse / validate / encode functions, and the data guards. Parsing is strict: unknown keys are rejected, exactly where the [JSON Schema](#thomasfosterauchartsschemajson) sets `additionalProperties: false`.
+The portable spec (Layer 1): plain types, the parse / validate / encode functions, and the data guards. Parsing a `'1'` or `'1.1'` document is strict: unknown keys are rejected, exactly where the [JSON Schema](#thomasfosterauchartsschemajson) sets `additionalProperties: false`. A newer `1.N` document degrades instead: its unknown keys are ignored and reported, and an unknown mark comes back as `unsupported` for the data-table fallback (see [§ Spec versioning](#spec-versioning)).
 
 ```ts
 import {
@@ -172,7 +172,12 @@ try {
 // Result form, for user-supplied input.
 const result = validateSpec(json);
 if (result.ok) {
+  // A newer 1.N document: what this version ignored to read it.
+  if (result.degradation) console.warn('Ignored', result.degradation.ignored);
   const persisted = encodeSpec(result.value); // plain JSON, ready to store
+} else if (result.unsupported) {
+  // A newer 1.N mark: show its data as a table (resolveChart does this for you).
+  console.warn(result.unsupported.spec.mark);
 } else {
   console.error(result.errors.join('\n'));
 }
@@ -182,8 +187,8 @@ if (result.ok) {
 
 | Function | Description |
 | --- | --- |
-| `parseSpec(input: unknown): ChartSpec` | Parses an unknown JSON value into a `ChartSpec`. Throws `SpecValidationError` when the value is not a valid spec; all problems are collected into the one message. |
-| `validateSpec(input: unknown): ValidationResult` | The same check, returning a result instead of throwing. On failure, `errors` currently holds one string that describes every problem found, each with its path. |
+| `parseSpec(input: unknown): ChartSpec` | Parses an unknown JSON value into a `ChartSpec`. Throws `SpecValidationError` when the value is not a valid spec; all problems are collected into the one message. A newer `1.N` document is read as `SPEC_VERSION` with its unknown keys dropped; one whose mark is unknown throws `UnsupportedMarkError` (a `SpecValidationError`, carrying the spec). |
+| `validateSpec(input: unknown): ValidationResult` | The same check, returning a result instead of throwing. On failure, `errors` currently holds one string that describes every problem found, each with its path. A newer `1.N` document that parses is `ok` with a `degradation` (its declared version and the ignored paths); one whose mark is unknown fails with an error naming the mark and carries `unsupported`. |
 | `encodeSpec(spec: ChartSpec): unknown` | Encodes a spec back to a plain JSON-safe value for persisting (for example into ProseMirror node attrs). Throws if `spec` does not satisfy the schema. |
 | `isInlineData(data: Data): data is InlineData` | `true` when the spec's data is inline `values`. |
 | `isDataRef(data: Data): data is DataRef` | `true` when the spec's data is an external `ref`. |
@@ -193,7 +198,8 @@ if (result.ok) {
 | Export | Description |
 | --- | --- |
 | `SpecValidationError` | `Error` subclass (`name: 'SpecValidationError'`) thrown by `parseSpec`. |
-| `SPEC_VERSION` | `'1.1'`: the version a new spec should declare. `parseSpec` accepts `'1'` and `'1.1'` and rejects any other `specVersion` (see [§ Spec versioning](#spec-versioning)). |
+| `UnsupportedMarkError` | `SpecValidationError` subclass (`name: 'UnsupportedMarkError'`) thrown by `parseSpec` for a newer `1.N` document whose mark is unknown; `unsupported: UnsupportedMark` carries its known fields. |
+| `SPEC_VERSION` | `'1.1'`: the version a new spec should declare. `parseSpec` reads `'1'` and `'1.1'` strictly, degrades a newer `'1.N'`, and rejects any other `specVersion` (see [§ Spec versioning](#spec-versioning)). |
 
 #### Types
 
@@ -216,7 +222,10 @@ if (result.ok) {
 | `Scales` | `{ x?: ScaleHint; y?: ScaleHint }`. |
 | `Config` | `{ title?: string; tooltip?: boolean }` — portable presentation hints. |
 | `Extensions` | `{ [key: string]: unknown }` — web-only hints; native interpreters ignore the whole object. |
-| `ValidationResult` | `{ ok: true; value: ChartSpec } \| { ok: false; errors: ReadonlyArray<string> }`. |
+| `ValidationResult` | `{ ok: true; value: ChartSpec; degradation?: SpecDegradation \| undefined } \| { ok: false; errors: ReadonlyArray<string>; unsupported?: UnsupportedMark \| undefined }`. Both optional members are absent for a `'1'` or `'1.1'` document. |
+| `SpecDegradation` | `{ declaredVersion: string; ignored: ReadonlyArray<string> }` — how a newer `1.N` document was read: the version it declared, and the paths (`["encoding"]["shape"]`) of the keys ignored, in document order. |
+| `UnsupportedMark` | `{ spec: UnsupportedMarkSpec; degradation: SpecDegradation }` — a newer `1.N` document whose mark is unknown. |
+| `UnsupportedMarkSpec` | `{ specVersion: SpecVersion; mark: string; encoding: Encoding; data: Data; scales?: Scales; config?: Config; extensions?: Extensions }` — that document's known fields, `mark` as written and `specVersion` normalised to `SPEC_VERSION`; `tree` options are dropped with the mark. What the data-table fallback renders. |
 
 ### `@thomasfosterau/charts/core`
 
@@ -259,7 +268,8 @@ Geometry is in **plot** coordinates: translate by `dimensions.margins.left` / `.
 
 | Function | Description |
 | --- | --- |
-| `resolveChart(spec: unknown, box: Box, data?: DataRows, options?: ComputeContextOptions): ResolvedChart` | `validateSpec` then `computeContext`, with every failure returned as a message instead of thrown: `Invalid chart spec: …`, a data `ref` with no `data` passed, or the error `computeContext` threw. The bundled Svelte `Chart` component renders its `error` message as its fallback. |
+| `resolveChart(spec: unknown, box: Box, data?: DataRows, options?: ResolveChartOptions): ResolvedChart` | `validateSpec` then `computeContext` and `buildDataTable`, with every failure returned as a message instead of thrown: `Invalid chart spec: …`, a data `ref` with no `data` passed, or the error the core threw. A newer `1.N` spec draws from its known subset (`degradation` says what was ignored); one whose mark is unknown resolves to `unsupported` with its `table`, which the interpreters show in place of a drawing. The bundled Svelte `Chart` component renders its `error` message as its fallback. |
+| `buildDataTable(spec: ChartSpec \| UnsupportedMarkSpec, rows: DataRows, options?: DataTableOptions): DataTable` | The chart's data as a table, the text alternative every interpreter renders: one column per encoded channel headed by its field (`x` with `x2`, or `y` with `y2`, as one "start to end" column; a channel repeating an earlier column's field is left out), one row per datum, each cell formatted by the declared type (numbers as written, dates as ISO 8601, the date alone at UTC midnight, missing values empty). A `tree` lists each node (its label, else its id) with its parent, named by label where there is a `label` channel. The caption is `config.title`. Throws `TypeError` when a value contradicts its declared type. |
 | `computeContext(spec: ChartSpec, box: Box, data?: DataRows, options?: ComputeContextOptions): ChartContext` | Turns a parsed spec, the measured outer box and resolved rows into a `ChartContext`. `data`, when passed, is used instead of the spec's inline values; it is required when the spec's data is a `ref` (otherwise throws `Error`). Throws `TypeError` when a value contradicts its channel's declared type. x maps onto `[0, plot.width]` and y onto `[plot.height, 0]`, so larger values sit higher. Without both `x` and `y` encodings the geometry is empty. |
 | `computeDimensions(outer: Box, margins?: Partial<Margins>): Dimensions` | Fills missing margins from `DEFAULT_MARGINS` and subtracts them from the box; the plot width and height are clamped at zero. |
 | `makeAccessor(channel: Channel): (datum: Datum) => FieldValue` | A typed reader for one channel: `quantitative` → finite number, `temporal` → `Date` (ISO 8601 string or epoch ms), `ordinal` / `nominal` → string (numbers and booleans stringified). Missing and `null` values read as `null`; a value contradicting the declared type throws `TypeError`. |
@@ -285,7 +295,8 @@ The four builders take `args: { data: DataRows; x: Channel; y: Channel; xScale: 
 | `DEFAULT_RADIUS_RANGE` | `[3, 12]` | Radius range in pixels for the `size` channel on point marks. |
 | `DEFAULT_POINT_RADIUS` | `4` | Point radius when there is no size encoding or the value is missing. |
 | `DEFAULT_TICK_COUNT` | `5` | Target tick count for continuous scales in `computeTicks`. |
-| `VISUALLY_HIDDEN_STYLE` | an inline `style` string | The visually-hidden style every interpreter puts on a tree's nested-list alternative (inline, since the interpreters ship no CSS). |
+| `VISUALLY_HIDDEN_STYLE` | an inline `style` string | The visually-hidden style every interpreter puts on its data table and a tree's nested-list alternative (inline, since the interpreters ship no CSS). |
+| `DEFAULT_RANGE_SEPARATOR` | `' to '` | Joins a range's start and end in a data table's header and cells. |
 
 #### Types
 
@@ -295,6 +306,10 @@ The four builders take `args: { data: DataRows; x: Channel; y: Channel; xScale: 
 | `Margins` | `{ top; right; bottom; left: number }` — pixels between the outer box and the plot. |
 | `Dimensions` | `{ outer: Box; margins: Margins; plot: Box }` — `plot` is `outer` minus `margins`. |
 | `ComputeContextOptions` | `{ margins?: Partial<Margins> }`. |
+| `ResolveChartOptions` | `ComputeContextOptions & DataTableOptions` — the options of `resolveChart`. |
+| `DataTableOptions` | `{ rangeSeparator?: string \| undefined }` — default `DEFAULT_RANGE_SEPARATOR`. |
+| `DataTable` | `{ caption: string \| undefined; columns: ReadonlyArray<DataTableColumn>; rows: ReadonlyArray<ReadonlyArray<string>> }` — every cell is text, one per column. |
+| `DataTableColumn` | `{ channels: ReadonlyArray<keyof Encoding>; header: string }` — the channels a column shows (one, or a range's two). |
 | `DataRows` | `ReadonlyArray<Datum>` — resolved rows, what the host passes after resolving a data ref. |
 | `FieldValue` | `number \| Date \| string \| null` — a typed value read by `makeAccessor`; `null` means missing, and geometry builders skip the row. |
 | `DomainValue` | `number \| string \| Date` — a value in a scale's domain. |
@@ -305,7 +320,7 @@ The four builders take `args: { data: DataRows; x: Channel; y: Channel; xScale: 
 | `Tick` | `{ value: DomainValue; position: number; label: string }` — `position` is in plot pixels along the axis. |
 | `ChartTicks` | `{ x?: ReadonlyArray<Tick>; y?: ReadonlyArray<Tick> }`. |
 | `ChartContext` | `{ dimensions: Dimensions; scales: ChartScales; geometry: Geometry; ticks: ChartTicks }` — everything an interpreter needs to draw. |
-| `ResolvedChart` | `{ kind: 'ready'; spec: ChartSpec; context: ChartContext } \| { kind: 'error'; message: string }` — the result of `resolveChart`. |
+| `ResolvedChart` | `{ kind: 'ready'; spec: ChartSpec; context: ChartContext; table: DataTable; degradation?: SpecDegradation \| undefined } \| { kind: 'unsupported'; spec: UnsupportedMarkSpec; table: DataTable; degradation: SpecDegradation; message: string } \| { kind: 'error'; message: string }` — the result of `resolveChart`. |
 | `Geometry` | `LineGeometry \| BarGeometry \| PointGeometry \| AreaGeometry \| TreeGeometry`, discriminated by `mark`. |
 | `TreeGeometry` | `{ mark: 'tree'; nodes: ReadonlyArray<TreeNodeBox>; links: ReadonlyArray<TreeLink>; outline: ReadonlyArray<TreeOutlineNode> }` — no scales or ticks; the interpreters draw no axes for it. |
 | `TreeNodeBox` | `{ id; label: string; depth; x; y; width; height: number; color: string \| undefined; datum: Datum }` — a node's box in plot pixels, depth-first. |
@@ -350,9 +365,12 @@ Peer: `svelte` (5.40+). A Svelte 5 `Chart` component. It is published as `.svelt
 | `height` | `number` | `360` | Outer height in pixels. |
 | `margins` | `Partial<Margins>` | `DEFAULT_MARGINS` | Margin overrides. |
 | `fallback` | `Snippet<[message: string]>` | alert `<div>` | What to render on an error; receives the message. |
+| `tableLabel` | `string` | `'Chart data'` | The data table's caption when the spec has no `config.title`. |
+| `rangeSeparator` | `string` | `' to '` | Joins a range's start and end in the data table. |
+| `unsupportedMessage` | `string` | `'This chart type is not supported here, so its data is shown as a table.'` | Shown above the visible table for a newer spec's unknown mark. |
 | …rest | `SVGAttributes<SVGSVGElement>` | — | Spread onto the `<svg>`. `class` also lands on the default fallback `<div>`; an `aria-label` replaces the one taken from `config.title`. |
 
-It renders `<svg role="img" viewBox="0 0 {width} {height}">`, named by `aria-label` from `config.title`, with the title drawn above the plot when set. On an error (invalid spec, a `ref` with no `data`, or a throw from the core) it renders `fallback`, or by default `<div role="alert" data-chart-error>` with the message.
+It renders `<svg role="img" viewBox="0 0 {width} {height}">`, named by `aria-label` from `config.title`, with the title drawn above the plot when set, followed by the chart's data as a visually hidden `<table data-chart-table>` (captioned by the title, else `tableLabel`; the SVG's `role="img"` makes its own children presentational, so the table is its sibling). For a newer `1.N` spec whose mark it cannot draw it renders `<div data-chart-unsupported>` with `unsupportedMessage` and the same table, visible (`class` lands on the `<div>`). On an error (invalid spec, a `ref` with no `data`, or a throw from the core) it renders `fallback`, or by default `<div role="alert" data-chart-error>` with the message.
 
 ### `@thomasfosterau/charts/prosemirror`
 
@@ -400,10 +418,11 @@ new EditorView(document.querySelector('#editor'), {
 
 | Export | Description |
 | --- | --- |
-| `createChartNodeSpec(options?: ChartNodeSpecOptions): NodeSpec` | The chart node: an atom (selectable, draggable) whose only attr is `spec` (default `null`), so `toJSON` / `fromJSON` carry the spec as is. `toDOM` writes `<div class="chart-node" data-chart-spec="…">` with the encoded spec JSON (empty for a `null` spec); `parseDOM` reads it back and validates it, and an invalid spec does not match the rule, leaving other rules to try. |
+| `createChartNodeSpec(options?: ChartNodeSpecOptions): NodeSpec` | The chart node: an atom (selectable, draggable) whose only attr is `spec` (default `null`), so `toJSON` / `fromJSON` carry the spec as is. `toDOM` writes `<div class="chart-node" data-chart-spec="…">` with the encoded spec JSON (empty for a `null` spec); `parseDOM` reads it back and validates it, and an invalid spec does not match the rule, leaving other rules to try. Nor does a newer `1.N` spec: its parsed value drops what this version does not know, and storing that would rewrite the document. |
 | `chartNodeViewFactory(options?: ChartNodeViewOptions): (node: Node, view: EditorView, getPos: () => number \| undefined) => ChartNodeView` | A constructor for the editor's `nodeViews` prop. |
-| `ChartNodeView` | `new ChartNodeView(node: Node, view: EditorView, options?: ChartNodeViewOptions)`. A `NodeView` whose `dom` is a `<div class="chart-node-view">` holding the rendered SVG. It re-validates the spec on every render and otherwise shows a `<div class="chart-node-view__placeholder">` with a message (no chart configured, invalid spec, data stored externally when there is no `resolveData`, loading, failed to load, or the core's error). It measures its own width and keeps `defaultBox`'s aspect ratio. `update` re-renders for a node of the same type (and returns `false` for any other), `ignoreMutation` returns `true`, and `destroy` drops any pending async resolution. |
+| `ChartNodeView` | `new ChartNodeView(node: Node, view: EditorView, options?: ChartNodeViewOptions)`. A `NodeView` whose `dom` is a `<div class="chart-node-view">` holding the rendered SVG. It re-validates the spec on every render, appends the chart's data as a visually hidden `<table data-chart-table>` after the SVG, and for a newer `1.N` spec whose mark it cannot draw shows `<div class="chart-node-view__unsupported" data-chart-unsupported>` with the message and the table, visible (`Unsupported chart type` when that spec's data is a `ref`: `resolveData` takes a `ChartSpec`). Otherwise it shows a `<div class="chart-node-view__placeholder">` with a message (no chart configured, invalid spec, data stored externally when there is no `resolveData`, loading, failed to load, or the core's error). It measures its own width and keeps `defaultBox`'s aspect ratio. `update` re-renders for a node of the same type (and returns `false` for any other), `ignoreMutation` returns `true`, and `destroy` drops any pending async resolution. |
 | `renderTreeOutline(context: ChartContext): string` | A tree's visually hidden nested `<ul>` text alternative as an HTML string (`''` for any other mark). The NodeView appends it after the SVG, whose `role="img"` would otherwise hide the structure. |
+| `renderDataTable(table: DataTable, options?: RenderDataTableOptions): string` | A `DataTable` as `<table data-chart-table>` with its caption, a `<th scope="col">` header row and one row per datum, every text escaped. `hidden: true` adds `VISUALLY_HIDDEN_STYLE`, for the table beside a drawing; without it, the visible fallback. |
 | `renderContextToSvg(context: ChartContext, options?: RenderSvgOptions): string` | Renders a `ChartContext` to an SVG string with no DOM, for the NodeView's `innerHTML`, server rendering or tests. The root is `<svg role="img" viewBox="…">` with no `aria-label` (the title is drawn as `<text>`); the title, class and tick labels are XML-escaped. |
 
 #### Constants
@@ -421,6 +440,7 @@ new EditorView(document.querySelector('#editor'), {
 | `ChartNodeAttrs` | `{ spec: ChartSpec \| null }` — a chart node's attrs; `null` is an empty placeholder chart. |
 | `ChartNodeViewOptions` | `{ defaultBox?: Box; resolveData?: DataResolver; className?: string }` — `defaultBox` (default 640 × 360) is used before the element can be measured and sets the aspect ratio after; without `resolveData`, charts whose data is a `ref` show a placeholder; `className` replaces `'chart-node-view'` on the wrapper. |
 | `DataResolver` | `(spec: ChartSpec) => DataRows \| Promise<DataRows>` — resolves a spec's data ref at edit time. A stale promise never overwrites a newer render. |
+| `RenderDataTableOptions` | `{ hidden?: boolean \| undefined }` — visually hide the table (default `false`). |
 | `RenderSvgOptions` | `{ title?: string \| undefined; className?: string \| undefined }` — title drawn above the plot, and the class of the root `<svg>`. |
 
 ### `@thomasfosterau/charts/vega`
@@ -441,8 +461,8 @@ try {
 
 | Export | Description |
 | --- | --- |
-| `emitVegaLite(spec: ChartSpec, options?: EmitVegaLiteOptions): VegaLiteSpec` | Translates the mark and typed encodings one-to-one. `config.title` becomes `title`, `config.tooltip` becomes `mark.tooltip`, and `scales.x` / `scales.y` become the x and y `scale` (`domain`, `nice`, `zero`); `extensions` are ignored. Data comes from `options.rows` if given, else inline `values`, else a `url` ref's `id` as `url`. |
-| `VegaLiteEmitError` | `Error` subclass (`name: 'VegaLiteEmitError'`) with a `reason`: `'unresolved-data'` when a `query` or `node` ref arrives without `options.rows`, `'unsupported-mark'` for a `tree` (Vega-Lite has no tree layout). |
+| `emitVegaLite(spec: ChartSpec, options?: EmitVegaLiteOptions): VegaLiteSpec` | Translates the mark and typed encodings one-to-one. `config.title` becomes `title`, `config.tooltip` becomes `mark.tooltip`, and `scales.x` / `scales.y` become the x and y `scale` (`domain`, `nice`, `zero`); `extensions` are ignored. Data comes from `options.rows` if given, else inline `values`, else a `url` ref's `id` as `url`. A newer `1.N` spec arrives degraded by `parseSpec`, so it emits from the known subset; an unknown mark never becomes a `ChartSpec` (render `validateSpec`'s `unsupported` with a TS interpreter's table instead), and one forced through a cast throws `'unsupported-mark'`. |
+| `VegaLiteEmitError` | `Error` subclass (`name: 'VegaLiteEmitError'`) with a `reason`: `'unresolved-data'` when a `query` or `node` ref arrives without `options.rows`, `'unsupported-mark'` for a `tree` (Vega-Lite has no tree layout) or a mark it does not know. |
 | `VegaLiteEmitErrorReason` | `'unsupported-mark' \| 'unresolved-data'`. |
 | `VEGA_LITE_SCHEMA` | `'https://vega.github.io/schema/vega-lite/v6.json'` — the `$schema` of every emitted spec. |
 | `EmitVegaLiteOptions` | `{ rows?: ReadonlyArray<Datum>; width?: number \| 'container'; height?: number }` — pre-resolved rows, width (default `'container'`, responsive) and height in pixels. |
@@ -491,6 +511,12 @@ For every spec field and mark type, this records which interpreters honour it an
 | `tree` (spec 1.1) | ✅ tidy layout (`buildTreeGeometry`), plus a visually hidden nested list | ⛔ `VegaLiteEmitError` with reason `'unsupported-mark'` (Vega-Lite has no tree layout; use full Vega's `tree` transform or another interpreter) | 🟡 `TreeLayout` drawn on a SwiftUI `Canvas` outside Swift Charts, the hierarchy as accessibility children | 🟡 custom layout outside the charting library | 🔵 | Render the nested-list fallback (the hierarchy as text), never an empty plot |
 
 The v1 mark set is deliberately the intersection of the native charting vocabularies. `tree` is the one exception (owner decision on #256): no native charting library has it, so every interpreter lays it out itself from the same algorithm, and the matrix rule 2 below is met by the nested-list degradation. New marks (e.g. `rect`, `rule`, `arc`) require a minor `specVersion` bump (see [§ Spec versioning](#spec-versioning)) and a row here **before** implementation.
+
+### Text alternatives
+
+| Feature | TS core | Vega-Lite | Swift Charts | Compose | Media | Degradation when unsupported |
+| --- | --- | --- | --- | --- | --- | --- |
+| Data table (#304) | ✅ `buildDataTable` (in `resolveChart`'s `table`); the Svelte and ProseMirror interpreters render it visually hidden beside every chart, and visible in place of a newer `1.N` mark they do not know | ⛔ (Vega-Lite has its own `description` / ARIA; an unknown mark is rendered by a TS interpreter) | 🔵 the same model through `accessibilityChildren`, and as the fallback view | 🔵 | 🔵 | **Normative** for an unknown mark: render the table, never an empty plot |
 
 ### Encoding channels
 
@@ -560,13 +586,15 @@ The TS core never resolves references itself: `computeContext` takes already-res
 
 | Field | TS core | Vega-Lite | Swift Charts | Compose | Media | Behaviour |
 | --- | --- | --- | --- | --- | --- | --- |
-| `specVersion` | ✅ accepts `'1'` and `'1.1'` | ✅ | 🔵 enforced by decoder (`.v1`, `.v1_1`) | 🔵 | 🔵 | See the rule below |
+| `specVersion` | ✅ `'1'` and `'1.1'` strictly; a newer `'1.N'` degraded | ✅ (the degraded spec) | 🔵 enforced by decoder (`.v1`, `.v1_1`); degrading a newer `1.N` not yet implemented | 🔵 | 🔵 | See the rule below |
 
 **The rule (owner decision on #255 / #256):** versions are `major.minor`, and `SPEC_VERSION` is the one a new spec should declare (`'1.1'`).
 
 - **A minor version only adds.** Every `'1'` spec is a valid `'1.1'` spec and renders the same. New channels and marks come in a minor version and need a row in this matrix first. `'1.1'` adds `encoding.x2` / `encoding.y2`, the `tree` mark with its `id` / `parent` / `label` channels and `tree` options, and `parseSpec` rejects all of them in a `'1'` spec.
 - **Degradation across minors is defined:** an interpreter given a newer `1.x` spec ignores channels it does not know, and renders a mark it does not know through the data-table fallback, never an empty plot. A new major version is a break, and an interpreter rejects it with a clear error.
-- **What is implemented today:** this release accepts `'1'` and `'1.1'` exactly. Interpreters published before it (spec `'1'` only) close every object, so they reject a `'1.1'` document rather than ignore its range channels. Accepting newer `1.x` minors and the data-table fallback are tracked in #304.
+- **What is implemented (#304):** `parseSpec` / `validateSpec` read `'1'` and `'1.1'` strictly, as before. A `specVersion` of the form `'1.N'` with N above 1 (no leading zero) is read as `'1.1'`: unknown keys anywhere are ignored and listed in the result's `degradation.ignored` with the declared version, the value's `specVersion` is `'1.1'` (so `encodeSpec` writes the known subset, not the original), and the 1.1 rules still hold for what it knows. An unknown `mark` fails validation with an error naming it and carries `unsupported` (`parseSpec` throws `UnsupportedMarkError`); `resolveChart` turns it into an `unsupported` outcome, which the Svelte and ProseMirror interpreters render as a visible data table. `'2'`, `'2.0'` and malformed versions are rejected.
+- **The JSON Schema stays strict** (owner decision on #304): `chart-spec.v1.json` describes only the versions it knows and closes every object, so validators keep catching typos. Only the parsers degrade.
+- **Interpreters that cannot degrade:** 0.1.0, the first release, shipped strict: it rejects any version above `'1.1'`, so the rule holds only for releases from this one on. ChartSpecKit's decoder does not degrade yet.
 
 ### Rules for changing this matrix
 

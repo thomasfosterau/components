@@ -166,3 +166,54 @@ describe('tree mark (spec 1.1) in SSR', () => {
     expect(order).toEqual([...TAXONOMY_ORDER]);
   });
 });
+
+describe('data table (#304) in SSR', () => {
+  it('renders the data as a visually hidden table beside the named SVG', () => {
+    const html = ssr({ spec: lineSpec });
+    expect(html).toContain('role="img"');
+    expect(html).toContain('aria-label="Prices"');
+    const table = html.slice(html.indexOf('</svg>'));
+    expect(table).toMatch(/<table style="position:absolute;[^"]*" data-chart-table="">/);
+    expect(table).toContain('<caption>Prices</caption>');
+    expect(table).toContain('<th scope="col">date</th>');
+    expect(table).toContain('<td>2024-01-01</td>');
+    expect(table.match(/<tr>/g)).toHaveLength(5);
+  });
+
+  it('captions an untitled chart with tableLabel', () => {
+    expect(ssr({ spec: refSpec, data: [{ cat: 'a', v: 1 }] })).toContain(
+      '<caption>Chart data</caption>',
+    );
+    expect(ssr({ spec: refSpec, data: [{ cat: 'a', v: 1 }], tableLabel: 'Ventes' })).toContain(
+      '<caption>Ventes</caption>',
+    );
+  });
+
+  it('draws a newer spec from its known subset', () => {
+    const future: ChartSpec = JSON.parse(
+      JSON.stringify({
+        ...lineSpec,
+        specVersion: '1.4',
+        encoding: { ...lineSpec.encoding, strokeDash: { field: 'ticker', type: 'nominal' } },
+      }),
+    );
+    const html = ssr({ spec: future });
+    expect(html.match(/<path /g)).toHaveLength(2);
+    expect(html).not.toContain('data-chart-error');
+  });
+
+  it('renders an unknown mark as the visible table, with its message', () => {
+    const sankey: ChartSpec = JSON.parse(
+      JSON.stringify({ ...lineSpec, specVersion: '1.2', mark: 'sankey' }),
+    );
+    const html = ssr({ spec: sankey, class: 'sales-chart', rangeSeparator: ' – ' });
+    expect(html).not.toContain('<svg');
+    expect(html).toContain('<div class="sales-chart" data-chart-unsupported="">');
+    expect(html).toContain('This chart type is not supported here');
+    expect(html).toMatch(/<table data-chart-table="">/);
+    expect(html).toContain('<td>AAPL</td>');
+    expect(ssr({ spec: sankey, unsupportedMessage: 'Non pris en charge' })).toContain(
+      'Non pris en charge',
+    );
+  });
+});

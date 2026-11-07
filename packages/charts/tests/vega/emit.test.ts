@@ -168,3 +168,26 @@ describe('tree mark (spec 1.1)', () => {
     );
   });
 });
+
+describe('newer 1.N specs (#304)', () => {
+  it('emits a degraded spec from its known subset', () => {
+    const future = parseSpec({
+      ...lineSpec,
+      specVersion: '1.2',
+      encoding: { ...lineSpec.encoding, strokeDash: { field: 'ticker', type: 'nominal' } },
+    });
+    expect(emitVegaLite(future).encoding).toEqual(emitVegaLite(lineSpec).encoding);
+  });
+
+  it('throws unsupported-mark for a mark it does not know, forced through a cast', () => {
+    const sankey = fromJson({ ...lineSpec, mark: 'sankey' });
+    expect(() => emitVegaLite(sankey)).toThrow(
+      expect.objectContaining({ name: 'VegaLiteEmitError', reason: 'unsupported-mark' }),
+    );
+  });
+});
+
+/** A document from outside, typed as a caller holding unchecked JSON would type it. */
+function fromJson(value: object): ChartSpec {
+  return JSON.parse(JSON.stringify(value));
+}
