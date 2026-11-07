@@ -31,7 +31,7 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
   import type { Size } from '../ui/tones.ts';
   import Pagination from './Pagination.svelte';
   import Table from './Table.svelte';
-  import type { SortState, TableColumn } from './table-types.ts';
+  import type { SortState, TableColumn, TableRowAttributes } from './table-types.ts';
 
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
     /** Every row; sorting, filtering and paging happen here. */
@@ -71,6 +71,8 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
     sort?: SortState | undefined;
     /** Makes every row activatable by pointer and keyboard; see `Table`. */
     onSelect?: ((row: T) => void) | undefined;
+    /** A body row's own `class` and `id`; see `Table`. */
+    rowAttributes?: ((row: T) => TableRowAttributes) | undefined;
     /** The line shown when no row matches. */
     emptyMessage?: string | undefined;
     /** Richer empty state, in place of `emptyMessage`. */
@@ -139,6 +141,7 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
     pinRows,
     sort = $bindable(undefined),
     onSelect,
+    rowAttributes,
     emptyMessage,
     emptyState,
     filterLabel = 'Search',
@@ -233,6 +236,7 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
     {zebra}
     {pinRows}
     {onSelect}
+    {rowAttributes}
     {emptyMessage}
     {emptyState}
     {sortLabel}

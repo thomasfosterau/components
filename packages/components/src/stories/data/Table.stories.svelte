@@ -84,6 +84,25 @@
   />
 </Story>
 
+<Story name="Row attributes and a hidden header">
+  <!-- `rowAttributes` bolds the selected row and gives each row an anchor id;
+       `headerClass="sr-only"` keeps the edit column's header for screen
+       readers over visible cells. -->
+  <Table
+    rows={plants}
+    columns={[
+      ...plainColumns,
+      { key: 'edit', header: 'Edit', value: () => 'Edit', headerClass: 'sr-only' },
+    ]}
+    {rowKey}
+    caption="Seedlings per plant"
+    rowAttributes={(plant) => ({
+      id: `plant-${plant.id}`,
+      class: plant.id === plants[0]?.id ? 'font-medium' : undefined,
+    })}
+  />
+</Story>
+
 <Story name="Caption hidden">
   <section>
     <h2 class="mb-2 text-xl font-semibold">Everything sown this season</h2>

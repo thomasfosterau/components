@@ -64,6 +64,24 @@
   />
 </Story>
 
+<Story name="Without chevrons, omitting unavailable arms">
+  <Pagination
+    offset={0}
+    limit={20}
+    total={151}
+    {href}
+    variant="prevNext"
+    chevrons={false}
+    unavailableArms="omit"
+  />
+</Story>
+
+<Story name="No total, only whether there is more">
+  <!-- A search with no corpus total: Next follows `hasMore`, and nothing
+       that would need the total is drawn. -->
+  <Pagination offset={20} limit={20} hasMore {href} />
+</Story>
+
 <Story name="Callback, not links">
   <!-- No `href`, so the controls are buttons: for a pager over state the URL
        does not carry. -->

@@ -35,7 +35,13 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes, HTMLTableAttributes } from 'svelte/elements';
   import type { Size } from '../ui/tones.ts';
-  import { columnAriaSort, nextSortState, type SortState, type TableColumn } from './table-types.ts';
+  import {
+    columnAriaSort,
+    nextSortState,
+    type SortState,
+    type TableColumn,
+    type TableRowAttributes,
+  } from './table-types.ts';
 
   interface Props extends Omit<HTMLTableAttributes, 'children'> {
     /** The rows to draw, in the order to draw them. */
@@ -67,6 +73,8 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
     onSort?: ((sort: SortState | undefined) => void) | undefined;
     /** Makes every row activatable by pointer and keyboard. */
     onSelect?: ((row: T) => void) | undefined;
+    /** A body row's own `class` and `id`, merged with what `onSelect` adds. */
+    rowAttributes?: ((row: T) => TableRowAttributes) | undefined;
     /**
      * The line shown instead of an empty body.
      * @defaultValue `'Nothing to show.'`
@@ -97,6 +105,7 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
     sort = $bindable(undefined),
     onSort,
     onSelect,
+    rowAttributes,
     emptyMessage = 'Nothing to show.',
     emptyState,
     foot,
@@ -139,13 +148,12 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
    * (a `role` without a `tabindex` is a lie) and one object is where that
    * agreement is visible.
    */
-  const rowAttributes = (row: T): HTMLAttributes<HTMLTableRowElement> =>
+  const activation = (row: T): HTMLAttributes<HTMLTableRowElement> =>
     onSelect === undefined
       ? {}
       : {
           role: 'button',
           tabindex: 0,
-          class: 'cursor-pointer',
           onclick: () => {
             onSelect(row);
           },
@@ -182,7 +190,11 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
     <thead>
       <tr>
         {#each columns as column (column.key)}
-          <th scope="col" class={columnClass(column)} aria-sort={column.sortable ? columnAriaSort(sort, column.key) : undefined}>
+          <th
+            scope="col"
+            class={[columnClass(column), column.headerClass]}
+            aria-sort={column.sortable ? columnAriaSort(sort, column.key) : undefined}
+          >
             {#if column.sortable}
               <button
                 type="button"
@@ -213,7 +225,12 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
         </tr>
       {:else}
         {#each rows as row (rowKey(row))}
-          <tr class="hover:bg-base-200" {...rowAttributes(row)}>
+          {@const own = rowAttributes?.(row)}
+          <tr
+            {...activation(row)}
+            id={own?.id}
+            class={['hover:bg-base-200', onSelect !== undefined && 'cursor-pointer', own?.class]}
+          >
             {#each columns as column (column.key)}
               {#if column.rowHeader}
                 <th scope="row" class={['font-normal', columnClass(column)]}>{@render cellBody(column, row)}</th>

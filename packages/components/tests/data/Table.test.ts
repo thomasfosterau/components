@@ -13,7 +13,7 @@ import { expect, test, vi } from 'vite-plus/test';
 import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import TableFixture from './fixtures/TableFixture.svelte';
-import { rows } from './fixtures/table-data.ts';
+import { rows, type Row } from './fixtures/table-data.ts';
 
 /** The body rows' first cells, in render order. */
 const names = (): string[] =>
@@ -166,4 +166,48 @@ test('without rowHeader every body cell is a data cell', async () => {
 
   expect(screen.getByRole('rowheader').elements()).toHaveLength(0);
   expect(screen.getByRole('cell').elements()).toHaveLength(6);
+});
+
+test('rowAttributes gives a row its own class and id', async () => {
+  const screen = await render(TableFixture, {
+    caption: 'Plants',
+    sortable: false,
+    rowAttributes: (row) => ({
+      id: `plant-${row.id}`,
+      class: row.id === 'tomato' ? 'font-medium' : undefined,
+    }),
+  });
+
+  const tomato = document.getElementById('plant-tomato');
+  expect(tomato?.tagName).toBe('TR');
+  expect(tomato?.classList.contains('font-medium')).toBe(true);
+  expect(document.getElementById('plant-basil')?.classList.contains('font-medium')).toBe(false);
+  await expect.element(screen.getByRole('table', { name: 'Plants' })).toBeInTheDocument();
+});
+
+test('an activatable row keeps its hover tint alongside its own class', async () => {
+  const screen = await render(TableFixture, {
+    sortable: false,
+    onSelect: vi.fn<(row: Row) => void>(),
+    rowAttributes: () => ({ class: 'font-medium' }),
+  });
+
+  const row = screen.getByRole('button').nth(0);
+  await expect.element(row).toHaveClass('hover:bg-base-200');
+  await expect.element(row).toHaveClass('cursor-pointer');
+  await expect.element(row).toHaveClass('font-medium');
+});
+
+test('headerClass styles the header only, so a header can be read but not seen', async () => {
+  const screen = await render(TableFixture, {
+    caption: 'Plants',
+    sortable: false,
+    headerClass: 'sr-only',
+  });
+
+  const header = screen.getByRole('columnheader', { name: 'Count' });
+  await expect.element(header).toHaveClass('sr-only');
+  for (const cell of screen.getByRole('cell').elements()) {
+    expect(cell.classList.contains('sr-only')).toBe(false);
+  }
 });

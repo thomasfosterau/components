@@ -181,3 +181,59 @@ test('page numbers are bare by default', async () => {
 
   await expect.element(screen.getByRole('link', { name: 'Page 1001' })).toHaveTextContent('1001');
 });
+
+test('chevrons={false} draws the arms as their text alone', async () => {
+  const screen = await render(Pagination, {
+    offset: 20,
+    limit: 20,
+    total: 60,
+    href,
+    chevrons: false,
+  });
+
+  const previous = screen.getByRole('link', { name: 'Previous' });
+  await expect.element(previous).toBeInTheDocument();
+  expect(previous.element().querySelector('svg')).toBeNull();
+  expect(screen.getByRole('link', { name: 'Next' }).element().querySelector('svg')).toBeNull();
+});
+
+test('unavailableArms="omit" leaves out an arm with nowhere to go', async () => {
+  const screen = await render(Pagination, {
+    offset: 0,
+    limit: 20,
+    total: 60,
+    href,
+    variant: 'prevNext',
+    unavailableArms: 'omit',
+  });
+
+  await expect.element(screen.getByRole('link', { name: 'Next' })).toBeInTheDocument();
+  expect(screen.getByText('Previous').elements()).toHaveLength(0);
+  expect(document.querySelector('[aria-disabled="true"]')).toBeNull();
+});
+
+test('without a total, Next follows hasMore and nothing prints a count', async () => {
+  const more = await render(Pagination, {
+    offset: 20,
+    limit: 20,
+    hasMore: true,
+    href,
+    showRange: true,
+    statusLabel: (page, pages) => `Page ${page} of ${pages}`,
+  });
+
+  const next = more.getByRole('link', { name: 'Next' });
+  await expect.element(next).toHaveAttribute('rel', 'next');
+  expect(params(next.element()).get('page[offset]')).toBe('40');
+  expect(params(more.getByRole('link', { name: 'Previous' }).element()).get('page[offset]')).toBe(
+    '0',
+  );
+  // No numbered window, range line or "of N": each would print a made-up total.
+  expect(more.getByRole('link', { name: /^Page / }).elements()).toHaveLength(0);
+  expect(more.getByText(/Showing|of \d/).elements()).toHaveLength(0);
+  await more.unmount();
+
+  const last = await render(Pagination, { offset: 40, limit: 20, href });
+  await expect.element(last.getByText('Next')).toBeInTheDocument();
+  expect(last.getByRole('link', { name: 'Next' }).elements()).toHaveLength(0);
+});

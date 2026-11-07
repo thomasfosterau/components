@@ -28,6 +28,14 @@ Offset-based page navigation: numbered links with gaps or a bare Previous/Next p
   navigate — unless `showRange` asked for the range line, which is a fact
   about the result and still true. In `prevNext` mode both arms stay, disabled:
   that variant is drawn by a caller that wants its control bar to hold place.
+
+  Three opt-outs for a pager that already looks different in an app, so
+  adopting this is a substitution: `chevrons={false}` draws the arms as text
+  alone; `unavailableArms="omit"` leaves an unavailable arm out instead of
+  disabling it (the caller accepts the cursor-slide above); and `total` may
+  be omitted for a listing that only knows whether there is more — it then
+  draws as `prevNext`, Next follows `hasMore`, and the range and status lines,
+  which need a total, are not drawn.
 -->
 <script lang="ts">
   import { ChevronLeft, ChevronRight } from '@lucide/svelte';
@@ -41,8 +49,25 @@ Offset-based page navigation: numbered links with gaps or a bare Previous/Next p
     offset: number;
     /** The page size the current page was rendered with. */
     limit: number;
-    /** The unpaged total across every page. */
-    total: number;
+    /**
+     * The unpaged total across every page. Omit it for a listing that only
+     * knows whether there is more (then pass `hasMore`): the pager draws as
+     * `prevNext`, without the range or status line.
+     */
+    total?: number | undefined;
+    /** Whether a next page exists, when `total` is omitted. */
+    hasMore?: boolean | undefined;
+    /**
+     * Draw a chevron beside the Previous and Next text.
+     * @defaultValue `true`
+     */
+    chevrons?: boolean | undefined;
+    /**
+     * An arm with nowhere to go: an `aria-disabled` placeholder that holds its
+     * place, or left out.
+     * @defaultValue `'disabled'`
+     */
+    unavailableArms?: 'disabled' | 'omit' | undefined;
     /**
      * `window` renders numbered page links with gaps; `prevNext` a bare Previous/Next pair.
      * @defaultValue `'window'`
@@ -114,7 +139,10 @@ Offset-based page navigation: numbered links with gaps or a bare Previous/Next p
     offset,
     limit,
     total,
-    variant = 'window',
+    hasMore = false,
+    chevrons = true,
+    unavailableArms = 'disabled',
+    variant: requestedVariant = 'window',
     href,
     onPage,
     siblings = 1,
@@ -134,7 +162,14 @@ Offset-based page navigation: numbered links with gaps or a bare Previous/Next p
 
   const context = getComponentsContext();
 
-  const view = $derived(pageWindow({ offset, limit }, total, siblings));
+  // Without a total, a stand-in that puts exactly one more page after the
+  // current one when there is more, and none when there is not: the arms are
+  // then right, and nothing that would print the stand-in is drawn.
+  const knownTotal = $derived(
+    total ?? Math.max(0, Math.floor(offset)) + (hasMore ? Math.max(1, Math.floor(limit)) + 1 : 1),
+  );
+  const variant = $derived(total === undefined ? 'prevNext' : requestedVariant);
+  const view = $derived(pageWindow({ offset, limit }, knownTotal, siblings));
 
   // The formatter and the formatted string are separate `$derived`s so the
   // (relatively expensive) `Intl.NumberFormat` is not rebuilt when only the
@@ -143,8 +178,8 @@ Offset-based page navigation: numbered links with gaps or a bare Previous/Next p
   const counts = $derived(new Intl.NumberFormat(locales));
   const rangeText = $derived(
     rangeLabel === undefined
-      ? `Showing ${counts.format(view.from)}–${counts.format(view.to)} of ${counts.format(total)}`
-      : rangeLabel(view.from, view.to, total),
+      ? `Showing ${counts.format(view.from)}–${counts.format(view.to)} of ${counts.format(knownTotal)}`
+      : rangeLabel(view.from, view.to, knownTotal),
   );
 
   /** A target offset's href, resolved through the context. */
@@ -156,29 +191,31 @@ Offset-based page navigation: numbered links with gaps or a bare Previous/Next p
 </script>
 
 {#snippet armBody(text: string, leading: boolean)}
-  {#if leading}<ChevronLeft class="size-4" aria-hidden="true" />{/if}
+  {#if chevrons && leading}<ChevronLeft class="size-4" aria-hidden="true" />{/if}
   <span>{text}</span>
-  {#if !leading}<ChevronRight class="size-4" aria-hidden="true" />{/if}
+  {#if chevrons && !leading}<ChevronRight class="size-4" aria-hidden="true" />{/if}
 {/snippet}
 
 {#snippet arm(target: number | undefined, text: string, rel: 'prev' | 'next', leading: boolean)}
-  <li>
-    {#if target === undefined}
-      <span class={inertClass} aria-disabled="true">{@render armBody(text, leading)}</span>
-    {:else if href !== undefined}
-      <a href={linkTo(target)} {rel} class={itemClass}>{@render armBody(text, leading)}</a>
-    {:else}
-      <button
-        type="button"
-        class={itemClass}
-        onclick={() => {
-          onPage?.(target);
-        }}
-      >
-        {@render armBody(text, leading)}
-      </button>
-    {/if}
-  </li>
+  {#if target !== undefined || unavailableArms === 'disabled'}
+    <li>
+      {#if target === undefined}
+        <span class={inertClass} aria-disabled="true">{@render armBody(text, leading)}</span>
+      {:else if href !== undefined}
+        <a href={linkTo(target)} {rel} class={itemClass}>{@render armBody(text, leading)}</a>
+      {:else}
+        <button
+          type="button"
+          class={itemClass}
+          onclick={() => {
+            onPage?.(target);
+          }}
+        >
+          {@render armBody(text, leading)}
+        </button>
+      {/if}
+    </li>
+  {/if}
 {/snippet}
 
 {#if variant === 'prevNext' || view.pageCount > 1}
@@ -187,13 +224,13 @@ Offset-based page navigation: numbered links with gaps or a bare Previous/Next p
     aria-label={label}
     class={['flex flex-col items-center gap-2 sm:flex-row sm:justify-between', className]}
   >
-    {#if showRange}
+    {#if showRange && total !== undefined}
       <p class="text-base-content/70 text-sm tabular-nums">{rangeText}</p>
     {/if}
     <ul class="join">
       {@render arm(view.previous, previousLabel, 'prev', true)}
       {#if variant === 'prevNext'}
-        {#if statusLabel !== undefined}
+        {#if statusLabel !== undefined && total !== undefined}
           <li>
             <span class={['btn btn-ghost join-item pointer-events-none', buttonSize[size]]}>
               {statusLabel(view.page, view.pageCount)}
@@ -232,7 +269,7 @@ Offset-based page navigation: numbered links with gaps or a bare Previous/Next p
       {@render arm(view.next, nextLabel, 'next', false)}
     </ul>
   </nav>
-{:else if showRange}
+{:else if showRange && total !== undefined}
   <!-- One page, so there is nothing to navigate — but the range line is a
        fact about the result, not about the pager, and stays. A <nav> around
        it alone would be a landmark with no controls in it. -->
