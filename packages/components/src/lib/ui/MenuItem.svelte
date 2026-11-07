@@ -27,10 +27,20 @@ One entry of a `Menu` (a navigation link), or of a `DropdownMenu` or `ContextMen
   navigation list `disabled` is `aria-disabled` + no `href`, where there is
   no widget to skip.
   The `icon` snippet is decorative — the label carries the meaning.
+
+  `hotkey` shows the item's shortcut as a trailing `HotkeyBadge`, hidden from
+  assistive technology so it does not join the item's name, and announces it
+  through `aria-keyshortcuts` instead (a chord or a single key; a sequence
+  has no `aria-keyshortcuts` form, so it is shown only). `tone="error"` marks
+  a destructive item in `text-error`; the colour is supplementary, so the
+  item's own verb ("Delete…") must still say what it does.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { getComponentsContext } from '../context.svelte.ts';
+  import HotkeyBadge from '../hotkeys/HotkeyBadge.svelte';
+  import { ariaKeyShortcuts } from '../hotkeys/match.ts';
+  import type { HotkeyTrigger } from '../hotkeys/types.ts';
   import { getMenuParts } from './menu-parts/menu-parts.ts';
 
   interface Props {
@@ -44,14 +54,27 @@ One entry of a `Menu` (a navigation link), or of a `DropdownMenu` or `ContextMen
     disabled?: boolean | undefined;
     /** Leading icon. Decorative. */
     icon?: Snippet<[]> | undefined;
+    /** The item's keyboard shortcut, shown as a hint and set as `aria-keyshortcuts`. */
+    hotkey?: HotkeyTrigger | undefined;
+    /** `'error'` for a destructive item; never the only cue. */
+    tone?: 'error' | undefined;
     /** Extra classes on the `<li>`. */
     class?: string | undefined;
     /** The item's label. */
     children: Snippet<[]>;
   }
 
-  let { href, onSelect, current, disabled = false, icon, class: className, children }: Props =
-    $props();
+  let {
+    href,
+    onSelect,
+    current,
+    disabled = false,
+    icon,
+    hotkey,
+    tone,
+    class: className,
+    children,
+  }: Props = $props();
 
   const context = getComponentsContext();
   const parts = getMenuParts();
@@ -60,6 +83,8 @@ One entry of a `Menu` (a navigation link), or of a `DropdownMenu` or `ContextMen
   // bits-ui's `onSelect` is not optional-friendly under
   // `exactOptionalPropertyTypes`; a stable wrapper is simpler than a spread.
   const select = (): void => onSelect?.();
+  const keyshortcuts = $derived(hotkey === undefined ? undefined : ariaKeyShortcuts(hotkey));
+  const itemClass = $derived(tone === 'error' ? 'text-error' : undefined);
   const isCurrent = $derived(
     current ?? (resolved === undefined ? false : context.isCurrent(resolved)),
   );
@@ -68,6 +93,11 @@ One entry of a `Menu` (a navigation link), or of a `DropdownMenu` or `ContextMen
 {#snippet label()}
   {#if icon}<span class="size-5 shrink-0" aria-hidden="true">{@render icon()}</span>{/if}
   {@render children()}
+  {#if hotkey !== undefined}
+    <span aria-hidden="true" class="text-base-content/60 ms-auto text-xs">
+      <HotkeyBadge trigger={hotkey} />
+    </span>
+  {/if}
 {/snippet}
 
 {#if parts}
@@ -77,18 +107,29 @@ One entry of a `Menu` (a navigation link), or of a `DropdownMenu` or `ContextMen
     {disabled}
     onSelect={select}
     class={className}
+    {itemClass}
+    {keyshortcuts}
     {label}
   />
 {:else}
   <li class={className}>
     {#if resolved === undefined}
-      <button type="button" {disabled} onclick={select}>{@render label()}</button>
+      <button
+        type="button"
+        {disabled}
+        class={itemClass}
+        aria-keyshortcuts={keyshortcuts}
+        onclick={select}
+      >
+        {@render label()}
+      </button>
     {:else}
       <a
         href={disabled ? undefined : resolved}
         aria-disabled={disabled ? 'true' : undefined}
         aria-current={isCurrent ? 'page' : undefined}
-        class:menu-active={isCurrent}
+        class={[itemClass, isCurrent && 'menu-active']}
+        aria-keyshortcuts={keyshortcuts}
         onclick={select}
       >
         {@render label()}

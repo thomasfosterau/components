@@ -4,6 +4,7 @@
   import Button from '../../lib/ui/Button.svelte';
   import DropdownMenu from '../../lib/ui/DropdownMenu.svelte';
   import MenuCheckboxItem from '../../lib/ui/MenuCheckboxItem.svelte';
+  import MenuGroup from '../../lib/ui/MenuGroup.svelte';
   import MenuItem from '../../lib/ui/MenuItem.svelte';
   import MenuRadioGroup from '../../lib/ui/MenuRadioGroup.svelte';
   import MenuRadioItem from '../../lib/ui/MenuRadioItem.svelte';
@@ -70,6 +71,30 @@
         <MenuItem onSelect={() => undefined}>Bed</MenuItem>
         <MenuItem onSelect={() => undefined}>Family</MenuItem>
       </MenuSub>
+    </DropdownMenu>
+  </div>
+</Story>
+
+<!--
+  Groups with headings, shortcut hints (announced through
+  `aria-keyshortcuts`, hidden from the item's name) and a destructive item,
+  whose verb still says what it does.
+-->
+<Story name="Groups, shortcuts and a destructive item">
+  <div class="p-10">
+    <DropdownMenu label="Garden">
+      {#snippet trigger({ props })}
+        <Button {...props} variant="outline">Garden actions</Button>
+      {/snippet}
+      <MenuGroup label="Edit">
+        <MenuItem hotkey="$mod+d">Duplicate</MenuItem>
+        <MenuItem hotkey="$mod+shift+e">Export…</MenuItem>
+        <MenuItem hotkey={['g', 'b']}>Go to beds</MenuItem>
+      </MenuGroup>
+      <MenuSeparator />
+      <MenuGroup label="Danger zone" showLabel={false}>
+        <MenuItem tone="error">Delete garden…</MenuItem>
+      </MenuGroup>
     </DropdownMenu>
   </div>
 </Story>

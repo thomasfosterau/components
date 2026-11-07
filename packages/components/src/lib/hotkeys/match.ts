@@ -38,6 +38,32 @@ export function isEditableTarget(target: EventTarget | null): boolean {
   return target.matches('input, textarea, select') || target.isContentEditable;
 }
 
+/** `aria-keyshortcuts`' names for this library's chord modifiers, `$mod` aside. */
+const ARIA_MODIFIERS: Readonly<Record<string, string>> = {
+  alt: 'Alt',
+  shift: 'Shift',
+};
+
+/**
+ * A trigger in `aria-keyshortcuts` syntax (`'Control+Shift+K'`, `'?'`), for
+ * the element that performs the action. `$mod` resolves to `Meta` on Apple
+ * platforms and `Control` elsewhere, as the matcher does. A sequence
+ * (`['g', 'p']`) has no `aria-keyshortcuts` form — the attribute lists
+ * alternatives, not steps — so it is `undefined`.
+ */
+export function ariaKeyShortcuts(trigger: HotkeyTrigger): string | undefined {
+  if (typeof trigger !== 'string') return undefined;
+  const parts = trigger.split('+');
+  const key = parts.at(-1) ?? '';
+  const named = key.length === 1 ? key.toUpperCase() : key;
+  const modifiers = parts
+    .slice(0, -1)
+    .map((part) =>
+      part === '$mod' ? (isApplePlatform() ? 'Meta' : 'Control') : (ARIA_MODIFIERS[part] ?? part),
+    );
+  return [...modifiers, named].join('+');
+}
+
 /** Whether a trigger is in the modifier-chord form (`'$mod+…'`). */
 function isModifierChord(trigger: HotkeyTrigger): boolean {
   return typeof trigger === 'string' && trigger.includes('+');

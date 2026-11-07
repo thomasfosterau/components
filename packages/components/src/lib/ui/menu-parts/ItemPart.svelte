@@ -14,17 +14,38 @@ Internal: the bits-ui item a `MenuItem` renders inside a `DropdownMenu` or `Cont
   import { DropdownMenu } from 'bits-ui';
   import type { ItemPartProps } from './menu-parts.ts';
 
-  let { href, current, disabled, onSelect, class: className, label }: ItemPartProps =
-    $props();
+  let {
+    href,
+    current,
+    disabled,
+    onSelect,
+    class: className,
+    itemClass,
+    keyshortcuts,
+    label,
+  }: ItemPartProps = $props();
 </script>
 
 <li role="none" class={className}>
   <DropdownMenu.Item {disabled} {onSelect}>
     {#snippet child({ props })}
       {#if href === undefined}
-        <button {...props} type="button">{@render label()}</button>
+        <button
+          {...props}
+          type="button"
+          class={itemClass}
+          aria-keyshortcuts={keyshortcuts}
+        >
+          {@render label()}
+        </button>
       {:else}
-        <a {...props} {href} aria-current={current ? 'page' : undefined}>
+        <a
+          {...props}
+          {href}
+          class={itemClass}
+          aria-current={current ? 'page' : undefined}
+          aria-keyshortcuts={keyshortcuts}
+        >
           {@render label()}
         </a>
       {/if}
