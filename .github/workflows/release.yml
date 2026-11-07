@@ -1,51 +1,118 @@
 name: Release
 
-# Changesets release flow: on every push to `trunk`, changesets/action either
-# opens/updates the "chore: version packages" pull request (while unreleased
-# changesets exist) or, once that pull request has merged, publishes every
-# package whose version is not yet on npm and tags the release.
+# Changesets release flow, split so that only publishing waits for approval.
+# On every push to `trunk`:
 #
-# Publishing is npm Trusted Publishing (OIDC) — there is NO `NPM_TOKEN` secret
-# and none is read here. The job's `id-token: write` lets the npm CLI exchange
-# a GitHub-minted token for a short-lived publish credential, scoped to this
-# repository, this workflow file and the `release` environment, which is what
-# each package's trusted publisher on npmjs.com names. Nothing requests
-# provenance (an explicit request fails from a private repository).
+# - `select` (read-only) asks changesets/action/select-mode what the repo state
+#   calls for: `version` while unreleased changesets exist, `publish` once none
+#   remain and some package version is not on npm yet (`changeset
+#   publish-plan`), else `none`.
+# - `version` opens/updates the "chore: version packages" PR. It holds a
+#   write-scoped token but no `id-token`, so it cannot publish, and runs outside
+#   the `release` environment, so it needs no approval.
+# - `publish` is the only job in the protected `release` environment and the
+#   only one with `id-token: write`: it publishes to npm via OIDC trusted
+#   publishing and tags the release, after the owner approves it (once per
+#   release). See PUBLISHING.md.
 #
-# The publish step is `scripts/publish.mjs` (`pnpm pack` + `npm publish
-# <tarball>`), not `changeset publish`; its header says why it is kept.
+# changesets/action's README recommends its sub-actions over the combined
+# action for trusted publishing, "to tighten publish permissions"; they need
+# Changesets CLI v3. The version and publish sub-actions push through the
+# GitHub API, so no checkout keeps git credentials.
 
 on:
   push:
     branches: [trunk]
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
-
 # Nothing by default; the job grants exactly what it uses.
 permissions: {}
 
 jobs:
-  release:
-    name: Version or publish
-    # A fork that copies this workflow must not try to publish, and a push
-    # made by Dependabot never reaches the job that holds `id-token: write`.
+  # Same setup as `publish` (see the comments there), minus the build.
+  select:
+    name: Select mode
     if: github.repository == 'thomasfosterau/components' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '*'
+          check-latest: true
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Select mode
+        id: mode
+        uses: changesets/action/select-mode@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+
+  version:
+    name: Version packages
+    needs: select
+    if: needs.select.outputs.mode == 'version'
+    runs-on: ubuntu-latest
     timeout-minutes: 20
+    concurrency:
+      group: release-version-${{ github.ref }}
+      cancel-in-progress: true
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '*'
+          check-latest: true
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Create or update the version PR
+        uses: changesets/action/version@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+        with:
+          script: pnpm changeset version
+          commit-message: "chore: version packages"
+          pr-title: "chore: version packages"
+
+  publish:
+    name: Publish to npm
+    # A fork that copies this workflow must not try to publish, and a push
+    # made by Dependabot never reaches the job that holds `id-token: write`.
+    # That guard is on `select` now: this job needs it, so it is skipped with it.
+    needs: select
+    if: needs.select.outputs.mode == 'publish'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # One publish at a time; never cancel one that has started.
+    concurrency:
+      group: release-publish-${{ github.ref }}
+      cancel-in-progress: false
     # A protected environment (deployment branches: `trunk` only), named by the
     # trusted publisher on npmjs.com — a workflow run from any other ref cannot
     # mint a publish credential even if it copies this file.
     environment: release
     permissions:
       # Commit the version bump, push tags, create GitHub releases.
-      contents: write
+      contents: write # push the release tags and create the GitHub releases
       # Open / update the "chore: version packages" pull request.
-      pull-requests: write
       # npm Trusted Publishing (OIDC).
       id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
@@ -82,12 +149,9 @@ jobs:
       # forward the ambient `ACTIONS_ID_TOKEN_REQUEST_URL` / `_TOKEN` that npm
       # needs for OIDC, and npm then falls back to token auth and fails with
       # ENEEDAUTH.
-      - uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+      - uses: changesets/action/publish@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
-          version-script: pnpm changeset version
-          publish-script: pnpm run release
-          commit-message: 'chore: version packages'
-          pr-title: 'chore: version packages'
+          script: pnpm run release
         # No `env:` block on purpose: don't force provenance (NPM_CONFIG_PROVENANCE).
         # npm attaches it itself when allowed, and an explicit request fails
         # from a private repository.
