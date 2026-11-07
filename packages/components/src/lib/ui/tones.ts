@@ -312,3 +312,6 @@ export const chatBubbleTone: Record<Tone, string> = {
   warning: 'chat-bubble-warning',
   error: 'chat-bubble-error',
 };
+
+/** How an `IconLabel` shows its title and icon; the title stays accessible text in every style. */
+export type IconLabelStyle = 'title-and-icon' | 'icon-only' | 'title-only';

@@ -106,11 +106,13 @@ Heavier families are separate `exports` entries so a consumer that never uses th
 
 ## ui
 
-Buttons, badges and surfaces — the family every other family builds on: `Alert` is what a form's errors surface in, `Card` is the surface a section is drawn on, `Button` is what a dialog's actions are.
+Buttons, badges and surfaces — the family every other family builds on: `Alert` is what a form's errors surface in, `Card` is the surface a section is drawn on, `Button` is what a dialog's actions are. An icon-only control is an `IconButton`, never a `Button` with an `aria-label` and empty text: `Button`'s `children` is its name, and `IconButton` adds the required `label`, the tooltip and the 24×24 target.
 
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
 | `Button` | The daisyUI `btn` | `tone?: Tone`, `variant?: 'solid'\|'outline'\|'soft'\|'dash'\|'ghost'\|'link'`, `size?: Size`, `loading?`, `block?`, `type='button'` + `HTMLButtonAttributes` | `icon?`, `children` | native `<button>`; `loading` is `disabled` **and** `aria-busy="true"`; spinner `aria-hidden` so the name never changes |
+| `IconButton` | Icon-only button or link | `label` (**required**: the accessible name and the tooltip), `href?`, `tooltip? = true`, `tooltipSide? = 'top'`, `tone?`, `variant? = 'ghost'`, `size? = 'md'`, `shape? = 'square'` (`'circle'`), `loading?`, `disabled?`, `type? = 'button'` + `HTMLAttributes` | `icon` | `aria-label={label}`, icon `aria-hidden`; the tooltip repeats the name and is never an `aria-describedby`; disabled with a tooltip is `aria-disabled` (still focusable); 24×24 minimum target; `href` → context link with `aria-current` |
+| `IconLabel` | Icon + title pair | `title`, `labelStyle? = 'title-and-icon'` (`'icon-only'` \| `'title-only'`), `trailingIcon?`, `tooltip?` (icon-only) + `HTMLAttributes<HTMLSpanElement>` | `icon?` | the title is always text (visually hidden in `icon-only`), so a containing control is named by it; icon `aria-hidden` |
 | `LinkButton` | Navigation that reads as an action | `href`, `tone?`, `variant?`, `size?`, `disabled?`, `block?`, `external?` + `HTMLAnchorAttributes` | `icon?`, `children` | `disabled` drops `href` and restores `role="button"` + `aria-disabled` + `tabindex="-1"`; `external` → `target="_blank"` + `rel="noreferrer"` |
 | `Link` | The in-text anchor | `href`, `variant?: 'primary'\|'muted'\|'plain'`, `external?` | `children` | native `<a>`; `external` pairs `target` and `rel` |
 | `ExternalLink` | A link off the site | `href`, `variant?`, `untrusted? = true`, `showIcon? = true`, `newTabLabel? = '(opens in a new tab)'` | `children` | `rel="noreferrer nofollow"` when untrusted, `"noreferrer"` otherwise; the new tab is **in the accessible name**, icon `aria-hidden` |

@@ -22,6 +22,7 @@ A `type="search"` field with a leading icon, a clear button while there is text,
 <script lang="ts">
   import { Search, X } from '@lucide/svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
+  import IconButtonCore from '../ui/IconButtonCore.svelte';
   import Spinner from '../ui/Spinner.svelte';
   import { inputSize, type FieldSize } from './field-types.ts';
 
@@ -95,9 +96,8 @@ A `type="search"` field with a leading icon, a clear button while there is text,
   {#if pending}
     <Spinner decorative size="xs" />
   {:else if value !== ''}
-    <button type="button" class="btn btn-ghost btn-xs btn-circle" onclick={clear}>
-      <X class="size-3.5" aria-hidden="true" />
-      <span class="sr-only">{clearLabel}</span>
-    </button>
+    <IconButtonCore label={clearLabel} size="xs" shape="circle" onclick={clear}>
+      {#snippet icon()}<X class="size-3.5" />{/snippet}
+    </IconButtonCore>
   {/if}
 </div>
