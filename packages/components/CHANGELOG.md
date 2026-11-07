@@ -1,5 +1,24 @@
 # @thomasfosterau/components
 
+## 0.3.0
+
+### Minor Changes
+
+- 9f53870: Add `Avatar`, a picture of a person or entity with an initials or icon fallback while it loads and when it fails (named once as an `img`, or decorative without a `name`, with presence in words), and `AvatarGroup`, overlapping avatars named as a group with a "+N" count. `tones.ts` gains `AvatarShape`, `avatarSize` and `avatarShape`; the `ui` family exports `initialsOf`.
+- ef9e721: `Card` takes `as="form" | "li" | "dl"` (with the `<form>` attributes typed for `as="form"`, and the `actions` row inside the form) and a `shadow` opt-out. `Badge` takes `tone="none"`, daisyUI's bare, toneless badge, which stays legible as an outline on a dark theme.
+- 79bca1b: Add `CopyButton`, which copies a value to the clipboard with a constant accessible name and announces the outcome in a polite status, and `CodeBlock`, code on daisyUI's `mockup-code` with optional line prefixes, highlighted lines, a caption and a copy action that copies the raw code. `CodeBlock` ships no highlighter; pass highlighted markup as `children`.
+- d430bea: Add `IconButton`, an icon-only button or link whose required `label` is its accessible name and its tooltip, with a 24×24 minimum target, and `IconLabel`, an icon beside a title that stays real text in every style (`title-and-icon`, `icon-only`, `title-only`). `Alert`'s dismiss, `Dialog`'s close, `SearchInput`'s clear and `Navbar`'s menu toggle now share the same icon-only naming rule (their accessible names are unchanged; the name is now the control's `aria-label`), through a tooltip-free core, so none of them loads the tooltip.
+- bbfa889: Add `Listbox`, an always-visible list to choose one or several options from as a form field: the WAI-ARIA APG listbox, one tab stop named through `FormField`'s `labelId`, with `aria-activedescendant` focus, typeahead, grouped options, the recommended multi-select keyboard and pointer model (Space, Shift ranges, Ctrl/⌘+A, modifier clicks) or a touch-first `toggle` model, and one hidden input per selected value.
+- bcf17cb: Add `MenuGroup`, a labelled run of menu items (a `role="group"` in a `DropdownMenu` or `ContextMenu`, a titled sub-list in a navigation `Menu`). `MenuItem` takes `hotkey` (a trailing `HotkeyBadge`, announced through `aria-keyshortcuts` rather than joining the item's name) and `tone="error"` for a destructive item. The hotkeys family exports `ariaKeyShortcuts(trigger)`.
+- 4ae400f: Add `PromptDialog`, a modal that asks for one short value (rename, a new name, type-to-confirm): focus starts in the field with its value selected, Enter submits, Confirm stays disabled while the value is invalid or a (sync or async, debounced) `validate` is pending, a rejection shows under the field, and closing aborts the work in flight. Callback mode (`onConfirm(value, signal)`) or a progressive-enhancement POST (`form`). `Dialog` takes `initialFocus`, to focus an element other than the first focusable one on open.
+- 97ca323: `Select` takes `clearable`, which keeps its placeholder selectable so an optional value can be cleared back to `''`. `ConfirmButton` gains a form mode: given `formAction`, its confirm step is a real `<form method="post">` inside a `<details>`, so the confirmation works with scripts off (`formMethod`, and `formFields` for hidden inputs); `action` becomes optional.
+- 10559d3: `Table` and `DataGrid` take `rowAttributes(row)` for a body row's own `class` and `id`, and a `TableColumn` takes `headerClass` for its header cell only. Activatable rows (`onSelect`) keep their hover tint, which the spread `class` used to replace. `Pagination` takes `chevrons={false}`, `unavailableArms="omit"`, and an optional `total` with `hasMore` for a listing that only knows whether there is more.
+- 9462b18: Add `TreeView`, an ARIA `tree` widget (the APG Tree View pattern) for a hierarchy the reader navigates and selects from: one Tab stop with roving focus, arrow keys to move, expand and collapse, Home/End, typeahead, `*` to expand siblings, and `'none'`, `'single'` or `'multiple'` selection, with `expanded` and `selected` bindable as `SvelteSet`s of ids. Children can load on first expand through `loadChildren(node, signal)`, with `aria-busy` while they load. `data` also exports the `TreeNode` model and the pure navigation functions behind it. `TreeList`'s documentation now says when to use which.
+
+### Patch Changes
+
+- 68e2369: Ship `CHANGELOG.md` in the published tarball, so the release notes can be read from `node_modules`.
+
 ## 0.2.0
 
 ### Minor Changes
