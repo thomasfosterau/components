@@ -31,9 +31,11 @@ export { default as ResultCount } from './ResultCount.svelte';
 export { default as Table } from './Table.svelte';
 export { default as TreeList } from './TreeList.svelte';
 export { default as TreeListItem } from './TreeListItem.svelte';
+export { default as TreeView } from './TreeView.svelte';
 
 export * from './description-context.ts';
 export * from './diff.ts';
 export * from './list-item.ts';
 export * from './pagination.ts';
 export * from './table-types.ts';
+export * from './tree-view.ts';

@@ -1,5 +1,5 @@
 <!-- @component
-One collapsible node of a hierarchy: an always-visible summary row and a subtree that folds away under it.
+One collapsible node of a hierarchy: an always-visible summary row and a subtree that folds away under it; for a hierarchy the reader selects from, use `TreeView`.
 -->
 <!--
   TreeList — one collapsible node of a hierarchy: a summary row that is always
@@ -22,6 +22,12 @@ One collapsible node of a hierarchy: an always-visible summary row and a subtree
   `role="tree"` would commit the caller to roving tabindex and typeahead over
   arbitrary nested content, which is a much larger promise than folding a
   taxonomy.
+
+  TreeList or TreeView? A hierarchy to read, with links or arbitrary content
+  in its rows, stays here. When the reader must select a node, or the tree
+  runs past a few dozen nodes (a Tab stop per summary stops being usable),
+  use `TreeView`: the data-driven ARIA `tree` widget with roving focus,
+  typeahead and selection.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
