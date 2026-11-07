@@ -1,5 +1,23 @@
 # @thomasfosterau/components-mapbox
 
+## 0.2.1
+
+### Patch Changes
+
+- 68e2369: Ship `CHANGELOG.md` in the published tarball, so the release notes can be read from `node_modules`.
+- Updated dependencies [9f53870]
+- Updated dependencies [ef9e721]
+- Updated dependencies [68e2369]
+- Updated dependencies [79bca1b]
+- Updated dependencies [d430bea]
+- Updated dependencies [bbfa889]
+- Updated dependencies [bcf17cb]
+- Updated dependencies [4ae400f]
+- Updated dependencies [97ca323]
+- Updated dependencies [10559d3]
+- Updated dependencies [9462b18]
+  - @thomasfosterau/components@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes
