@@ -13,7 +13,7 @@ import { expect, test, vi } from 'vite-plus/test';
 import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import TableFixture from './fixtures/TableFixture.svelte';
-import { rows } from './fixtures/table-data.ts';
+import { rows, type Row } from './fixtures/table-data.ts';
 
 /** The body rows' first cells, in render order. */
 const names = (): string[] =>
@@ -188,7 +188,7 @@ test('rowAttributes gives a row its own class and id', async () => {
 test('an activatable row keeps its hover tint alongside its own class', async () => {
   const screen = await render(TableFixture, {
     sortable: false,
-    onSelect: vi.fn(),
+    onSelect: vi.fn<(row: Row) => void>(),
     rowAttributes: () => ({ class: 'font-medium' }),
   });
 
