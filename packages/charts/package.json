@@ -22,7 +22,8 @@
   },
   "files": [
     "dist",
-    "schema"
+    "schema",
+    "CHANGELOG.md"
   ],
   "type": "module",
   "sideEffects": false,

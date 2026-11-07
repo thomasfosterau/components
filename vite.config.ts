@@ -309,9 +309,13 @@ export default defineConfig({
   // it can sort.
   // `packages/charts/schema/` is generated: its formatting is owned by that
   // package's `emit-schema` task, and a test compares it to the emitter's
-  // output, so the formatter must not touch it.
+  // output, so the formatter must not touch it. `CHANGELOG.md` is written by
+  // `changeset version` on the release bot's branch, where no format step
+  // runs: its indented blank lines would otherwise turn trunk red the moment
+  // the Version Packages PR merges.
   fmt: {
     ignorePatterns: [
+      '**/CHANGELOG.md',
       '**/dist/**',
       '**/.svelte-kit/**',
       '**/storybook-static/**',
