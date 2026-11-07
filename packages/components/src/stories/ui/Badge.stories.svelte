@@ -27,6 +27,18 @@
   </div>
 </Story>
 
+<!--
+  `tone="none"` is daisyUI's bare badge: no colour class, so it draws in
+  `base-content` and stays legible on a dark theme, outline included.
+-->
+<Story name="Toneless">
+  <div class="flex flex-wrap gap-2">
+    <Badge tone="none" variant="solid">Disabled</Badge>
+    <Badge tone="none" variant="outline">12 reactions</Badge>
+    <Badge tone="neutral" variant="outline">Neutral outline</Badge>
+  </div>
+</Story>
+
 <Story name="Variants and sizes">
   <div class="flex flex-wrap items-center gap-2">
     <Badge tone="primary" variant="solid">Solid</Badge>

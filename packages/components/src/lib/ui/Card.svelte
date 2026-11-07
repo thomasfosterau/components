@@ -18,11 +18,16 @@ The bordered `base-100` surface: a padded body with an optional heading, a figur
   document outline stays true. The default is `h2` — a card under the page's
   `<h1>`. `as` picks the element that carries the semantics: `article` for a
   self-contained item (the default), `section` for a labelled region of the
-  page, `div` for pure grouping.
+  page, `div` for pure grouping, `li` for a card that is an item of a list,
+  `dl` for a card that is a description list, and `form` for a card that is
+  the form — the `actions` row renders inside the element, so its submit
+  buttons stay in the `<form>` and it works with scripts off. For `dl`, put
+  each `<dt>`/`<dd>` pair in a `<div>` (valid inside a `<dl>`): the body is a
+  `<div>` too.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import type { HTMLAttributes } from 'svelte/elements';
+  import type { HTMLAttributes, HTMLFormAttributes } from 'svelte/elements';
   import {
     cardSize,
     cardVariant,
@@ -31,12 +36,26 @@ The bordered `base-100` surface: a padded body with an optional heading, a figur
     type Size,
   } from './tones.ts';
 
-  interface Props extends HTMLAttributes<HTMLElement> {
+  /** The `<form>` attributes, for `as="form"`. */
+  type FormAttributes = Pick<
+    HTMLFormAttributes,
+    | 'accept-charset'
+    | 'action'
+    | 'autocomplete'
+    | 'enctype'
+    | 'method'
+    | 'name'
+    | 'novalidate'
+    | 'rel'
+    | 'target'
+  >;
+
+  interface Props extends HTMLAttributes<HTMLElement>, FormAttributes {
     /**
      * The element that carries the semantics.
      * @defaultValue `'article'`
      */
-    as?: 'article' | 'section' | 'div' | undefined;
+    as?: 'article' | 'section' | 'div' | 'li' | 'dl' | 'form' | undefined;
     /** Heading rendered as `card-title` at the top of the body. */
     title?: string | undefined;
     /**
@@ -59,6 +78,11 @@ The bordered `base-100` surface: a padded body with an optional heading, a figur
      * @defaultValue `true`
      */
     padded?: boolean | undefined;
+    /**
+     * daisyUI's `shadow-sm` under the card; `false` for a flat surface.
+     * @defaultValue `true`
+     */
+    shadow?: boolean | undefined;
     /** Extra classes on the `card-body`, for layout the caller owns. */
     bodyClass?: string | undefined;
     /** Media block rendered above the body. */
@@ -76,6 +100,7 @@ The bordered `base-100` surface: a padded body with an optional heading, a figur
     variant = 'border',
     size = 'md',
     padded = true,
+    shadow = true,
     bodyClass,
     figure,
     actions,
@@ -89,7 +114,8 @@ The bordered `base-100` surface: a padded body with an optional heading, a figur
   this={as}
   {...rest}
   class={[
-    'card bg-base-100 shadow-sm',
+    'card bg-base-100',
+    shadow && 'shadow-sm',
     cardVariant[variant],
     cardSize[size],
     className,

@@ -63,3 +63,30 @@
     </Card>
   </div>
 </Story>
+
+<Story name="As a form, without a shadow">
+  <div class="max-w-sm">
+    <Card as="form" method="post" title="Rename garden" shadow={false} aria-label="Rename garden">
+      <label class="floating-label">
+        <span>Name</span>
+        <input class="input w-full" name="name" value="Allotment 14" />
+      </label>
+      {#snippet actions()}
+        <Button type="submit" tone="primary" size="sm">Save</Button>
+      {/snippet}
+    </Card>
+  </div>
+</Story>
+
+<Story name="As list items and a description list">
+  <div class="grid gap-4 sm:grid-cols-2">
+    <ul class="space-y-2">
+      <Card as="li" shadow={false} size="sm"><p>Bed 1 — brassicas</p></Card>
+      <Card as="li" shadow={false} size="sm"><p>Bed 2 — alliums</p></Card>
+    </ul>
+    <Card as="dl" shadow={false} size="sm">
+      <div class="flex justify-between"><dt>Sown</dt><dd>14 September</dd></div>
+      <div class="flex justify-between"><dt>Transplanted</dt><dd>12 October</dd></div>
+    </Card>
+  </div>
+</Story>

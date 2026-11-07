@@ -12,6 +12,10 @@ The daisyUI `badge`: a short inline label for a status, a count or a category.
   tints its border and a translucent fill from that one variable and keeps
   `base-content` text, so it stays legible on either theme whatever the hue.
   `colourToken` wins over `tone` — a subject's colour is not a tone.
+  `tone="none"` is daisyUI's bare `badge`: no colour class, so it draws in
+  `base-content` and its outline in `currentColor`, legible on either theme
+  (a neutral outline draws in `--color-neutral`, which a dark theme puts
+  close to `base-100`).
 
   ARIA contract: none, deliberately. A badge is a decorative frame around
   text, so the text has to carry the meaning: a status badge showing only a
@@ -33,10 +37,10 @@ The daisyUI `badge`: a short inline label for a status, a count or a category.
 
   interface Props extends HTMLAttributes<HTMLSpanElement> {
     /**
-     * Semantic colour.
+     * Semantic colour; `'none'` for daisyUI's bare, toneless `badge`.
      * @defaultValue `'neutral'`
      */
-    tone?: Tone | undefined;
+    tone?: Tone | 'none' | undefined;
     /**
      * daisyUI badge style.
      * @defaultValue `'soft'`
@@ -69,7 +73,13 @@ The daisyUI `badge`: a short inline label for a status, a count or a category.
 
   const classes = $derived(
     colourToken === undefined
-      ? ['badge', badgeTone[tone], badgeVariant[variant], badgeSize[size], className]
+      ? [
+          'badge',
+          tone !== 'none' && badgeTone[tone],
+          badgeVariant[variant],
+          badgeSize[size],
+          className,
+        ]
       : [
           'badge border-(--badge-colour) bg-(--badge-colour)/15 text-base-content',
           badgeSize[size],
