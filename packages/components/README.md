@@ -383,6 +383,18 @@ interface FieldControl {
 
 Every primitive accepts it by spread — `<TextInput {...control} bind:value />` — so `for`/`id`, `aria-describedby`, `aria-invalid` and `required` cannot drift apart. `errors` is always `readonly string[]`; a field that fails three rules says three things.
 
+**Which choice control?**
+
+| Control | Choose | Options on screen | Best for |
+| --- | --- | --- | --- |
+| `RadioGroup` | one | all, one row each | about seven or fewer, where seeing every option matters |
+| `CheckboxGroup` | several | all, one row and one tab stop each | about seven or fewer |
+| `Select` | one | behind the native popup | a known list of any length; no script, the platform picker |
+| `Listbox` | One or several choices from an always-visible list | `options: (ListboxOption \| string)[]` (a `ListboxOption` is a `FieldOption` with `group?`), `multiple?`, `value ⚓` (single) **or** `values ⚓: string[]` (multiple, kept in option order), `onValueChange?`, `rows? = 8` (`4`/`6`/`8`/`10`/`12`), `selectionModel? = 'recommended'` (`'toggle'`), `emptyLabel? = 'No options'`, `name?`, `disabled?`, `size?`, `labelId?`, `describedBy?`, `invalid?`, `required?` + `HTMLAttributes<HTMLDivElement>` | `option?(option, { selected })` | APG listbox, hand-rolled (bits-ui has no standalone one): one tab stop named via `labelId`, `aria-activedescendant`, `aria-selected` + a check icon, `aria-multiselectable`; arrows / Home / End / typeahead, Space, Shift ranges, Ctrl/⌘+A, modifier clicks; groups are `role="group"` named by their headings; one hidden input per value under `name` |
+| `MultiSelect` | several | behind a popover, summarised in the trigger | a longer known list in a compact space |
+| `Combobox` | one | filtered as you type | a long or fetched list (`onSearch`) |
+| `Listbox` | one or several | a fixed-height inline list, one tab stop | 20 to a few hundred options to scan at once, with typeahead and range selection |
+
 **When a control uses `labelId`.** `<label for>` names only a labelable element (`input`, `select`, `textarea`, `button`, `meter`, `output`, `progress`); every primitive above is one, and ignores `labelId` (it never reaches the DOM as an attribute). A control whose focusable part is a role on a `span` or `div` — a `role="slider"` thumb, a `role="group"` or `radiogroup` root, a segmented date group — points `aria-labelledby={control.labelId}` at the label instead, and `FormField` forwards a click on its label to it (the control itself if focusable, else its first focusable descendant). `Fieldset` hands its `children` a `FieldsetControl` (`{ labelId }`, the `<legend>`'s id) for the same purpose. `RadioGroup` is its own frame with its own `legend`, so it takes neither.
 
 | Component | Purpose | Props | Snippets | ARIA |
