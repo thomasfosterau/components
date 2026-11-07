@@ -44,6 +44,21 @@ test('the placeholder is a disabled first option, selected while the value is em
   await expect.element(screen.getByRole('combobox', { name: 'Rank' })).toHaveValue('');
 });
 
+test('clearable keeps the placeholder selectable, so a chosen value can be cleared', async () => {
+  const screen = await render(Select, {
+    'aria-label': 'Licence',
+    options: RANKS,
+    placeholder: 'No licence',
+    clearable: true,
+    value: 'genus',
+  });
+
+  const select = screen.getByRole('combobox', { name: 'Licence' });
+  await expect.element(screen.getByRole('option', { name: 'No licence' })).not.toBeDisabled();
+  await userEvent.selectOptions(select, '');
+  await expect.element(select).toHaveValue('');
+});
+
 test('bare strings become options whose value is their label', async () => {
   const screen = await render(Select, {
     'aria-label': 'Bed',

@@ -14,6 +14,12 @@ A native `<select>` in daisyUI styling over a list of options, with an optional 
 
   ARIA contract: the platform's. `describedBy` and `invalid` are the only
   attributes added.
+
+  The placeholder is disabled by default: a required choice should not offer
+  "nothing" as an answer. `clearable` keeps it selectable instead, for an
+  optional field whose value has to be clearable back to `''` on edit; the
+  form then submits the empty string. It applies only with a `placeholder`,
+  so the blank choice always has a visible name.
 -->
 <script lang="ts">
   import type { HTMLSelectAttributes } from 'svelte/elements';
@@ -27,8 +33,14 @@ A native `<select>` in daisyUI styling over a list of options, with an optional 
      * @defaultValue `''`
      */
     value?: string | undefined;
-    /** Disabled first option, shown while nothing is selected. */
+    /** First option, shown while nothing is selected; disabled unless `clearable`. */
     placeholder?: string | undefined;
+    /**
+     * Keep the placeholder selectable, so an optional value can be cleared
+     * back to `''`. Needs `placeholder`.
+     * @defaultValue `false`
+     */
+    clearable?: boolean | undefined;
     /**
      * daisyUI size step.
      * @defaultValue `'md'`
@@ -53,6 +65,7 @@ A native `<select>` in daisyUI styling over a list of options, with an optional 
     options,
     value = $bindable(''),
     placeholder,
+    clearable = false,
     size = 'md',
     invalid = false,
     describedBy = '',
@@ -72,7 +85,7 @@ A native `<select>` in daisyUI styling over a list of options, with an optional 
   class={['select w-full', selectSize[size], invalid && 'select-error', className]}
 >
   {#if placeholder !== undefined}
-    <option value="" disabled>{placeholder}</option>
+    <option value="" disabled={!clearable}>{placeholder}</option>
   {/if}
   {#each entries as option (option.value)}
     <option value={option.value} disabled={option.disabled === true}>{option.label}</option>
