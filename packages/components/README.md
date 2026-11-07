@@ -141,7 +141,8 @@ Buttons, badges and surfaces — the family every other family builds on: `Alert
 | `Menu` | Navigation list | `label`, `class?` | `children` | `<nav aria-label>` + `<ul class="menu">`; imports nothing from bits-ui |
 | `DropdownMenu` | Application menu behind a trigger | `label`, `open? ⚓`, `side? = 'bottom'`, `align? = 'end'`, `class?` | `trigger?({ props })`, `children` | bits-ui `role="menu"`: `aria-haspopup`/`aria-expanded`, roving focus, typeahead, Escape, focus return. The only `Menu*` component that loads bits-ui's dropdown |
 | `ContextMenu` (`./context-menu` entry) | Actions for a region, at the pointer | `label`, `open? ⚓`, `disabled? = false` (the browser's menu shows instead), `class?` | `trigger({ props })` (the region; spread `props`), `children` | bits-ui `role="menu"` named by `label`; opens on right-click, long-press, and Shift+F10 / the Menu key on the focused region (`props` carry `tabindex="0"`); roving focus, typeahead, → / ← submenus, Escape returns focus to the region. **Never the only route to an action** — see below |
-| `MenuItem` | One entry of a `Menu`, `DropdownMenu` or `ContextMenu` | `href?`, `onSelect?`, `current?`, `disabled?` | `icon?`, `children` | in a `Menu`: `aria-current="page"` + `menu-active`; in a bits-ui menu: `role="menuitem"` |
+| `MenuItem` | One entry of a `Menu`, `DropdownMenu` or `ContextMenu` | `href?`, `onSelect?`, `current?`, `disabled?`, `hotkey?: HotkeyTrigger` (a trailing `HotkeyBadge`), `tone?: 'error'` (destructive; never the only cue) | `icon?`, `children` | in a `Menu`: `aria-current="page"` + `menu-active`; in a bits-ui menu: `role="menuitem"`; `hotkey` sets `aria-keyshortcuts` (chords and single keys) and its badge is `aria-hidden` |
+| `MenuGroup` | A labelled run of items | `label`, `showLabel? = true` | `children` | in a bits-ui menu: `role="group"` named by its heading (or `aria-label`); in a `Menu`: a titled sub-list named by `aria-labelledby`, deliberately not a heading |
 | `MenuSeparator` | Rule between item groups | — | — | `role="separator"` (bits-ui's in a bits-ui menu, inside a `role="none"` `<li>`) |
 | `MenuCheckboxItem` | An on/off setting in a bits-ui menu | `checked? ⚓`, `onCheckedChange?`, `disabled?` | `children` | `role="menuitemcheckbox"` + `aria-checked`; renders nothing in a `Menu` |
 | `MenuRadioGroup` | One choice from a few, in a bits-ui menu | `value? ⚓`, `onValueChange?`, `label?` (visible heading, names the group) | `children` (the `MenuRadioItem`s) | `role="group"`; renders nothing in a `Menu` |
@@ -694,6 +695,7 @@ The matching rules `HotkeyProvider` runs are exported as pure functions, for a c
 | `hasChordModifier(event): boolean` | Whether ⌘, Ctrl or Alt is held. |
 | `isEditableTarget(target): boolean` | Whether the target is an `input`, `textarea`, `select` or contenteditable element — where only `allowInEditable` actions fire. |
 | `isApplePlatform(): boolean` | Whether `$mod` means ⌘ here (`navigator.platform` is a Mac or iOS device); `false` where there is no `navigator`. |
+| `ariaKeyShortcuts(trigger): string \| undefined` | The trigger in `aria-keyshortcuts` syntax (`'Control+Shift+K'`, `'?'`), with `$mod` as `Meta` on Apple platforms and `Control` elsewhere; `undefined` for a sequence, which the attribute cannot express. `MenuItem`'s `hotkey` uses it. |
 | `triggerDisplay(trigger): TriggerDisplay` | The trigger as `HotkeyBadge` renders it: `TriggerDisplay` is `{ keys: readonly string[], sequential: boolean }`, keys upper-cased except `'$mod'`, which is left for the renderer to resolve per platform. |
 
 ```svelte

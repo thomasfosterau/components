@@ -34,8 +34,24 @@ export interface ItemPartProps {
   onSelect: () => void;
   /** Extra classes on the `<li>`. */
   class: string | undefined;
-  /** The item's label, icon included. */
+  /** Classes on the item element itself (the destructive tone). */
+  itemClass: string | undefined;
+  /** The item's shortcut in `aria-keyshortcuts` syntax. */
+  keyshortcuts: string | undefined;
+  /** The item's label, icon and shortcut hint included. */
   label: Snippet<[]>;
+}
+
+/** What `MenuGroup` hands the group part. */
+export interface GroupPartProps {
+  /** The group's accessible name, and its visible heading when `showLabel`. */
+  label: string;
+  /** Show `label` as a heading. */
+  showLabel: boolean;
+  /** Extra classes on the `<li>`. */
+  class: string | undefined;
+  /** The group's items. */
+  children: Snippet<[]>;
 }
 
 /** What `MenuSeparator` hands the separator part. */
@@ -105,6 +121,7 @@ export interface MenuParts {
   readonly radioGroup: Component<RadioGroupPartProps>;
   readonly radioItem: Component<RadioItemPartProps>;
   readonly sub: Component<SubPartProps>;
+  readonly group: Component<GroupPartProps>;
 }
 
 const MENU_PARTS_KEY = Symbol('@thomasfosterau/components:menu-parts');

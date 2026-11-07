@@ -33,6 +33,7 @@ export { default as HotkeyHelpDialog } from './HotkeyHelpDialog.svelte';
 export { default as HotkeyProvider } from './HotkeyProvider.svelte';
 export {
   SEQUENCE_TIMEOUT_MS,
+  ariaKeyShortcuts,
   hasChordModifier,
   isApplePlatform,
   isEditableTarget,

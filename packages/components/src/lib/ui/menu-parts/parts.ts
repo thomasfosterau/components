@@ -9,6 +9,7 @@
  */
 
 import CheckboxItemPart from './CheckboxItemPart.svelte';
+import GroupPart from './GroupPart.svelte';
 import ItemPart from './ItemPart.svelte';
 import type { MenuParts } from './menu-parts.ts';
 import RadioGroupPart from './RadioGroupPart.svelte';
@@ -26,5 +27,6 @@ export function menuParts(kind: MenuParts['kind']): MenuParts {
     radioGroup: RadioGroupPart,
     radioItem: RadioItemPart,
     sub: SubPart,
+    group: GroupPart,
   };
 }

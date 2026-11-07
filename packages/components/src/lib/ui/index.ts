@@ -37,6 +37,7 @@ export { default as Link } from './Link.svelte';
 export { default as LinkButton } from './LinkButton.svelte';
 export { default as Menu } from './Menu.svelte';
 export { default as MenuCheckboxItem } from './MenuCheckboxItem.svelte';
+export { default as MenuGroup } from './MenuGroup.svelte';
 export { default as MenuItem } from './MenuItem.svelte';
 export { default as MenuRadioGroup } from './MenuRadioGroup.svelte';
 export { default as MenuRadioItem } from './MenuRadioItem.svelte';

@@ -8,6 +8,7 @@
 
 import { afterEach, beforeEach, describe, expect, test } from 'vite-plus/test';
 import {
+  ariaKeyShortcuts,
   hasChordModifier,
   isApplePlatform,
   isEditableTarget,
@@ -195,5 +196,25 @@ describe('triggerDisplay', () => {
 
   test('projects a sequence as ordered sequential chips', () => {
     expect(triggerDisplay(['g', 'p'])).toEqual({ keys: ['G', 'P'], sequential: true });
+  });
+});
+
+describe('ariaKeyShortcuts', () => {
+  test('resolves $mod per platform and names the other modifiers', () => {
+    setPlatform('MacIntel');
+    expect(ariaKeyShortcuts('$mod+shift+k')).toBe('Meta+Shift+K');
+    setPlatform('Win32');
+    expect(ariaKeyShortcuts('$mod+shift+k')).toBe('Control+Shift+K');
+    expect(ariaKeyShortcuts('$mod+alt+p')).toBe('Control+Alt+P');
+  });
+
+  test('keeps a single key, upper-casing a letter', () => {
+    expect(ariaKeyShortcuts('?')).toBe('?');
+    expect(ariaKeyShortcuts('n')).toBe('N');
+    expect(ariaKeyShortcuts('Escape')).toBe('Escape');
+  });
+
+  test('has no form for a sequence', () => {
+    expect(ariaKeyShortcuts(['g', 'p'])).toBeUndefined();
   });
 });
