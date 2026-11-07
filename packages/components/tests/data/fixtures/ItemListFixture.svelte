@@ -12,6 +12,7 @@
     busy?: boolean;
     label?: string;
     emptyMessage?: string;
+    lazyRender?: boolean;
   }
 
   let {
@@ -25,10 +26,11 @@
     busy = false,
     label,
     emptyMessage,
+    lazyRender = false,
   }: Props = $props();
 </script>
 
-<ItemList {items} {variant} {feed} {busy} {label} {emptyMessage} getKey={(item) => item.id}>
+<ItemList {items} {variant} {feed} {busy} {label} {emptyMessage} {lazyRender} getKey={(item) => item.id}>
   {#snippet item(entry)}
     <LinkListItem
       href={entry.href}

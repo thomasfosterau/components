@@ -20,16 +20,25 @@ A list in one of four shapes — `compact` links, `stacked` rows, a `grid` or `c
     `label`, and `aria-busy` while more is loading; each item is an `<article>`
     carrying `aria-posinset` / `aria-setsize`, so "article 7 of 40" is
     announced even though only 20 are in the DOM, and `tabindex="-1"` so the
-    reader's Page Down lands somewhere.
+    reader's Page Down lands somewhere. Page Down / Page Up move focus to
+    the next / previous article (the APG Feed keys, `feed.ts`, shared with
+    `VirtualList`).
 
     Feed mode renders `<div role="feed">` with `<article>` children rather
     than a list, deliberately: `feed` is not a role HTML permits on `<ul>`,
     and forcing `role="article"` onto each `<li>` would throw away the list
     semantics to get there. A feed is not a list, and the markup says so.
+
+  `lazyRender` is the zero-JS alternative to `VirtualList` for a few hundred
+  rows: each row takes `content-visibility: auto` with an intrinsic size of
+  `estimateSize`, so the browser skips laying out and painting rows off
+  screen, while every row stays in the DOM — find-in-page and a screen
+  reader's browse mode still reach them all.
 -->
 <script lang="ts" generics="T">
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
+  import { moveFeedFocus } from './feed.ts';
 
   type Variant = 'compact' | 'stacked' | 'grid' | 'cards';
 
@@ -58,6 +67,16 @@ A list in one of four shapes — `compact` links, `stacked` rows, a `grid` or `c
     label?: string | undefined;
     /** More items are loading — `aria-busy` on the feed. */
     busy?: boolean | undefined;
+    /**
+     * Let the browser skip rendering off-screen rows (`content-visibility: auto`).
+     * @defaultValue `false`
+     */
+    lazyRender?: boolean | undefined;
+    /**
+     * With `lazyRender`, the height in px a row is assumed to have until it is first rendered.
+     * @defaultValue `48`
+     */
+    estimateSize?: number | undefined;
   }
 
   let {
@@ -70,6 +89,9 @@ A list in one of four shapes — `compact` links, `stacked` rows, a `grid` or `c
     feed = false,
     label,
     busy = false,
+    lazyRender = false,
+    estimateSize = 48,
+    onkeydown,
     class: className,
     ...rest
   }: Props = $props();
@@ -91,6 +113,13 @@ A list in one of four shapes — `compact` links, `stacked` rows, a `grid` or `c
   };
 
   const setSize = $derived(items.length);
+  const contentVisibility = $derived(lazyRender ? 'auto' : undefined);
+  const intrinsicSize = $derived(lazyRender ? `auto ${estimateSize}px` : undefined);
+
+  function onFeedKeydown(event: KeyboardEvent & { currentTarget: EventTarget & HTMLElement }): void {
+    onkeydown?.(event);
+    if (!event.defaultPrevented) moveFeedFocus(event, event.currentTarget);
+  }
 </script>
 
 {#if items.length === 0}
@@ -106,6 +135,7 @@ A list in one of four shapes — `compact` links, `stacked` rows, a `grid` or `c
     aria-label={label}
     aria-busy={busy}
     class={[containerClass[variant], className]}
+    onkeydown={onFeedKeydown}
   >
     {#each items as entry, index (getKey(entry, index))}
       <article
@@ -113,15 +143,23 @@ A list in one of four shapes — `compact` links, `stacked` rows, a `grid` or `c
         aria-setsize={setSize}
         tabindex="-1"
         class={itemClass[variant]}
+        style:content-visibility={contentVisibility}
+        style:contain-intrinsic-size={intrinsicSize}
       >
         {@render item(entry, index)}
       </article>
     {/each}
   </div>
 {:else}
-  <ul {...rest} aria-label={label} class={[containerClass[variant], className]}>
+  <ul {...rest} aria-label={label} class={[containerClass[variant], className]} {onkeydown}>
     {#each items as entry, index (getKey(entry, index))}
-      <li class={itemClass[variant]}>{@render item(entry, index)}</li>
+      <li
+        class={itemClass[variant]}
+        style:content-visibility={contentVisibility}
+        style:contain-intrinsic-size={intrinsicSize}
+      >
+        {@render item(entry, index)}
+      </li>
     {/each}
   </ul>
 {/if}

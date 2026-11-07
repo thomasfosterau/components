@@ -6,6 +6,7 @@
  */
 
 import { expect, test } from 'vite-plus/test';
+import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import ItemListFixture from './fixtures/ItemListFixture.svelte';
 
@@ -34,6 +35,31 @@ test('feed mode states each article’s position in the whole stream', async () 
 
   // A feed is not a list, so it does not claim to be one.
   expect(screen.getByRole('list').elements()).toHaveLength(0);
+});
+
+test('feed mode: Page Down / Page Up move focus between articles', async () => {
+  const screen = await render(ItemListFixture, { feed: true, label: 'Recent posts' });
+
+  const articles = screen.getByRole('article').elements();
+  screen.getByRole('link', { name: 'Back bed' }).element().focus();
+  await userEvent.keyboard('{PageDown}');
+  expect(document.activeElement).toBe(articles[1]);
+  await userEvent.keyboard('{PageDown}');
+  expect(document.activeElement).toBe(articles[2]);
+  // The last article has no next; focus stays.
+  await userEvent.keyboard('{PageDown}');
+  expect(document.activeElement).toBe(articles[2]);
+  await userEvent.keyboard('{PageUp}');
+  expect(document.activeElement).toBe(articles[1]);
+});
+
+test('lazyRender lets the browser skip off-screen rows, keeping them in the DOM', async () => {
+  const screen = await render(ItemListFixture, { lazyRender: true });
+
+  const rows = screen.getByRole('listitem').elements();
+  expect(rows).toHaveLength(3);
+  expect(rows[0]).toHaveStyle({ contentVisibility: 'auto' });
+  expect(rows[0]?.getAttribute('style')).toContain('contain-intrinsic-size: auto 48px');
 });
 
 test('reports that more is on the way with aria-busy', async () => {
