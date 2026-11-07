@@ -11,7 +11,15 @@
 
 export { computeContext } from './context.ts';
 
-export { resolveChart, type ResolvedChart } from './resolve.ts';
+export { resolveChart, type ResolveChartOptions, type ResolvedChart } from './resolve.ts';
+
+export {
+  buildDataTable,
+  DEFAULT_RANGE_SEPARATOR,
+  type DataTable,
+  type DataTableColumn,
+  type DataTableOptions,
+} from './table.ts';
 
 export { computeDimensions, DEFAULT_MARGINS } from './layout.ts';
 

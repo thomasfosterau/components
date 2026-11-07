@@ -167,3 +167,45 @@ describe('chartNodeViewFactory', () => {
     expect(view.dom.querySelector('svg')).toBeTruthy();
   });
 });
+
+describe('ChartNodeView data table (#304)', () => {
+  it('appends the data as a visually hidden table after the SVG', () => {
+    const view = viewFor(inlineSpec);
+    const table = view.dom.querySelector('table[data-chart-table]');
+    expect(table?.previousElementSibling?.tagName.toLowerCase()).toBe('svg');
+    expect(table?.getAttribute('style')).toContain('position:absolute');
+    expect(table?.querySelectorAll('tbody tr')).toHaveLength(2);
+  });
+
+  it('draws a newer spec from its known subset', () => {
+    const future = {
+      ...inlineSpec,
+      specVersion: '1.2',
+      encoding: { ...inlineSpec.encoding, z: {} },
+    };
+    const view = viewFor(fromJson(future));
+    expect(view.dom.querySelectorAll('circle')).toHaveLength(2);
+  });
+
+  it('renders an unknown mark as the visible table', () => {
+    const sankey = { ...inlineSpec, specVersion: '1.2', mark: 'sankey' };
+    const view = viewFor(fromJson(sankey));
+    expect(view.dom.querySelector('svg')).toBeNull();
+    const fallback = view.dom.querySelector('[data-chart-unsupported]');
+    expect(fallback?.textContent).toContain('"sankey"');
+    const table = fallback?.querySelector('table[data-chart-table]');
+    expect(table?.getAttribute('style')).toBeNull();
+    expect(table?.querySelectorAll('tbody tr')).toHaveLength(2);
+  });
+
+  it('shows a message for an unknown mark whose data is a reference', () => {
+    const sankey = { ...refSpec, specVersion: '1.2', mark: 'sankey' };
+    const view = viewFor(fromJson(sankey), { resolveData: () => refRows });
+    expect(view.dom.textContent).toContain('Unsupported chart type');
+  });
+});
+
+/** A document from outside, typed as a caller holding unchecked JSON would type it. */
+function fromJson(value: object): ChartSpec {
+  return JSON.parse(JSON.stringify(value));
+}

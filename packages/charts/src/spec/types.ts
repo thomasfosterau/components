@@ -26,9 +26,11 @@
 export const SPEC_VERSION = '1.1';
 
 /**
- * The spec versions this interpreter accepts. `'1.1'` adds the `x2` / `y2`
+ * The spec versions this interpreter knows. `'1.1'` adds the `x2` / `y2`
  * range channels and the `tree` mark; every `'1'` spec is a valid `'1.1'`
- * spec. See the README § Spec versioning for the minor-version rule.
+ * spec. A newer `'1.N'` document is parsed as `'1.1'`, its unknown keys
+ * ignored (`validateSpec` reports them). See the README § Spec versioning
+ * for the minor-version rule.
  */
 export type SpecVersion = '1' | '1.1';
 
@@ -176,4 +178,25 @@ export interface ChartSpec {
   readonly extensions?: Extensions;
   /** Spec 1.1: layout options of the `tree` mark; only valid with it. */
   readonly tree?: TreeOptions;
+}
+
+/**
+ * A newer `1.N` document (N above the newest minor this interpreter knows)
+ * whose `mark` this interpreter does not know. It carries the spec's known
+ * fields, so an interpreter can render its data through the data-table
+ * fallback; `validateSpec` returns it as `unsupported` on a failed result,
+ * and `parseSpec` throws it on an `UnsupportedMarkError`. `specVersion` is
+ * the newest version this interpreter knows; the version the document
+ * declared is in its `SpecDegradation`. It has no `tree` options, which
+ * belong to the `tree` mark.
+ */
+export interface UnsupportedMarkSpec {
+  readonly specVersion: SpecVersion;
+  /** The mark the document names, which this interpreter does not know. */
+  readonly mark: string;
+  readonly encoding: Encoding;
+  readonly data: Data;
+  readonly scales?: Scales;
+  readonly config?: Config;
+  readonly extensions?: Extensions;
 }

@@ -103,6 +103,15 @@ describe('createChartNodeSpec', () => {
       expect(parsed.firstChild!.type.name).not.toBe(CHART_NODE_NAME);
     });
 
+    it('does not parse a newer 1.N spec, so pasting never rewrites it', () => {
+      const container = document.createElement('div');
+      const future = JSON.stringify({ ...chartSpec, specVersion: '1.2' });
+      container.innerHTML = `<div ${CHART_SPEC_ATTRIBUTE}='${future}'><p>fallback</p></div>`;
+
+      const parsed = PMDOMParser.fromSchema(schema).parse(container);
+      expect(parsed.firstChild!.type.name).not.toBe(CHART_NODE_NAME);
+    });
+
     it('uses a custom class name when provided', () => {
       const customSchema = new Schema({
         nodes: {

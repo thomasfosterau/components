@@ -11,6 +11,19 @@ import type { VegaLiteData, VegaLiteEncoding, VegaLiteFieldDef, VegaLiteSpec } f
 /** The Vega-Lite schema the emitter targets. */
 export const VEGA_LITE_SCHEMA = 'https://vega.github.io/schema/vega-lite/v6.json';
 
+/** Whether `mark` translates one-to-one to a Vega-Lite mark. */
+function isVegaLiteMark(mark: string): boolean {
+  switch (mark) {
+    case 'bar':
+    case 'line':
+    case 'point':
+    case 'area':
+      return true;
+    default:
+      return false;
+  }
+}
+
 /** Options for {@link emitVegaLite}. */
 export interface EmitVegaLiteOptions {
   /**
@@ -53,11 +66,25 @@ export class VegaLiteEmitError extends Error {
  * typed encodings translate one-to-one.
  *
  * Web-only `extensions` are ignored, per the capability matrix.
+ *
+ * A newer `1.N` document reaches it already degraded: `parseSpec` has
+ * dropped what this version does not know, so the emitted spec is the
+ * known subset. A newer mark never becomes a `ChartSpec` (`validateSpec`
+ * returns it as `unsupported`; render it with a TS interpreter's data-table
+ * fallback); one forced through a cast throws, as the `tree` mark does.
+ *
+ * @throws {VegaLiteEmitError} with reason `'unsupported-mark'` for a `tree` or unknown mark, `'unresolved-data'` for a `query` / `node` ref without `rows`.
  */
 export function emitVegaLite(spec: ChartSpec, options?: EmitVegaLiteOptions): VegaLiteSpec {
   if (spec.mark === 'tree') {
     throw new VegaLiteEmitError(
       'Vega-Lite has no tree layout (that is full Vega); render a "tree" spec with a TS interpreter',
+      'unsupported-mark',
+    );
+  }
+  if (!isVegaLiteMark(spec.mark)) {
+    throw new VegaLiteEmitError(
+      `Mark "${spec.mark}" is not one this emitter knows; render the spec with a TS interpreter`,
       'unsupported-mark',
     );
   }
