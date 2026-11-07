@@ -34,6 +34,18 @@
   </div>
 </Story>
 
+<Story name="Clearable placeholder">
+  <!-- An optional field: the placeholder stays selectable, so a chosen value
+       can be cleared back to '' on edit. -->
+  <div class="max-w-sm">
+    <FormField label="Rank">
+      {#snippet children(control)}
+        <Select {...control} options={ranks} placeholder="No rank" clearable value="genus" />
+      {/snippet}
+    </FormField>
+  </div>
+</Story>
+
 <Story name="Bare strings">
   <div class="max-w-sm">
     <FormField label="Bed">

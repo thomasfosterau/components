@@ -48,3 +48,26 @@
     confirmLabel="Archive"
   />
 </Story>
+
+{#snippet idField()}
+  <input type="hidden" name="id" value="garden-7" />
+{/snippet}
+
+<!--
+  Form mode: the confirm step is a real POST form, so it works with scripts
+  off. The wrapper here only stops the story's own page being submitted away.
+-->
+<Story name="Form mode, no JavaScript needed">
+  <div
+    onsubmit={(event) => {
+      event.preventDefault();
+    }}
+  >
+    <ConfirmButton
+      formAction="/gardens/7?/delete"
+      formFields={idField}
+      idleLabel="Delete this garden"
+      confirmMessage="Delete the garden and everything in it?"
+    />
+  </div>
+</Story>

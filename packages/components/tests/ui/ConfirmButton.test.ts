@@ -2,6 +2,7 @@ import { userEvent } from 'vite-plus/test/browser';
 import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import ConfirmButtonFixture from './fixtures/ConfirmButtonFixture.svelte';
+import ConfirmButtonFormFixture from './fixtures/ConfirmButtonFormFixture.svelte';
 
 const resolved = (): Promise<unknown> => Promise.resolve('ok');
 
@@ -76,4 +77,42 @@ test('redirectTo navigates through the components context once the action resolv
   await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
   await expect.poll(() => onNavigate.mock.calls).toEqual([['/gardens']]);
+});
+
+test('form mode: the confirm step is a POST form, behind a disclosure', async () => {
+  const onSubmit = vi.fn<(data: FormData, form: HTMLFormElement) => void>();
+  const action = vi.fn<() => Promise<unknown>>(resolved);
+  const screen = await render(ConfirmButtonFormFixture, { onSubmit, action });
+
+  const details = document.querySelector('details');
+  expect(details?.open).toBe(false);
+  // Closed, the confirm form is not rendered for anyone, so it is not in the
+  // accessibility tree at all.
+  expect(document.querySelector('form')?.checkVisibility()).toBe(false);
+
+  await userEvent.click(screen.getByText('Delete this garden'));
+  expect(details?.open).toBe(true);
+
+  const confirm = screen.getByRole('button', { name: 'Confirm' });
+  await expect.element(confirm).toHaveAttribute('type', 'submit');
+  const form = confirm.element().closest('form');
+  expect(form?.getAttribute('method')).toBe('post');
+  expect(form?.getAttribute('action')).toBe('/gardens/7?/delete');
+
+  await userEvent.click(confirm);
+  expect(onSubmit).toHaveBeenCalledTimes(1);
+  expect(onSubmit.mock.calls[0]?.[0].get('id')).toBe('garden-7');
+  // The browser's submit is the action; the callback is not run.
+  expect(action).not.toHaveBeenCalled();
+});
+
+test('form mode: Cancel closes the disclosure without submitting', async () => {
+  const onSubmit = vi.fn<(data: FormData, form: HTMLFormElement) => void>();
+  const screen = await render(ConfirmButtonFormFixture, { onSubmit });
+
+  await userEvent.click(screen.getByText('Delete this garden'));
+  await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+  expect(document.querySelector('details')?.open).toBe(false);
+  expect(onSubmit).not.toHaveBeenCalled();
 });
