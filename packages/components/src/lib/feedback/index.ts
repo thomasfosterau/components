@@ -20,6 +20,7 @@ export { default as Dialog } from './Dialog.svelte';
 export { default as Drawer } from './Drawer.svelte';
 export { default as LoadingBoundary } from './LoadingBoundary.svelte';
 export { default as ProgressBar } from './ProgressBar.svelte';
+export { default as PromptDialog } from './PromptDialog.svelte';
 export { default as SegmentBar } from './SegmentBar.svelte';
 export { default as StatTile } from './StatTile.svelte';
 export { default as Stats } from './Stats.svelte';
