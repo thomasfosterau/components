@@ -31,6 +31,8 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
     contentClass: ClassValue;
     trigger?: Snippet<[{ props: Record<string, unknown> }]> | undefined;
     actions?: Snippet<[{ close: () => void }]> | undefined;
+    /** The element to focus on open, instead of bits-ui's first focusable one. */
+    initialFocus?: (() => HTMLElement | null | undefined) | undefined;
     children: Snippet<[]>;
   }
 
@@ -44,8 +46,17 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
     contentClass,
     trigger,
     actions,
+    initialFocus,
     children,
   }: Props = $props();
+
+  /** Hand focus to `initialFocus`'s element when it names one; otherwise bits-ui's default. */
+  const onOpenAutoFocus = (event: Event): void => {
+    const target = initialFocus?.();
+    if (target === null || target === undefined) return;
+    event.preventDefault();
+    target.focus();
+  };
 
   const close = (): void => {
     open = false;
@@ -65,7 +76,7 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
     <!-- daisyUI's `modal-backdrop` is a child of an open `.modal`; this is
          the same scrim as an element bits-ui can animate and dismiss from. -->
     <Dialog.Overlay class="bg-base-300/60 fixed inset-0 z-40" />
-    <Dialog.Content class={contentClass}>
+    <Dialog.Content class={contentClass} {onOpenAutoFocus}>
       <div class={['flex items-start justify-between gap-4', sheet && 'px-4 pt-4']}>
         <Dialog.Title class={hideTitle ? 'sr-only' : 'text-lg font-semibold'}>{title}</Dialog.Title>
         <Dialog.Close>
