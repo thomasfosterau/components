@@ -22,7 +22,8 @@
     "directory": "packages/components"
   },
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
   "type": "module",
   "sideEffects": false,
