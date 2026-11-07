@@ -21,6 +21,8 @@
 export { default as Accordion } from './Accordion.svelte';
 export { default as AccordionItem } from './AccordionItem.svelte';
 export { default as Alert } from './Alert.svelte';
+export { default as Avatar } from './Avatar.svelte';
+export { default as AvatarGroup } from './AvatarGroup.svelte';
 export { default as Badge } from './Badge.svelte';
 export { default as Button } from './Button.svelte';
 export { default as ButtonGroup } from './ButtonGroup.svelte';
@@ -66,5 +68,6 @@ export { default as VisuallyHidden } from './VisuallyHidden.svelte';
 export * from './colour-token.ts';
 export * from './menu-context.ts';
 export * from './slug.ts';
+export { initialsOf } from './avatar.ts';
 export * from './tones.ts';
 export type { ToggleGroupItem } from './toggle-classes.ts';

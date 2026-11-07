@@ -315,3 +315,22 @@ export const chatBubbleTone: Record<Tone, string> = {
 
 /** How an `IconLabel` shows its title and icon; the title stays accessible text in every style. */
 export type IconLabelStyle = 'title-and-icon' | 'icon-only' | 'title-only';
+
+/** The shapes an `Avatar` frame takes. */
+export type AvatarShape = 'circle' | 'rounded' | 'square';
+
+/** Literal size per `Size` for `Avatar`; a lookup table so Tailwind's scanner sees every class. */
+export const avatarSize: Record<Size, string> = {
+  xs: 'size-6 text-xs',
+  sm: 'size-8 text-sm',
+  md: 'size-12 text-base',
+  lg: 'size-16 text-xl',
+  xl: 'size-20 text-2xl',
+};
+
+/** Literal radius per `AvatarShape` for `Avatar`; a lookup table so Tailwind's scanner sees every class. */
+export const avatarShape: Record<AvatarShape, string> = {
+  circle: 'rounded-full',
+  rounded: 'rounded-box',
+  square: 'rounded-field',
+};
