@@ -35,7 +35,7 @@ The site banner: brand, primary links and account controls, with a disclosure fo
   import { Menu as MenuIcon } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
-  import VisuallyHidden from '../ui/VisuallyHidden.svelte';
+  import IconButtonCore from '../ui/IconButtonCore.svelte';
 
   interface Props extends HTMLAttributes<HTMLElement> {
     /**
@@ -89,10 +89,9 @@ The site banner: brand, primary links and account controls, with a disclosure fo
           {#if menu}
             <Collapsible.Trigger>
               {#snippet child({ props: triggerProps })}
-                <button {...triggerProps} class="btn btn-ghost btn-square lg:hidden">
-                  <MenuIcon class="size-5" aria-hidden="true" />
-                  <VisuallyHidden>{menuLabel}</VisuallyHidden>
-                </button>
+                <IconButtonCore {...triggerProps} label={menuLabel} class="lg:hidden">
+                  {#snippet icon()}<MenuIcon class="size-5" />{/snippet}
+                </IconButtonCore>
               {/snippet}
             </Collapsible.Trigger>
           {/if}

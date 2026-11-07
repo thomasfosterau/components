@@ -18,8 +18,7 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
   import { Dialog } from 'bits-ui';
   import type { Snippet } from 'svelte';
   import type { ClassValue } from 'svelte/elements';
-  import Button from '../ui/Button.svelte';
-  import VisuallyHidden from '../ui/VisuallyHidden.svelte';
+  import IconButtonCore from '../ui/IconButtonCore.svelte';
 
   interface Props {
     open?: boolean | undefined;
@@ -71,10 +70,9 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
         <Dialog.Title class={hideTitle ? 'sr-only' : 'text-lg font-semibold'}>{title}</Dialog.Title>
         <Dialog.Close>
           {#snippet child({ props })}
-            <Button {...props} variant="ghost" size="sm" class="btn-square -mt-1 -mr-1 ms-auto">
-              <X class="size-4" aria-hidden="true" />
-              <VisuallyHidden>{closeLabel}</VisuallyHidden>
-            </Button>
+            <IconButtonCore {...props} label={closeLabel} size="sm" class="-mt-1 -mr-1 ms-auto">
+              {#snippet icon()}<X class="size-4" />{/snippet}
+            </IconButtonCore>
           {/snippet}
         </Dialog.Close>
       </div>

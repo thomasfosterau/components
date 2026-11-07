@@ -19,16 +19,16 @@ The daisyUI `alert`: a tone-coloured notice with an icon, an optional lead-in an
   alert on failure gets the announcement from the insertion.
 
   The tone icon is `aria-hidden` — it restates the tone, which the text
-  already carries — and the dismiss button is a labelled `Button`, not a
-  bare glyph.
+  already carries — and the dismiss button is an icon-only button named by
+  `dismissLabel` (`IconButtonCore`, the tooltip-free half of `IconButton`,
+  so an alert never loads the tooltip machinery), not a bare glyph.
 -->
 <script lang="ts">
   import { CircleCheck, CircleX, Info, TriangleAlert, X } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
-  import Button from './Button.svelte';
+  import IconButtonCore from './IconButtonCore.svelte';
   import { alertTone, alertVariant, type AlertVariant, type StatusTone } from './tones.ts';
-  import VisuallyHidden from './VisuallyHidden.svelte';
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
     /**
@@ -102,9 +102,8 @@ The daisyUI `alert`: a tone-coloured notice with an icon, an optional lead-in an
     {@render children()}
   </div>
   {#if onDismiss}
-    <Button variant="ghost" size="sm" class="btn-square" onclick={onDismiss}>
-      <X class="size-4" aria-hidden="true" />
-      <VisuallyHidden>{dismissLabel}</VisuallyHidden>
-    </Button>
+    <IconButtonCore label={dismissLabel} size="sm" onclick={onDismiss}>
+      {#snippet icon()}<X class="size-4" />{/snippet}
+    </IconButtonCore>
   {/if}
 </div>
