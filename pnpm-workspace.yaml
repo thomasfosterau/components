@@ -99,7 +99,7 @@ catalog:
   # package at that exact version).
   # `@vitest/browser` itself arrives through vite-plus, so it is not
   # catalogued separately.
-  '@vitest/browser-playwright': 5.0.5
+  '@vitest/browser-playwright': 5.1.0
   # Headless Svelte 5 primitives. Every component whose behaviour is more
   # than "render these attributes" — menus, dialogs, comboboxes, tooltips —
   # is built on a bits-ui primitive rather than on hand-rolled keyboard and
@@ -148,15 +148,15 @@ catalog:
   # A group PR that doesn't bump vite-plus itself is closed unmerged, unless it
   # is an `@effect/tsgo` bump that CI passes on its own.
   # `vite` is the same release published under its aliased core package.
-  vite-plus: 1.4.0
+  vite-plus: 1.5.0
   vite: npm:@voidzero-dev/vite-plus-core@1.4.0
-  vitest: 5.0.5
+  vitest: 5.1.0
   # Istanbul coverage for the root `test:coverage` task, whose
   # `coverage/coverage-final.json` `fallow audit` reads for per-function CRAP
   # scores. Istanbul rather than v8 because it instruments in the transform,
   # so the browser-mode suites report too. It pins `vitest` EXACTLY, so it
   # moves with `vitest` above (Dependabot's `toolchain` group).
-  '@vitest/coverage-istanbul': 5.0.5
+  '@vitest/coverage-istanbul': 5.1.0
   # Effect Language Service as a native (TypeScript-Go) binary, and the source
   # of the `@effect/tsgo/oxlint-presets` lint preset the root vite.config.ts
   # extends. `effect-tsgo patch --typescript --oxlint` (the root `prepare`)
@@ -172,7 +172,7 @@ catalog:
   # three. Dependabot's `toolchain` group brings `@effect/tsgo` with
   # vite-plus; the `@typescript/native` alias moves by hand
   # (.github/dependabot.yml).
-  '@effect/tsgo': 0.63.0
+  '@effect/tsgo': 0.67.4
   # TS7, the native Go compiler (bin `tsc`), Effect-patched by the `prepare`
   # above. It type-checks packages/charts (the one pure-TS package, and the one
   # whose `src/spec` is Effect code). The Svelte packages stay on the TS6
