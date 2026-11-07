@@ -47,6 +47,19 @@ export interface TableColumn<T> {
   readonly align?: 'start' | 'end' | undefined;
   /** Extra classes on this column's header and body cells. */
   readonly class?: string | undefined;
+  /**
+   * Extra classes on this column's `<th scope="col">` only, after `class` —
+   * `'sr-only'` keeps a header for screen readers over visible cells.
+   */
+  readonly headerClass?: string | undefined;
+}
+
+/** What `Table`'s `rowAttributes` may set on a body row's `<tr>`. */
+export interface TableRowAttributes {
+  /** Classes merged onto the row (bold a changed or selected row). */
+  readonly class?: string | undefined;
+  /** The row's `id`, an anchor target (`#element-26`). */
+  readonly id?: string | undefined;
 }
 
 /**

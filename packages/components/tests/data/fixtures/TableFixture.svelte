@@ -6,7 +6,11 @@
 -->
 <script lang="ts">
   import Table from '../../../src/lib/data/Table.svelte';
-  import type { SortState } from '../../../src/lib/data/table-types.ts';
+  import type {
+    SortState,
+    TableColumn,
+    TableRowAttributes,
+  } from '../../../src/lib/data/table-types.ts';
   import type { Size } from '../../../src/lib/ui/tones.ts';
   import { columns, plainColumns, rowKey, rows as allRows, type Row } from './table-data.ts';
 
@@ -27,6 +31,9 @@
     withFoot?: boolean;
     /** Make the first column the row header. */
     rowHeader?: boolean;
+    /** Classes on the last column's header only. */
+    headerClass?: string | undefined;
+    rowAttributes?: ((row: Row) => TableRowAttributes) | undefined;
   }
 
   let {
@@ -44,11 +51,21 @@
     withEmptyState = false,
     withFoot = false,
     rowHeader = false,
+    headerClass,
+    rowAttributes,
   }: Props = $props();
 
   const baseColumns = $derived(sortable ? columns : plainColumns);
   const shownColumns = $derived(
-    rowHeader ? baseColumns.map((column, index) => (index === 0 ? { ...column, rowHeader: true } : column)) : baseColumns,
+    baseColumns.map(
+      (column, index): TableColumn<Row> =>
+        Object.assign(
+          {},
+          column,
+          rowHeader && index === 0 ? { rowHeader: true } : {},
+          index === baseColumns.length - 1 ? { headerClass } : {},
+        ),
+    ),
   );
 </script>
 
@@ -73,6 +90,7 @@
   {emptyMessage}
   {onSort}
   {onSelect}
+  {rowAttributes}
   emptyState={withEmptyState ? emptyState : undefined}
   foot={withFoot ? foot : undefined}
 />
