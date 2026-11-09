@@ -90,7 +90,7 @@ catalog:
   '@sveltejs/kit': 3.1.1
   '@sveltejs/package': 3.0.2
   '@sveltejs/vite-plugin-svelte': ^7.3.1
-  '@tailwindcss/vite': ^4.3.4
+  '@tailwindcss/vite': ^4.3.5
   '@testing-library/jest-dom': ^7.0.1
   '@types/node': ^26.6.6
   # Vitest browser mode: the Playwright provider is its own package as of
@@ -128,7 +128,7 @@ catalog:
   storybook: ^10.6.5
   svelte-check: ^4.7.8
   svelte: ^5.57.3
-  tailwindcss: ^4.3.4
+  tailwindcss: ^4.3.5
   # The TS6 JS compiler, aliased so the package stays importable as
   # `typescript`: svelte-check drives TypeScript through its JS API, which
   # TypeScript 7 (the native Go compiler) does not ship until 7.1. The app
