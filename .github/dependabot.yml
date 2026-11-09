@@ -142,7 +142,8 @@ updates:
             'version-update:semver-minor',
             'version-update:semver-patch',
           ]
-
+    assignees:
+      - thomasfosterau
   # Each action updates in its own PR (no group). `directories`, not `directory: '/'`: the
   # local composite action under .github/actions/setup pins actions too, and
   # `/` covers only .github/workflows (the Swift workflow included).
@@ -160,6 +161,8 @@ updates:
       prefix: 'chore'
     cooldown:
       default-days: 1
+    assignees:
+      - thomasfosterau
   # The .devcontainer/ features (the image tag moves with vite-plus by hand).
   - package-ecosystem: 'devcontainers'
     directory: '/'
@@ -173,3 +176,5 @@ updates:
       prefix: 'chore'
     cooldown:
       default-days: 1
+    assignees:
+      - thomasfosterau
