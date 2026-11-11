@@ -334,3 +334,12 @@ export const avatarShape: Record<AvatarShape, string> = {
   rounded: 'rounded-box',
   square: 'rounded-field',
 };
+
+/** Literal daisyUI class per `Size` for `BottomNav`; a lookup table so Tailwind's scanner sees every class. */
+export const dockSize: Record<Size, string> = {
+  xs: 'dock-xs',
+  sm: 'dock-sm',
+  md: 'dock-md',
+  lg: 'dock-lg',
+  xl: 'dock-xl',
+};
