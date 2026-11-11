@@ -30,6 +30,7 @@ export { default as MessageThread } from './MessageThread.svelte';
 export { default as Pagination } from './Pagination.svelte';
 export { default as PaginationFooter } from './PaginationFooter.svelte';
 export { default as ResultCount } from './ResultCount.svelte';
+export { default as SortableList } from './SortableList.svelte';
 export { default as Table } from './Table.svelte';
 export { default as TreeList } from './TreeList.svelte';
 export { default as TreeListItem } from './TreeListItem.svelte';
@@ -40,6 +41,7 @@ export * from './description-context.ts';
 export * from './diff.ts';
 export * from './list-item.ts';
 export * from './pagination.ts';
+export { defaultSortableAnnouncements, move, type SortableAnnouncements } from './sortable.ts';
 export * from './table-types.ts';
 export * from './tree-view.ts';
 export type {
