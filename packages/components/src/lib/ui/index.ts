@@ -37,6 +37,7 @@ export { default as DropdownMenu } from './DropdownMenu.svelte';
 export { default as EmptyState } from './EmptyState.svelte';
 export { default as ExternalLink } from './ExternalLink.svelte';
 export { default as Heading } from './Heading.svelte';
+export { default as ExpandableText } from './ExpandableText.svelte';
 export { default as IconButton } from './IconButton.svelte';
 export { default as IconLabel } from './IconLabel.svelte';
 export { default as Indicator } from './Indicator.svelte';
