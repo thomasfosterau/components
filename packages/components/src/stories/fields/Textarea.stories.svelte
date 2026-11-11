@@ -39,3 +39,23 @@
     </FormField>
   </div>
 </Story>
+
+<Story name="Auto-grow">
+  <div class="max-w-lg">
+    <FormField label="Observation" hint="Grows from 2 to 6 lines, then scrolls.">
+      {#snippet children(control)}
+        <Textarea {...control} autoGrow minRows={2} maxRows={6} />
+      {/snippet}
+    </FormField>
+  </div>
+</Story>
+
+<Story name="Character counter">
+  <div class="max-w-lg">
+    <FormField label="Summary">
+      {#snippet children(control)}
+        <Textarea {...control} maxlength={280} showCount value="Six seedlings in, two survived." />
+      {/snippet}
+    </FormField>
+  </div>
+</Story>

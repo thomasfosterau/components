@@ -6,10 +6,11 @@ A `type="search"` field with a leading icon, a clear button while there is text,
   wrapper, with a leading icon, a clear button while there is text, and a
   spinner while `pending`.
 
-  The wrapper is a `<div>`, not a `<label>`: the clear button lives inside it,
-  and a button inside a label is both mis-named (the label's text becomes part
-  of ITS name) and label-activated (clicking it also focuses the field). The
-  visible label is optional — `label` always supplies the accessible name.
+  Built on `TextInput`'s `leading` / `trailing`, whose wrapper is a `<div>`,
+  not a `<label>`: the clear button lives inside it, and a button inside a
+  label is both mis-named (the label's text becomes part of ITS name) and
+  label-activated (clicking it also focuses the field). The visible label is
+  optional — `label` always supplies the accessible name.
 
   ARIA contract: the leading magnifier is `aria-hidden`, because the field's
   own name already says what it is; the clear button is a real button with a
@@ -24,9 +25,10 @@ A `type="search"` field with a leading icon, a clear button while there is text,
   import type { HTMLInputAttributes } from 'svelte/elements';
   import IconButtonCore from '../ui/IconButtonCore.svelte';
   import Spinner from '../ui/Spinner.svelte';
-  import { inputSize, type FieldSize } from './field-types.ts';
+  import type { FieldSize } from './field-types.ts';
+  import TextInput from './TextInput.svelte';
 
-  interface Props extends Omit<HTMLInputAttributes, 'type' | 'value' | 'size'> {
+  interface Props extends Omit<HTMLInputAttributes, 'type' | 'value' | 'size' | 'prefix'> {
     /** Accessible name of the field. */
     label: string;
     /**
@@ -76,23 +78,11 @@ A `type="search"` field with a leading icon, a clear button while there is text,
   };
 </script>
 
-<div class={['input w-full', inputSize[size], className]}>
+{#snippet magnifier()}
   <Search class="size-4 opacity-60" aria-hidden="true" />
-  <input
-    {...rest}
-    type="search"
-    {name}
-    {placeholder}
-    aria-label={label}
-    bind:value
-    oninput={() => onInput?.(value)}
-    onkeydown={(event) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        onSubmit?.(value);
-      }
-    }}
-  />
+{/snippet}
+
+{#snippet status()}
   {#if pending}
     <Spinner decorative size="xs" />
   {:else if value !== ''}
@@ -100,4 +90,24 @@ A `type="search"` field with a leading icon, a clear button while there is text,
       {#snippet icon()}<X class="size-3.5" />{/snippet}
     </IconButtonCore>
   {/if}
-</div>
+{/snippet}
+
+<TextInput
+  {...rest}
+  type="search"
+  {name}
+  {placeholder}
+  {size}
+  class={className}
+  aria-label={label}
+  bind:value
+  leading={magnifier}
+  trailing={status}
+  oninput={() => onInput?.(value)}
+  onkeydown={(event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      onSubmit?.(value);
+    }
+  }}
+/>

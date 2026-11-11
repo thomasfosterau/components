@@ -34,3 +34,39 @@ test('the FieldControl wiring becomes aria-describedby and aria-invalid', async 
   await expect.element(field).toHaveAttribute('aria-invalid', 'true');
   await expect.element(field).toHaveClass('textarea-error');
 });
+
+test('showCount puts the count in the description', async () => {
+  const screen = await render(Textarea, { 'aria-label': 'Notes', maxlength: 280, showCount: true });
+  const field = screen.getByRole('textbox', { name: 'Notes' });
+
+  await userEvent.fill(field, 'a'.repeat(42));
+  await expect.element(field).toHaveAccessibleDescription('42 / 280');
+});
+
+test('autoGrow grows from minRows to maxRows, then scrolls', async () => {
+  const screen = await render(Textarea, {
+    'aria-label': 'Notes',
+    autoGrow: true,
+    minRows: 2,
+    maxRows: 4,
+  });
+  const field = screen.getByRole('textbox', { name: 'Notes' });
+  const element = field.element();
+  if (!(element instanceof HTMLTextAreaElement)) throw new TypeError('not a textarea');
+  const height = (): number => element.getBoundingClientRect().height;
+
+  await expect.element(field).toHaveAttribute('rows', '2');
+  await userEvent.fill(field, 'one');
+  const one = height();
+  await userEvent.fill(field, 'one\ntwo\nthree');
+  const three = height();
+  await userEvent.fill(field, Array.from({ length: 10 }, (_, i) => `line ${i}`).join('\n'));
+  const ten = height();
+
+  expect(one).toBeLessThan(three);
+  expect(three).toBeLessThan(ten);
+  await userEvent.fill(field, Array.from({ length: 20 }, (_, i) => `line ${i}`).join('\n'));
+  expect(height()).toBe(ten);
+  expect(element.scrollHeight).toBeGreaterThan(element.clientHeight);
+  await expect.element(field).toHaveClass('resize-y');
+});
