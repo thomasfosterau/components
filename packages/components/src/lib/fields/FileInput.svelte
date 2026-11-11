@@ -22,6 +22,8 @@ A native file input in daisyUI `file-input` styling, with the chosen `File` bind
   is announced and is available again on focus.
 -->
 <script lang="ts">
+  import { getComponentsContext } from '../context.svelte.ts';
+  import { formatBytes } from '../formatting/bytes.ts';
   import type { HTMLInputAttributes } from 'svelte/elements';
   import FieldErrors from './FieldErrors.svelte';
   import { fileInputSize, type FieldSize } from './field-types.ts';
@@ -36,7 +38,7 @@ A native file input in daisyUI `file-input` styling, with the chosen `File` bind
     maxBytes?: number | undefined;
     /**
      * Shown when the chosen file exceeds `maxBytes`.
-     * @defaultValue `'That file is too large.'`
+     * @defaultValue `'That file is too large. The limit is <maxBytes>.'`, the limit from `formatBytes` in the context's locale
      */
     tooLargeMessage?: string | undefined;
     /** Called with the accepted file, or `undefined` when the choice cleared it. */
@@ -65,7 +67,7 @@ A native file input in daisyUI `file-input` styling, with the chosen `File` bind
     file = $bindable(),
     accept,
     maxBytes,
-    tooLargeMessage = 'That file is too large.',
+    tooLargeMessage: tooLargeMessageProp,
     onSelect,
     size = 'md',
     invalid = false,
@@ -74,6 +76,14 @@ A native file input in daisyUI `file-input` styling, with the chosen `File` bind
     class: className,
     ...rest
   }: Props = $props();
+
+  const context = getComponentsContext();
+  const tooLargeMessage = $derived(
+    tooLargeMessageProp ??
+      (maxBytes === undefined
+        ? 'That file is too large.'
+        : `That file is too large. The limit is ${formatBytes(maxBytes, {}, context.locale())}.`),
+  );
 
   const uid = $props.id();
   const tooLargeId = `${uid}-too-large`;

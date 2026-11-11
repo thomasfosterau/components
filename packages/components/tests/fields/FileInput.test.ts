@@ -78,3 +78,16 @@ test('a file within the cap leaves no alert behind', async () => {
 
   expect(screen.getByRole('alert').elements()).toHaveLength(0);
 });
+
+test('the default too-large message names the limit, formatted', async () => {
+  const screen = await render(FileInput, {
+    'aria-label': 'Attachment',
+    maxBytes: 4_200_000,
+    'data-testid': 'file',
+  });
+
+  await screen.getByTestId('file').upload(textFile('big.txt', 4_300_000));
+  await expect
+    .element(screen.getByRole('alert'))
+    .toHaveTextContent('That file is too large. The limit is 4.2 MB.');
+});
