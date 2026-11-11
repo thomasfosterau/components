@@ -73,6 +73,14 @@ Every component that needs to resolve a link, navigate, know the current page or
 
 Every member is optional in the object you pass — an omitted one falls back individually to `defaultComponentsContext` (identity `href`, `window.location.assign` for navigation, pathname equality for `isCurrent`, runtime-default locale), so every component works unwired in a story or a test. The object's type is exported as `ComponentsContext` (every member required; `setComponentsContext` takes the same members, each optional), and `getComponentsContext()` reads the merged result back for a component of your own.
 
+**A skip link first.** Put `SkipLink` before everything else in the root layout, so it is the first Tab stop on every page, and render the page content in `Main` (whose default `id` is the link's default target):
+
+```svelte
+<SkipLink />
+<Navbar>…</Navbar>
+<Main>{@render children()}</Main>
+```
+
 **Passing i18n messages.** There is no message catalogue in this package — every accessible-name prop has an English default and nothing more. An app using [Paraglide](https://inlang.com/m/gerre34r/library-inlang-paraglideJs) (or any other i18n library) passes its own messages at the call site:
 
 ```svelte
@@ -229,7 +237,8 @@ The landmarks a page is assembled from, and the blocks that sit inside them. Str
 
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
-| `Main` | The page content column | `as? = 'main'` (`'main'\|'section'`) + `HTMLAttributes<HTMLElement>` | `children` | `<main>` is THE landmark, one per page |
+| `Main` | The page content column | `as? = 'main'` (`'main'\|'section'`), `id? = 'main-content'` as a `<main>` (the `SkipLink` default target) + `HTMLAttributes<HTMLElement>` | `children` | `<main>` is THE landmark, one per page |
+| `SkipLink` | "Skip to main content", the first Tab stop on every page | `target? = 'main-content'`, `label? = 'Skip to main content'`, `targets?: { id, label }[]` (several, in order) + `HTMLAnchorAttributes` | — | a real `<a href="#…">` (works without script), `sr-only` until focused, then shown at the top start above sticky headers; on activation a non-focusable target gets `tabindex="-1"` and focus (removed on blur), so the next Tab continues inside it. Put it first in the root layout |
 | `Hero` | The top of a landing or "about" page: headline, copy and calls to action | `title: string \| Snippet`, `description?`, `headingLevel? = 1`, `align?: 'start' \| 'center'`, `backgroundImage?`, `actionsLabel? = 'Actions'` | `actions?`, `figure?`, `children?` | A `<section>` named by its heading; `actions` is a `role="group"`; a background image is decorative CSS under an overlay, never an `<img>`. A page has one `<h1>`: don't pair a `Hero` with a `PageHeader` at level 1 |
 | `PageHeader` | What the page is about, and what you can do to it | `title: string \| Snippet`, `subtitle?`, `headingLevel? = 1`, `actionsLabel? = 'Page actions'` | `eyebrow?`, `icon?`, `meta?`, `actions?`, `children?` | `title` is a real heading; `actions` is a `role="group"` named by `actionsLabel`; `icon` is `aria-hidden` |
 | `AppShell` | The responsive app frame | `navOpen? ⚓`, `navLabel? = 'Menu'`, `navTitle? = 'Navigation'` | `sidebar`, `header?({ triggerProps })`, `children` | the sidebar is a plain column from `lg` up and a `Drawer side="start"` below it, with exactly one `navigation` landmark in the tree at any width; close it on navigation with `afterNavigate(() => (navOpen = false))` |

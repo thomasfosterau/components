@@ -28,6 +28,7 @@ export { default as Grid } from './Grid.svelte';
 export { default as HStack } from './HStack.svelte';
 export { default as Hero } from './Hero.svelte';
 export { default as Main } from './Main.svelte';
+export { default as SkipLink } from './SkipLink.svelte';
 export { default as Navbar } from './Navbar.svelte';
 export { default as PageHeader } from './PageHeader.svelte';
 export { default as Section } from './Section.svelte';
