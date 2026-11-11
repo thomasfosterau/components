@@ -148,7 +148,7 @@ A line, area or bar chart drawn as plain SVG from a declarative series spec, wit
 
   /** Five gridlines, the bottom one being the zero (or minimum) rule. */
   const ticks = $derived(
-    Array.from({ length: 5 }, (_unused, step) => min + ((max - min) / 4) * step).reverse(),
+    Array.from({ length: 5 }, (_unused, step) => min + ((max - min) / 4) * step).toReversed(),
   );
 
   // Bars share a category band: each series takes an equal slice of it, less a

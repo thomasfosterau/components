@@ -62,7 +62,7 @@ test('bare adds no layout and puts every dt/dd directly in the caller’s list',
 
   const list = document.querySelector('dl');
   // Only the caller's classes: none of the other variants' layout.
-  expect(list?.className.split(/\s+/).filter(Boolean).sort()).toEqual([
+  expect(list?.className.split(/\s+/).filter(Boolean).toSorted()).toEqual([
     'grid',
     'grid-cols-[auto_1fr]',
   ]);

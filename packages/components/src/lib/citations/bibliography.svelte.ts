@@ -54,7 +54,7 @@ export class BibliographyManager {
 
   /** Every collected source, in citation order. */
   citations(): readonly BibliographyEntry[] {
-    return [...this.#entries.values()].sort((a, b) => a.order - b.order);
+    return [...this.#entries.values()].toSorted((a, b) => a.order - b.order);
   }
 
   /** Register a footnote under a caller-supplied key. */

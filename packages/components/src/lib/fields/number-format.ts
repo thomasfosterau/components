@@ -82,7 +82,7 @@ export function parseNumber(
   const { group, decimal, literals } = numberSymbols(locales, options);
   let rest = text;
   // Longest first, so "US$" is removed before "$".
-  for (const literal of [...literals].sort((a, b) => b.length - a.length)) {
+  for (const literal of [...literals].toSorted((a, b) => b.length - a.length)) {
     rest = rest.split(literal).join('');
   }
   if (group.trim() === '') rest = rest.replace(SPACES, '');
