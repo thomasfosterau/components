@@ -251,6 +251,12 @@ export default defineConfig({
         rules: {
           ...effectTsgoRecommended.rules,
           ...effect.configs.recommended.rules,
+          // The owner's family-wide decision (2026-11-11): Effect helper
+          // modules are namespace-imported under the rule's canonical alias
+          // (`Arr`, `P`, `R`, `Str`, `Eq`, `Bool`; `Option`, `Schema` keep
+          // their names), never by named import. `recommended` already sets
+          // it to `error`; it is pinned here so a preset change cannot drop it.
+          'effect/prefer-namespace-imports': 'error',
         },
       },
       // The `/entity-form` renderer and its story are Svelte components in the
