@@ -87,3 +87,18 @@
     emptyMessage="No devices are registered to this account."
   />
 </Story>
+
+<Story name="Selection and columns">
+  <!-- Selections are keyed by row, so they survive the filter, a sort and a
+       page change; select-all covers the page on screen. -->
+  <DataGrid
+    rows={devices}
+    {columns}
+    {rowKey}
+    filterable
+    pageSize={5}
+    caption="Your devices"
+    selection="multiple"
+    columnMenu
+  />
+</Story>

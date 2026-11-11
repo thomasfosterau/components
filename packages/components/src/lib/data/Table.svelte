@@ -1,5 +1,5 @@
 <!-- @component
-A daisyUI `table` from column definitions and rows, with optional sortable headers and activatable rows.
+A daisyUI `table` from column definitions and rows, with optional sortable headers, activatable rows, row selection and reader-hideable columns.
 -->
 <!--
   Table — columns in, rows in, a daisyUI `table` out.
@@ -27,6 +27,27 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
   or a button inside a cell where the row's structure matters, and keep this
   for a grid whose whole row is one destination.
 
+  Selection (`selection="multiple" | "single"`) adds a first column of native
+  inputs: a checkbox per row with a tri-state select-all checkbox in the
+  header, or a radio per row sharing one `name` per table. The table stays a
+  `<table>` — this component has no `role="grid"` to extend, so there is no
+  `aria-selected`: the input's checked state IS the selection's semantics,
+  each input is an ordinary Tab stop, Space toggles a checkbox and the arrow
+  keys move a radio group, as natively. Select-all covers the rows in hand
+  (the current page) and never touches a selected key that is not on it. A
+  selected row also takes `bg-base-200`, never colour alone. Activation and
+  selection never share a gesture: the selection cell stops its clicks and
+  keys from reaching an activatable row's handler, and activating a row
+  selects nothing. (An activatable row is `role="button"`, whose children
+  are presentational, so a table that wants both reads better with a link in
+  a cell than with `onSelect`.)
+
+  `hiddenColumns` removes a column's `<th>` and `<td>`s — not CSS — so a
+  screen reader's column count is the one on screen; `columnMenu` offers it
+  to the reader as a `menu` of `menuitemcheckbox`es. The first column names
+  the row and is never hidden. The count, the bulk actions and the menu live
+  in `TableToolbar` (see its header).
+
   The empty state is not an optional nicety: a table body with no rows and no
   explanation reads as broken, and only the caller knows whether "nothing"
   means "none yet" or "none matched".
@@ -35,15 +56,21 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes, HTMLTableAttributes } from 'svelte/elements';
   import type { Size } from '../ui/tones.ts';
+  import TableToolbar from './TableToolbar.svelte';
   import {
     columnAriaSort,
+    defaultHiddenColumns,
+    isColumnHideable,
     nextSortState,
+    pageSelectionState,
+    withKeys,
     type SortState,
+    type TableChoiceProps,
     type TableColumn,
     type TableRowAttributes,
   } from './table-types.ts';
 
-  interface Props extends Omit<HTMLTableAttributes, 'children'> {
+  interface Props extends Omit<HTMLTableAttributes, 'children'>, TableChoiceProps<T> {
     /** The rows to draw, in the order to draw them. */
     rows: readonly T[];
     /** Column definitions: header, cell renderer, sort key. */
@@ -111,6 +138,17 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
     foot,
     sortLabel = (column) => `Sort by ${column.header}`,
     containerClass,
+    selection = 'none',
+    selected = $bindable(new Set<string>()),
+    onSelectionChange,
+    selectRowLabel = (row) => `Select ${columns[0] === undefined ? '' : String(columns[0].value(row))}`,
+    selectAllLabel = 'Select all on this page',
+    selectColumnLabel = 'Select',
+    bulkActions,
+    selectedCountLabel = (count) => `${count} selected`,
+    hiddenColumns = $bindable(undefined),
+    columnMenu = false,
+    columnMenuLabel = 'Columns',
     class: className,
     ...rest
   }: Props = $props();
@@ -128,6 +166,44 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
     column.align === 'end' ? 'text-end' : 'text-start',
     column.class,
   ];
+
+  const radioName = $props.id();
+
+  const hidden = $derived(hiddenColumns ?? defaultHiddenColumns(columns));
+  const shownColumns = $derived(
+    columns.filter((column, index) => !(isColumnHideable(column, index) && hidden.has(column.key))),
+  );
+  const selectable = $derived(selection !== 'none');
+  const pageKeys = $derived(rows.map((row) => rowKey(row)));
+  const pageState = $derived(pageSelectionState(selected, pageKeys));
+
+  const select = (next: Set<string>): void => {
+    selected = next;
+    onSelectionChange?.(next);
+  };
+
+  const columnChoices = $derived(
+    columnMenu
+      ? columns.map((column, index) => ({
+          key: column.key,
+          header: column.header,
+          hideable: isColumnHideable(column, index),
+          visible: !(isColumnHideable(column, index) && hidden.has(column.key)),
+        }))
+      : [],
+  );
+
+  const toggleColumn = (key: string, visible: boolean): void => {
+    hiddenColumns = withKeys(hidden, [key], !visible);
+  };
+
+  /**
+   * Keeps the selection cell's clicks and keys from the row: a row that is
+   * activatable would otherwise open when the reader only meant to include it.
+   */
+  const isolate = (event: Event): void => {
+    event.stopPropagation();
+  };
 
   const toggleSort = (column: TableColumn<T>): void => {
     const next = nextSortState(sort, column.key);
@@ -171,6 +247,144 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
   {#if column.cell}{@render column.cell(row)}{:else}{column.value(row)}{/if}
 {/snippet}
 
+{#snippet selectHeader()}
+  <th scope="col" class="w-0">
+    {#if selection === 'multiple'}
+      <input
+        type="checkbox"
+        class="checkbox checkbox-sm"
+        aria-label={selectAllLabel}
+        disabled={pageKeys.length === 0}
+        bind:checked={
+          () => pageState === 'all',
+          (checked) => {
+            select(withKeys(selected, pageKeys, checked));
+          }
+        }
+        bind:indeterminate={
+          () => pageState === 'some',
+          () => {
+            // The browser clears it on click; the derived state puts it back if due.
+          }
+        }
+      />
+    {:else}
+      <span class="sr-only">{selectColumnLabel}</span>
+    {/if}
+  </th>
+{/snippet}
+
+{#snippet selectCell(row: T, key: string)}
+  <td class="w-0" onclick={isolate} onkeydown={isolate}>
+    {#if selection === 'multiple'}
+      <input
+        type="checkbox"
+        class="checkbox checkbox-sm"
+        aria-label={selectRowLabel(row)}
+        bind:checked={
+          () => selected.has(key),
+          (checked) => {
+            select(withKeys(selected, [key], checked));
+          }
+        }
+      />
+    {:else}
+      <input
+        type="radio"
+        class="radio radio-sm"
+        name={radioName}
+        value={key}
+        aria-label={selectRowLabel(row)}
+        checked={selected.has(key)}
+        onchange={() => {
+          select(new Set([key]));
+        }}
+      />
+    {/if}
+  </td>
+{/snippet}
+
+{#snippet columnHeader(column: TableColumn<T>)}
+  <th
+    scope="col"
+    class={[columnClass(column), column.headerClass]}
+    aria-sort={column.sortable ? columnAriaSort(sort, column.key) : undefined}
+  >
+    {#if column.sortable}
+      <button
+        type="button"
+        class="link link-hover inline-flex items-center gap-1"
+        onclick={() => {
+          toggleSort(column);
+        }}
+        aria-label={sortLabel(column)}
+      >
+        {column.header}
+        <span aria-hidden="true" class="text-xs">{sortIndicator(column.key)}</span>
+      </button>
+    {:else}
+      {column.header}
+    {/if}
+  </th>
+{/snippet}
+
+{#snippet bodyRow(row: T)}
+  {@const own = rowAttributes?.(row)}
+  {@const key = rowKey(row)}
+  <tr
+    {...activation(row)}
+    id={own?.id}
+    class={[
+      'hover:bg-base-200',
+      onSelect !== undefined && 'cursor-pointer',
+      selectable && selected.has(key) && 'bg-base-200',
+      own?.class,
+    ]}
+  >
+    {#if selectable}{@render selectCell(row, key)}{/if}
+    {#each shownColumns as column (column.key)}
+      {#if column.rowHeader}
+        <th scope="row" class={['font-normal', columnClass(column)]}>{@render cellBody(column, row)}</th>
+      {:else}
+        <td class={columnClass(column)}>{@render cellBody(column, row)}</td>
+      {/if}
+    {/each}
+  </tr>
+{/snippet}
+
+{#snippet body()}
+<tbody>
+  {#if rows.length === 0}
+    <tr>
+      <!-- Without the colspan the message sits under the first column and
+           the table looks like it lost its data rather than never had any. -->
+      <td colspan={shownColumns.length + (selectable ? 1 : 0)} class="text-base-content/60 py-8 text-center">
+        {#if emptyState}{@render emptyState()}{:else}{emptyMessage}{/if}
+      </td>
+    </tr>
+  {:else}
+    {#each rows as row (rowKey(row))}
+      {@render bodyRow(row)}
+    {/each}
+  {/if}
+</tbody>
+{/snippet}
+
+{#if selectable || columnMenu}
+  <TableToolbar
+    {selectable}
+    {selected}
+    clear={() => {
+      select(new Set());
+    }}
+    {bulkActions}
+    {selectedCountLabel}
+    {columnChoices}
+    {columnMenuLabel}
+    onColumnToggle={toggleColumn}
+  />
+{/if}
+
 <div class={['overflow-x-auto', containerClass]}>
   <table
     {...rest}
@@ -189,59 +403,13 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
     {/if}
     <thead>
       <tr>
-        {#each columns as column (column.key)}
-          <th
-            scope="col"
-            class={[columnClass(column), column.headerClass]}
-            aria-sort={column.sortable ? columnAriaSort(sort, column.key) : undefined}
-          >
-            {#if column.sortable}
-              <button
-                type="button"
-                class="link link-hover inline-flex items-center gap-1"
-                onclick={() => {
-                  toggleSort(column);
-                }}
-                aria-label={sortLabel(column)}
-              >
-                {column.header}
-                <span aria-hidden="true" class="text-xs">{sortIndicator(column.key)}</span>
-              </button>
-            {:else}
-              {column.header}
-            {/if}
-          </th>
+        {#if selectable}{@render selectHeader()}{/if}
+        {#each shownColumns as column (column.key)}
+          {@render columnHeader(column)}
         {/each}
       </tr>
     </thead>
-    <tbody>
-      {#if rows.length === 0}
-        <tr>
-          <!-- Without the colspan the message sits under the first column and
-               the table looks like it lost its data rather than never had any. -->
-          <td colspan={columns.length} class="text-base-content/60 py-8 text-center">
-            {#if emptyState}{@render emptyState()}{:else}{emptyMessage}{/if}
-          </td>
-        </tr>
-      {:else}
-        {#each rows as row (rowKey(row))}
-          {@const own = rowAttributes?.(row)}
-          <tr
-            {...activation(row)}
-            id={own?.id}
-            class={['hover:bg-base-200', onSelect !== undefined && 'cursor-pointer', own?.class]}
-          >
-            {#each columns as column (column.key)}
-              {#if column.rowHeader}
-                <th scope="row" class={['font-normal', columnClass(column)]}>{@render cellBody(column, row)}</th>
-              {:else}
-                <td class={columnClass(column)}>{@render cellBody(column, row)}</td>
-              {/if}
-            {/each}
-          </tr>
-        {/each}
-      {/if}
-    </tbody>
+    {@render body()}
     {#if foot}
       <tfoot>
         <tr>{@render foot()}</tr>

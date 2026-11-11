@@ -11,10 +11,10 @@ import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import DataGridFixture from './fixtures/DataGridFixture.svelte';
 
-/** The body rows' first cells, in render order. */
+/** The body rows' first data cells (past any selection cell), in render order. */
 const names = (): string[] =>
   [...document.querySelectorAll('tbody tr')].map(
-    (row) => row.querySelector('td')?.textContent?.trim() ?? '',
+    (row) => row.querySelector('td:not(:has(input))')?.textContent?.trim() ?? '',
   );
 
 test('cycles a column through ascending, descending and back to the caller’s order', async () => {
@@ -117,4 +117,43 @@ test('hides the pager entirely when the result is empty', async () => {
 
   await expect.element(screen.getByText('No plants.')).toBeInTheDocument();
   expect(screen.getByRole('navigation').elements()).toHaveLength(0);
+});
+
+/** The fixture's bound selection, sorted. */
+const selectedKeys = (): string =>
+  document.querySelector('[data-testid="selected"]')?.textContent ?? '';
+
+test('keeps selections by key across sorting, filtering and paging', async () => {
+  const screen = await render(DataGridFixture, {
+    selection: 'multiple',
+    pageSize: 2,
+    filterable: true,
+  });
+
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Select all on this page' }));
+  expect(selectedKeys()).toBe('basil,tomato');
+
+  // Page 2 starts unselected and leaves page 1's selections alone.
+  await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+  const all = screen.getByRole('checkbox', { name: 'Select all on this page' });
+  await expect.element(all).not.toBeChecked();
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Select Garlic' }));
+  expect(selectedKeys()).toBe('basil,garlic,tomato');
+
+  await userEvent.click(screen.getByRole('button', { name: 'Previous' }));
+  await expect.element(screen.getByRole('checkbox', { name: 'Select Basil' })).toBeChecked();
+
+  // A sort reorders the rows; the boxes follow the rows, not the positions.
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Select Tomato' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Sort by Count' }));
+  expect(names()).toEqual(['Tomato', 'Basil']);
+  await expect.element(screen.getByRole('checkbox', { name: 'Select Tomato' })).not.toBeChecked();
+  await expect.element(screen.getByRole('checkbox', { name: 'Select Basil' })).toBeChecked();
+
+  // A filter hides rows without deselecting them.
+  await userEvent.fill(screen.getByRole('searchbox', { name: 'Search' }), 'gar');
+  expect(names()).toEqual(['Garlic']);
+  await expect.element(screen.getByRole('checkbox', { name: 'Select Garlic' })).toBeChecked();
+  expect(selectedKeys()).toBe('basil,garlic');
+  await expect.element(screen.getByRole('status')).toHaveTextContent('2 selected');
 });
