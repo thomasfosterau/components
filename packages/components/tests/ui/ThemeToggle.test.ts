@@ -75,3 +75,17 @@ test('the icons say nothing the switch does not', async () => {
 
   await expect.element(screen.getByRole('switch')).toHaveAccessibleName('Toggle dark mode');
 });
+
+test('the icons are a Swap that follows the switch', async () => {
+  const screen = await render(ThemeToggle, {
+    lightTheme: 'light',
+    darkTheme: 'dark',
+    storageKey: STORAGE_KEY,
+  });
+
+  const swap = screen.container.querySelector('.swap');
+  expect(swap?.getAttribute('aria-hidden')).toBe('true');
+  expect(swap?.classList.contains('swap-active')).toBe(false);
+  await userEvent.click(screen.getByRole('switch'));
+  expect(swap?.classList.contains('swap-active')).toBe(true);
+});

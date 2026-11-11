@@ -437,3 +437,13 @@ export const indicatorPlacement: Record<IndicatorPlacement, string> = {
   'bottom-center': 'indicator-bottom indicator-center',
   'bottom-end': 'indicator-bottom indicator-end',
 };
+
+/** The transition a `Swap` uses between its faces. */
+export type SwapEffect = 'fade' | 'rotate' | 'flip';
+
+/** Literal daisyUI class per `SwapEffect` for `Swap`; a lookup table so Tailwind's scanner sees every class. */
+export const swapEffect: Record<SwapEffect, string> = {
+  fade: '',
+  rotate: 'swap-rotate',
+  flip: 'swap-flip',
+};
