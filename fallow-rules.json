@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/rule-pack-schema.json",
   "version": 1,
   "name": "components-boundaries",
-  "description": "The import boundaries AGENTS.md and the package CLAUDE.md files state, as policy-violation findings. Relative imports across packages and the charts layering are .fallowrc.json's zones; this pack covers what a zone cannot see: package-name and external specifiers.",
+  "description": "The import boundaries AGENTS.md and the package AGENTS.md files state, as policy-violation findings. Relative imports across packages and the charts layering are .fallowrc.json's zones; this pack covers what a zone cannot see: package-name and external specifiers.",
   "rules": [
     {
       "id": "no-sveltekit-app-modules",
@@ -16,7 +16,7 @@
       "kind": "banned-import",
       "specifiers": ["effect"],
       "files": ["packages/components/src/lib/**", "packages/mapbox/src/lib/**"],
-      "message": "`effect` is not a peer of the Svelte packages. Only the /entity-form entry reaches it, and only through @thomasfosterau/effect-forms-svelte (packages/components/CLAUDE.md § Boundary)."
+      "message": "`effect` is not a peer of the Svelte packages. Only the /entity-form entry reaches it, and only through @thomasfosterau/effect-forms-svelte (packages/components/AGENTS.md § Boundary)."
     },
     {
       "id": "form-library-only-in-entity-form",
@@ -61,14 +61,14 @@
       "specifiers": ["effect"],
       "files": ["packages/charts/src/**"],
       "exclude": ["packages/charts/src/spec/**"],
-      "message": "Effect stays inside packages/charts/src/spec, and never in a published type (packages/charts/CLAUDE.md § Boundary)."
+      "message": "Effect stays inside packages/charts/src/spec, and never in a published type (packages/charts/AGENTS.md § Boundary)."
     },
     {
       "id": "charts-independent",
       "kind": "banned-import",
       "specifiers": ["@thomasfosterau/components", "@thomasfosterau/components-mapbox"],
       "files": ["packages/charts/src/**"],
-      "message": "@thomasfosterau/charts is independent of the Svelte packages (packages/charts/CLAUDE.md § Boundary)."
+      "message": "@thomasfosterau/charts is independent of the Svelte packages (packages/charts/AGENTS.md § Boundary)."
     },
     {
       "id": "svelte-packages-independent-of-charts",
@@ -91,7 +91,7 @@
         "@thomasfosterau/components/theme.css"
       ],
       "files": ["packages/mapbox/src/lib/**"],
-      "message": "packages/mapbox consumes the core only through its published /canvas entry (packages/mapbox/CLAUDE.md § Boundary). The bare root import is banned by the root vite.config.ts's no-restricted-imports, which can match it exactly."
+      "message": "packages/mapbox consumes the core only through its published /canvas entry (packages/mapbox/AGENTS.md § Boundary). The bare root import is banned by the root vite.config.ts's no-restricted-imports, which can match it exactly."
     }
   ]
 }

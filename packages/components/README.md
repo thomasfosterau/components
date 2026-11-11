@@ -997,7 +997,7 @@ store.register({
 
 Rules it enforces rather than leaving to the caller: one y axis (two measures of different scale are two charts); the zero line is always drawn; identity is never colour alone (a legend for 2+ series, a direct end-of-line label for ≤4); the numbers are always readable as a `<table>`, visually hidden by default. `key` is stable identity and picks the colour, so a filtered-out series never repaints the survivors that remain.
 
-Series colours come from four validated theme slots, `--color-chart-1…4`, assigned by series order and never cycled — a fifth series draws in `--color-neutral` and the legend says which one it is. See [`theme.css`](https://github.com/thomasfosterau/components/blob/trunk/packages/components/src/lib/theme.css) for the measured separations, and the [package guide's Terms section](https://github.com/thomasfosterau/components/blob/trunk/packages/components/CLAUDE.md#terms) for the rules those measurements exist to keep.
+Series colours come from four validated theme slots, `--color-chart-1…4`, assigned by series order and never cycled — a fifth series draws in `--color-neutral` and the legend says which one it is. See [`theme.css`](https://github.com/thomasfosterau/components/blob/trunk/packages/components/src/lib/theme.css) for the measured separations, and the [package guide's Terms section](https://github.com/thomasfosterau/components/blob/trunk/packages/components/AGENTS.md#terms) for the rules those measurements exist to keep.
 
 ## canvas
 

@@ -18,7 +18,7 @@ The interactive Mapbox GL map, panned and zoomed, with a fallback when WebGL is 
     bundle, and a constructor that throws all land on the same `catch` below,
     and `unavailableLabel`. That is the branch the browser tests drive, by
     mocking `mapbox-gl` with a `Map` whose constructor throws
-    (packages/mapbox/CLAUDE.md § Testing).
+    (packages/mapbox/AGENTS.md § Testing).
 
   ## ARIA contract
 

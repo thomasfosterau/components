@@ -2,7 +2,7 @@
  * Fails the build when a published type definition mentions `effect`.
  *
  * Effect Schema is an implementation detail of the spec entry (the
- * isolation invariant in CLAUDE.md): consumers see plain TypeScript types and
+ * isolation invariant in AGENTS.md): consumers see plain TypeScript types and
  * never need Effect's types to compile. A `.d.mts` that names it would make
  * every consumer's type-check depend on Effect's, so it is caught here,
  * against the emitted `dist/`, rather than trusted to review.

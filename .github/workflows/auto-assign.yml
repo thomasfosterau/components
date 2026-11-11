@@ -1,0 +1,40 @@
+name: Auto-assign
+
+# Assigns the owner to every pull request when it opens (or reopens, or
+# leaves draft), so each one is on their list without a manual step.
+#
+# `pull_request`, never `pull_request_target`: nothing here needs the base
+# repository's secrets, and there is no checkout at all, so no PR code runs.
+# The token is the job's own GITHUB_TOKEN with `pull-requests: write` alone.
+# Skipped when the PR already has an assignee, for Dependabot (its token is
+# read-only; dependabot.yml assigns its PRs itself), and for a fork's PR
+# (whose token is read-only too).
+#
+# Known gap: the "chore: version packages" PR is opened by the Changesets
+# action with GITHUB_TOKEN, and events from GITHUB_TOKEN do not trigger other
+# workflows, so this does not run for it.
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+
+# Nothing by default; the job grants exactly what it uses.
+permissions: {}
+
+jobs:
+  assign:
+    name: Assign the owner
+    if: >-
+      github.actor != 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      toJSON(github.event.pull_request.assignees) == '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Assign thomasfosterau
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr edit "$PR_URL" --add-assignee thomasfosterau

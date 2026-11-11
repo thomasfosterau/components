@@ -264,7 +264,7 @@ export default defineConfig({
       // `createForm` and types but never `effect` itself: `effect` is a peer
       // of the form library, not of `@thomasfosterau/components`, so an
       // import of it here would be an undeclared dependency of the published
-      // package (packages/components/CLAUDE.md § Boundary). Every fix these
+      // package (packages/components/AGENTS.md § Boundary). Every fix these
       // three rules offer is an `effect` import (`Option`, `effect/Record`,
       // `Predicate.isTagged` / `Match`), so none can apply here; and a
       // component's optional props are `T | undefined` by the workspace's
