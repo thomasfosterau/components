@@ -27,12 +27,14 @@ export { default as Footer } from './Footer.svelte';
 export { default as Grid } from './Grid.svelte';
 export { default as HStack } from './HStack.svelte';
 export { default as Hero } from './Hero.svelte';
+export { default as ListDetailLayout } from './ListDetailLayout.svelte';
 export { default as Main } from './Main.svelte';
 export { default as Navbar } from './Navbar.svelte';
 export { default as PageHeader } from './PageHeader.svelte';
 export { default as Section } from './Section.svelte';
 export { default as Sidebar } from './Sidebar.svelte';
 export { default as Spacer } from './Spacer.svelte';
+export { default as SupportingPane } from './SupportingPane.svelte';
 export { default as Tabs } from './Tabs.svelte';
 export { default as VStack } from './VStack.svelte';
 

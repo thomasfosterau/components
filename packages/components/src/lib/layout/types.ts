@@ -68,3 +68,52 @@ export const tabsSize: Record<Size, string> = {
   lg: 'tabs-lg',
   xl: 'tabs-xl',
 };
+
+/** The width class at which an adaptive layout's panes sit side by side. */
+export type ExpandAt = 'md' | 'lg' | 'xl';
+
+/** The media query for each {@link ExpandAt}: Tailwind's default breakpoints. */
+export const expandQuery: Record<ExpandAt, string> = {
+  md: '(min-width: 48rem)',
+  lg: '(min-width: 64rem)',
+  xl: '(min-width: 80rem)',
+};
+
+/**
+ * A pane shown only from the breakpoint up (hidden on compact widths), and a
+ * pane shown on compact widths but also from the breakpoint up. Literal so
+ * Tailwind's scanner sees every class.
+ */
+export const paneFromBreakpoint: Record<ExpandAt, string> = {
+  md: 'hidden md:flex',
+  lg: 'hidden lg:flex',
+  xl: 'hidden xl:flex',
+};
+
+/** The two-column grid of a `ListDetailLayout`, from its breakpoint up. */
+export const listDetailGrid: Record<ExpandAt, string> = {
+  md: 'md:grid md:grid-cols-[var(--list-width)_1fr]',
+  lg: 'lg:grid lg:grid-cols-[var(--list-width)_1fr]',
+  xl: 'xl:grid xl:grid-cols-[var(--list-width)_1fr]',
+};
+
+/** The list pane's border, from the breakpoint up, where it sits beside the detail. */
+export const listDivider: Record<ExpandAt, string> = {
+  md: 'md:border-e md:border-base-300',
+  lg: 'lg:border-e lg:border-base-300',
+  xl: 'xl:border-e xl:border-base-300',
+};
+
+/** The Back link of a `ListDetailLayout`, shown only on compact widths. */
+export const compactOnly: Record<ExpandAt, string> = {
+  md: 'md:hidden',
+  lg: 'lg:hidden',
+  xl: 'xl:hidden',
+};
+
+/** The list pane's width: data, set as the `--list-width` custom property. */
+export const listWidth: Record<'sm' | 'md' | 'lg', string> = {
+  sm: '20rem',
+  md: '24rem',
+  lg: '28rem',
+};
