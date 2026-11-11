@@ -18,6 +18,8 @@
  */
 
 export { default as AppShell } from './AppShell.svelte';
+export { default as BottomNav } from './BottomNav.svelte';
+export { default as BottomNavItem } from './BottomNavItem.svelte';
 export { default as Breadcrumbs } from './Breadcrumbs.svelte';
 export { default as Cluster } from './Cluster.svelte';
 export { default as DetailLayout } from './DetailLayout.svelte';

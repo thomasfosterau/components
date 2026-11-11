@@ -233,6 +233,8 @@ The landmarks a page is assembled from, and the blocks that sit inside them. Str
 | `Hero` | The top of a landing or "about" page: headline, copy and calls to action | `title: string \| Snippet`, `description?`, `headingLevel? = 1`, `align?: 'start' \| 'center'`, `backgroundImage?`, `actionsLabel? = 'Actions'` | `actions?`, `figure?`, `children?` | A `<section>` named by its heading; `actions` is a `role="group"`; a background image is decorative CSS under an overlay, never an `<img>`. A page has one `<h1>`: don't pair a `Hero` with a `PageHeader` at level 1 |
 | `PageHeader` | What the page is about, and what you can do to it | `title: string \| Snippet`, `subtitle?`, `headingLevel? = 1`, `actionsLabel? = 'Page actions'` | `eyebrow?`, `icon?`, `meta?`, `actions?`, `children?` | `title` is a real heading; `actions` is a `role="group"` named by `actionsLabel`; `icon` is `aria-hidden` |
 | `AppShell` | The responsive app frame | `navOpen? ⚓`, `navLabel? = 'Menu'`, `navTitle? = 'Navigation'` | `sidebar`, `header?({ triggerProps })`, `children` | the sidebar is a plain column from `lg` up and a `Drawer side="start"` below it, with exactly one `navigation` landmark in the tree at any width; close it on navigation with `afterNavigate(() => (navOpen = false))` |
+| `BottomNav` | The phone's primary navigation, on daisyUI `dock` | `label? = 'Primary'`, `size? = 'md'`, `fixed? = true` + `HTMLAttributes<HTMLElement>` | `children` (the `BottomNavItem`s) | `<nav aria-label>` around a list of links; no bits-ui and no `Menu`; fixed, it sets `--bottom-nav-height` on the root so the page can pad (`pb-(--bottom-nav-height)`) |
+| `BottomNavItem` | One destination | `href` (through the context), `label`, `current?` (else the context's `isCurrent`), `badge?`, `badgeLabel? = (b) => \`${b} new\``+`HTMLAnchorAttributes` | `icon` | the name is `label` plus the badge's words, never the icon (`aria-hidden`); current is `aria-current="page"` + `dock-active`, never `aria-selected` |
 | `Breadcrumbs` | The ancestor trail | `items: readonly Crumb[]`, `label? = 'Breadcrumb'` | `item?(crumb, index)` | `<nav aria-label>` + `<ol>`; ancestors are links, the trailing crumb is text with `aria-current="page"` |
 | `Navbar` | The site banner | `label? = 'Primary'`, `menuLabel? = 'Menu'`, `menuOpen? ⚓` | `start`, `center?`, `end?`, `menu?` | `<header>` (`banner`) > `<nav aria-label>`; the responsive toggle is a bits-ui `Collapsible` |
 | `Footer` | The site footer | — + `HTMLAttributes<HTMLElement>` | `children`, `aside?` | `<footer>` (`contentinfo`); `aside` renders first |
@@ -243,6 +245,17 @@ The landmarks a page is assembled from, and the blocks that sit inside them. Str
 | `Tabs` | One strip, two things | `items: readonly TabItem[]`, `mode? = 'panels'`, `value? ⚓`, `label? = 'Sections'`, `variant? = 'border'`, `size? = 'md'` | `panel?(item)` | panels: bits-ui `Tabs` (tablist/tab/tabpanel, roving tabindex, arrows); links: `<nav>` of anchors with `aria-current="page"` |
 | `FilterBar` | The filter row above a list | `options: readonly FilterOption[]`, `label` | — | `<nav aria-label>` of `btn`-styled anchors; the active one carries `aria-current="page"` |
 | `Sidebar` | The standing navigation column | `label?`, `title?`, `headingLevel? = 2` | `brand?`, `footer?`, `children` (the `MenuItem`s) | the landmark is `Menu`'s; deliberately not an `<aside>` — `complementary` is the wrong landmark for primary navigation; for narrow viewports put it in an `AppShell` |
+
+**`Sidebar` or `BottomNav`?** The same destinations, by width: a standing `Sidebar` from `sm` up, a `BottomNav` below it. Hide the inactive one with `hidden` / `sm:hidden` (never `invisible` or opacity), so exactly one "Primary" navigation landmark is in the tree, and pad the page for the fixed bar:
+
+```svelte
+<Sidebar class="hidden sm:block" label="Primary">…</Sidebar>
+<Main class="pb-(--bottom-nav-height) sm:pb-0">…</Main>
+<BottomNav class="sm:hidden">
+  <BottomNavItem href="/gardens" label="Gardens" icon={gardensIcon} />
+  <BottomNavItem href="/taxa" label="Taxa" icon={taxaIcon} />
+</BottomNav>
+```
 
 `layout` also exports `types.ts` (`Crumb`, `TabItem`, `FilterOption`, `TabsMode`, `TabsVariant`, `tabsVariant`, `tabsSize`).
 
