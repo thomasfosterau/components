@@ -33,3 +33,8 @@
     <Checkbox size="lg" label="Large" checked />
   </div>
 </Story>
+
+<Story name="Mixed">
+  <!-- `indeterminate` is the platform's mixed state, drawn as a dash; a click settles it to checked. -->
+  <Checkbox label="Some beds watered" indeterminate />
+</Story>

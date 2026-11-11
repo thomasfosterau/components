@@ -15,6 +15,11 @@ A daisyUI `checkbox` with its label in the same `<label>`, so the whole row is t
   so `checked` is the state assistive technology reads and Space toggles it
   with no script. `describedBy` and `invalid` tie it to an enclosing group's
   hint and errors when there is one.
+
+  Mixed state: `indeterminate` binds the input's `indeterminate` PROPERTY
+  (there is no attribute), which the platform exposes as "mixed" and daisyUI
+  draws as a dash, so it is never colour alone. No `aria-checked` — it is
+  invalid on a native checkbox.
 -->
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
@@ -25,6 +30,12 @@ A daisyUI `checkbox` with its label in the same `<label>`, so the whole row is t
     label: string;
     /** Whether the box is ticked. Bindable. */
     checked?: boolean | undefined;
+    /**
+     * Show the mixed state ("some of these"). A click clears it and ticks the
+     * box, as the platform does. Bindable.
+     * @defaultValue `false`
+     */
+    indeterminate?: boolean | undefined;
     /**
      * daisyUI size step.
      * @defaultValue `'md'`
@@ -48,6 +59,7 @@ A daisyUI `checkbox` with its label in the same `<label>`, so the whole row is t
   let {
     label,
     checked = $bindable(false),
+    indeterminate = $bindable(false),
     size = 'md',
     invalid = false,
     describedBy = '',
@@ -62,6 +74,7 @@ A daisyUI `checkbox` with its label in the same `<label>`, so the whole row is t
     {...rest}
     type="checkbox"
     bind:checked
+    bind:indeterminate
     aria-invalid={invalid ? 'true' : undefined}
     aria-describedby={describedBy === '' ? undefined : describedBy}
     class={['checkbox', checkboxSize[size], invalid && 'checkbox-error']}
