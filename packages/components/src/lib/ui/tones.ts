@@ -187,6 +187,16 @@ export const dividerOrientation: Record<'horizontal' | 'vertical', string> = {
   vertical: 'divider-horizontal',
 };
 
+/** Where a `Carousel` snaps each slide within its viewport. */
+export type CarouselAlign = 'start' | 'center' | 'end';
+
+/** Literal daisyUI class per `CarouselAlign` for `Carousel`; a lookup table so Tailwind's scanner sees every class. */
+export const carouselAlign: Record<CarouselAlign, string> = {
+  start: 'carousel-start',
+  center: 'carousel-center',
+  end: 'carousel-end',
+};
+
 /** The daisyUI `loading` shapes `Spinner` draws. */
 export type SpinnerVariant = 'spinner' | 'dots' | 'ring' | 'ball' | 'bars' | 'infinity';
 
