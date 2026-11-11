@@ -43,8 +43,8 @@ catalogs:
       specifier: ^7.0.1
       version: 7.0.1
     '@thomasfosterau/effect-forms-svelte':
-      specifier: ^0.3.1
-      version: 0.3.1
+      specifier: ^0.3.2
+      version: 0.3.2
     '@types/d3-scale':
       specifier: ^4.0.9
       version: 4.0.9
@@ -269,7 +269,7 @@ importers:
         version: 7.0.1(@testing-library/dom@10.4.2)(vitest@5.0.5)
       '@thomasfosterau/effect-forms-svelte':
         specifier: 'catalog:'
-        version: 0.3.1(@sveltejs/kit@3.1.1(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3))(effect@4.1.2)(svelte@5.57.3)
+        version: 0.3.2(@sveltejs/kit@3.1.1(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3))(effect@4.1.2)(svelte@5.57.3)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -1579,8 +1579,8 @@ packages:
     peerDependencies:
       '@testing-library/dom': '>=7.21.4'
 
-  '@thomasfosterau/effect-forms-svelte@0.3.1':
-    resolution: {integrity: sha512-6RmITtZu0Eji2mx0leRCMSlVVCIis+3cQ3TxXqQT00RoXIcRh5pJUiQ/TnW/5dgDl7gxaAkABcJ/CasKxSSK3Q==}
+  '@thomasfosterau/effect-forms-svelte@0.3.2':
+    resolution: {integrity: sha512-GoqjvLyRVIAn4idZ1h5USkTDmV7ouboa+JKViSVbqVBOSVkay1WhAQKhugbCvwy/tS5SYl0m/HmHgrQ/iCyFhg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       '@sveltejs/kit': 3.1.1
@@ -1593,8 +1593,8 @@ packages:
       '@thomasfosterau/effect-jsonapi':
         optional: true
 
-  '@thomasfosterau/effect-forms@0.3.1':
-    resolution: {integrity: sha512-7sv2VhlXrd7AABcV+DuQHIiOo37QvvYf6yA0v7k+vLdvanNoIgHNOPJer67hlODZWYNDNex9QP2WjPPU3fC0fg==}
+  '@thomasfosterau/effect-forms@0.3.2':
+    resolution: {integrity: sha512-w+qFvad1vYHMUGr1PQT/NaHvaA/mcy0486O91DJq6hgQMYGv1Ig9N3B3m0ZnVSSVzkREwF1bpRVo30dVPZd3sA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       effect: 4.1.2
@@ -4178,15 +4178,15 @@ snapshots:
     dependencies:
       '@testing-library/dom': 10.4.2
 
-  '@thomasfosterau/effect-forms-svelte@0.3.1(@sveltejs/kit@3.1.1(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3))(effect@4.1.2)(svelte@5.57.3)':
+  '@thomasfosterau/effect-forms-svelte@0.3.2(@sveltejs/kit@3.1.1(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3))(effect@4.1.2)(svelte@5.57.3)':
     dependencies:
-      '@thomasfosterau/effect-forms': 0.3.1(effect@4.1.2)
+      '@thomasfosterau/effect-forms': 0.3.2(effect@4.1.2)
       effect: 4.1.2
       svelte: 5.57.3
     optionalDependencies:
       '@sveltejs/kit': 3.1.1(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3)
 
-  '@thomasfosterau/effect-forms@0.3.1(effect@4.1.2)':
+  '@thomasfosterau/effect-forms@0.3.2(effect@4.1.2)':
     dependencies:
       effect: 4.1.2
 
