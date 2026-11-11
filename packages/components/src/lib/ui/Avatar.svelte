@@ -24,12 +24,27 @@ A person's or entity's picture in daisyUI's `avatar` frame, with an initials (or
     twice (WCAG technique H67).
   - Presence is never colour alone: the ring is decorative, and
     `onlineLabel` / `offlineLabel` is part of the name.
+
+  `shape` also takes daisyUI's mask shapes (`MaskShape`: squircle, hexagon,
+  star…). The mask goes on the INNER picture frame only, never on the outer
+  element: a mask clips everything outside the shape, a focus outline
+  included, so it must never sit on (or around) anything focusable — wrap a
+  masked avatar in a link or button, never the other way round. `'circle'`
+  stays the plain `rounded-full` frame; a mask is purely visual and changes
+  no role, name or state.
 -->
+<script module lang="ts">
+  import { avatarShape, maskShape, type AvatarShape, type MaskShape } from './tones.ts';
+
+  /** Every `shape` an Avatar takes: its own radii, then the masks (`circle` stays the radius). */
+  const frameShape: Record<AvatarShape | MaskShape, string> = { ...maskShape, ...avatarShape };
+</script>
+
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import { initialsOf } from './avatar.ts';
-  import { avatarShape, avatarSize, type AvatarShape, type Size } from './tones.ts';
+  import { avatarSize, type Size } from './tones.ts';
 
   interface Props extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
     /** The image URL. Omitted or failing, the fallback shows. */
@@ -44,10 +59,10 @@ A person's or entity's picture in daisyUI's `avatar` frame, with an initials (or
      */
     size?: Size | undefined;
     /**
-     * Frame shape.
+     * Frame shape: a radius (`'circle'`, `'rounded'`, `'square'`) or a daisyUI mask (`'squircle'`, `'hexagon'`, …).
      * @defaultValue `'circle'`
      */
-    shape?: AvatarShape | undefined;
+    shape?: AvatarShape | MaskShape | undefined;
     /** A presence ring (daisyUI `avatar-online` / `avatar-offline`), named in words too. */
     presence?: 'online' | 'offline' | undefined;
     /**
@@ -138,7 +153,7 @@ A person's or entity's picture in daisyUI's `avatar` frame, with an initials (or
     class={[
       'relative inline-flex items-center justify-center overflow-hidden',
       avatarSize[size],
-      avatarShape[shape],
+      frameShape[shape],
       (showFallback || !showImage) && 'bg-neutral text-neutral-content',
     ]}
   >

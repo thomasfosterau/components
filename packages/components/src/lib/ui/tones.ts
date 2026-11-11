@@ -328,6 +328,44 @@ export const avatarSize: Record<Size, string> = {
   xl: 'size-20 text-2xl',
 };
 
+/**
+ * daisyUI `mask` shapes. A mask clips everything outside the shape,
+ * including a focus outline, so it never goes on a focusable element.
+ */
+export type MaskShape =
+  | 'squircle'
+  | 'circle'
+  | 'decagon'
+  | 'diamond'
+  | 'heart'
+  | 'hexagon'
+  | 'hexagon-2'
+  | 'pentagon'
+  | 'star'
+  | 'star-2'
+  | 'triangle'
+  | 'triangle-2'
+  | 'triangle-3'
+  | 'triangle-4';
+
+/** Literal daisyUI classes per `MaskShape` (`Avatar`'s `shape`, or an `Image`'s `class`); a lookup table so Tailwind's scanner sees every class. */
+export const maskShape: Record<MaskShape, string> = {
+  squircle: 'mask mask-squircle',
+  circle: 'mask mask-circle',
+  decagon: 'mask mask-decagon',
+  diamond: 'mask mask-diamond',
+  heart: 'mask mask-heart',
+  hexagon: 'mask mask-hexagon',
+  'hexagon-2': 'mask mask-hexagon-2',
+  pentagon: 'mask mask-pentagon',
+  star: 'mask mask-star',
+  'star-2': 'mask mask-star-2',
+  triangle: 'mask mask-triangle',
+  'triangle-2': 'mask mask-triangle-2',
+  'triangle-3': 'mask mask-triangle-3',
+  'triangle-4': 'mask mask-triangle-4',
+};
+
 /** Literal radius per `AvatarShape` for `Avatar`; a lookup table so Tailwind's scanner sees every class. */
 export const avatarShape: Record<AvatarShape, string> = {
   circle: 'rounded-full',
