@@ -24,6 +24,14 @@
     { id: '4', href: '/gardens/4', title: 'Verge planting', subtitle: 'Council-approved' },
   ];
 
+  /** A few hundred rows: `lazyRender`'s range, where virtualising would cost find-in-page. */
+  const manyGardens: readonly LinkListItemData[] = Array.from({ length: 300 }, (_, index) => ({
+    id: String(index + 1),
+    href: `/gardens/${index + 1}`,
+    title: `Plot ${index + 1}`,
+    subtitle: 'Community allotment',
+  }));
+
   const { Story } = defineMeta({
     title: 'Data/ItemList',
     component: ItemList,
@@ -37,6 +45,10 @@
     },
   });
 </script>
+
+{#snippet plotRow(garden: LinkListItemData)}
+  <LinkListItem href={garden.href} title={garden.title} subtitle={garden.subtitle} />
+{/snippet}
 
 <Story name="Compact">
   <ItemList items={gardens} getKey={(garden) => garden.id}>
@@ -105,6 +117,19 @@
       />
     {/snippet}
   </ItemList>
+</Story>
+
+<Story name="Lazy render">
+  <!-- Every row is in the DOM (find-in-page reaches plot 300); the browser
+       skips laying out and painting the ones off screen. -->
+  <ItemList
+    items={manyGardens}
+    variant="stacked"
+    lazyRender
+    estimateSize={72}
+    getKey={(garden) => garden.id}
+    item={plotRow}
+  />
 </Story>
 
 <Story name="Empty">

@@ -8,6 +8,8 @@
  * of 40,000 as happily as a list of four. `DataGrid` is the other shape —
  * it sorts, filters and pages a bounded set the page already holds, entirely
  * on the client — and it composes the first two rather than duplicating them.
+ * `VirtualList` is the third: it holds the whole of a long list and mounts
+ * only the window the reader is looking at.
  *
  * Every optional prop in this family is declared `T | undefined`, not bare
  * `T`: the workspace compiles with `exactOptionalPropertyTypes`, under which
@@ -32,6 +34,7 @@ export { default as Table } from './Table.svelte';
 export { default as TreeList } from './TreeList.svelte';
 export { default as TreeListItem } from './TreeListItem.svelte';
 export { default as TreeView } from './TreeView.svelte';
+export { default as VirtualList } from './VirtualList.svelte';
 
 export * from './description-context.ts';
 export * from './diff.ts';
@@ -39,3 +42,9 @@ export * from './list-item.ts';
 export * from './pagination.ts';
 export * from './table-types.ts';
 export * from './tree-view.ts';
+export type {
+  VirtualAlign,
+  VirtualKey,
+  VirtualListApi,
+  VirtualScrollOptions,
+} from './virtual.svelte.ts';
