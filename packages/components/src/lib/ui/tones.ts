@@ -353,3 +353,49 @@ export const dockSize: Record<Size, string> = {
   lg: 'dock-lg',
   xl: 'dock-xl',
 };
+
+/** Literal daisyUI class per `Tone` for `StatusDot`; a lookup table so Tailwind's scanner sees every class. */
+export const statusTone: Record<Tone, string> = {
+  neutral: 'status-neutral',
+  primary: 'status-primary',
+  secondary: 'status-secondary',
+  accent: 'status-accent',
+  info: 'status-info',
+  success: 'status-success',
+  warning: 'status-warning',
+  error: 'status-error',
+};
+
+/** Literal daisyUI class per `Size` for `StatusDot`; a lookup table so Tailwind's scanner sees every class. */
+export const statusSize: Record<Size, string> = {
+  xs: 'status-xs',
+  sm: 'status-sm',
+  md: 'status-md',
+  lg: 'status-lg',
+  xl: 'status-xl',
+};
+
+/** Where an `Indicator` puts its mark on the element it sits on. */
+export type IndicatorPlacement =
+  | 'top-start'
+  | 'top-center'
+  | 'top-end'
+  | 'middle-start'
+  | 'middle-center'
+  | 'middle-end'
+  | 'bottom-start'
+  | 'bottom-center'
+  | 'bottom-end';
+
+/** Literal daisyUI classes per `IndicatorPlacement` for `Indicator`; a lookup table so Tailwind's scanner sees every class. */
+export const indicatorPlacement: Record<IndicatorPlacement, string> = {
+  'top-start': 'indicator-top indicator-start',
+  'top-center': 'indicator-top indicator-center',
+  'top-end': 'indicator-top indicator-end',
+  'middle-start': 'indicator-middle indicator-start',
+  'middle-center': 'indicator-middle indicator-center',
+  'middle-end': 'indicator-middle indicator-end',
+  'bottom-start': 'indicator-bottom indicator-start',
+  'bottom-center': 'indicator-bottom indicator-center',
+  'bottom-end': 'indicator-bottom indicator-end',
+};
