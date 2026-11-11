@@ -41,6 +41,17 @@
   </div>
 </Story>
 
+<Story name="Mask shapes">
+  <div class="flex items-center gap-4">
+    <Avatar src={PIXEL} name="Ada Lovelace" size="lg" shape="squircle" />
+    <Avatar src={PIXEL} name="Grace Hopper" size="lg" shape="hexagon" />
+    <Avatar name="Émile Zola" size="lg" shape="decagon" />
+    <a href="#people/ada" class="link">
+      <Avatar src={PIXEL} name="Ada Lovelace" size="lg" shape="star" />
+    </a>
+  </div>
+</Story>
+
 <Story name="Group with overflow">
   <AvatarGroup label="Bed 4 volunteers" overflow={3}>
     <Avatar name="Ada Lovelace" />

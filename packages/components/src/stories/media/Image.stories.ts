@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import Image from '../../lib/media/Image.svelte';
+import { maskShape } from '../../lib/ui/tones.ts';
 
 const meta = {
   title: 'Media/Image',
@@ -75,5 +76,16 @@ export const Decorative: Story = {
     alt: '',
     width: 200,
     height: 100,
+  },
+};
+
+/** A daisyUI mask through `class`, from the `maskShape` table so Tailwind sees the classes. */
+export const Masked: Story = {
+  args: {
+    src: 'https://placehold.co/240x240',
+    alt: 'A placeholder image in a hexagon',
+    width: 240,
+    height: 240,
+    class: maskShape.hexagon,
   },
 };

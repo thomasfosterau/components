@@ -10,6 +10,7 @@ import { render } from 'vitest-browser-svelte';
 import Avatar from '../../src/lib/ui/Avatar.svelte';
 import { initialsOf } from '../../src/lib/ui/avatar.ts';
 import AvatarGroupFixture from './fixtures/AvatarGroupFixture.svelte';
+import MaskedAvatarLink from './fixtures/MaskedAvatarLink.svelte';
 
 const PIXEL =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -69,4 +70,30 @@ test('the group is named, and its +N avatar says how many more', async () => {
   const group = screen.getByRole('group', { name: 'Bed 4 volunteers' });
   await expect.element(group.getByRole('img', { name: 'Ada Lovelace' })).toBeInTheDocument();
   await expect.element(group.getByRole('img', { name: '3 more' })).toHaveTextContent('+3');
+});
+
+test('a mask shape lands on the inner frame, never on the named (outer) element', async () => {
+  const screen = await render(Avatar, { name: 'Ada Lovelace', shape: 'hexagon' });
+
+  const outer = screen.getByRole('img', { name: 'Ada Lovelace' }).element();
+  expect(outer.classList.contains('mask')).toBe(false);
+  const inner = outer.firstElementChild;
+  expect(inner?.classList.contains('mask')).toBe(true);
+  expect(inner?.classList.contains('mask-hexagon')).toBe(true);
+});
+
+test('circle stays the plain radius, not the circle mask', async () => {
+  const screen = await render(Avatar, { name: 'Ada Lovelace' });
+
+  const inner = screen.getByRole('img', { name: 'Ada Lovelace' }).element().firstElementChild;
+  expect(inner?.classList.contains('rounded-full')).toBe(true);
+  expect(inner?.classList.contains('mask')).toBe(false);
+});
+
+test('a masked avatar inside a link leaves the link (and its focus ring) unclipped', async () => {
+  const screen = await render(MaskedAvatarLink);
+
+  const link = screen.getByRole('link').element();
+  expect(link.closest('.mask')).toBeNull();
+  expect(link.querySelector('.mask-squircle')).not.toBeNull();
 });
