@@ -190,7 +190,7 @@ catalog:
   # Dead code, duplication, complexity and architecture boundaries
   # (.fallowrc.json); the PreToolUse gate (.claude/hooks/fallow-gate.sh) runs
   # its audit before every agent `git commit` / `git push`.
-  fallow: 3.40.0
+  fallow: 3.41.0
   # `render` + locators for Svelte components under Vitest browser mode. The
   # app repos use @testing-library/svelte under happy-dom instead; this repo
   # runs the real browser, and this is the renderer Vitest browser mode
