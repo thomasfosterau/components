@@ -63,7 +63,7 @@ catalog:
   # `vega` / `vega-lite` are dev-only: the `/vega` entry emits a plain Vega-Lite object and its suite
   # validates that against the real compiler. `happy-dom` is that package's
   # DOM for the client-side suites, which run under Node rather than browser
-  # mode (packages/charts/CLAUDE.md § Testing). The package's runtime `effect`
+  # mode (packages/charts/AGENTS.md § Testing). The package's runtime `effect`
   # is developed on the `effect` entry above and published as
   # `catalogs.published.effect` (`^4.0.0`).
   '@types/d3-scale': ^4.0.9
@@ -86,7 +86,7 @@ catalog:
   # SvelteKit is a BUILD-TIME dependency here, not a runtime one: `svelte-kit
   # sync` generates the package's ambient types and `svelte-package` emits
   # `dist/`. Nothing in `src/lib/` may import `$app/*` — see
-  # packages/components/CLAUDE.md.
+  # packages/components/AGENTS.md.
   '@sveltejs/kit': 3.2.0
   '@sveltejs/package': 3.0.2
   '@sveltejs/vite-plugin-svelte': ^7.3.1

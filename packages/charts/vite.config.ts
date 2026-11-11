@@ -20,7 +20,7 @@
  *   (tsconfig.svelte.json), which `tsc` cannot read.
  * - `test:unit` runs under Node, not browser mode. The suites are geometry,
  *   parsing and SSR string output; the few that mount into a DOM opt into
- *   `happy-dom` per file. See CLAUDE.md § Testing.
+ *   `happy-dom` per file. See AGENTS.md § Testing.
  */
 
 import { svelte } from '@sveltejs/vite-plugin-svelte';

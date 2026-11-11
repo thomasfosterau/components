@@ -97,7 +97,7 @@
   "duplicates": {
     // A deliberate copy of packages/components/tests/canvas/pointer.ts: test
     // helpers are not published, so there is nothing to import it from
-    // (packages/mapbox/CLAUDE.md § Invariants).
+    // (packages/mapbox/AGENTS.md § Invariants).
     "ignore": ["packages/mapbox/tests/pointer.ts"]
   },
   "health": {
