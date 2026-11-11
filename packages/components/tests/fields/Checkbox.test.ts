@@ -2,6 +2,7 @@ import { userEvent } from 'vite-plus/test/browser';
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import Checkbox from '../../src/lib/fields/Checkbox.svelte';
+import CheckboxMixedFixture from './fixtures/CheckboxMixedFixture.svelte';
 
 test('the inline label names the input, with no id/for pair', async () => {
   const screen = await render(Checkbox, { label: 'Formally published' });
@@ -52,4 +53,14 @@ test('disabled is disabled', async () => {
   const screen = await render(Checkbox, { label: 'Cultigen', disabled: true });
 
   await expect.element(screen.getByRole('checkbox', { name: 'Cultigen' })).toBeDisabled();
+});
+
+test('indeterminate shows the mixed state, and a click settles it to checked', async () => {
+  const screen = await render(CheckboxMixedFixture, {});
+
+  const box = screen.getByRole('checkbox', { name: 'All beds' });
+  await expect.element(box).toBePartiallyChecked();
+  await userEvent.click(box);
+  await expect.element(box).toBeChecked();
+  await expect.element(screen.getByTestId('single')).toHaveTextContent('checked settled');
 });

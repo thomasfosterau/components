@@ -1,7 +1,8 @@
 import { userEvent } from 'vite-plus/test/browser';
-import { expect, test } from 'vite-plus/test';
+import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import CheckboxGroup from '../../src/lib/fields/CheckboxGroup.svelte';
+import CheckboxMixedFixture from './fixtures/CheckboxMixedFixture.svelte';
 
 const CONDITIONS = [
   { value: 'full-sun', label: 'Full sun' },
@@ -76,4 +77,44 @@ test('the group carries the hint and the errors, not each box', async () => {
   const group = screen.getByRole('group', { name: /Growing conditions/ }).element();
   expect((group.getAttribute('aria-describedby') ?? '').split(' ')).toHaveLength(2);
   await expect.element(screen.getByRole('alert')).toHaveTextContent('Choose at least one');
+});
+
+test('selectAll: the parent follows its children, and ticks or clears the enabled ones', async () => {
+  const screen = await render(CheckboxMixedFixture, {});
+
+  const parent = screen.getByRole('checkbox', { name: 'All vegetables' });
+  await expect.element(parent).not.toBeChecked();
+  await expect.element(parent).not.toBePartiallyChecked();
+
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Kale' }));
+  await expect.element(parent).toBePartiallyChecked();
+
+  await userEvent.click(parent);
+  await expect.element(parent).toBeChecked();
+  await expect.element(screen.getByTestId('values')).toHaveTextContent('Kale|Leek');
+  // The disabled option is never touched.
+  await expect.element(screen.getByRole('checkbox', { name: 'Okra' })).not.toBeChecked();
+
+  await userEvent.click(parent);
+  await expect.element(parent).not.toBeChecked();
+  await expect.element(screen.getByTestId('values')).toHaveTextContent(/^$/);
+});
+
+test('selectAll: the parent controls the options and is never submitted', async () => {
+  const onSubmitted = vi.fn<(data: FormData) => void>();
+  const screen = await render(CheckboxMixedFixture, { onSubmitted });
+
+  const parent = screen.getByRole('checkbox', { name: 'All vegetables' });
+  const controlled = (parent.element().getAttribute('aria-controls') ?? '').split(' ');
+  expect(controlled.map((id) => document.getElementById(id)?.getAttribute('value'))).toEqual([
+    'Kale',
+    'Leek',
+    'Okra',
+  ]);
+
+  await userEvent.click(parent);
+  await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.getAll('veg')).toEqual(['Kale', 'Leek']);
+  expect([...(data?.keys() ?? [])]).toEqual(['veg', 'veg']);
 });

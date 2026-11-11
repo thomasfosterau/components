@@ -51,3 +51,16 @@
     />
   </div>
 </Story>
+
+<Story name="With a select-all parent">
+  <!-- The parent is mixed while some are ticked, and never touches a disabled option. -->
+  <div class="max-w-sm">
+    <CheckboxGroup
+      legend="Growing conditions"
+      options={conditions}
+      values={['full-sun']}
+      selectAll
+      selectAllLabel="All conditions"
+    />
+  </div>
+</Story>
