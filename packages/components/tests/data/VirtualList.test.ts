@@ -242,3 +242,20 @@ test('feed mode: articles, aria-busy, and Page Down / Page Up between articles',
   await screen.rerender({ semantics: 'feed', busy: false, label: 'Recent' });
   await expect.element(feed).toHaveAttribute('aria-busy', 'false');
 });
+
+test('feed mode: Ctrl+End / Ctrl+Home leave the feed, whichever rows are rendered', async () => {
+  const screen = await render(VirtualListFixture, {
+    semantics: 'feed',
+    label: 'Recent',
+    surround: true,
+  });
+
+  // From the first article, the 10,000th is not in the DOM; the escape does not need it.
+  screen.getByRole('link', { name: 'Observation 1', exact: true }).element().focus();
+  await userEvent.keyboard('{Control>}{End}{/Control}');
+  await expect.element(screen.getByRole('button', { name: 'After the feed' })).toHaveFocus();
+
+  screen.getByRole('link', { name: 'Observation 1', exact: true }).element().focus();
+  await userEvent.keyboard('{Control>}{Home}{/Control}');
+  await expect.element(screen.getByRole('button', { name: 'Before the feed' })).toHaveFocus();
+});

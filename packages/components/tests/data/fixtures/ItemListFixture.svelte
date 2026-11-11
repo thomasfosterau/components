@@ -13,6 +13,7 @@
     label?: string;
     emptyMessage?: string;
     lazyRender?: boolean;
+    surround?: boolean;
   }
 
   let {
@@ -27,9 +28,11 @@
     label,
     emptyMessage,
     lazyRender = false,
+    surround = false,
   }: Props = $props();
 </script>
 
+{#if surround}<button type="button">Before the feed</button>{/if}
 <ItemList {items} {variant} {feed} {busy} {label} {emptyMessage} {lazyRender} getKey={(item) => item.id}>
   {#snippet item(entry)}
     <LinkListItem
@@ -40,3 +43,4 @@
     />
   {/snippet}
 </ItemList>
+{#if surround}<button type="button">After the feed</button>{/if}

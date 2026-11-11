@@ -36,8 +36,11 @@ A list of thousands of rows that mounts only the rows in or near the viewport, w
   - `semantics="feed"`: `ItemList`'s feed contract exactly — `role="feed"`
     named by `label`, `aria-busy`, `<article tabindex="-1">` rows — and the
     APG Feed keys: Page Down / Page Up move focus to the next / previous
-    article, scrolling it into existence first if it is outside the window
-    (`feed.ts`, shared with `ItemList`).
+    article, scrolling it into existence first if it is outside the window,
+    and Ctrl+End / Ctrl+Home leave the feed for the next / previous
+    focusable element outside it, found from the feed's own place in the
+    document so unrendered rows never matter (`feed.ts`, shared with
+    `ItemList`).
   - `aria-busy` reflects `busy` in both modes.
   - Spacers are `aria-hidden` and carry no role.
   - Focus retention: the row holding focus stays mounted however far the
@@ -53,7 +56,7 @@ A list of thousands of rows that mounts only the rows in or near the viewport, w
   import { tick, untrack, type Snippet } from 'svelte';
   import type { Attachment } from 'svelte/attachments';
   import type { HTMLAttributes } from 'svelte/elements';
-  import { feedStep } from './feed.ts';
+  import { feedStep, leaveFeed } from './feed.ts';
   import {
     VirtualWindow,
     type VirtualAlign,
@@ -325,6 +328,7 @@ A list of thousands of rows that mounts only the rows in or near the viewport, w
 
   function onkeydown(event: KeyboardEvent): void {
     if (semantics !== 'feed') return;
+    if (list !== undefined && leaveFeed(event, list)) return;
     const step = feedStep(event);
     const index = rowIndexOf(event.target);
     if (step === undefined || index === undefined) return;
