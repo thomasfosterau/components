@@ -114,10 +114,12 @@ function presentFields(value: DurationValue): DurationValue {
   );
 }
 
+/** Two digits, zero-padded: `5` → `'05'`. */
+const pad = (n: number): string => String(n).padStart(2, '0');
+
 /** `H:MM:SS` from the hours, minutes and seconds, the larger units folded into hours. */
 function digital(value: DurationValue): string {
   const hours = (value.days ?? 0) * 24 + (value.hours ?? 0);
-  const pad = (n: number): string => String(n).padStart(2, '0');
   return `${hours}:${pad(value.minutes ?? 0)}:${pad(value.seconds ?? 0)}`;
 }
 

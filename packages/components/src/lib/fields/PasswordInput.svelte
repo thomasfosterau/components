@@ -124,13 +124,14 @@ A password field with a "Show password" toggle and the `autocomplete` a password
     requestAnimationFrame(() => input?.setSelectionRange(start, end));
   }
 
+  const hide = (): void => {
+    revealed = false;
+  };
+
   // Hide again on submit, so a revealed password is not restored with the form.
   $effect(() => {
     const form = input?.form;
     if (form === null || form === undefined) return;
-    const hide = (): void => {
-      revealed = false;
-    };
     form.addEventListener('submit', hide);
     return () => form.removeEventListener('submit', hide);
   });
