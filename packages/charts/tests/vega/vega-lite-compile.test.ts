@@ -9,14 +9,25 @@ import { compile } from 'vega-lite';
 import { emitVegaLite } from '../../src/vega/index.ts';
 import type { TopLevelSpec } from 'vega-lite';
 
+/**
+ * Whether `value` has the shape of a Vega-Lite top-level spec. The emitter's
+ * own `VegaLiteSpec` is narrower than vega-lite's `TopLevelSpec` (and not
+ * assignable to it under `exactOptionalPropertyTypes`), so the structural
+ * agreement is checked by `compile()` itself, not by the type system.
+ */
+function isTopLevelSpec(value: unknown): value is TopLevelSpec {
+  return typeof value === 'object' && value !== null && 'mark' in value && 'encoding' in value;
+}
+
 function compileEmitted(
   spec: Parameters<typeof emitVegaLite>[0],
   options?: Parameters<typeof emitVegaLite>[1],
 ) {
   const emitted = emitVegaLite(spec, options);
-  // Cast through the compiler's own type: if the structural shapes diverge,
+  // Handed to the compiler as its own type: if the structural shapes diverge,
   // compile() throws or logs, and the test fails.
-  return compile(emitted as unknown as TopLevelSpec, {
+  if (!isTopLevelSpec(emitted)) throw new Error('expected an emitted unit spec');
+  return compile(emitted, {
     logger: failOnWarnLogger(),
   });
 }

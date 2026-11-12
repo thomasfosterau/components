@@ -6,13 +6,14 @@
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import PrimitivesFixture from './fixtures/PrimitivesFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 const shown = async (width: number): Promise<string[]> => {
   const screen = await render(PrimitivesFixture, { kind: 'fits', width });
   const visible = ['row', 'column', 'menu'].filter(
     (id) =>
-      getComputedStyle(screen.getByTestId(id).element().parentElement as Element).display !==
-      'none',
+      getComputedStyle(instanceOf(screen.getByTestId(id).element().parentElement, Element))
+        .display !== 'none',
   );
   // One copy of each control in the accessibility tree.
   expect(screen.getByRole('button', { name: 'Save' }).elements()).toHaveLength(1);

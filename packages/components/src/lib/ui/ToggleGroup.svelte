@@ -123,7 +123,9 @@ A set of toggle buttons answering one question, exclusively or independently, on
   );
 
   const setters = toggleSetters<V>({
+    values: () => items.map((entry) => entry.value),
     required: () => required,
+    type: () => type,
     assign: (next) => (value = next),
     notify: () => onValueChange,
   });

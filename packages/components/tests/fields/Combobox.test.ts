@@ -2,6 +2,7 @@ import { userEvent } from 'vite-plus/test/browser';
 import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import ComboboxFormFixture, { type Taxon } from './fixtures/ComboboxFormFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 const TAXA: readonly Taxon[] = [
   { id: 'rosa-canina', name: 'Rosa canina', rank: 'species' },
@@ -290,7 +291,10 @@ test('postedValue="query" puts the name on the visible input and drops the hidde
 
   // The server-rendered input itself is the posted control, which is what
   // keeps a plain GET search form working with JavaScript off.
-  const input = screen.getByRole('combobox', { name: 'Taxon' }).element() as HTMLInputElement;
+  const input = instanceOf(
+    screen.getByRole('combobox', { name: 'Taxon' }).element(),
+    HTMLInputElement,
+  );
   expect(input.name).toBe('query');
   expect(input.value).toBe('rosa');
   expect(screen.container.querySelectorAll('input[type="hidden"]')).toHaveLength(0);

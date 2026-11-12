@@ -9,6 +9,7 @@ import { userEvent } from 'vite-plus/test/browser';
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import ToggleGroupFixture from './fixtures/ToggleGroupFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 test('single: a radiogroup of radios; arrows move and select, skipping a disabled item', async () => {
   const screen = await render(ToggleGroupFixture, { initial: 'grid' });
@@ -84,7 +85,7 @@ test('multiple: a group of toggle buttons; two pressed at once; both post', asyn
 test('multiple: arrows move focus without toggling', async () => {
   const screen = await render(ToggleGroupFixture, { type: 'multiple' });
 
-  (screen.getByRole('button', { name: 'Bold' }).element() as HTMLButtonElement).focus();
+  instanceOf(screen.getByRole('button', { name: 'Bold' }).element(), HTMLButtonElement).focus();
   await userEvent.keyboard('{ArrowRight}');
   await expect
     .element(screen.getByRole('button', { name: 'Italic', pressed: false }))

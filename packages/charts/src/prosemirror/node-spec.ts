@@ -1,5 +1,5 @@
 import { encodeSpec, validateSpec, type ChartSpec } from '../spec/index.ts';
-import type { NodeSpec } from 'prosemirror-model';
+import type { Attrs, NodeSpec } from 'prosemirror-model';
 
 /** The canonical name for the chart node in a ProseMirror schema. */
 export const CHART_NODE_NAME = 'chart';
@@ -19,6 +19,12 @@ export interface ChartNodeSpecOptions {
 export interface ChartNodeAttrs {
   /** The portable chart spec, or null for an empty/placeholder chart. */
   readonly spec: ChartSpec | null;
+}
+
+/** The chart attrs of a node's `attrs`, which ProseMirror types as `any` values. */
+export function chartNodeAttrs(attrs: Attrs): ChartNodeAttrs {
+  const spec: ChartSpec | null = attrs['spec'];
+  return { spec };
 }
 
 /**
@@ -59,7 +65,7 @@ export function createChartNodeSpec(options?: ChartNodeSpecOptions): NodeSpec {
       },
     ],
     toDOM: (node) => {
-      const attrs = node.attrs as ChartNodeAttrs;
+      const attrs = chartNodeAttrs(node.attrs);
       return [
         'div',
         {

@@ -64,7 +64,9 @@ A set of toggles inside a `Toolbar` (Bold / Italic, alignment), sharing the tool
   }: Props = $props();
 
   const setters = toggleSetters<V>({
+    values: () => items.map((entry) => entry.value),
     required: () => required,
+    type: () => type,
     assign: (next) => (value = next),
     notify: () => onValueChange,
   });

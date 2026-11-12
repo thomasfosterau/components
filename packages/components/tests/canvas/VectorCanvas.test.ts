@@ -21,6 +21,7 @@ import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import CanvasFixture from './fixtures/CanvasFixture.svelte';
 import { drag, press } from './pointer.ts';
+import { instanceOf } from '../dom.ts';
 
 test('names the surface for assistive tech, and the name is a prop', async () => {
   const screen = await render(CanvasFixture);
@@ -107,7 +108,7 @@ const state = async (screen: Awaited<ReturnType<typeof render>>, name: string): 
 
 /** Give the surface keyboard focus, as Tab would. */
 const focus = async (screen: Awaited<ReturnType<typeof render>>): Promise<void> => {
-  (screen.getByRole('application').element() as SVGSVGElement).focus();
+  instanceOf(screen.getByRole('application').element(), SVGSVGElement).focus();
   await expect.element(screen.getByRole('application')).toHaveFocus();
 };
 

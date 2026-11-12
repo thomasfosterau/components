@@ -15,6 +15,7 @@ import { render } from 'vitest-browser-svelte';
 import type { SortState } from '../../src/lib/data/table-types.ts';
 import TableFixture from './fixtures/TableFixture.svelte';
 import { rows, type Row } from './fixtures/table-data.ts';
+import { instanceOf } from '../dom.ts';
 
 /** The body rows' first cells, in render order. */
 const names = (): string[] =>
@@ -95,7 +96,7 @@ test('activates a row with Enter and with Space, not only with a click', async (
   expect(element.tagName).toBe('TR');
   await expect.element(first).toHaveAttribute('tabindex', '0');
 
-  (element as HTMLElement).focus();
+  instanceOf(element, HTMLElement).focus();
   await userEvent.keyboard('{Enter}');
   expect(onSelect).toHaveBeenLastCalledWith(rows[0]);
 

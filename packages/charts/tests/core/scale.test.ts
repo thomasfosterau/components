@@ -6,6 +6,7 @@ import {
   resolvePositionalScale,
   resolveSizeScale,
 } from '../../src/core/index.ts';
+import { instanceOf } from '../dom.ts';
 
 const range: readonly [number, number] = [0, 100];
 
@@ -59,7 +60,9 @@ describe('resolvePositionalScale', () => {
         [{ v: 0.13 }, { v: 9.87 }],
         { nice: true },
       );
-      const [lo, hi] = scale.resolved.domain as [number, number];
+      const [lo, hi] = scale.resolved.domain;
+      if (typeof lo !== 'number' || typeof hi !== 'number')
+        throw new Error('expected a numeric domain');
       expect(lo).toBeLessThanOrEqual(0.13);
       expect(hi).toBeGreaterThanOrEqual(9.87);
       expect(Number.isInteger(lo)).toBe(true);
@@ -98,7 +101,7 @@ describe('resolvePositionalScale', () => {
       ]);
       const domain = scale.resolved.domain;
       expect(domain[0]).toBeInstanceOf(Date);
-      expect((domain[0] as Date).toISOString()).toBe('2024-01-01T00:00:00.000Z');
+      expect(instanceOf(domain[0], Date).toISOString()).toBe('2024-01-01T00:00:00.000Z');
     });
   });
 

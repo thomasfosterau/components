@@ -2,7 +2,7 @@ import type { Channel } from '../../spec/index.ts';
 import { makeAccessor } from '../accessor.ts';
 import type { PositionalScale } from '../scale.ts';
 import type { DataRows, ResolvedScale } from '../types.ts';
-import { baselineOf, positionOf } from './position.ts';
+import { baselineOf, pixelRangeOf, positionOf } from './position.ts';
 import { colorOfDatum } from './series.ts';
 import type { BarGeometry, BarRect } from './types.ts';
 
@@ -92,7 +92,7 @@ function barWidthOf(xScale: PositionalScale, count: number): number {
     return xScale.d3.bandwidth();
   }
   // Continuous x-scale: divide the range across the data with padding.
-  const range = xScale.resolved.range as ReadonlyArray<number>;
+  const range = pixelRangeOf(xScale);
   const extent = Math.abs(Math.max(...range) - Math.min(...range));
   return count > 0 ? Math.max(1, (extent / count) * 0.8) : 1;
 }

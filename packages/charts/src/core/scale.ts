@@ -120,7 +120,8 @@ function resolveLinear(
     d3Scale = d3Scale.nice();
   }
 
-  const finalDomain = d3Scale.domain() as [number, number];
+  const [finalMin = domain[0], finalMax = domain[1]] = d3Scale.domain();
+  const finalDomain: [number, number] = [finalMin, finalMax];
   return {
     kind: 'linear',
     d3: d3Scale,
@@ -167,7 +168,8 @@ function resolveUtc(
     d3Scale = d3Scale.nice();
   }
 
-  const finalDomain = d3Scale.domain() as [Date, Date];
+  const [finalStart = domain[0], finalEnd = domain[1]] = d3Scale.domain();
+  const finalDomain: [Date, Date] = [finalStart, finalEnd];
   return {
     kind: 'utc',
     d3: d3Scale,
@@ -306,8 +308,11 @@ function numericHintDomain(hint?: ScaleHint): [number, number] | undefined {
 
 function temporalHintDomain(hint?: ScaleHint): [Date, Date] | undefined {
   if (!hint?.domain || hint.domain.length < 2) return undefined;
-  const min = new Date(hint.domain[0] as string | number);
-  const max = new Date(hint.domain[hint.domain.length - 1] as string | number);
+  const first = hint.domain[0];
+  const last = hint.domain[hint.domain.length - 1];
+  if (first === undefined || last === undefined) return undefined;
+  const min = new Date(first);
+  const max = new Date(last);
   if (!Number.isNaN(min.getTime()) && !Number.isNaN(max.getTime())) return [min, max];
   return undefined;
 }

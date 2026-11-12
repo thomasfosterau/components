@@ -77,7 +77,7 @@ describe('isEditableTarget', () => {
 
   test('is false for no target and for non-elements', () => {
     expect(isEditableTarget(null)).toBe(false);
-    expect(isEditableTarget(document.createTextNode('x') as unknown as EventTarget)).toBe(false);
+    expect(isEditableTarget(document.createTextNode('x'))).toBe(false);
   });
 
   test.each(['input', 'textarea', 'select'])('is true for a <%s>', (tag) => {

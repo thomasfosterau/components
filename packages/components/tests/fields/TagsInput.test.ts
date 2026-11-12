@@ -2,6 +2,7 @@ import { userEvent } from 'vite-plus/test/browser';
 import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import TagsInputFixture from './fixtures/TagsInputFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 const pasteInto = (element: Element, text: string): void => {
   const data = new DataTransfer();
@@ -149,7 +150,7 @@ test('required is satisfied by a committed tag, never by uncommitted text', asyn
   const screen = await render(TagsInputFixture, { required: true, onSubmitted });
 
   const input = screen.getByLabelText(/Tags/);
-  const element = input.element() as HTMLInputElement;
+  const element = instanceOf(input.element(), HTMLInputElement);
   await userEvent.click(input);
   await userEvent.keyboard('herb');
   expect(element.validity.valid).toBe(false);
@@ -213,12 +214,12 @@ test('a paste replaces the selection before it is split', async () => {
   const input = screen.getByLabelText('Tags');
   await userEvent.click(input);
   await userEvent.keyboard('old');
-  (input.element() as HTMLInputElement).setSelectionRange(0, 3);
+  instanceOf(input.element(), HTMLInputElement).setSelectionRange(0, 3);
   pasteInto(input.element(), 'a, b');
   await expect.element(screen.getByTestId('bound')).toHaveTextContent(/^a\|b$/);
 
   await userEvent.keyboard('xz');
-  (input.element() as HTMLInputElement).setSelectionRange(1, 1);
+  instanceOf(input.element(), HTMLInputElement).setSelectionRange(1, 1);
   pasteInto(input.element(), 'y,w');
   await expect.element(screen.getByTestId('bound')).toHaveTextContent(/^a\|b\|xy\|wz$/);
 });

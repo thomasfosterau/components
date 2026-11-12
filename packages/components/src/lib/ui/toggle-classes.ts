@@ -28,28 +28,51 @@ export interface ToggleGroupItem<Value extends string = string> {
   readonly disabled?: boolean | undefined;
 }
 
+/** `notify` is only the single-mode handler when `type` says so. */
+const handlesSingle = (
+  notify: (value: never) => void,
+  type: 'single' | 'multiple',
+): notify is (value: string) => void => type === 'single';
+const handlesMultiple = (
+  notify: (value: never) => void,
+  type: 'single' | 'multiple',
+): notify is (value: string[]) => void => type === 'multiple';
+
 /**
  * The two writers bits-ui's toggle-group `bind:value` needs, for single and
  * multiple mode. In single mode `''` (the selected item pressed off) is
  * refused when `required()`. Otherwise the value goes to `assign` and then
- * to `notify()`. `ToggleGroup` and `ToolbarToggleGroup` share it, so
- * `required` means the same in both.
+ * to the mode's notifier. `ToggleGroup` and `ToolbarToggleGroup` share it, so
+ * `required` means the same in both. bits-ui reports plain strings; only
+ * those that are one of `values()` are passed on, so the typed callbacks
+ * never see a value the group does not own.
  */
 export function toggleSetters<V extends string>(options: {
+  readonly values: () => readonly V[];
   readonly required: () => boolean;
+  readonly type: () => 'single' | 'multiple';
   readonly assign: (value: V | '' | V[]) => void;
   readonly notify: () => ((value: never) => void) | undefined;
 }): { readonly single: (next: string) => void; readonly multiple: (next: string[]) => void } {
-  // SAFETY: bits-ui only ever reports values of the group's own items, or ''.
-  const write = (next: V | '' | V[]): void => {
-    options.assign(next);
-    (options.notify() as ((value: V | '' | V[]) => void) | undefined)?.(next);
-  };
+  // `notify` is the `onValueChange` of a `single | multiple` props union, so
+  // TypeScript only lets it be called with `never`; `type` is the discriminant,
+  // and the predicates above carry it to the call site.
+  const isValue = (candidate: string): candidate is V =>
+    options.values().some((value) => value === candidate);
+  const accepts = (candidate: string): candidate is V | '' =>
+    candidate === '' ? !options.required() : isValue(candidate);
   return {
     single: (next) => {
-      if (options.required() && next === '') return;
-      write(next as V | '');
+      if (!accepts(next)) return;
+      options.assign(next);
+      const notify = options.notify();
+      if (notify && handlesSingle(notify, options.type())) notify(next);
     },
-    multiple: (next) => write(next as V[]),
+    multiple: (next) => {
+      const values = next.filter(isValue);
+      options.assign(values);
+      const notify = options.notify();
+      if (notify && handlesMultiple(notify, options.type())) notify(values);
+    },
   };
 }

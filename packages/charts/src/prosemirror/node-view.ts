@@ -2,7 +2,7 @@ import { resolveChart, type Box, type DataRows } from '../core/index.ts';
 import { isDataRef, validateSpec, type ChartSpec } from '../spec/index.ts';
 import type { Node as ProseMirrorNode } from 'prosemirror-model';
 import type { EditorView, NodeView } from 'prosemirror-view';
-import type { ChartNodeAttrs } from './node-spec.ts';
+import { chartNodeAttrs } from './node-spec.ts';
 import { renderContextToSvg, renderDataTable, renderTreeOutline } from './render-svg.ts';
 
 /** Resolves a data reference to rows. The host (CMS) owns how refs are fetched. */
@@ -69,7 +69,7 @@ export class ChartNodeView implements NodeView {
 
   private render(): void {
     const token = ++this.renderToken;
-    const spec = (this.node.attrs as ChartNodeAttrs).spec;
+    const spec = chartNodeAttrs(this.node.attrs).spec;
 
     if (!spec) {
       this.renderMessage('No chart configured');
