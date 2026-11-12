@@ -106,7 +106,7 @@ Heavier families are separate `exports` entries so a consumer that never uses th
 | `@thomasfosterau/components/hotkeys` | hotkeys | The same exports the barrel re-exports, as their own entry, so `import('@thomasfosterau/components/hotkeys')` can load `HotkeyHelpDialog` lazily. |
 | `@thomasfosterau/components/tips` | tips | `Tip`, `PopoverTip`, `createTipStore`, `createTipStack`. |
 | `@thomasfosterau/components/context-menu` | ui | `ContextMenu` — kept out of the barrel so bits-ui's menu runtime loads only where it is used. Its children (`MenuItem`, `MenuCheckboxItem`, …) come from the barrel. |
-| `@thomasfosterau/components/entity-form` | forms | `EntityForm` — needs the optional peer `@thomasfosterau/effect-forms-svelte` (see [entity-form](#entity-form)). |
+| `@thomasfosterau/components/entity-form` | forms | `EntityForm` — needs the optional peers `@thomasfosterau/effect-forms-svelte` and `effect` (see [entity-form](#entity-form)). |
 | `@thomasfosterau/components/seo` | seo | `Head`, `JsonLd`, `serializeJsonLd`, `ogImageUrl` and the share-card constants. |
 | `@thomasfosterau/components/theme.css` | — | The daisyUI theme skeleton (see [Install](#install)). |
 
@@ -862,7 +862,7 @@ A `Citation` or `Footnote` rendered with no `setupBibliography()` provider above
 
 ## entity-form
 
-`@thomasfosterau/components/entity-form`. The renderer for [`@thomasfosterau/effect-forms-svelte`](https://github.com/thomasfosterau/effect-forms)'s `defineEntityForm` definitions. It is the only entry point that reaches Effect, so it is kept separate and its form library is an optional peer: `pnpm add @thomasfosterau/effect-forms-svelte effect` if you use it.
+`@thomasfosterau/components/entity-form`. The renderer for [`@thomasfosterau/effect-forms-svelte`](https://github.com/thomasfosterau/effect-forms)'s `defineEntityForm` definitions. It is the only entry point that reaches Effect, so it is kept separate, and its form library and `effect` are optional peers: `pnpm add @thomasfosterau/effect-forms-svelte effect` if you use it.
 
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |

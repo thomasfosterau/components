@@ -255,24 +255,18 @@ export default defineConfig({
           'effect/prefer-namespace-imports': 'error',
         },
       },
-      // The `/entity-form` renderer and its story are Svelte components in the
-      // core package, which may import `@thomasfosterau/effect-forms-svelte`'s
-      // `createForm` and types but never `effect` itself: `effect` is a peer
-      // of the form library, not of `@thomasfosterau/components`, so an
-      // import of it here would be an undeclared dependency of the published
-      // package (packages/components/AGENTS.md § Boundary). Every fix these
-      // three rules offer is an `effect` import (`Option`, `effect/Record`,
-      // `Predicate.isTagged` / `Match`), so none can apply here; and a
-      // component's optional props are `T | undefined` by the workspace's
-      // `exactOptionalPropertyTypes` convention (AGENTS.md § Conventions),
-      // which `prefer-option-over-null` would turn into `Option<T>` props that
-      // every caller would need `effect` to pass.
+      // The `/entity-form` renderer: `effect` is an optional peer of this
+      // package (#312), so every Effect rule applies to it except
+      // `prefer-option-over-null`, at 12 sites that are not this file's to
+      // change: 11 are the component's props, which stay `T | undefined`
+      // because a Svelte prop is not an Effect option bag (the owner's
+      // Option-everywhere decision, #405) and `Option<T>`
+      // props would make every caller import `effect`; 1 is the form
+      // library's own `FieldHandle<string | undefined>` API type.
       {
-        files: ['packages/components/src/**/forms/EntityForm*.svelte'],
+        files: ['packages/components/src/lib/forms/EntityForm.svelte'],
         rules: {
           'effect/prefer-option-over-null': 'off',
-          'effect/avoid-native-object-helpers': 'off',
-          'effect/avoid-direct-tag-checks': 'off',
         },
       },
       // `parseSpec` / `validateSpec` take arbitrary JSON and `encodeSpec`
