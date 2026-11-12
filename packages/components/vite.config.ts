@@ -97,9 +97,14 @@ export default defineConfig({
   // every test file in flight at that moment fails with "Failed to fetch
   // dynamically imported module" while the ones already running lose their
   // DOM mid-click. A warm local cache hides it; a fresh CI runner does not.
-  // Vitest's own warning for that reload names this field as the fix.
+  // Vitest's own warning for that reload names this field as the fix. Keep it
+  // to every entry of `dependencies` and `peerDependencies` plus the test-only
+  // imports: `@internationalized/date` was missed when `Calendar` arrived, and
+  // a cold run then reloaded mid-suite ("Unknown date type" from bits-ui's
+  // calendar holding a second copy of its date classes).
   optimizeDeps: {
     include: [
+      '@internationalized/date',
       '@lucide/svelte',
       '@testing-library/jest-dom/vitest',
       '@thomasfosterau/effect-forms-svelte',
