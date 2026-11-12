@@ -1,5 +1,5 @@
 /**
- * forms — the pieces of a form that are not one control: the whole-form error
+ * forms — the pieces of a form that are not one control: the field-error summary, the whole-form error
  * list, the submit row, a hidden command field, and the site search form.
  *
  * Everything field-level lives in `fields/`. The split is by who owns the
@@ -9,7 +9,14 @@
  * @module
  */
 
+export { default as ErrorSummary } from './ErrorSummary.svelte';
 export { default as FormActions } from './FormActions.svelte';
 export { default as FormErrors } from './FormErrors.svelte';
 export { default as HiddenField } from './HiddenField.svelte';
 export { default as SearchForm } from './SearchForm.svelte';
+export {
+  errorSummaryItems,
+  fieldId,
+  type ErrorSummaryItem,
+  type ErrorSummaryRecord,
+} from './error-summary.ts';

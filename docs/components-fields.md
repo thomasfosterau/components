@@ -1,6 +1,6 @@
 # Fields and forms
 
-Form controls wired through the `FormField` + `FieldControl` contract, and the parts of a form that are not one control (`FormErrors`, `FormActions`, `SearchForm`, `HiddenField`). Each component's props, defaults, snippets and ARIA contract are in its doc comments, so they show on hover in your editor and in the generated `.d.ts`; this guide covers what a doc comment cannot: how the family fits together, which component to choose, and worked examples.
+Form controls wired through the `FormField` + `FieldControl` contract, and the parts of a form that are not one control (`ErrorSummary`, `FormErrors`, `FormActions`, `SearchForm`, `HiddenField`). Each component's props, defaults, snippets and ARIA contract are in its doc comments, so they show on hover in your editor and in the generated `.d.ts`; this guide covers what a doc comment cannot: how the family fits together, which component to choose, and worked examples.
 
 Form controls wired through the `FormField` + `FieldControl` contract. `FormField` (one control) or `Fieldset` (a group) owns the label, hint and errors; it derives `hintId`/`errorId` from a single `id` and hands `children` a `FieldControl`:
 
@@ -96,6 +96,8 @@ Which multi-choice control: `CheckboxGroup` when every option fits on screen (ab
 
 ## Forms
 
+Three components carry error messages, split by where the reader meets them. `FieldErrors` (inside `FormField` and `Fieldset`) sits under its control and says what is wrong with it. `FormErrors` holds the messages that belong to the submission and have no field. `ErrorSummary` sits at the top of the form after a failed submission, repeats both in one list, and takes focus so that a screen-reader user, who hears nothing from a reloaded page, learns that it failed and where, and a sighted user on a long form does not have to hunt. The repetition is deliberate; use the summary alongside the field errors, not instead of them.
+
 The split from `fields` is by who owns the message: a `FormErrors` message has no field to attach to, and a `FormActions` row belongs to the form rather than anything in it.
 
 ```svelte
@@ -111,6 +113,9 @@ The split from `fields` is by who owns the message: a `FormErrors` message has n
   </FormField>
   <FormActions submitLabel="Add plant" pendingLabel="Adding…" pending={saving} cancelHref={`/gardens/${garden.id}`} />
 </form>
+
+<!-- After a failed POST: a focused list of links, one per message. Give each FormField the id the summary links to, fieldId(formId, name), or pass ErrorSummaryItems with your own ids. -->
+<ErrorSummary formId="plant" errors={{ name: form?.errors?.name ?? [] }} formErrors={form?.errors?._errors} />
 
 <!-- A GET form on purpose: a search result should be a URL people can bookmark, share and go back to. -->
 <SearchForm action="/search" name="query" label="Search the site" placeholder="Scientific or common name" />

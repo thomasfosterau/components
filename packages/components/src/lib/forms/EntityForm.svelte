@@ -39,6 +39,14 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   `messages` (a failure the store never saw, such as a server action's
   `fail(500, { message })`) share one `FormErrors` block, store errors first.
 
+  **Error summary.** `errorSummary` renders an `ErrorSummary` at the top of
+  the form: every field's visible errors, in entry order, each linking to the
+  control (`entity-form-<key>`, the id of every scalar and select field; a
+  widget links to that id only if it puts it on its focusable part), and the
+  form-level messages above them. It replaces the separate `FormErrors` block
+  rather than nesting alerts in alerts. It takes focus only once the form has
+  been submitted (or was posted), and again on every further failed attempt.
+
   Accessibility: each control is labelled by its `FormField`, field errors are
   reached through `aria-describedby`, and root errors and `messages` are
   `FormErrors` alerts (one `role="alert"` each).
@@ -66,6 +74,8 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   import TextInput from '../fields/TextInput.svelte';
   import Textarea from '../fields/Textarea.svelte';
   import FormActions from './FormActions.svelte';
+  import ErrorSummary from './ErrorSummary.svelte';
+  import { errorSummaryItems, fieldId } from './error-summary.ts';
   import FormErrors from './FormErrors.svelte';
 
   type Store = ReturnType<typeof createForm>;
@@ -128,6 +138,21 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
      * errors, after them, one `role="alert"` each. The text is shown as given.
      */
     messages?: readonly string[] | undefined;
+    /**
+     * Show an `ErrorSummary` at the top of the form (a list of every field
+     * error linking to its field, focused after a failed submission) in place
+     * of the plain `FormErrors` block. Pass an object to change its copy.
+     * @defaultValue `false`
+     */
+    errorSummary?:
+      | boolean
+      | {
+          /** The summary's heading, `'There is a problem'` by default. */
+          readonly title?: string | undefined;
+          /** The `document.title` prefix while it shows, `'Error: '` by default; empty disables it. */
+          readonly titlePrefix?: string | undefined;
+        }
+      | undefined;
   }
 
   let {
@@ -144,6 +169,7 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     selectPlaceholder = 'Choose…',
     requiredLabel,
     messages,
+    errorSummary = false,
     class: className,
     ...rest
   }: Props = $props();
@@ -232,10 +258,18 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   // The empty path is the form's own (non-field) messages.
   // The caller's `messages` (a server fault with no form state) follow them.
   const rootErrors = $derived([...form.errorsAt([]), ...(messages ?? [])]);
-  const fieldId = (key: string): string => `entity-form-${key}`;
+  const FORM_ID = 'entity-form';
+  const controlId = (key: string): string => fieldId(FORM_ID, key);
+  const summary = $derived(errorSummary === false ? undefined : errorSummary);
+  const summaryItems = $derived(
+    errorSummaryItems(
+      R.fromEntries(entries.map((entry) => [entry.key, handle(entry.key).visibleErrors])),
+      FORM_ID,
+    ),
+  );
   // The `FormField` wrapper is the same for a select and a scalar entry.
   const fieldAttrs = (entry: SelectEntry | ScalarEntry) => ({
-    id: fieldId(entry.key),
+    id: controlId(entry.key),
     label: entry.options.label(),
     required: entry.options.required === true,
     errors: handle(entry.key).visibleErrors,
@@ -275,7 +309,18 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     <input type="hidden" name="id" value={getField('id')} />
   {/if}
 
-  <FormErrors messages={rootErrors} />
+  {#if summary === undefined}
+    <FormErrors messages={rootErrors} />
+  {:else}
+    <ErrorSummary
+      errors={summaryItems}
+      formErrors={rootErrors}
+      autofocus={form.isSubmitted || form.posted}
+      focusKey={form.isSubmitted && !form.submitting ? form.submissionAttempts : undefined}
+      title={summary === true ? undefined : summary.title}
+      titlePrefix={summary === true ? undefined : summary.titlePrefix}
+    />
+  {/if}
 
   {#each entries as entry (entry.key)}
     {#if entry._tag === 'widget'}

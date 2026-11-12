@@ -8,6 +8,8 @@ Field labels, submit labels and option labels come from the definition's own mes
 
 **The widget bridge.** A `custom` or `rows` widget receives its definition's `props()`, then your `fieldProps[key]`, then `name` / `value` / `onChange` / `errors`, in that order. The bridge goes last, so neither of the first two can sever the store binding. A `custom` widget bridges a string field of the store. A `rows` widget bridges a row list held by the renderer and serialises it itself. A `gate: true` widget disables submit while its value is empty. A create form whose command carries a client id gets a `crypto.randomUUID()` minted once per mount, so a retried submission stays idempotent.
 
+**Error summary.** `errorSummary` renders an `ErrorSummary` at the top of the form in place of the plain form-level `FormErrors` block: the form-level messages, then a link per visible field error, each to the control (`entity-form-<key>`). It takes focus after a failed submission or a posted failure, never while the reader is still typing. Pass `{ title, titlePrefix }` instead of `true` to change its copy. A custom widget links only if it puts `entity-form-<key>` on its focusable part.
+
 **SvelteKit.** This package cannot import `$app/forms`, so pass your app's `enhanceForm` (the `$app/forms`-backed spreadable attributes, which effect-forms#2 moves into `@thomasfosterau/effect-forms-svelte/kit`):
 
 ```svelte
