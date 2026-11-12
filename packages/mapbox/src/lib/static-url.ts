@@ -54,6 +54,10 @@ const viewSegment = (view: StaticView): string => {
 /**
  * Build the image URL for one static map request.
  *
+ * Appends the access token as `access_token`, rounds `width` and `height` to
+ * whole pixels, and adds `@2x` when `retina` is set. Use it where a map has to
+ * be a URL: an `og:image`, an email.
+ *
  * The overlay is `encodeURIComponent`d rather than interpolated raw: a GeoJSON
  * string carries `{`, `"` and `,`, and the path grammar reads commas as its own
  * separators — an un-encoded overlay silently becomes a different request.

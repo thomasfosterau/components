@@ -37,6 +37,11 @@
  * for arbitrary pairs of floats, and this comment says so rather than claiming
  * an exactness the arithmetic does not have.
  *
+ * The frame is equirectangular, chosen for exact invertibility rather than
+ * looks: away from the equator a plan reads wider than it is on the ground. A
+ * document in this frame wants `grid.snap: false`, or the grid quantises the
+ * boundary.
+ *
  * ## Why the geometry type is declared here
  *
  * Structurally the same as an application's own `GeoJsonGeometry`, and
@@ -283,6 +288,14 @@ export const geometryFrame = (
 /**
  * The geometry as editable shapes in `frame`.
  *
+ * `Point` and `MultiPoint` become markers, `LineString` and `MultiLineString`
+ * lines, `Polygon` and `MultiPolygon` polygons (the repeated closing position
+ * dropped). Anything not representable is reported in `unrepresentable`
+ * rather than flattened: a polygon's interior rings are dropped and reported,
+ * while a position with an altitude, a position short of two ordinates, or
+ * `coordinates` nested at the wrong depth for the `type` yields no shapes at
+ * all. `newId` mints each shape's id.
+ *
  * Every shape is anchored at the canvas origin, its vertices carrying the whole
  * coordinate: adding a zero offset is exact, so a boundary nobody has dragged
  * comes back out of {@link shapesGeometry} bit-identical. Once the reader moves
@@ -324,6 +337,10 @@ export const geometryShapes = (
 
 /**
  * The shapes as one geometry, or none when they have no single one.
+ *
+ * One marker is a `Point`, several a `MultiPoint`, and likewise
+ * `LineString` / `MultiLineString` and `Polygon` / `MultiPolygon`. The result
+ * is a zero- or one-element array.
  *
  * None rather than a lie, in three cases, and the caller is told by the empty
  * array in all three: there are no shapes; they are of mixed kinds, for which
