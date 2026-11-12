@@ -56,11 +56,13 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes, HTMLTableAttributes } from 'svelte/elements';
   import type { Size } from '../ui/tones.ts';
+  import ColumnHeading from './ColumnHeading.svelte';
+  import TableSelect from './TableSelect.svelte';
   import TableToolbar from './TableToolbar.svelte';
+  import { columnClass, tableSize } from './table-classes.ts';
+  import { choiceLabels, columnView, sortIndicator } from './table-view.ts';
   import {
     columnAriaSort,
-    defaultHiddenColumns,
-    isColumnHideable,
     nextSortState,
     pageSelectionState,
     withKeys,
@@ -141,37 +143,28 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
     selection = 'none',
     selected = $bindable(new Set<string>()),
     onSelectionChange,
-    selectRowLabel = (row) => `Select ${columns[0] === undefined ? '' : String(columns[0].value(row))}`,
-    selectAllLabel = 'Select all on this page',
-    selectColumnLabel = 'Select',
+    selectRowLabel,
+    selectAllLabel,
+    selectColumnLabel,
     bulkActions,
-    selectedCountLabel = (count) => `${count} selected`,
+    selectedCountLabel,
     hiddenColumns = $bindable(undefined),
     columnMenu = false,
-    columnMenuLabel = 'Columns',
+    columnMenuLabel,
     class: className,
     ...rest
   }: Props = $props();
 
-  const tableSize: Record<Size, string> = {
-    xs: 'table-xs',
-    sm: 'table-sm',
-    md: 'table-md',
-    lg: 'table-lg',
-    xl: 'table-xl',
-  };
-
-  /** Alignment and the column's own classes, shared by its `<th>` and `<td>`. */
-  const columnClass = (column: TableColumn<T>): (string | false | undefined)[] => [
-    column.align === 'end' ? 'text-end' : 'text-start',
-    column.class,
-  ];
-
   const radioName = $props.id();
 
-  const hidden = $derived(hiddenColumns ?? defaultHiddenColumns(columns));
-  const shownColumns = $derived(
-    columns.filter((column, index) => !(isColumnHideable(column, index) && hidden.has(column.key))),
+  const view = $derived(columnView(columns, hiddenColumns, columnMenu));
+  const hidden = $derived(view.hidden);
+  const shownColumns = $derived(view.shown);
+  const labels = $derived(
+    choiceLabels(
+      { selectRowLabel, selectAllLabel, selectColumnLabel, selectedCountLabel, columnMenuLabel },
+      columns,
+    ),
   );
   const selectable = $derived(selection !== 'none');
   const pageKeys = $derived(rows.map((row) => rowKey(row)));
@@ -181,17 +174,6 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
     selected = next;
     onSelectionChange?.(next);
   };
-
-  const columnChoices = $derived(
-    columnMenu
-      ? columns.map((column, index) => ({
-          key: column.key,
-          header: column.header,
-          hideable: isColumnHideable(column, index),
-          visible: !(isColumnHideable(column, index) && hidden.has(column.key)),
-        }))
-      : [],
-  );
 
   const toggleColumn = (key: string, visible: boolean): void => {
     hiddenColumns = withKeys(hidden, [key], !visible);
@@ -209,12 +191,6 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
     const next = nextSortState(sort, column.key);
     sort = next;
     onSort?.(next);
-  };
-
-  /** The arrow beside a sorted header. Decorative — `aria-sort` is the state. */
-  const sortIndicator = (key: string): string => {
-    if (sort === undefined || sort.key !== key) return '';
-    return sort.direction === 'asc' ? '▲' : '▼';
   };
 
   /**
@@ -249,58 +225,33 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
 
 {#snippet selectHeader()}
   <th scope="col" class="w-0">
-    {#if selection === 'multiple'}
-      <input
-        type="checkbox"
-        class="checkbox checkbox-sm"
-        aria-label={selectAllLabel}
-        disabled={pageKeys.length === 0}
-        bind:checked={
-          () => pageState === 'all',
-          (checked) => {
-            select(withKeys(selected, pageKeys, checked));
-          }
-        }
-        bind:indeterminate={
-          () => pageState === 'some',
-          () => {
-            // The browser clears it on click; the derived state puts it back if due.
-          }
-        }
-      />
-    {:else}
-      <span class="sr-only">{selectColumnLabel}</span>
-    {/if}
+    <TableSelect
+      header
+      selection={selection === 'single' ? 'single' : 'multiple'}
+      label={selection === 'single' ? labels.selectColumnLabel : labels.selectAllLabel}
+      disabled={pageKeys.length === 0}
+      checked={pageState === 'all'}
+      indeterminate={pageState === 'some'}
+      onToggle={(checked) => {
+        select(withKeys(selected, pageKeys, checked));
+      }}
+    />
   </th>
 {/snippet}
 
 {#snippet selectCell(row: T, key: string)}
   <td class="w-0" onclick={isolate} onkeydown={isolate}>
-    {#if selection === 'multiple'}
-      <input
-        type="checkbox"
-        class="checkbox checkbox-sm"
-        aria-label={selectRowLabel(row)}
-        bind:checked={
-          () => selected.has(key),
-          (checked) => {
-            select(withKeys(selected, [key], checked));
-          }
-        }
-      />
-    {:else}
-      <input
-        type="radio"
-        class="radio radio-sm"
-        name={radioName}
-        value={key}
-        aria-label={selectRowLabel(row)}
-        checked={selected.has(key)}
-        onchange={() => {
-          select(new Set([key]));
-        }}
-      />
-    {/if}
+    <TableSelect
+      header={false}
+      selection={selection === 'single' ? 'single' : 'multiple'}
+      label={labels.selectRowLabel(row)}
+      name={selection === 'single' ? radioName : undefined}
+      value={selection === 'single' ? key : undefined}
+      checked={selected.has(key)}
+      onToggle={(checked) => {
+        select(selection === 'single' ? new Set([key]) : withKeys(selected, [key], checked));
+      }}
+    />
   </td>
 {/snippet}
 
@@ -310,21 +261,15 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
     class={[columnClass(column), column.headerClass]}
     aria-sort={column.sortable ? columnAriaSort(sort, column.key) : undefined}
   >
-    {#if column.sortable}
-      <button
-        type="button"
-        class="link link-hover inline-flex items-center gap-1"
-        onclick={() => {
-          toggleSort(column);
-        }}
-        aria-label={sortLabel(column)}
-      >
-        {column.header}
-        <span aria-hidden="true" class="text-xs">{sortIndicator(column.key)}</span>
-      </button>
-    {:else}
-      {column.header}
-    {/if}
+    <ColumnHeading
+      sortable={column.sortable === true}
+      header={column.header}
+      label={sortLabel(column)}
+      indicator={sortIndicator(sort, column.key)}
+      onclick={() => {
+        toggleSort(column);
+      }}
+    />
   </th>
 {/snippet}
 
@@ -378,9 +323,9 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
       select(new Set());
     }}
     {bulkActions}
-    {selectedCountLabel}
-    {columnChoices}
-    {columnMenuLabel}
+    selectedCountLabel={labels.selectedCountLabel}
+    columnChoices={view.choices}
+    columnMenuLabel={labels.columnMenuLabel}
     onColumnToggle={toggleColumn}
   />
 {/if}

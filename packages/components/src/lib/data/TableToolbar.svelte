@@ -25,14 +25,7 @@ The bar above a `Table`: the selection count, the bulk actions while rows are se
   import MenuCheckboxItem from '../ui/MenuCheckboxItem.svelte';
   import Toolbar from '../ui/Toolbar.svelte';
   import type { TableBulkActions } from './table-types.ts';
-
-  /** One entry of the columns menu. */
-  interface ColumnChoice {
-    readonly key: string;
-    readonly header: string;
-    readonly hideable: boolean;
-    readonly visible: boolean;
-  }
+  import type { ColumnChoice } from './table-view.ts';
 
   interface Props {
     /** Show the selection count and, while it is non-zero, the bulk actions. */
