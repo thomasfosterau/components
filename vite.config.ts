@@ -262,13 +262,23 @@ export default defineConfig({
       // `createForm` and types but never `effect` itself: `effect` is a peer
       // of the form library, not of `@thomasfosterau/components`, so an
       // import of it here would be an undeclared dependency of the published
-      // package (packages/components/AGENTS.md § Boundary). Every fix these
-      // three rules offer is an `effect` import (`Option`, `effect/Record`,
-      // `Predicate.isTagged` / `Match`), so none can apply here; and a
-      // component's optional props are `T | undefined` by the workspace's
-      // `exactOptionalPropertyTypes` convention (AGENTS.md § Conventions),
-      // which `prefer-option-over-null` would turn into `Option<T>` props that
-      // every caller would need `effect` to pass.
+      // package (packages/components/AGENTS.md § Boundary). These three are
+      // the genuine can't-applies under the owner's lint policy (2026-11-11,
+      // #312), each measured on trunk:
+      // - `avoid-direct-tag-checks` (2 sites, `entry._tag === 'widget'`): its
+      //   only fixes, `Predicate.isTagged` and `Match`, are `effect` imports.
+      // - `avoid-native-object-helpers` (1 site, the `Object.fromEntries`
+      //   seeding the rows-bridged widgets): its fix is `effect/Record`, and
+      //   every native rewrite trips another rule here (a loop is
+      //   `effect/imperative-loops`, a typed accumulator
+      //   `effect/no-known-value-widening`, a spreading `reduce` the `perf`
+      //   category's accumulating spread).
+      // - `prefer-option-over-null` (13 sites): 11 are the component's props,
+      //   which stay `T | undefined` (a Svelte prop is not an Effect option
+      //   bag, and `Option<T>` props would make every caller import
+      //   `effect`); 1 is the form library's own `FieldHandle<string |
+      //   undefined>` API type; 1 is the `inputmode` attribute, where
+      //   `undefined` means "absent".
       {
         files: ['packages/components/src/**/forms/EntityForm*.svelte'],
         rules: {
