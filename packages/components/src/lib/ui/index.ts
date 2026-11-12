@@ -56,6 +56,7 @@ export { default as Skeleton } from './Skeleton.svelte';
 export { default as Spinner } from './Spinner.svelte';
 export { default as Stack } from './Stack.svelte';
 export { default as StatusDot } from './StatusDot.svelte';
+export { default as Swap } from './Swap.svelte';
 export { default as ThemeToggle } from './ThemeToggle.svelte';
 export { default as ToggleButton } from './ToggleButton.svelte';
 export { default as ToggleGroup } from './ToggleGroup.svelte';
