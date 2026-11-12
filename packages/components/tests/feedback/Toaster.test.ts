@@ -89,7 +89,7 @@ test('a toast dismisses itself after its duration', async () => {
   // `advanceFakeTimersWhilePending`), so the clock would already be past the
   // push when the action resolves.
   vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
-  push.click();
+  push.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   flushSync();
   // The clock is held, so presence no longer races the timer.
   expect(toast()).toHaveLength(1);
