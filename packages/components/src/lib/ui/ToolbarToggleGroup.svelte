@@ -63,13 +63,10 @@ A set of toggles inside a `Toolbar` (Bold / Italic, alignment), sharing the tool
     class: className,
   }: Props = $props();
 
-  const setters = toggleSetters<V>({
-    values: () => items.map((entry) => entry.value),
-    required: () => required,
-    type: () => type,
-    assign: (next) => (value = next),
-    notify: () => onValueChange,
-  });
+  const setters = toggleSetters<V>(
+    () => ({ items, required, type, onValueChange }),
+    (next) => (value = next),
+  );
 </script>
 
 {#snippet group({ props }: { props: Record<string, unknown> })}

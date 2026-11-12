@@ -47,32 +47,37 @@ const handlesMultiple = (
  * those that are one of `values()` are passed on, so the typed callbacks
  * never see a value the group does not own.
  */
-export function toggleSetters<V extends string>(options: {
-  readonly values: () => readonly V[];
-  readonly required: () => boolean;
-  readonly type: () => 'single' | 'multiple';
-  readonly assign: (value: V | '' | V[]) => void;
-  readonly notify: () => ((value: never) => void) | undefined;
-}): { readonly single: (next: string) => void; readonly multiple: (next: string[]) => void } {
-  // `notify` is the `onValueChange` of a `single | multiple` props union, so
-  // TypeScript only lets it be called with `never`; `type` is the discriminant,
-  // and the predicates above carry it to the call site.
+/** The props of a toggle group that its setters read, at call time. */
+export interface ToggleGroupSource<V extends string> {
+  readonly items: readonly { readonly value: V }[];
+  readonly required: boolean;
+  readonly type: 'single' | 'multiple';
+  readonly onValueChange: ((value: never) => void) | undefined;
+}
+
+export function toggleSetters<V extends string>(
+  source: () => ToggleGroupSource<V>,
+  assign: (value: V | '' | V[]) => void,
+): { readonly single: (next: string) => void; readonly multiple: (next: string[]) => void } {
+  // `onValueChange` is the callback of a `single | multiple` props union, so
+  // TypeScript only lets it be called with `never`; `type` is the
+  // discriminant, and the predicates above carry it to the call site.
   const isValue = (candidate: string): candidate is V =>
-    options.values().some((value) => value === candidate);
+    source().items.some((entry) => entry.value === candidate);
   const accepts = (candidate: string): candidate is V | '' =>
-    candidate === '' ? !options.required() : isValue(candidate);
+    candidate === '' ? !source().required : isValue(candidate);
   return {
     single: (next) => {
       if (!accepts(next)) return;
-      options.assign(next);
-      const notify = options.notify();
-      if (notify && handlesSingle(notify, options.type())) notify(next);
+      assign(next);
+      const { onValueChange: notify, type } = source();
+      if (notify && handlesSingle(notify, type)) notify(next);
     },
     multiple: (next) => {
       const values = next.filter(isValue);
-      options.assign(values);
-      const notify = options.notify();
-      if (notify && handlesMultiple(notify, options.type())) notify(values);
+      assign(values);
+      const { onValueChange: notify, type } = source();
+      if (notify && handlesMultiple(notify, type)) notify(values);
     },
   };
 }

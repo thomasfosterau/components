@@ -306,15 +306,18 @@ function numericHintDomain(hint?: ScaleHint): [number, number] | undefined {
   return undefined;
 }
 
+/** A hint value as a valid `Date`, or `undefined`. */
+function hintDate(value: number | string | undefined): Date | undefined {
+  if (value === undefined) return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
 function temporalHintDomain(hint?: ScaleHint): [Date, Date] | undefined {
   if (!hint?.domain || hint.domain.length < 2) return undefined;
-  const first = hint.domain[0];
-  const last = hint.domain[hint.domain.length - 1];
-  if (first === undefined || last === undefined) return undefined;
-  const min = new Date(first);
-  const max = new Date(last);
-  if (!Number.isNaN(min.getTime()) && !Number.isNaN(max.getTime())) return [min, max];
-  return undefined;
+  const min = hintDate(hint.domain.at(0));
+  const max = hintDate(hint.domain.at(-1));
+  return min && max ? [min, max] : undefined;
 }
 
 function categoricalDomain(channel: Channel, data: DataRows, hint?: ScaleHint): string[] {
