@@ -2,6 +2,7 @@
   import { Bell, Leaf, Sprout, User } from '@lucide/svelte';
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import BottomNav from '../../lib/layout/BottomNav.svelte';
+  import type { NavDestination } from '../../lib/layout/nav-destination.ts';
   import BottomNavItem from '../../lib/layout/BottomNavItem.svelte';
 
   const { Story } = defineMeta({
@@ -16,6 +17,13 @@
       },
     },
   });
+
+  const destinations: readonly NavDestination[] = [
+    { href: '/gardens', label: 'Gardens', icon: gardens },
+    { href: '/taxa', label: 'Taxa', icon: taxa },
+    { href: '/notifications', label: 'Notifications', icon: notifications, badge: 3 },
+    { href: '/account', label: 'Account', icon: account, compact: false },
+  ];
 </script>
 
 {#snippet gardens()}<Sprout class="size-5" />{/snippet}
@@ -38,4 +46,8 @@
     <BottomNavItem href="/taxa" label="Taxa" icon={taxa} />
     <BottomNavItem href="/account" label="Account" icon={account} />
   </BottomNav>
+</Story>
+
+<Story name="From destinations">
+  <BottomNav fixed={false} {destinations} />
 </Story>

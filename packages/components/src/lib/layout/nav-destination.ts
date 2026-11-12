@@ -68,3 +68,8 @@ export const expandedTier: Record<ExpandedAt, string> = {
   lg: 'hidden lg:flex',
   xl: 'hidden xl:flex',
 };
+
+/** The destinations the compact bottom bar holds: all but `compact: false`. */
+export const compactDestinations = (
+  destinations: readonly NavDestination[],
+): readonly NavDestination[] => destinations.filter((destination) => destination.compact !== false);
