@@ -161,7 +161,6 @@ export default defineConfig({
       'unicorn/consistent-function-scoping': 'warn', // 5 sites, 4 in `.svelte`
       'unicorn/no-array-sort': 'warn', // 5 sites; `toSorted` raises the published browser baseline
       'unicorn/no-array-reverse': 'warn', // 1 site, same reason
-      'promise/always-return': 'warn', // 4 sites
       'no-shadow': 'warn', // 2 sites, both in `.svelte`
     },
     // Nothing that ships may import a module SvelteKit only resolves inside an

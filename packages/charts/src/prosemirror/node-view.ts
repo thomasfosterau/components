@@ -106,17 +106,25 @@ export class ChartNodeView implements NodeView {
     const resolved = resolve(spec);
     if (isPromise(resolved)) {
       this.renderMessage('Loading chart data…');
-      resolved
-        .then((rows) => {
-          if (token === this.renderToken) this.renderChart(spec, rows);
-        })
-        .catch(() => {
-          if (token === this.renderToken) this.renderMessage('Failed to load chart data');
-        });
+      void this.renderWhenResolved(spec, resolved, token);
       return;
     }
 
     this.renderChart(spec, resolved);
+  }
+
+  /** Draw the chart once its data arrives, unless a later render superseded this one. */
+  private async renderWhenResolved(
+    spec: unknown,
+    resolved: Promise<DataRows>,
+    token: number,
+  ): Promise<void> {
+    try {
+      const rows = await resolved;
+      if (token === this.renderToken) this.renderChart(spec, rows);
+    } catch {
+      if (token === this.renderToken) this.renderMessage('Failed to load chart data');
+    }
   }
 
   /**

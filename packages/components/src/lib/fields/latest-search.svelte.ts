@@ -75,16 +75,19 @@ export class LatestSearch<T> {
     // A superseded request must not write: `#inFlight` is the identity check,
     // `signal.aborted` catches the caller aborting its own work.
     const current = (): boolean => !own.signal.aborted && this.#inFlight === own;
-    void search(query, own.signal)
-      .then((next) => {
-        if (!current()) return;
-        this.results = next;
-        this.pending = false;
-      })
-      .catch((error: unknown) => {
-        if (!current()) return;
-        this.pending = false;
-        this.error = error instanceof Error ? error.message : String(error);
-      });
+    void this.#settle(search(query, own.signal), current);
+  }
+
+  /** Apply a request's outcome, unless a later one superseded it. */
+  async #settle(request: Promise<readonly T[]>, current: () => boolean): Promise<void> {
+    try {
+      const next = await request;
+      if (!current()) return;
+      this.results = next;
+    } catch (error: unknown) {
+      if (!current()) return;
+      this.error = error instanceof Error ? error.message : String(error);
+    }
+    this.pending = false;
   }
 }

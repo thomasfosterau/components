@@ -231,18 +231,19 @@ The ⌘K / Ctrl+K command palette: bits-ui’s `Command` inside this library’s
     const own = new AbortController();
     inFlight = own;
     pending = true;
-    void onSearch(text, own.signal)
-      .then((next) => {
-        // A superseded request must not write: `inFlight` is the identity
-        // check, `signal.aborted` catches the caller aborting its own work.
+    // A superseded request must not write: `inFlight` is the identity
+    // check, `signal.aborted` catches the caller aborting its own work.
+    const settle = async (request: ReturnType<typeof onSearch>): Promise<void> => {
+      try {
+        const next = await request;
         if (own.signal.aborted || inFlight !== own) return;
         results = next;
-        pending = false;
-      })
-      .catch(() => {
+      } catch {
         if (own.signal.aborted || inFlight !== own) return;
-        pending = false;
-      });
+      }
+      pending = false;
+    };
+    void settle(onSearch(text, own.signal));
   };
 
   const cancel = (): void => {
