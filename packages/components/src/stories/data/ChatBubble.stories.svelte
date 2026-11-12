@@ -43,6 +43,18 @@
   </MessageThread>
 </Story>
 
+<Story name="Grouped burst">
+  <MessageThread label="A burst from one author" class="max-w-md">
+    {#each ['The tomatoes need staking.', 'Before the wind on Thursday.', 'Use the soft ties, not wire.'] as text, i (text)}
+      <ChatBubble author="Ada Lovelace" sentAt={now - 5 * 60_000} relative grouped={i > 0}>
+        {#snippet avatar()}{@render initials('AL')}{/snippet}
+        {text}
+      </ChatBubble>
+    {/each}
+    <ChatBubble author="You" sentAt={now - 60_000} relative side="end" tone="primary">On it.</ChatBubble>
+  </MessageThread>
+</Story>
+
 <Story name="Tones, absolute time">
   <MessageThread label="Tones" class="max-w-md">
     {#each ['neutral', 'secondary', 'accent', 'info', 'success', 'warning', 'error'] as const as tone (tone)}
