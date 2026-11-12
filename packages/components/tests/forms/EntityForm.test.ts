@@ -1,9 +1,19 @@
 import { userEvent } from 'vite-plus/test/browser';
 import { describe, expect, it } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
-import { createForm } from '@thomasfosterau/effect-forms-svelte';
+import type { EntityFormDefinition, FormStore } from '@thomasfosterau/effect-forms-svelte';
 import EntityForm from '../../src/lib/forms/EntityForm.svelte';
 import { thingForm } from './fixtures/entity-form-definitions.ts';
+
+/**
+ * The store `EntityForm` hands its `enhance` prop: validated by the mode's
+ * input schema, over the all-string input record. Spelled out because the
+ * type-aware lint cannot read the `.svelte` component's own types.
+ */
+type Store = FormStore<
+  EntityFormDefinition['createInput'],
+  Readonly<Record<string, string | undefined>>
+>;
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
@@ -183,7 +193,7 @@ describe('errorSummary', () => {
   });
 
   it('lists a posted failure as links to the fields, in entry order, and focuses itself', async () => {
-    let store: ReturnType<typeof createForm> | undefined;
+    let store: Store | undefined;
     const screen = await render(EntityForm, {
       definition: thingForm,
       mode: 'create',

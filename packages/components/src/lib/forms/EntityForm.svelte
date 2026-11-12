@@ -14,7 +14,17 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   `@thomasfosterau/effect-forms-svelte` an OPTIONAL peer: a consumer that
   never imports this entry never installs the form library or `effect`.
   `effect` is an optional peer of this package for the same reason: the
-  renderer imports its `Option`, `Predicate` and `Record` modules.
+  renderer imports its `Layer`, `Option`, `Predicate` and `Record` modules.
+
+  **The store.** A `FormStore` over the definition's all-string input record
+  (`EntityFormData`), validated by the mode's `createInput` / `updateInput`.
+  It is constructed directly rather than through `createForm`, whose seed
+  overloads take only a schema whose decoded and encoded types are form data
+  trees: the definition types its input schemas `Command.FormInputField`
+  (`Schema.Codec<unknown, unknown>`), though each is a struct of strings at
+  runtime. The store's own constructor takes any service-free schema, so the
+  data type is stated here instead of asserted. Each entry is addressed by the
+  focus `form.root.key(entry.key)`.
 
   **Seeding.** `definition`, `mode`, `initial` and `initialRows` configure the
   store ONCE, at mount: a form never changes entity or mode mid-flight, and an
@@ -35,7 +45,7 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   enhancement); a SvelteKit app passes its `$app/forms`-backed `enhanceForm`,
   which this package cannot import.
 
-  **Form-level messages.** The store's root errors and the caller's
+  **Form-level messages.** The store's `formErrors` and the caller's
   `messages` (a failure the store never saw, such as a server action's
   `fail(500, { message })`) share one `FormErrors` block, store errors first.
 
@@ -45,7 +55,8 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   widget links to that id only if it puts it on its focusable part), and the
   form-level messages above them. It replaces the separate `FormErrors` block
   rather than nesting alerts in alerts. It takes focus only once the form has
-  been submitted (or was posted), and again on every further failed attempt.
+  been submitted (or was posted, `isPosted`), and again on every further
+  failed attempt.
 
   **Unsaved changes.** `saveBar` adds a `SaveBar` inside the form: it shows
   while the store has tainted fields (or a `rows` widget has been changed), Save is the form's own submit and Discard is the store's `reset()`
@@ -61,13 +72,13 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
 -->
 <script lang="ts">
   import {
-    createForm,
+    FormStore,
     type EntityFormDefinition,
-    type FieldHandle,
     type ScalarEntry,
     type SelectEntry,
     type WidgetEntry,
   } from '@thomasfosterau/effect-forms-svelte';
+  import * as Layer from 'effect/Layer';
   import * as Option from 'effect/Option';
   import * as P from 'effect/Predicate';
   import * as R from 'effect/Record';
@@ -85,9 +96,26 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   import FormErrors from './FormErrors.svelte';
   import SaveBar from './SaveBar.svelte';
 
-  type Store = ReturnType<typeof createForm>;
-  /** The props a widget entry receives: its definition's `props()` shape, owned by the form library. */
+  /** The store's data: the definition's all-string input, one value per entry key (absent until set). */
+  type EntityFormData = Readonly<Record<string, string | undefined>>;
+  /** The store `enhance` receives: validated by the mode's input schema, over {@link EntityFormData}. */
+  type Store = FormStore<EntityFormDefinition['createInput'], EntityFormData>;
+  /** A widget entry's own props: its definition's `props()` shape (`WidgetOwnProps`), owned by the form library. */
   type WidgetProps = ReturnType<WidgetEntry['props']>;
+  /** What the renderer bridges into a widget, spread after its own props. */
+  type WidgetBridge =
+    | {
+        readonly name: string;
+        readonly value: unknown[];
+        readonly onChange: (next: unknown[]) => void;
+        readonly errors: readonly string[];
+      }
+    | {
+        readonly name: string;
+        readonly value: string;
+        readonly onChange: (next: string) => void;
+        readonly errors: readonly string[];
+      };
 
   interface Props extends Omit<HTMLFormAttributes, 'action' | 'method' | 'children'> {
     /** The form definition from `defineEntityForm`. */
@@ -213,13 +241,18 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
       : undefined;
   const defaults = { ...baseDefaults, ...configured.initial, ...mintedId };
 
-  const form = createForm({
-    schema:
-      configured.mode === 'create'
-        ? configured.definition.createInput
-        : configured.definition.updateInput,
-    defaults,
-  });
+  // The blank, unposted state `createForm`'s seed overload would build (see
+  // the header for why the store is constructed directly).
+  const form: Store = new FormStore<EntityFormDefinition['createInput'], EntityFormData>(
+    { id: 'default', isValid: true, isPosted: false, data: defaults, errors: {} },
+    {
+      schema:
+        configured.mode === 'create'
+          ? configured.definition.createInput
+          : configured.definition.updateInput,
+      layer: Layer.empty,
+    },
+  );
   const entries = configured.definition.entriesFor(configured.mode);
   const seedRows = (): Record<string, unknown[]> =>
     R.fromEntries(
@@ -228,15 +261,14 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
         .map((entry) => [entry.key, [...(configured.initialRows[entry.key] ?? [])]]),
     );
 
-  // SAFETY: `defineEntityForm` validated every entry key against the derived
-  // all-string input schema. The definition types that schema `Schema.Top`,
-  // whose path-typed accessor admits no key (`never`), so the key is asserted
-  // into it and the handle typed by this function's own return type.
-  const handle = (key: string): FieldHandle<string | undefined> => form.field(key as never);
-  const getField = (key: string): string => handle(key).value ?? '';
+  // Every entry key is a key of the all-string input record, so its focus is
+  // a total lens: an absent key reads as `undefined`, and a write sets it.
+  const focus = (key: string) => form.root.key(key);
+  const getField = (key: string): string => form.get(focus(key)) ?? '';
   const setField = (key: string, next: string): void => {
-    handle(key).value = next;
+    form.set(focus(key), next);
   };
+  const fieldErrors = (key: string): readonly string[] => form.visibleErrorsAt(focus(key));
 
   let rows: Record<string, unknown[]> = $state(seedRows());
   let rowsChanged = $state(false);
@@ -250,7 +282,7 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     rowsChanged = false;
   };
 
-  const bridge = (entry: WidgetEntry): WidgetProps =>
+  const bridge = (entry: WidgetEntry): WidgetBridge =>
     entry.bridge === 'rows'
       ? {
           name: entry.key,
@@ -259,13 +291,13 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
             rows[entry.key] = next;
             rowsChanged = true;
           },
-          errors: handle(entry.key).visibleErrors,
+          errors: fieldErrors(entry.key),
         }
       : {
           name: entry.key,
           value: getField(entry.key),
           onChange: (next: string) => setField(entry.key, next),
-          errors: handle(entry.key).visibleErrors,
+          errors: fieldErrors(entry.key),
         };
 
   const selectOptions = (entry: SelectEntry) =>
@@ -290,15 +322,15 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
       (entry) => P.isTagged(entry, 'widget') && entry.options.gate === true && getField(entry.key) === '',
     ),
   );
-  // The empty path is the form's own (non-field) messages.
-  // The caller's `messages` (a server fault with no form state) follow them.
-  const rootErrors = $derived([...form.errorsAt([]), ...(messages ?? [])]);
+  // The form's own (non-field) messages, then the caller's `messages` (a
+  // server fault with no form state).
+  const rootErrors = $derived([...form.formErrors, ...(messages ?? [])]);
   const FORM_ID = 'entity-form';
   const controlId = (key: string): string => fieldId(FORM_ID, key);
   const summary = $derived(errorSummary === false ? undefined : errorSummary);
   const summaryItems = $derived(
     errorSummaryItems(
-      R.fromEntries(entries.map((entry) => [entry.key, handle(entry.key).visibleErrors])),
+      R.fromEntries(entries.map((entry) => [entry.key, fieldErrors(entry.key)])),
       FORM_ID,
     ),
   );
@@ -307,7 +339,7 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     id: controlId(entry.key),
     label: entry.options.label(),
     required: entry.options.required === true,
-    errors: handle(entry.key).visibleErrors,
+    errors: fieldErrors(entry.key),
     requiredLabel,
   });
 </script>
@@ -350,7 +382,7 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     <ErrorSummary
       errors={summaryItems}
       formErrors={rootErrors}
-      autofocus={form.isSubmitted || form.posted}
+      autofocus={form.isSubmitted || form.isPosted}
       focusKey={form.isSubmitted && !form.submitting ? form.submissionAttempts : undefined}
       title={summary === true ? undefined : summary.title}
       titlePrefix={summary === true ? undefined : summary.titlePrefix}
