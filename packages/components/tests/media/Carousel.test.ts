@@ -4,6 +4,7 @@ import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import Carousel from '../../src/lib/media/Carousel.svelte';
 import CarouselFixture from './fixtures/CarouselFixture.svelte';
+import CarouselStaleFixture from './fixtures/CarouselStaleFixture.svelte';
 
 const pause = (ms: number): Promise<void> =>
   new Promise((resolve) => {
@@ -146,4 +147,38 @@ test('spreads native attributes and merges class', async () => {
   await expect.element(region).toHaveAttribute('id', 'my-carousel');
   await expect.element(region).toHaveClass('mine');
   await expect.element(region).toHaveClass('flex');
+});
+
+test('a late observer batch describing the old position does not pull the index back', async () => {
+  const native = window.IntersectionObserver;
+  const callbacks: IntersectionObserverCallback[] = [];
+  // Capture each observer's callback so the test can deliver a stale batch at will.
+  window.IntersectionObserver = class extends native {
+    constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {
+      super(callback, options);
+      callbacks.push(callback);
+    }
+  };
+  try {
+    const screen = await render(CarouselStaleFixture);
+    await screen.getByRole('button', { name: 'Jump' }).click();
+    await expect.element(screen.getByTestId('index')).toHaveTextContent('1');
+    // Only the carousel's own observer is captured: toBeInViewport makes its own.
+    window.IntersectionObserver = native;
+    expect(callbacks).toHaveLength(1);
+    await expect.element(screen.getByText('Photo 2')).toBeInViewport();
+    // Let the smooth scroll finish, as in the race: the stale batch lands after it.
+    await pause(600);
+
+    // The initial "slide 1 intersecting" batch, delivered only now.
+    const first = screen.getByRole('group').all()[0]?.element();
+    if (first === undefined) throw new TypeError('no slides');
+    const stale: IntersectionObserverEntry = Object.create(IntersectionObserverEntry.prototype);
+    Object.defineProperty(stale, 'isIntersecting', { value: true });
+    Object.defineProperty(stale, 'target', { value: first });
+    for (const callback of callbacks) callback([stale], new native(() => {}));
+    await expect.element(screen.getByTestId('index')).toHaveTextContent('1');
+  } finally {
+    window.IntersectionObserver = native;
+  }
 });

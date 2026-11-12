@@ -12,7 +12,8 @@ An APG carousel: a named, scroll-snapped strip of slides with Previous / Next bu
   daisyUI's `carousel`, which brings touch swipe and momentum for free. An
   Embla-style engine would be a third-party dependency, which belongs in its
   own package. The script here only scrolls a slide into view on a button
-  press, tracks the slide in view with an `IntersectionObserver`, and runs
+  press, tracks the slide in view (an `IntersectionObserver` says when to
+  look; the strip's scroll position says which slide), and runs
   the rotation timer — all inside `$effect`, nothing at module top.
 
   ARIA contract: `<section aria-roledescription="carousel" aria-label>`;
@@ -164,17 +165,19 @@ An APG carousel: a named, scroll-snapped strip of slides with Previous / Next bu
     if (scroller === undefined) return;
     const root = scroller;
     const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          const seen = Array.prototype.indexOf.call(root.children, entry.target);
-          if (seen < 0) continue;
-          // Ignore the slides a long smooth scroll passes on its way.
-          if (pending !== undefined && seen !== pending) continue;
-          pending = undefined;
-          observed = seen;
-          index = seen;
-        }
+      () => {
+        // The entries only say that something moved: a batch can arrive late
+        // and describe where the strip WAS (the initial "slide 0 is in view"
+        // landing after a Next press has already scrolled on), so the slide
+        // in view is read from the strip's geometry now, one slide per view.
+        const width = root.clientWidth;
+        if (width === 0) return;
+        const seen = Math.min(Math.round(Math.abs(root.scrollLeft) / width), last);
+        // Ignore the slides a long smooth scroll passes on its way.
+        if (pending !== undefined && seen !== pending) return;
+        pending = undefined;
+        observed = seen;
+        index = seen;
       },
       { root, threshold: 0.6 },
     );
