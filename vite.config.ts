@@ -266,12 +266,14 @@ export default defineConfig({
       },
       // The `/entity-form` renderer: `effect` is an optional peer of this
       // package (#312), so every Effect rule applies to it except
-      // `prefer-option-over-null`, at 12 sites that are not this file's to
-      // change: 11 are the component's props, which stay `T | undefined`
+      // `prefer-option-over-null`, at 18 sites that are not this file's to
+      // change: 17 are the component's props, which stay `T | undefined`
       // because a Svelte prop is not an Effect option bag (the owner's
       // Option-everywhere decision, #405) and `Option<T>`
-      // props would make every caller import `effect`; 1 is the form
-      // library's own `FieldHandle<string | undefined>` API type.
+      // props would make every caller import `effect`; 1 is the store's data
+      // type, the form library's all-string input record
+      // (`Command.FormInputRecord`, where a field the submission left out is
+      // `undefined`), which a focus reads and writes as it is.
       {
         files: ['packages/components/src/lib/forms/EntityForm.svelte'],
         rules: {
