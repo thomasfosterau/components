@@ -70,7 +70,11 @@ export interface MapEdit {
 /** How few vertices each kind can be reduced to before it stops being one. */
 export const MINIMUM_VERTICES = { polygon: 3, line: 2, marker: 0 } as const;
 
-/** How near a pointer must come to a handle, in canvas units, to take it. */
+/**
+ * How near a pointer must come to a handle, in canvas units, to take it: the
+ * default `tolerance` of `vertexAt` and `midpointAt`. Canvas units, so it
+ * scales with the zoom exactly as the drawn handles do.
+ */
 export const HANDLE_TOLERANCE = 6;
 
 /** How near a pointer must come to a line to select it, in canvas units. */
@@ -105,7 +109,12 @@ export const shapeVertices = (shape: MapShape): readonly Point[] =>
     y: shape.position.y + point.y,
   }));
 
-/** The shape's box in CANVAS coordinates — what a click is tested against. */
+/**
+ * The shape's box in CANVAS coordinates — what a click is tested against.
+ *
+ * A marker (or an outline with no vertices) is a square of its `radius`,
+ * default 6, around its position.
+ */
 export const shapeBounds = (shape: MapShape): Rect => {
   const vertices = shapeVertices(shape);
   if (shape.type === 'marker' || vertices.length === 0) {

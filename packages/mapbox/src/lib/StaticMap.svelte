@@ -8,6 +8,12 @@ A map as one raster image from the Mapbox Static Images API.
   the server and in a `<noscript>`. A map surface starts here and upgrades to
   `DynamicMap` only where panning is the point.
 
+  It sets a 2x `srcset` entry beside the 1x `src`, so a high-density display
+  fetches the retina raster and any other display does not. `loading="lazy"`
+  and `decoding="async"` are always set. `src`, `srcset`, `width`, `height` and
+  `style` are not passable (the last is the MAP style here); every other native
+  `<img>` attribute is spread onto the element, and `class` is merged last.
+
   ## ARIA contract
 
   `alt` is REQUIRED rather than defaulted to `""`. A map is content — it says

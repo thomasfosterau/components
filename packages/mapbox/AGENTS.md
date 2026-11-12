@@ -24,4 +24,4 @@ Vitest browser mode, headless Chromium through Playwright; the sibling's [AGENTS
 
 ## Terms
 
-Map editor vocabulary (shape, grip vs indicator, committed edit, geo frame): see [README § Map editor vocabulary](README.md#map-editor-vocabulary).
+Map editor vocabulary (shape, grip vs indicator, committed edit, geo frame): see [docs/mapbox-plan-editor.md](../../docs/mapbox-plan-editor.md).

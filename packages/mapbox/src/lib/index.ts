@@ -16,6 +16,13 @@
  * depend even on the token, which is what keeps it working on a build that has
  * no Mapbox credential at all.
  *
+ * Install `mapbox-gl` (`^3.33.0`, required), `svelte` (`^5.40.0`) and
+ * `@thomasfosterau/components` beside it. `tailwindcss` (`^4`) and `daisyui`
+ * (`^5`) are required too, though not declared peers: the components emit
+ * daisyUI classes and ship no CSS, so add this package's `dist/` to Tailwind's
+ * `@source`. Mapbox GL's stylesheet is imported by `DynamicMap` inside its
+ * mount effect; do not import it yourself.
+ *
  * @module
  */
 
