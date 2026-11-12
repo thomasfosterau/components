@@ -58,6 +58,18 @@ export default defineConfig({
 
   run: {
     tasks: {
+      // The whole CI pipeline, in AGENTS.md § Verification order, so a local
+      // `vp run ci` and the CI workflow are the same thing: ci.yml runs only
+      // this after checkout, setup-vp and the frozen install. Fail-fast: the
+      // first red gate stops the run. Chromium first, at the revision the
+      // pinned `playwright` expects (a no-op when it is already there), for
+      // `test:unit` and `storybook:build`; then `sync`, which the type-aware
+      // lint and the Svelte type gate read.
+      ci: {
+        command:
+          'playwright install chromium && vp run -r sync && vp check && vp run check && vp run -r test:unit && vp run -r build && vp run --filter ./packages/components storybook:build && pnpm audit --audit-level high',
+        cache: false,
+      },
       // The type-check gate, as one task: every package's `check` pipeline
       // (`svelte-kit sync` + svelte-check; `tsc` in packages/charts). A pure graph node — the root
       // depends on every package purely so this edge reaches them.
