@@ -42,7 +42,11 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
     or toggles (multiple); `*` expands every sibling parent; printable
     characters typeahead (500 ms buffer; one key repeated cycles). In
     multiple selection Shift+↓/↑ moves and adds the node reached to the
-    selection, and Ctrl/⌘+A selects every visible enabled node.
+    selection, Shift+Space selects from the node last toggled (by Space or a
+    click) to the focused one, Ctrl/⌘+Shift+Home/End selects from the focused
+    node to the first / last and moves there, and Ctrl/⌘+A selects every
+    visible enabled node — `Listbox`'s recommended model. A range never
+    selects a disabled node.
   - A disabled node stays focusable and expandable (its children may not be
     disabled) but is never selected or activated.
   - Pointer: clicking a row focuses and selects it (toggles, in multiple
@@ -56,6 +60,19 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
   collapses, or the tree unmounts, before it resolves; a rejection collapses
   the node again, so expanding it retries.
 -->
+<script module lang="ts">
+  /** Which multiple-selection chord a keydown is, if any. */
+  function selectionChordOf(event: KeyboardEvent): 'all' | 'first' | 'last' | 'range' | undefined {
+    if (event.altKey) return undefined;
+    const command = event.ctrlKey || event.metaKey;
+    if (command && event.key.toLowerCase() === 'a') return 'all';
+    if (command && event.shiftKey && event.key === 'Home') return 'first';
+    if (command && event.shiftKey && event.key === 'End') return 'last';
+    if (!command && event.shiftKey && event.key === ' ') return 'range';
+    return undefined;
+  }
+</script>
+
 <script lang="ts" generics="T">
   import { ChevronRight } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
@@ -77,6 +94,7 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
     typeaheadTreeIndex,
     visibleTreeNodes,
     type TreeNode,
+    type VisibleTreeNode,
     type TreeRowState,
     type TreeSelection,
     type TreeShape,
@@ -258,6 +276,9 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
     elements.get(node.id)?.focus();
   }
 
+  /** The node Space or a click last toggled: where Shift+Space ranges from. */
+  let anchorId: string | undefined;
+
   function toggleExpanded(node: TreeNode<T>): void {
     if (expanded.has(node.id)) expanded.delete(node.id);
     else expanded.add(node.id);
@@ -273,10 +294,20 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
   }
 
   function toggleSelected(node: TreeNode<T>): void {
+    anchorId = node.id;
     if (selection === 'multiple' && node.disabled !== true && selected.has(node.id)) {
       selected.delete(node.id);
     } else {
       select(node);
+    }
+  }
+
+  /** Select every enabled visible node between two visible indices, inclusive. */
+  function selectBetween(from: number, to: number): void {
+    const [low, high] = from <= to ? [from, to] : [to, from];
+    for (let index = low; index <= high; index += 1) {
+      const between = visible[index];
+      if (between !== undefined) select(between.node);
     }
   }
 
@@ -296,48 +327,75 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
     if (match !== -1) focusNode(visible[match]?.node);
   }
 
+  /** Multiple selection's chords: Ctrl/⌘+A, Ctrl/⌘+Shift+Home/End, Shift+Space. Whether one matched. */
+  function selectionChord(event: KeyboardEvent, index: number): boolean {
+    const chord = selection === 'multiple' ? selectionChordOf(event) : undefined;
+    if (chord === undefined) return false;
+    if (chord === 'all') {
+      for (const other of visible) select(other.node);
+    } else if (chord === 'range') {
+      const from = anchorId === undefined ? -1 : treeIndexOf(visible, anchorId);
+      selectBetween(from === -1 ? index : from, index);
+    } else {
+      const edge = chord === 'first' ? 0 : visible.length - 1;
+      selectBetween(index, edge);
+      focusNode(visible[edge]?.node);
+    }
+    return true;
+  }
+
+  /** The arrow, Home and End keys. Whether one matched. */
+  function navigationKey(event: KeyboardEvent, index: number, entry: VisibleTreeNode<T>): boolean {
+    const { node } = entry;
+    switch (event.key) {
+      case 'ArrowDown':
+      case 'ArrowUp': {
+        const target =
+          visible[event.key === 'ArrowDown' ? nextTreeIndex(visible, index) : previousTreeIndex(index)];
+        focusNode(target?.node);
+        if (event.shiftKey && selection === 'multiple' && target !== undefined) select(target.node);
+        return true;
+      }
+      case 'ArrowRight':
+        if (entry.parent && !entry.expanded) expanded.add(node.id);
+        else if (entry.expanded) focusNode(visible[firstChildTreeIndex(visible, index)]?.node);
+        return true;
+      case 'ArrowLeft':
+        if (entry.expanded) expanded.delete(node.id);
+        else focusNode(visible[parentTreeIndex(visible, index)]?.node);
+        return true;
+      case 'Home':
+        focusNode(visible[0]?.node);
+        return true;
+      case 'End':
+        focusNode(visible.at(-1)?.node);
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  /** Enter, Space, `*` and typeahead. Whether one matched. */
+  function actionKey(event: KeyboardEvent, index: number, node: TreeNode<T>): boolean {
+    if (event.key === 'Enter') activate(node);
+    else if (event.key === ' ') toggleSelected(node);
+    else if (event.key === '*') {
+      for (const siblingId of siblingParentIds(visible, index)) expanded.add(siblingId);
+    } else if (event.key.length === 1 && event.key.trim() !== '') typeahead(index, event.key);
+    else return false;
+    return true;
+  }
+
   const onkeydown: KeyboardEventHandler<HTMLUListElement> = (event) => {
     callerKeydown?.(event);
     if (event.defaultPrevented) return;
     const index = treeIndexOf(visible, focusedId);
     const entry = visible[index];
     if (entry === undefined) return;
-    const { node } = entry;
-    const command = event.ctrlKey || event.metaKey;
-    const multiple = selection === 'multiple';
-    let handled = true;
-
-    if (command && !event.altKey && event.key.toLowerCase() === 'a' && multiple) {
-      for (const other of visible) select(other.node);
-    } else if (command || event.altKey) {
-      handled = false;
-    } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      const target =
-        visible[event.key === 'ArrowDown' ? nextTreeIndex(visible, index) : previousTreeIndex(index)];
-      focusNode(target?.node);
-      if (event.shiftKey && multiple && target !== undefined) select(target.node);
-    } else if (event.key === 'ArrowRight') {
-      if (entry.parent && !entry.expanded) expanded.add(node.id);
-      else if (entry.expanded) focusNode(visible[firstChildTreeIndex(visible, index)]?.node);
-    } else if (event.key === 'ArrowLeft') {
-      if (entry.expanded) expanded.delete(node.id);
-      else focusNode(visible[parentTreeIndex(visible, index)]?.node);
-    } else if (event.key === 'Home') {
-      focusNode(visible[0]?.node);
-    } else if (event.key === 'End') {
-      focusNode(visible.at(-1)?.node);
-    } else if (event.key === 'Enter') {
-      activate(node);
-    } else if (event.key === ' ') {
-      toggleSelected(node);
-    } else if (event.key === '*') {
-      for (const siblingId of siblingParentIds(visible, index)) expanded.add(siblingId);
-    } else if (event.key.length === 1 && event.key.trim() !== '') {
-      typeahead(index, event.key);
-    } else {
-      handled = false;
-    }
-
+    const plain = !(event.ctrlKey || event.metaKey || event.altKey);
+    const handled =
+      selectionChord(event, index) ||
+      (plain && (navigationKey(event, index, entry) || actionKey(event, index, entry.node)));
     if (handled) event.preventDefault();
   };
 

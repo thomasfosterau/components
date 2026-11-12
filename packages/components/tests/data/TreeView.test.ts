@@ -317,6 +317,51 @@ describe('TreeView', () => {
       .toHaveAttribute('aria-selected', 'false');
   });
 
+  test('multiple selection: Shift+Space selects from the last toggled node, skipping disabled ones', async () => {
+    const selected = new SvelteSet<string>();
+    const screen = await render(TreeView, {
+      nodes: taxa,
+      label: 'Taxa',
+      selection: 'multiple',
+      selected,
+    });
+
+    await userEvent.tab();
+    await userEvent.keyboard(' ');
+    expect([...selected]).toEqual(['rosaceae']);
+    await userEvent.keyboard('{ArrowDown}{ArrowDown}{Shift>} {/Shift}');
+    await expect.element(screen.getByRole('treeitem', { name: 'Incertae sedis' })).toHaveFocus();
+    expect([...selected].toSorted()).toEqual(['amaryllidaceae', 'rosaceae']);
+  });
+
+  test('multiple selection: Ctrl+Shift+End / Home select to the last / first node and move there', async () => {
+    const selected = new SvelteSet<string>();
+    const screen = await render(TreeView, {
+      nodes: taxa,
+      label: 'Taxa',
+      selection: 'multiple',
+      selected,
+    });
+
+    await userEvent.tab();
+    await userEvent.keyboard('{ArrowDown}{Control>}{Shift>}{End}{/Shift}{/Control}');
+    await expect.element(screen.getByRole('treeitem', { name: 'Incertae sedis' })).toHaveFocus();
+    expect([...selected]).toEqual(['amaryllidaceae']);
+
+    await userEvent.keyboard('{Control>}{Shift>}{Home}{/Shift}{/Control}');
+    await expect.element(screen.getByRole('treeitem', { name: 'Rosaceae' })).toHaveFocus();
+    expect([...selected].toSorted()).toEqual(['amaryllidaceae', 'rosaceae']);
+  });
+
+  test('single selection ignores the range keys', async () => {
+    const selected = new SvelteSet<string>();
+    await render(TreeView, { nodes: taxa, label: 'Taxa', selected });
+
+    await userEvent.tab();
+    await userEvent.keyboard('{Control>}{Shift>}{End}{/Shift}{/Control}');
+    expect([...selected]).toEqual([]);
+  });
+
   test('a disabled node is focusable but never selected or activated', async () => {
     const onActivate = vi.fn<(node: TreeNode) => void>();
     const screen = await render(TreeView, { nodes: taxa, label: 'Taxa', onActivate });
