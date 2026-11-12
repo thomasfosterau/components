@@ -1,6 +1,6 @@
 # Fields and forms
 
-Form controls wired through the `FormField` + `FieldControl` contract, and the parts of a form that are not one control (`ErrorSummary`, `FormErrors`, `FormActions`, `SearchForm`, `HiddenField`). Each component's props, defaults, snippets and ARIA contract are in its doc comments, so they show on hover in your editor and in the generated `.d.ts`; this guide covers what a doc comment cannot: how the family fits together, which component to choose, and worked examples.
+Form controls wired through the `FormField` + `FieldControl` contract, and the parts of a form that are not one control (`ErrorSummary`, `FormErrors`, `FormActions`, `SearchForm`, `HiddenField`, `SaveBar`, the leave guard). Each component's props, defaults, snippets and ARIA contract are in its doc comments, so they show on hover in your editor and in the generated `.d.ts`; this guide covers what a doc comment cannot: how the family fits together, which component to choose, and worked examples.
 
 Form controls wired through the `FormField` + `FieldControl` contract. `FormField` (one control) or `Fieldset` (a group) owns the label, hint and errors; it derives `hintId`/`errorId` from a single `id` and hands `children` a `FieldControl`:
 
@@ -120,3 +120,37 @@ The split from `fields` is by who owns the message: a `FormErrors` message has n
 <!-- A GET form on purpose: a search result should be a URL people can bookmark, share and go back to. -->
 <SearchForm action="/search" name="query" label="Search the site" placeholder="Scientific or common name" />
 ```
+
+### Unsaved changes: `SaveBar` and the leave guard
+
+`SaveBar` shows "Unsaved changes" with Discard and Save, sticky at the bottom (or `position="top"`), from the first edit until the form is saved or discarded. Save is a real submit button tied to the form by `form="…"`, so it works from outside the `<form>` and without scripting; give it `onSave` instead to run a callback. It never takes focus, announces itself once (and "Saved" when it goes away) in a polite status region, and asks "Discard changes?" before `onDiscard` unless `confirmDiscard={false}`. A sticky bar can cover a focused field, so give the scroller room: `html { scroll-padding-block: 5rem; }` (at least the bar's height). `EntityForm` takes `saveBar` and does all of this from its own store; `bind:dirty` hands its dirty state to a guard.
+
+`createLeaveGuard({ dirty })` covers the two ways out of a page. Closing the tab goes through the browser's `beforeunload`, which the guard registers only while `dirty()` is true, so clean pages stay eligible for the back/forward cache; browsers show their own generic text there and ignore any custom message, so there is none to set. An in-app link is the router's, and this library cannot import `$app/navigation`, so wire `shouldBlock()` and `confirmLeave()` into your layout's `beforeNavigate` and mount one `LeaveGuardDialog` (an `alertdialog`; focus starts on Stay, Escape is Stay). Create the guard while a component initialises.
+
+```svelte
+<script lang="ts">
+  import { beforeNavigate, goto } from '$app/navigation';
+  import { createLeaveGuard, LeaveGuardDialog, SaveBar } from '@thomasfosterau/components';
+
+  let dirty = $state(false);
+  const guard = createLeaveGuard({ dirty: () => dirty });
+
+  let leaving = false;
+  beforeNavigate((nav) => {
+    if (leaving || nav.type === 'leave' || !guard.shouldBlock()) return;
+    nav.cancel();
+    void guard.confirmLeave().then((leave) => {
+      if (leave && nav.to) {
+        leaving = true;
+        void goto(nav.to.url);
+      }
+    });
+  });
+</script>
+
+<form id="edit-bed" method="post"><!-- fields set dirty = true --></form>
+<SaveBar {dirty} form="edit-bed" onDiscard={() => (dirty = false)} />
+<LeaveGuardDialog {guard} />
+```
+
+(`nav.type === 'leave'` is the tab closing, which the guard's own `beforeunload` handles.)

@@ -1,6 +1,7 @@
 /**
  * forms — the pieces of a form that are not one control: the field-error summary, the whole-form error
- * list, the submit row, a hidden command field, and the site search form.
+ * list, the submit row, a hidden command field, and the site search form, plus
+ * the unsaved-changes pair: `SaveBar` and the leave guard.
  *
  * Everything field-level lives in `fields/`. The split is by who owns the
  * message: a `FormErrors` message has no field to attach to, and a
@@ -14,9 +15,14 @@ export { default as FormActions } from './FormActions.svelte';
 export { default as FormErrors } from './FormErrors.svelte';
 export { default as HiddenField } from './HiddenField.svelte';
 export { default as SearchForm } from './SearchForm.svelte';
+export { default as LeaveGuardDialog } from './LeaveGuardDialog.svelte';
+export { default as SaveBar } from './SaveBar.svelte';
 export {
   errorSummaryItems,
   fieldId,
   type ErrorSummaryItem,
   type ErrorSummaryRecord,
 } from './error-summary.ts';
+
+export { createLeaveGuard } from './leave-guard.svelte.ts';
+export type { LeaveGuard, LeaveGuardDialogState, LeaveGuardOptions } from './leave-guard.svelte.ts';

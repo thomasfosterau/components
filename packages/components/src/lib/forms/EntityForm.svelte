@@ -47,6 +47,11 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   rather than nesting alerts in alerts. It takes focus only once the form has
   been submitted (or was posted), and again on every further failed attempt.
 
+  **Unsaved changes.** `saveBar` adds a `SaveBar` inside the form: it shows
+  while the store has tainted fields (or a `rows` widget has been changed), Save is the form's own submit and Discard is the store's `reset()`
+  plus the rows' seed, so nothing is duplicated. Pair it with
+  `bind:dirty` and `createLeaveGuard({ dirty: () => dirty })` in the page to guard navigation.
+
   Accessibility: each control is labelled by its `FormField`, field errors are
   reached through `aria-describedby`, and root errors and `messages` are
   `FormErrors` alerts (one `role="alert"` each).
@@ -66,6 +71,7 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   import * as Option from 'effect/Option';
   import * as P from 'effect/Predicate';
   import * as R from 'effect/Record';
+  import type { ComponentProps } from 'svelte';
   import type { HTMLFormAttributes } from 'svelte/elements';
   import DateInput from '../fields/DateInput.svelte';
   import type { FieldControl } from '../fields/field-types.ts';
@@ -77,6 +83,7 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   import ErrorSummary from './ErrorSummary.svelte';
   import { errorSummaryItems, fieldId } from './error-summary.ts';
   import FormErrors from './FormErrors.svelte';
+  import SaveBar from './SaveBar.svelte';
 
   type Store = ReturnType<typeof createForm>;
   /** The props a widget entry receives: its definition's `props()` shape, owned by the form library. */
@@ -153,6 +160,20 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
           readonly titlePrefix?: string | undefined;
         }
       | undefined;
+    /**
+     * Show a `SaveBar` while the form has unsaved changes.
+     * @defaultValue `false`
+     */
+    saveBar?: boolean | undefined;
+    /**
+     * Whether the form has unsaved changes; output only, for `bind:dirty` into a leave guard.
+     * @defaultValue `false`
+     */
+    dirty?: boolean | undefined;
+    /** Props for the save bar (`position`, labels, `confirmDiscard`); the form owns `dirty`, `saving`, Save and Discard. */
+    saveBarProps?:
+      | Omit<ComponentProps<typeof SaveBar>, 'dirty' | 'form' | 'onSave' | 'onDiscard' | 'saving'>
+      | undefined;
   }
 
   let {
@@ -170,6 +191,9 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     requiredLabel,
     messages,
     errorSummary = false,
+    saveBar = false,
+    dirty = $bindable(false),
+    saveBarProps,
     class: className,
     ...rest
   }: Props = $props();
@@ -197,6 +221,12 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     defaults,
   });
   const entries = configured.definition.entriesFor(configured.mode);
+  const seedRows = (): Record<string, unknown[]> =>
+    R.fromEntries(
+      entries
+        .filter((entry) => P.isTagged(entry, 'widget') && entry.bridge === 'rows')
+        .map((entry) => [entry.key, [...(configured.initialRows[entry.key] ?? [])]]),
+    );
 
   // SAFETY: `defineEntityForm` validated every entry key against the derived
   // all-string input schema. The definition types that schema `Schema.Top`,
@@ -208,13 +238,17 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     handle(key).value = next;
   };
 
-  let rows: Record<string, unknown[]> = $state(
-    R.fromEntries(
-      entries
-        .filter((entry) => P.isTagged(entry, 'widget') && entry.bridge === 'rows')
-        .map((entry) => [entry.key, [...(configured.initialRows[entry.key] ?? [])]]),
-    ),
-  );
+  let rows: Record<string, unknown[]> = $state(seedRows());
+  let rowsChanged = $state(false);
+  const isDirty = $derived(form.isTainted || rowsChanged);
+  $effect(() => {
+    dirty = isDirty;
+  });
+  const discard = (): void => {
+    form.reset();
+    rows = seedRows();
+    rowsChanged = false;
+  };
 
   const bridge = (entry: WidgetEntry): WidgetProps =>
     entry.bridge === 'rows'
@@ -223,6 +257,7 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
           value: rows[entry.key] ?? [],
           onChange: (next: unknown[]) => {
             rows[entry.key] = next;
+            rowsChanged = true;
           },
           errors: handle(entry.key).visibleErrors,
         }
@@ -354,4 +389,8 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     {cancelHref}
     {cancelLabel}
   />
+
+  {#if saveBar}
+    <SaveBar {...saveBarProps} dirty={isDirty} saving={form.submitting} onDiscard={discard} />
+  {/if}
 </form>

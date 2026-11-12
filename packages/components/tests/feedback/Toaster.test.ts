@@ -80,11 +80,16 @@ test('the dismiss button is a labelled control and removes its toast', async () 
 });
 
 test('a toast dismisses itself after its duration', async () => {
-  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
   const screen = await render(ToasterFixture, { toastDurationMs: 5_000 });
   const toast = () => screen.getByText('Bed 1 saved').elements();
+  const push = screen.getByRole('button', { name: 'Push a toast' }).element();
 
-  await userEvent.click(screen.getByRole('button', { name: 'Push a toast' }));
+  // Push synchronously: a `userEvent` action awaited under fake timers advances
+  // them 50 ms per 50 ms of real time until the provider answers (Vitest 5.1's
+  // `advanceFakeTimersWhilePending`), so the clock would already be past the
+  // push when the action resolves.
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+  push.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   flushSync();
   // The clock is held, so presence no longer races the timer.
   expect(toast()).toHaveLength(1);

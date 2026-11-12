@@ -1,3 +1,4 @@
+import { userEvent } from 'vite-plus/test/browser';
 import { describe, expect, it } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import { createForm } from '@thomasfosterau/effect-forms-svelte';
@@ -225,5 +226,45 @@ describe('errorSummary', () => {
       messages: ['Nope'],
     });
     await expect.element(screen.getByRole('alert', { name: 'Fix these' })).toBeInTheDocument();
+  });
+});
+
+describe('saveBar', () => {
+  it('renders no bar unless asked', async () => {
+    const screen = await render(EntityForm, { definition: thingForm, mode: 'create' });
+    await userEvent.type(screen.getByRole('textbox', { name: /Title/ }), 'x');
+    expect(screen.getByRole('region').elements()).toHaveLength(0);
+  });
+
+  it('shows the bar after a field edit, and Discard resets the form', async () => {
+    const screen = await render(EntityForm, {
+      definition: thingForm,
+      mode: 'create',
+      saveBar: true,
+    });
+    expect(screen.getByRole('region').elements()).toHaveLength(0);
+
+    const title = screen.getByRole('textbox', { name: /Title/ });
+    await userEvent.type(title, 'Roses');
+    const bar = screen.getByRole('region', { name: 'Unsaved changes' });
+    await expect.element(bar).toBeInTheDocument();
+
+    await userEvent.click(bar.getByRole('button', { name: 'Discard' }));
+    await userEvent.click(screen.getByRole('dialog').getByRole('button', { name: 'Discard' }));
+    await expect.element(title).toHaveValue('');
+    await expect.element(screen.getByRole('region')).not.toBeInTheDocument();
+  });
+
+  it('reports dirty through bind:dirty-style props and takes saveBarProps', async () => {
+    const screen = await render(EntityForm, {
+      definition: thingForm,
+      mode: 'create',
+      saveBar: true,
+      saveBarProps: { message: 'Not saved yet', position: 'top' },
+    });
+    await userEvent.type(screen.getByRole('textbox', { name: /Title/ }), 'x');
+    await expect
+      .element(screen.getByRole('region', { name: 'Not saved yet' }))
+      .toHaveClass('top-0');
   });
 });
