@@ -60,11 +60,11 @@ These are the Svelte packages' conventions; `packages/charts` follows the langua
 - **bits-ui owns interaction.** Anything with focus management, keyboard semantics, a popover, or an ARIA relationship between elements is built on a bits-ui primitive rather than hand-rolled. Hand-rolling is the exception, and it needs a reason in the component's header comment.
 - **ARIA is part of the contract, not decoration.** A component's accessible name, role and state are its public API as much as its props are, and they are pinned by a test.
 - **Every component ships with a story and a browser test.** One `*.stories.svelte` / `*.stories.ts` per component under `src/stories/<family>/` and one `tests/<family>/<Component>.test.ts`, both mirroring `src/lib/<family>/` (in `packages/mapbox`, which is one family, the `<family>/` level is dropped) — not beside the component, because `svelte-package` copies every `src/lib/` file into `dist/` and stories must not ship. Snippet-taking components use Svelte CSF (`defineMeta` + `<Story>`), prop-only ones plain CSF.
-- **Families, entry points, and when a family becomes a package.** Core families (`ui`, `feedback`, `layout`, `fields`, `forms`, `data`, `infobox`, `formatting`, `links`, `media`, `hotkeys`, `search`) are re-exported from `@thomasfosterau/components`' root barrel; `citations`, `canvas`, `charts`, `tips` and `seo` are separate `exports` entries (`@thomasfosterau/components/<family>`), as is `entity-form` (the `forms` family's `EntityForm`, kept out of the barrel because of its optional peer) so a consumer that never uses them never loads them. `hotkeys` is also its own entry (`/hotkeys`) while staying in the barrel, so a consumer can load `HotkeyHelpDialog` lazily. A new family gets a barrel, an `exports` entry if heavy, and a README section.
+- **Families, entry points, and when a family becomes a package.** Core families (`ui`, `feedback`, `layout`, `fields`, `forms`, `data`, `infobox`, `formatting`, `links`, `media`, `hotkeys`, `search`) are re-exported from `@thomasfosterau/components`' root barrel; `citations`, `canvas`, `charts`, `tips` and `seo` are separate `exports` entries (`@thomasfosterau/components/<family>`), as is `entity-form` (the `forms` family's `EntityForm`, kept out of the barrel because of its optional peer) so a consumer that never uses them never loads them. `hotkeys` is also its own entry (`/hotkeys`) while staying in the barrel, so a consumer can load `HotkeyHelpDialog` lazily. A new family gets a barrel, an `exports` entry if heavy, and a README row and, when it needs more than a doc comment, a `docs/` guide.
 
   **A component whose behaviour needs a specific third-party dependency lives in its own package adjacent to `packages/components`, so the core stays free of it** — the dependency becomes that package's required peer, and installing the package is the decision to take it on. `packages/mapbox` is the worked example: `@thomasfosterau/components-mapbox`, `mapbox-gl` required. An "optional peer" of the core library is the shape this rule replaces; nothing in this workspace could check it. `canvas`, `charts`, `citations` and `tips` need no such dependency and stay where they are.
 
-- **Prefer vertical slices per component** over horizontal sweeps: component → barrel export → story → test → README row, finished, before starting the next.
+- **Prefer vertical slices per component** over horizontal sweeps: component → barrel export → story → test → README row (families only), finished, before starting the next.
 
 ## Commands
 
@@ -109,13 +109,15 @@ One home per fact:
 - **`AGENTS.md`** (this file) — repo-wide rules for any coding agent: pitfalls, conventions, the gate list, the work tracker.
 - **Package `AGENTS.md`** — that package's boundary, invariants and terms. Its `CLAUDE.md` only imports it (`@AGENTS.md`).
 - **`.claude/CLAUDE.md`** — what is specific to Claude Code: its hooks and session constraints. It imports this file, CONTRIBUTING.md and the README rather than repeating them; there is no root `CLAUDE.md`.
-- **Package `README.md`** — the API reference consumers read on npm. The root `README.md` is the landing page.
+- **Package `README.md`** — short, and read on npm: what the package is, install, one minimal example, a table of entry points, and absolute links. It holds no API detail. The root `README.md` is the repo landing page.
+- **Component doc comments** — the API reference: the `@component` one-liner, the header's ARIA contract and a `/** */` (with `@defaultValue`) per prop.
+- **`docs/*.md`** — longer guides and concepts, linked from the READMEs.
 - **`CONTRIBUTING.md`** — setup, the hooks, the commands, and the branch / pull request / changeset rules. **`PUBLISHING.md`** — the release flow and its one-time owner setup. **`SECURITY.md`** — the reporting channel and the supply-chain posture.
 - **`.fallowrc.json` / `fallow-rules.json`** — the entry points and the import boundaries, each exemption commented where it is made.
 - **Issue comments** — decisions and findings, later comments overriding the body.
 - **`.claude/rules/`** — a Claude rule that must be visible when touching certain files (none exist yet). Formatter and lint config goes in `vite.config.ts` first.
 
-There is no `docs/` tree.
+`docs/*.md` holds the longer guides (setup, decision guides such as which choice control, worked examples), named `docs/<package>-<topic>.md`. One home per fact: API detail (props, defaults, ARIA, keyboard) lives in the doc comments, how-tos in `docs/`, and a package README is only the short landing page.
 
 ## Fallow local gate
 

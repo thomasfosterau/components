@@ -6,43 +6,11 @@ Accessible Svelte 5 components built on Tailwind CSS 4, daisyUI 5 and bits-ui, w
 
 | Package | npm | What it is |
 | --- | --- | --- |
-| [`@thomasfosterau/components`](./packages/components) | [![npm](https://img.shields.io/npm/v/@thomasfosterau/components)](https://www.npmjs.com/package/@thomasfosterau/components) | Accessible Svelte 5 UI primitives: daisyUI classes for styling, bits-ui for interaction, every string a prop. The core families in one barrel; citations, canvas, charts, tips, SEO, hotkeys and the Effect-backed `EntityForm` behind their own entry points. |
-| [`@thomasfosterau/components-mapbox`](./packages/mapbox) | [![npm](https://img.shields.io/npm/v/@thomasfosterau/components-mapbox)](https://www.npmjs.com/package/@thomasfosterau/components-mapbox) | Mapbox GL maps and a plan editor for `@thomasfosterau/components`: a static raster, the interactive surface, and the GeoJSON seam. `mapbox-gl` is a required peer. |
-| [`@thomasfosterau/charts`](./packages/charts) | [![npm](https://img.shields.io/npm/v/@thomasfosterau/charts)](https://www.npmjs.com/package/@thomasfosterau/charts) | A portable, renderer-agnostic chart spec and its JSON Schema, a pure TypeScript geometry core, and Svelte, ProseMirror and Vega-Lite interpreters (plus the Swift `ChartSpecKit`). Its Svelte `Chart` reads the spec; the core library's `/charts` one takes series props. |
+| [`@thomasfosterau/components`](https://github.com/thomasfosterau/components/blob/trunk/packages/components/README.md) | [![npm](https://img.shields.io/npm/v/@thomasfosterau/components)](https://www.npmjs.com/package/@thomasfosterau/components) | Accessible Svelte 5 UI primitives: daisyUI classes for styling, bits-ui for interaction, every string a prop. |
+| [`@thomasfosterau/components-mapbox`](https://github.com/thomasfosterau/components/blob/trunk/packages/mapbox/README.md) | [![npm](https://img.shields.io/npm/v/@thomasfosterau/components-mapbox)](https://www.npmjs.com/package/@thomasfosterau/components-mapbox) | Mapbox GL maps and a plan editor for the components. `mapbox-gl` is a required peer. |
+| [`@thomasfosterau/charts`](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/README.md) | [![npm](https://img.shields.io/npm/v/@thomasfosterau/charts)](https://www.npmjs.com/package/@thomasfosterau/charts) | A portable, renderer-agnostic chart spec and its JSON Schema, with Svelte, ProseMirror and Vega-Lite interpreters. |
 
-## Install
-
-```sh
-pnpm add @thomasfosterau/components
-```
-
-The components ship uncompiled `.svelte` files and Tailwind class names, so your app needs `svelte` 5, Tailwind CSS 4 and daisyUI 5. Point Tailwind at the package and import its themes from your CSS entry:
-
-```css
-@import 'tailwindcss';
-@source '../node_modules/@thomasfosterau/components/dist';
-@plugin "daisyui" {
-  themes: false;
-}
-@import '@thomasfosterau/components/theme.css';
-```
-
-## Example
-
-```svelte
-<script lang="ts">
-  import { Alert, Button } from '@thomasfosterau/components';
-
-  let saved = $state(false);
-</script>
-
-<Button onclick={() => (saved = true)}>Save</Button>
-{#if saved}
-  <Alert tone="success">Saved.</Alert>
-{/if}
-```
-
-App integration (links, navigation, locale), every family's props and the entry points are in the [components reference](./packages/components/README.md). The maps are in the [`components-mapbox` reference](./packages/mapbox/README.md); the chart spec, its interpreters and the capability matrix in the [`charts` reference](./packages/charts/README.md).
+The guides are in [`docs/`](https://github.com/thomasfosterau/components/blob/trunk/docs).
 
 ## Contributing
 

@@ -3,6 +3,7 @@ The picture at the top of an `Infobox`, with its caption.
 -->
 <!--
   InfoboxImage — the picture at the top of an `Infobox`, with its caption.
+  A `<figure>` around an `<img>` and, with a `caption`, a `<figcaption>`.
 
   `width`/`height` are passed through so the browser can reserve the box
   before the bytes arrive — the difference between a page that settles and

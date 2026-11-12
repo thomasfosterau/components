@@ -32,7 +32,8 @@ const PARAGRAPH_SEPARATOR = new RegExp(String.fromCharCode(0x2029), 'g');
 
 /**
  * Serialise a JSON-LD object to a string safe to embed in a
- * `<script type="application/ld+json">` block. The output is valid JSON that
+ * `<script type="application/ld+json">` block. `<`, `>`, `&`, U+2028 and U+2029
+ * are escaped so authored text cannot close the script element. The output is valid JSON that
  * round-trips through `JSON.parse` to the input.
  */
 export function serializeJsonLd(data: JsonLdObject): string {

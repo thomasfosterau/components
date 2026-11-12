@@ -5,7 +5,7 @@ A modal on bits-ui’s `Dialog`, wearing daisyUI’s `modal-box`.
   Dialog — a modal on bits-ui's `Dialog`, wearing daisyUI's `modal-box`.
 
   ARIA contract: everything that makes a modal a modal is bits-ui's — the
-  focus trap, the initial focus move, `aria-modal`, the `aria-labelledby` /
+  `role="dialog"` with `aria-modal`, the focus trap, the initial focus move, `aria-modal`, the `aria-labelledby` /
   `aria-describedby` wiring to `Dialog.Title` and `Dialog.Description`,
   Escape and outside-click dismissal, the scroll lock, and returning focus
   to whatever opened it. None of that is re-implemented here, because the

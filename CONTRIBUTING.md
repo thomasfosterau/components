@@ -65,6 +65,6 @@ pnpm audit --audit-level high
 1. Run the gates in [AGENTS.md § Verification](./AGENTS.md#verification) and note each result in the pull request.
 2. Add a changeset (`pnpm changeset`) where [§ Branches, pull requests and changesets](#branches-pull-requests-and-changesets) asks for one.
 3. Rebase onto `trunk`: `git fetch origin trunk && git rebase origin/trunk`. Don't merge `trunk` into your branch.
-4. Update the docs: the package `README.md` for any change to what a package exports, the package `AGENTS.md` for a new term or invariant, and a story and a browser test for a new component.
+4. Update the docs: the component's doc comments (`@component`, the header's ARIA contract, a `/** */` per prop) for any change to its API, the matching `docs/` guide when a how-to or decision guide changes, the package `README.md` only when its entry-point table changes, the package `AGENTS.md` for a new term or invariant, and a story and a browser test for a new component.
 
 Security issues go through [SECURITY.md](./SECURITY.md), not a public issue.

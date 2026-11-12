@@ -2,7 +2,8 @@
 One label/value pair inside an `InfoboxSection`.
 -->
 <!--
-  InfoboxRow — one label/value pair inside an `InfoboxSection`.
+  InfoboxRow — one label/value pair inside an `InfoboxSection`: a `<dt>` and
+  a `<dd>` in a `<div>`. `children` win over `value`.
 
   Absent by default: a row with neither a `value` nor `children` renders no
   DOM at all, so a page can build a run of rows straight off sparse resource

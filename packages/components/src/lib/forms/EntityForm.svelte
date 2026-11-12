@@ -39,6 +39,10 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   `messages` (a failure the store never saw, such as a server action's
   `fail(500, { message })`) share one `FormErrors` block, store errors first.
 
+  Accessibility: each control is labelled by its `FormField`, field errors are
+  reached through `aria-describedby`, and root errors and `messages` are
+  `FormErrors` alerts (one `role="alert"` each).
+
   Every string that is not the definition's own (labels, submit labels and
   option labels are its message thunks) is a prop with an English default.
 -->
