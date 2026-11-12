@@ -26,6 +26,11 @@ const effectFiles = [
   // packages/charts: Effect Schema parses the spec and emits its JSON Schema.
   'packages/charts/src/spec/parse.ts',
   'packages/charts/src/spec/internal/**',
+  // packages/import: the headless core is Effect code throughout (Schema
+  // decodes the rows, Stream carries them), and so is its suite, which runs
+  // under `@effect/vitest`.
+  'packages/import/src/**',
+  'packages/import/tests/**',
   // packages/components: the `/entity-form` entry and its story / fixtures.
   'packages/components/src/lib/forms/entity-form.ts',
   'packages/components/src/lib/forms/EntityForm.svelte',
@@ -273,6 +278,32 @@ export default defineConfig({
           'effect/prefer-option-over-null': 'off',
         },
       },
+      // A module augmentation must restate Effect's own names: the
+      // `Annotations` interface lives in the `Annotations` namespace of
+      // `effect/Schema`, so the inner name shadows the outer by construction.
+      {
+        files: ['packages/import/src/annotations.ts'],
+        rules: { 'no-shadow': 'off' },
+      },
+      // The Effect rules apply to packages/import's suite (AGENTS.md § Effect),
+      // which runs under `@effect/vitest`'s `it.effect` as that section
+      // requires. `@effect/vitest` marks `it` itself unstable, so every test
+      // would report it: the rule has nothing to say about a suite that must
+      // use that API.
+      {
+        files: ['packages/import/tests/**'],
+        plugins: effectTsgoRecommended.plugins,
+        rules: { 'effecttsgo/unstable-api-usage': 'off' },
+      },
+      // `SourceCell` is the plain value of one source cell, `undefined` for a
+      // gap, as effect-document's worksheet rows write it (`null` in JSON).
+      // It is the type a non-Effect adapter or the UI's grid builds, one per
+      // cell of a whole workbook, so an `Option` per cell would allocate a
+      // wrapper for every cell and make every adapter import `effect`.
+      {
+        files: ['packages/import/src/table.ts'],
+        rules: { 'effect/prefer-option-over-null': 'off' },
+      },
       // `parseSpec` / `validateSpec` take arbitrary JSON and `encodeSpec`
       // returns it: they ARE the parse boundary these two rules ask callers
       // to go through, and `unknown` in their published signatures is the
@@ -297,7 +328,11 @@ export default defineConfig({
       provider: 'istanbul',
       reporter: ['text-summary', 'json-summary', 'json'],
       reportsDirectory: './coverage',
-      include: ['packages/*/src/lib/**/*.{ts,svelte}', 'packages/charts/src/**/*.{ts,svelte}'],
+      include: [
+        'packages/*/src/lib/**/*.{ts,svelte}',
+        'packages/charts/src/**/*.{ts,svelte}',
+        'packages/import/src/**/*.ts',
+      ],
       exclude: ['**/*.d.ts'],
     },
   },

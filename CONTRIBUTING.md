@@ -25,10 +25,10 @@ Invoke everything through `vp` — `vp run <script>`, `vp exec <bin>` (instead o
 
 - `pnpm install` — dependencies, the Vite+ git hooks (pre-commit runs `vp staged`: format + lint on staged files) and the `effect-tsgo` patch (the root `prepare`). There is no pre-push hook.
 - `vp check` — format + lint (Oxfmt + Oxlint over its `correctness`, `suspicious` and `perf` categories). Lint is type-aware through oxlint-tsgolint (`lint.options.typeAware`); `typeCheck` stays off because tsgolint cannot read `.svelte` (the reason is beside it in the root `vite.config.ts`). Every rule is at `error`: there is no `warn` tier and no inline disable, and a rule is turned `off` only for a genuine can't-apply, with the technical reason beside it (#310). `vp run check` — the type gate: every package's `check` (`svelte-kit sync` + `svelte-check`). They are different commands.
-- `vp run -r test:unit` — every package's suite: the Svelte packages in headless Chromium under Vitest browser mode, `packages/charts` under Node.
+- `vp run -r test:unit` — every package's suite: the Svelte packages in headless Chromium under Vitest browser mode, `packages/charts` and `packages/import` under Node.
 - `vp run test:coverage` — every suite in one Vitest run, writing the Istanbul map `coverage/coverage-final.json` that `fallow audit` reads. Not a gate; run it before an audit.
 - `vp exec fallow` (`pnpm run fallow`) — dead code, duplication, complexity and the import boundaries (`.fallowrc.json` zones, `fallow-rules.json` policy). `vp exec fallow audit --base origin/trunk` is the pre-commit check ([AGENTS.md § Fallow local gate](./AGENTS.md#fallow-local-gate)).
-- `vp run -r build` — `svelte-package` → `packages/components/dist` and `packages/mapbox/dist`; `vp pack` → `packages/charts/dist`.
+- `vp run -r build` — `svelte-package` → `packages/components/dist` and `packages/mapbox/dist`; `vp pack` → `packages/charts/dist` and `packages/import/dist`.
 - `vp run --filter ./packages/components storybook:build` — the static Storybook build. `storybook` is the dev server on port 6006 (a long-running process; one Storybook for the workspace, see [packages/components/AGENTS.md](packages/components/AGENTS.md#storybook)).
 - `pnpm changeset` — add a changeset.
 
@@ -37,11 +37,11 @@ As a quick reference:
 ```sh
 vp check                                            # format + lint (oxfmt + oxlint)
 vp check --fix                                      # ...and fix what can be fixed
-vp run check                                        # the type gate: svelte-check, and tsc for charts
+vp run check                                        # the type gate: svelte-check, and tsc for charts and import
 vp run --filter ./packages/charts check             # one package's type gate
 vp run -r test:unit                                 # every suite
 vp test run tests/ui/Button.test.ts                 # one file (from inside its package)
-vp run -r build                                     # dist/ for all three packages
+vp run -r build                                     # dist/ for all four packages
 vp run --filter ./packages/components storybook     # Storybook dev server on port 6006
 vp run --filter ./packages/components storybook:build
 vp run test:coverage                                # one Istanbul map, for fallow
