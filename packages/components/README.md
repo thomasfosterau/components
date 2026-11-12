@@ -431,6 +431,23 @@ Every primitive accepts it by spread — `<TextInput {...control} bind:value />`
 
 **When a control uses `labelId`.** `<label for>` names only a labelable element (`input`, `select`, `textarea`, `button`, `meter`, `output`, `progress`); every primitive above is one, and ignores `labelId` (it never reaches the DOM as an attribute). A control whose focusable part is a role on a `span` or `div` — a `role="slider"` thumb, a `role="group"` or `radiogroup` root, a segmented date group — points `aria-labelledby={control.labelId}` at the label instead, and `FormField` forwards a click on its label to it (the control itself if focusable, else its first focusable descendant). `Fieldset` hands its `children` a `FieldsetControl` (`{ labelId }`, the `<legend>`'s id) for the same purpose. `RadioGroup` is its own frame with its own `legend`, so it takes neither.
 
+**Translating `requiredLabel` once.** `FormField`, `Fieldset`, `CheckboxGroup` and `RadioGroup` each take `requiredLabel = '(required)'`, the screen-reader text after a required field's label. Like every other string, it is a prop. The components context carries no copy, by design (#353). An i18n app wraps the frame once and imports the wrapper everywhere, rather than threading the prop through every call site:
+
+```svelte
+<!-- src/lib/components/AppFormField.svelte, in the app -->
+<script lang="ts">
+  import { FormField } from '@thomasfosterau/components';
+  import type { ComponentProps } from 'svelte';
+  import { m } from '$lib/paraglide/messages';
+
+  let props: ComponentProps<typeof FormField> = $props();
+</script>
+
+<FormField requiredLabel={m.required()} {...props} />
+```
+
+The wrapper passes `requiredLabel` before the spread, so a call site can still override it. Wrap `Fieldset`, `CheckboxGroup` and `RadioGroup` the same way if the app uses them. The same pattern fits any default an app always translates (`dismissLabel`, `previousLabel`, …): one wrapper per component, not a message bag in the context.
+
 | Component | Purpose | Props | Snippets | ARIA |
 | --- | --- | --- | --- | --- |
 | `FormField` | Label + hint + errors around one control | `id?`, `label`, `hint?`, `errors?: readonly string[]`, `required?`, `requiredLabel? = '(required)'` + `HTMLAttributes<HTMLDivElement>` | `children(control)` | `<label for>` names the control (a role-based control uses `aria-labelledby={labelId}`; label clicks are forwarded to it); `describedBy` lists hint id then error id; `aria-invalid` when there are errors |
