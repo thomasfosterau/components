@@ -8,9 +8,10 @@ import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import ToggleButton from '../../src/lib/ui/ToggleButton.svelte';
 import { htmlSnippet, textSnippet } from './snippets.ts';
+import { instanceOf } from '../dom.ts';
 
 test('a click presses it; the name stays the same', async () => {
-  const onPressedChange = vi.fn();
+  const onPressedChange = vi.fn<(pressed: boolean) => void>();
   const screen = await render(ToggleButton, {
     children: textSnippet('Show frost dates'),
     onPressedChange,
@@ -29,7 +30,7 @@ test('Space and Enter both toggle', async () => {
   const screen = await render(ToggleButton, { children: textSnippet('Bold') });
 
   const button = screen.getByRole('button', { name: 'Bold' });
-  (button.element() as HTMLButtonElement).focus();
+  instanceOf(button.element(), HTMLButtonElement).focus();
   await userEvent.keyboard(' ');
   await expect.element(button).toHaveAttribute('aria-pressed', 'true');
   await userEvent.keyboard('{Enter}');

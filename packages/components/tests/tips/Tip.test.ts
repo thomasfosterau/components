@@ -65,7 +65,7 @@ test('the dismiss button accepts a caller-supplied accessible name', async () =>
 
 test('COMPLETES rather than dismisses when the reader takes an action', async () => {
   const store = createTipStore({ storage: memoryTipStorage() });
-  const handler = vi.fn();
+  const handler = vi.fn<() => void | Promise<void>>();
   const config = tip({ actions: [{ id: 'go', title: 'Get started', handler }] });
   store.register(config);
 

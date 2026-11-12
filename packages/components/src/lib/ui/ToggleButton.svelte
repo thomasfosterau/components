@@ -12,8 +12,9 @@ A button that stays pressed (`aria-pressed`), on bits-ui `Toggle`.
   pressed, because the state is `aria-pressed`'s job. An icon-only button
   must have a `label` (the types enforce it), read as visually hidden text;
   `tooltip` opts in to showing it on hover and focus. `data-state="on" |
-  "off"` is a supported styling hook. Pressed is not colour alone: see
-  `toggle-classes.ts`; `pressedIcon` adds a shape change.
+  "off"` is a supported styling hook. Pressed is not colour alone: it is a
+  fill plus `btn-active` (see `toggle-classes.ts`); `pressedIcon` adds a shape
+  change.
 -->
 <script lang="ts">
   import { Toggle } from 'bits-ui';

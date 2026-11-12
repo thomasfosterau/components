@@ -16,7 +16,9 @@ import type { DataRows, DomainValue, ResolvedScale } from './types.ts';
 
 /**
  * Default categorical palette (Tableau 10). Interpreters may override; the
- * core resolves concrete colours so geometry is directly drawable.
+ * core resolves concrete colours so geometry is directly drawable. Colours
+ * repeat past ten categories, and the bundled interpreters draw uncoloured
+ * marks in the first entry.
  */
 export const CATEGORICAL_PALETTE: ReadonlyArray<string> = [
   '#4e79a7',
@@ -62,6 +64,13 @@ export type PositionalScale =
  * - `temporal` → UTC time (UTC for cross-platform determinism)
  * - `ordinal`/`nominal` → band for bar marks (bars need bandwidth),
  *   point for line/point/area marks (single positions)
+ *
+ * Band padding is 0.1 and point padding 0.5. A continuous `hint.domain` with
+ * at least two entries supplies its first and last as the domain (otherwise
+ * the data extent is used); a categorical one is used whole. `hint.zero`
+ * (default `true` on a `bar` mark, else `false`) extends a linear domain to
+ * include zero, and `hint.nice` rounds linear and UTC domains. A single-value
+ * domain is padded (±1, or ±1 day).
  */
 export function resolvePositionalScale(
   channel: Channel,
@@ -120,7 +129,8 @@ function resolveLinear(
     d3Scale = d3Scale.nice();
   }
 
-  const finalDomain = d3Scale.domain() as [number, number];
+  const [finalMin = domain[0], finalMax = domain[1]] = d3Scale.domain();
+  const finalDomain: [number, number] = [finalMin, finalMax];
   return {
     kind: 'linear',
     d3: d3Scale,
@@ -167,7 +177,8 @@ function resolveUtc(
     d3Scale = d3Scale.nice();
   }
 
-  const finalDomain = d3Scale.domain() as [Date, Date];
+  const [finalStart = domain[0], finalEnd = domain[1]] = d3Scale.domain();
+  const finalDomain: [Date, Date] = [finalStart, finalEnd];
   return {
     kind: 'utc',
     d3: d3Scale,
@@ -234,6 +245,8 @@ function resolveCategorical(
  * - `ordinal`/`nominal` → categorical palette
  * - `quantitative`/`temporal` → normalised [0, 1] linear scale; interpreters
  *   map the normalised value onto their own gradient
+ *
+ * Categories take palette colours in first-seen order.
  */
 export function resolveColorScale(channel: Channel, data: DataRows): ResolvedScale {
   if (channel.type === 'ordinal' || channel.type === 'nominal') {
@@ -276,7 +289,8 @@ export function resolveColorScale(channel: Channel, data: DataRows): ResolvedSca
 /**
  * Resolves the size scale for point marks: quantitative values map onto a
  * radius range with square-root scaling so symbol *area* is proportional to
- * the value.
+ * the value. Only numeric (quantitative) values map; its `kind` reads
+ * `'linear'`.
  */
 export function resolveSizeScale(channel: Channel, data: DataRows): ResolvedScale {
   const accessor = makeAccessor(channel);
@@ -304,12 +318,18 @@ function numericHintDomain(hint?: ScaleHint): [number, number] | undefined {
   return undefined;
 }
 
+/** A hint value as a valid `Date`, or `undefined`. */
+function hintDate(value: number | string | undefined): Date | undefined {
+  if (value === undefined) return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
 function temporalHintDomain(hint?: ScaleHint): [Date, Date] | undefined {
   if (!hint?.domain || hint.domain.length < 2) return undefined;
-  const min = new Date(hint.domain[0] as string | number);
-  const max = new Date(hint.domain[hint.domain.length - 1] as string | number);
-  if (!Number.isNaN(min.getTime()) && !Number.isNaN(max.getTime())) return [min, max];
-  return undefined;
+  const min = hintDate(hint.domain.at(0));
+  const max = hintDate(hint.domain.at(-1));
+  return min && max ? [min, max] : undefined;
 }
 
 function categoricalDomain(channel: Channel, data: DataRows, hint?: ScaleHint): string[] {

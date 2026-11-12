@@ -20,6 +20,7 @@
     label?: string;
     onEndReached?: () => void;
     onApi?: (api: VirtualListApi) => void;
+    surround?: boolean;
   }
 
   let {
@@ -32,6 +33,7 @@
     label = 'Observations',
     onEndReached,
     onApi,
+    surround = false,
   }: Props = $props();
 
   // Measured rows vary between 20 and 80 px so a fixed estimate is wrong for most.
@@ -47,6 +49,7 @@
   });
 </script>
 
+{#if surround}<button type="button">Before the feed</button>{/if}
 <VirtualList
   items={rows}
   key={(entry) => entry.id}
@@ -67,3 +70,4 @@
     </div>
   {/snippet}
 </VirtualList>
+{#if surround}<button type="button">After the feed</button>{/if}

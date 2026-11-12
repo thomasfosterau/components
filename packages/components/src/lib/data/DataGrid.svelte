@@ -1,5 +1,5 @@
 <!-- @component
-A `Table` with client-side sorting, filtering across every column and paging, for a list that is already entirely in hand.
+A `Table` with client-side sorting, filtering across every column and paging, for a list that is already entirely in hand — and, with `editing`, an APG grid of editable cells.
 -->
 <!--
   DataGrid — the three controls a reader wants over a list that is already
@@ -23,6 +23,17 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
   Selections are keyed by `rowKey`, so they survive a sort, a filter and a
   page change; the select-all header covers the page on screen.
 
+  Editing (`editing="cell" | "batch"`) swaps `Table` for `EditableGrid`, the
+  same table as an APG Grid with one Tab stop and editable cells; its
+  header has the keyboard and ARIA contract. Columns opt in with
+  `editable`, and edit with the `fields/` primitive their `editor` names.
+  `'cell'` hands each commit to `onCellCommit` (reject to roll it back);
+  `'batch'` collects them in the bindable `changes` for one save. Either
+  way the caller's `rows` stay the truth: an edit is shown over them until
+  its save settles (cell) or until the caller clears `changes` (batch).
+  `onSelect` does not apply to an editing grid — a row cannot be both a
+  button and a row of cells.
+
   ARIA contract: the `Table`'s and the `Pagination`'s. The filter is a
   `<input type="search">` with a real label (visually hidden, because the
   control sits in a toolbar where a visible label would be the only one), and
@@ -33,12 +44,16 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
   import type { HTMLAttributes } from 'svelte/elements';
   import { getComponentsContext } from '../context.svelte.ts';
   import type { Size } from '../ui/tones.ts';
+  import EditableGrid from './EditableGrid.svelte';
   import Pagination from './Pagination.svelte';
   import Table from './Table.svelte';
   import type {
+    CellChange,
+    CellError,
     SortState,
     TableChoiceProps,
     TableColumn,
+    TableEditing,
     TableRowAttributes,
   } from './table-types.ts';
 
@@ -130,6 +145,55 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
     /** How a sortable column’s button is named; see `Table`. */
     sortLabel?: ((column: TableColumn<T>) => string) | undefined;
     /**
+     * Let the reader edit the cells of columns marked `editable`: each commit
+     * saved on its own (`'cell'`), or collected in `changes` (`'batch'`). Any
+     * value but `'none'` makes the table an APG grid.
+     * @defaultValue `'none'`
+     */
+    editing?: TableEditing | undefined;
+    /**
+     * `'cell'` mode: persist one commit. Resolve once the caller's `rows`
+     * hold the new value; reject (with an `Error` whose message says why) to
+     * roll the cell back. The signal aborts when the cell is edited again.
+     */
+    onCellCommit?: ((change: CellChange<T>, signal: AbortSignal) => Promise<void>) | undefined;
+    /**
+     * `'batch'` mode: the edits not yet saved, one per cell. Bindable; the
+     * caller saves them, updates `rows` and empties it.
+     * @defaultValue `[]`
+     */
+    changes?: CellChange<T>[] | undefined;
+    /**
+     * An editing grid's description: how to start editing.
+     * @defaultValue `'Press Enter or F2 to edit a cell, Escape to cancel.'`
+     */
+    editHintLabel?: string | undefined;
+    /**
+     * The error summary's count line, a polite live region.
+     * @defaultValue `"<n> cells have errors"`
+     */
+    errorsLabel?: ((count: number) => string) | undefined;
+    /**
+     * One entry of the error summary, which focuses its cell.
+     * @defaultValue `"<first column's value>, <header>: <message>"`
+     */
+    cellErrorLabel?: ((error: CellError<T>) => string) | undefined;
+    /**
+     * What is announced when `onCellCommit` rejects.
+     * @defaultValue `"<header> for <first column's value> was not saved: <message>"`
+     */
+    commitErrorLabel?: ((error: CellError<T>) => string) | undefined;
+    /**
+     * A rejection's message when it carries none.
+     * @defaultValue `'The change could not be saved.'`
+     */
+    saveFailedLabel?: string | undefined;
+    /**
+     * How a changed cell is described in `'batch'` mode.
+     * @defaultValue `'Changed'`
+     */
+    changedLabel?: string | undefined;
+    /**
      * Locale(s) for `Intl` formatting.
      * @defaultValue the components context's `locale()`
      */
@@ -174,10 +238,25 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
     hiddenColumns = $bindable(undefined),
     columnMenu,
     columnMenuLabel,
+    editing = 'none',
+    onCellCommit,
+    changes = $bindable([]),
+    editHintLabel = 'Press Enter or F2 to edit a cell, Escape to cancel.',
+    errorsLabel = (count) => (count === 1 ? '1 cell has an error' : `${count} cells have errors`),
+    cellErrorLabel = (error) => `${rowName(error.row)}, ${error.column.header}: ${error.message}`,
+    commitErrorLabel = (error) =>
+      `${error.column.header} for ${rowName(error.row)} was not saved: ${error.message}`,
+    saveFailedLabel = 'The change could not be saved.',
+    changedLabel = 'Changed',
     locales = getComponentsContext().locale(),
     class: className,
     ...rest
   }: Props = $props();
+
+  /** What names a row in an error message: its first column's value. */
+  function rowName(row: T): string {
+    return columns[0] === undefined ? '' : String(columns[0].value(row));
+  }
 
   let filter = $state('');
   // 0 is "the reader has not chosen": the `pageSize` prop stays authoritative
@@ -229,6 +308,20 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
   );
   const from = $derived(total === 0 ? 0 : current * limit + 1);
   const to = $derived(Math.min((current + 1) * limit, total));
+
+  /** Bring a row on screen for the error summary: past the filter, onto its page. */
+  function reveal(row: T): void {
+    const key = rowKey(row);
+    const indexOf = (): number => sorted.findIndex((candidate) => rowKey(candidate) === key);
+    if (indexOf() === -1) filter = '';
+    const index = indexOf();
+    if (paginated && index !== -1) page = Math.floor(index / limit);
+  }
+
+  /** A new sort re-orders the whole result, so the reader's place in the old order means nothing. */
+  const resetPage = (): void => {
+    page = 0;
+  };
 </script>
 
 <div {...rest} class={['space-y-3', className]}>
@@ -247,38 +340,79 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
     </label>
   {/if}
 
-  <Table
-    rows={visible}
-    {columns}
-    {rowKey}
-    {caption}
-    {captionHidden}
-    {size}
-    {zebra}
-    {pinRows}
-    {onSelect}
-    {rowAttributes}
-    {emptyMessage}
-    {emptyState}
-    {sortLabel}
-    {selection}
-    {onSelectionChange}
-    {selectRowLabel}
-    {selectAllLabel}
-    {selectColumnLabel}
-    {bulkActions}
-    {selectedCountLabel}
-    {columnMenu}
-    {columnMenuLabel}
-    bind:selected
-    bind:hiddenColumns
-    bind:sort
-    onSort={() => {
-      // A new sort re-orders the whole result, so the reader's place in the
-      // old order means nothing; page 1 is the only honest answer.
-      page = 0;
-    }}
-  />
+  {#if editing === 'none'}
+    <Table
+      rows={visible}
+      {columns}
+      {rowKey}
+      {caption}
+      {captionHidden}
+      {size}
+      {zebra}
+      {pinRows}
+      {onSelect}
+      {rowAttributes}
+      {emptyMessage}
+      {emptyState}
+      {sortLabel}
+      {selection}
+      {onSelectionChange}
+      {selectRowLabel}
+      {selectAllLabel}
+      {selectColumnLabel}
+      {bulkActions}
+      {selectedCountLabel}
+      {columnMenu}
+      {columnMenuLabel}
+      bind:selected
+      bind:hiddenColumns
+      bind:sort
+      onSort={resetPage}
+    />
+  {:else}
+    <EditableGrid
+      rows={visible}
+      allRows={rows}
+      {columns}
+      {rowKey}
+      {editing}
+      {onCellCommit}
+      rowCount={total}
+      rowOffset={paginated ? current * limit : 0}
+      pageStep={paginated ? limit : 10}
+      onReveal={reveal}
+      {caption}
+      {captionHidden}
+      {size}
+      {zebra}
+      {pinRows}
+      {rowAttributes}
+      {emptyMessage}
+      {emptyState}
+      {sortLabel}
+      {locales}
+      {editHintLabel}
+      {errorsLabel}
+      {cellErrorLabel}
+      {commitErrorLabel}
+      {saveFailedLabel}
+      {changedLabel}
+      {selection}
+      {onSelectionChange}
+      {selectRowLabel}
+      {selectAllLabel}
+      {selectColumnLabel}
+      {bulkActions}
+      {selectedCountLabel}
+      {columnMenu}
+      {columnMenuLabel}
+      bind:changes
+      bind:selected
+      bind:hiddenColumns
+      bind:sort
+      onSort={resetPage}
+    />
+  {/if}
 
   {#if paginated && total > 0}
     <div class="flex flex-wrap items-center justify-between gap-3">

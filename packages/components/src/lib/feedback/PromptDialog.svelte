@@ -19,7 +19,7 @@ A modal that asks for one short text value — rename, a new name, type-to-confi
     FIELD, with its value selected so typing replaces it.
   - Confirm is `disabled` while the value is invalid or a validation is
     pending, and the field then carries `aria-invalid` and the messages in its
-    description, so a screen-reader user hears why Confirm does nothing. A
+    `aria-describedby`, so a screen-reader user hears why Confirm does nothing. A
     pending async validation marks the form `aria-busy`.
   - In flight, Confirm shows `loading` (`aria-busy`, its name unchanged);
     the field and Cancel stay usable. Closing — Cancel, Escape, the corner

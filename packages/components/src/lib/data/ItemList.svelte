@@ -21,8 +21,9 @@ A list in one of four shapes — `compact` links, `stacked` rows, a `grid` or `c
     carrying `aria-posinset` / `aria-setsize`, so "article 7 of 40" is
     announced even though only 20 are in the DOM, and `tabindex="-1"` so the
     reader's Page Down lands somewhere. Page Down / Page Up move focus to
-    the next / previous article (the APG Feed keys, `feed.ts`, shared with
-    `VirtualList`).
+    the next / previous article, and Ctrl+End / Ctrl+Home leave the feed
+    for the next / previous focusable element outside it (the APG Feed
+    keys, `feed.ts`, shared with `VirtualList`).
 
     Feed mode renders `<div role="feed">` with `<article>` children rather
     than a list, deliberately: `feed` is not a role HTML permits on `<ul>`,

@@ -11,8 +11,8 @@ import { render } from 'vitest-browser-svelte';
 import ConfirmDialogFixture from './fixtures/ConfirmDialogFixture.svelte';
 
 test('a resolving callback closes the dialog and navigates', async () => {
-  const onConfirm = vi.fn(() => Promise.resolve('gone'));
-  const onNavigate = vi.fn();
+  const onConfirm = vi.fn<() => Promise<unknown>>(() => Promise.resolve('gone'));
+  const onNavigate = vi.fn<(url: string) => void>();
   const screen = await render(ConfirmDialogFixture, {
     onConfirm,
     onNavigate,
@@ -54,7 +54,7 @@ test('a rejection that is not an Error falls back to failureMessage', async () =
 });
 
 test('form mode renders a real POST form whose confirm button submits it', async () => {
-  const enhance = vi.fn();
+  const enhance = vi.fn<(form: HTMLFormElement) => void | (() => void)>();
   const screen = await render(ConfirmDialogFixture, {
     form: { action: '?/delete', fields: { id: 'garden-7' }, enhance },
     confirmLabel: 'Delete it',
@@ -81,7 +81,7 @@ test('form mode renders a real POST form whose confirm button submits it', async
 });
 
 test('the cancel button closes without confirming, in either mode', async () => {
-  const onConfirm = vi.fn(() => Promise.resolve(undefined));
+  const onConfirm = vi.fn<() => Promise<unknown>>(() => Promise.resolve(undefined));
   const screen = await render(ConfirmDialogFixture, { onConfirm });
 
   await userEvent.click(screen.getByRole('button', { name: 'Delete garden' }));

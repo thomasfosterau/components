@@ -28,8 +28,8 @@ const RESULTS: readonly CommandItem[] = [
 
 /** An `onSearch` that settles after `ms` and rejects when aborted. */
 const slowSearch = (ms: number, calls: string[] = []) =>
-  vi.fn(
-    (query: string, signal: AbortSignal): Promise<readonly CommandItem[]> =>
+  vi.fn<(query: string, signal: AbortSignal) => Promise<readonly CommandItem[]>>(
+    (query, signal) =>
       new Promise((resolve, reject) => {
         calls.push(query);
         const timer = setTimeout(() => {

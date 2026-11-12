@@ -89,10 +89,10 @@ The time left until an instant, ticking every second in daisyUI's `countdown` di
 
   /** The units shown, from `largestUnit` down to seconds, each with its count. */
   const parts = $derived.by(() => {
-    let rest = Math.ceil(remaining / SECOND) * SECOND;
+    let left = Math.ceil(remaining / SECOND) * SECOND;
     return ORDER.slice(ORDER.indexOf(largestUnit)).map((unit) => {
-      const count = Math.floor(rest / SIZES[unit]);
-      rest -= count * SIZES[unit];
+      const count = Math.floor(left / SIZES[unit]);
+      left -= count * SIZES[unit];
       return { unit, count };
     });
   });

@@ -43,3 +43,5 @@ export {
   type UnsupportedMark,
   type ValidationResult,
 } from './parse.ts';
+
+export { ganttSpec, type GanttFields, type GanttOptions } from './gantt.ts';

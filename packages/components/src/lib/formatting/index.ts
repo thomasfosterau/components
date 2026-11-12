@@ -5,8 +5,11 @@
  * @module
  */
 
+export { default as ByteSize } from './ByteSize.svelte';
+export * from './bytes.ts';
 export { default as Countdown } from './Countdown.svelte';
 export { default as DateTime } from './DateTime.svelte';
+export { default as ElapsedTime } from './ElapsedTime.svelte';
 export { default as Duration } from './Duration.svelte';
 export * from './duration.ts';
 // `NumberFormat`, not `Number`: a named export called `Number` would shadow

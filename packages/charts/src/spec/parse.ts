@@ -273,6 +273,8 @@ export function parseSpec(input: unknown): ChartSpec {
  * Validates an unknown JSON value against the portable chart spec,
  * returning a result instead of throwing. `'1'` and `'1.1'` documents are
  * read strictly; a newer `1.N` one degrades (see {@link ValidationResult}).
+ * On failure `errors` currently holds one string describing every problem
+ * found, each with its path.
  */
 export function validateSpec(input: unknown): ValidationResult {
   return decode(input);
@@ -281,6 +283,8 @@ export function validateSpec(input: unknown): ValidationResult {
 /**
  * Encodes a {@link ChartSpec} back to a plain JSON-safe value, suitable for
  * persisting (e.g. into ProseMirror node attrs).
+ *
+ * @throws when `spec` does not satisfy the schema.
  */
 export function encodeSpec(spec: ChartSpec): unknown {
   return encode(spec);

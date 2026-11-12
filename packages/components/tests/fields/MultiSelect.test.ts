@@ -2,6 +2,7 @@ import { userEvent } from 'vite-plus/test/browser';
 import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import MultiSelectFixture from './fixtures/MultiSelectFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 test('is a combobox named by its label, showing the placeholder', async () => {
   const screen = await render(MultiSelectFixture, {});
@@ -57,12 +58,12 @@ test('Escape closes the listbox and focus returns to the trigger', async () => {
 });
 
 test('a wrapping form posts one entry per selected value', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(MultiSelectFixture, { values: ['Moist', 'Full sun'], onSubmitted });
 
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.getAll('conditions')).toEqual(['Full sun', 'Moist']);
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.getAll('conditions')).toEqual(['Full sun', 'Moist']);
 });
 
 test('a disabled option cannot be selected', async () => {
@@ -71,7 +72,7 @@ test('a disabled option cannot be selected', async () => {
   await userEvent.click(screen.getByRole('combobox', { name: 'Growing conditions' }));
   const bog = screen.getByRole('option', { name: 'Bog' });
   await expect.element(bog).toHaveAttribute('aria-disabled', 'true');
-  (bog.element() as HTMLElement).click();
+  instanceOf(bog.element(), HTMLElement).click();
   await expect.element(screen.getByTestId('bound')).toHaveTextContent('');
 });
 

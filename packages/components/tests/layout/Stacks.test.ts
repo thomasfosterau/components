@@ -7,6 +7,7 @@
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import PrimitivesFixture from './fixtures/PrimitivesFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 test('VStack is a flex column with the default md gap; class merges last', async () => {
   const screen = await render(PrimitivesFixture, { kind: 'vstack' });
@@ -37,7 +38,9 @@ test('as="ul" renders a list with role="list" and no bullets', async () => {
 test('divider rules sit between children, never around them', async () => {
   const screen = await render(PrimitivesFixture, { kind: 'vstack', divider: true });
 
-  const children = [...screen.getByTestId('root').element().children] as HTMLElement[];
+  const children = [...screen.getByTestId('root').element().children].map((child) =>
+    instanceOf(child, HTMLElement),
+  );
   const borders = children.map((child) => {
     const style = getComputedStyle(child);
     return [style.borderTopWidth, style.borderBottomWidth];
@@ -61,7 +64,7 @@ test('Spacer pushes what follows to the far end and is hidden', async () => {
   const screen = await render(PrimitivesFixture, { kind: 'spacer', width: 600 });
 
   const root = screen.getByTestId('root').element();
-  const spacer = root.querySelector('[aria-hidden="true"]') as HTMLElement;
+  const spacer = instanceOf(root.querySelector('[aria-hidden="true"]'), HTMLElement);
   expect(spacer.className).toBe('flex-1');
   const next = screen.getByRole('button', { name: 'Next' }).element().getBoundingClientRect();
   expect(Math.round(next.right)).toBe(Math.round(root.getBoundingClientRect().right));

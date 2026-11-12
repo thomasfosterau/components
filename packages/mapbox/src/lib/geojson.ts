@@ -37,6 +37,11 @@
  * for arbitrary pairs of floats, and this comment says so rather than claiming
  * an exactness the arithmetic does not have.
  *
+ * The frame is equirectangular, chosen for exact invertibility rather than
+ * looks: away from the equator a plan reads wider than it is on the ground. A
+ * document in this frame wants `grid.snap: false`, or the grid quantises the
+ * boundary.
+ *
  * ## Why the geometry type is declared here
  *
  * Structurally the same as an application's own `GeoJsonGeometry`, and
@@ -156,8 +161,24 @@ export const geoFromCanvas = (frame: GeoFrame, point: Point): GeoPosition => {
 };
 
 /** The nesting depth of a `coordinates` value; a bare position is 1. */
-const depthOf = (value: GeoCoordinates | number): number =>
-  Array.isArray(value) ? 1 + (value.length === 0 ? 0 : depthOf(value[0] as GeoCoordinates)) : 0;
+const depthOf = (value: unknown): number =>
+  Array.isArray(value) ? 1 + (value.length === 0 ? 0 : depthOf(value[0])) : 0;
+
+/** Whether `value` is a position: an array of numbers. */
+const isPosition = (value: unknown): value is GeoPosition =>
+  Array.isArray(value) && value.every((ordinate) => typeof ordinate === 'number');
+
+/** Whether `value` is a list of positions. */
+const isPositions = (value: unknown): value is readonly GeoPosition[] =>
+  Array.isArray(value) && value.every(isPosition);
+
+/** Whether `value` is a list of position lists. */
+const isRings = (value: unknown): value is readonly (readonly GeoPosition[])[] =>
+  Array.isArray(value) && value.every(isPositions);
+
+/** Whether `value` is a list of ring lists. */
+const isPolygons = (value: unknown): value is readonly (readonly (readonly GeoPosition[])[])[] =>
+  Array.isArray(value) && value.every(isRings);
 
 /** The depth each geometry type's `coordinates` must have to mean what it says. */
 const DEPTHS = {
@@ -208,27 +229,24 @@ const outlinesOf = (
   readonly outlines: readonly (readonly GeoPosition[])[];
   readonly refused: readonly Unrepresentable[];
 } => {
-  if (depthOf(geometry.coordinates) !== DEPTHS[geometry.type]) {
-    return { outlines: [], refused: ['malformed'] };
-  }
+  const { coordinates } = geometry;
+  const malformed = { outlines: [], refused: ['malformed'] } as const;
+  if (depthOf(coordinates) !== DEPTHS[geometry.type]) return malformed;
   switch (geometry.type) {
     case 'Point':
-      return { outlines: [[geometry.coordinates as GeoPosition]], refused: [] };
+      return isPosition(coordinates) ? { outlines: [[coordinates]], refused: [] } : malformed;
     case 'MultiPoint':
-      return {
-        outlines: (geometry.coordinates as readonly GeoPosition[]).map((position) => [position]),
-        refused: [],
-      };
+      return isPositions(coordinates)
+        ? { outlines: coordinates.map((position) => [position]), refused: [] }
+        : malformed;
     case 'LineString':
-      return { outlines: [geometry.coordinates as readonly GeoPosition[]], refused: [] };
+      return isPositions(coordinates) ? { outlines: [coordinates], refused: [] } : malformed;
     case 'MultiLineString':
-      return { outlines: geometry.coordinates as readonly (readonly GeoPosition[])[], refused: [] };
+      return isRings(coordinates) ? { outlines: coordinates, refused: [] } : malformed;
     case 'Polygon':
-      return exteriorRings([geometry.coordinates as readonly (readonly GeoPosition[])[]]);
+      return isRings(coordinates) ? exteriorRings([coordinates]) : malformed;
     case 'MultiPolygon':
-      return exteriorRings(
-        geometry.coordinates as readonly (readonly (readonly GeoPosition[])[])[],
-      );
+      return isPolygons(coordinates) ? exteriorRings(coordinates) : malformed;
   }
 };
 
@@ -269,6 +287,14 @@ export const geometryFrame = (
 
 /**
  * The geometry as editable shapes in `frame`.
+ *
+ * `Point` and `MultiPoint` become markers, `LineString` and `MultiLineString`
+ * lines, `Polygon` and `MultiPolygon` polygons (the repeated closing position
+ * dropped). Anything not representable is reported in `unrepresentable`
+ * rather than flattened: a polygon's interior rings are dropped and reported,
+ * while a position with an altitude, a position short of two ordinates, or
+ * `coordinates` nested at the wrong depth for the `type` yields no shapes at
+ * all. `newId` mints each shape's id.
  *
  * Every shape is anchored at the canvas origin, its vertices carrying the whole
  * coordinate: adding a zero offset is exact, so a boundary nobody has dragged
@@ -312,6 +338,10 @@ export const geometryShapes = (
 /**
  * The shapes as one geometry, or none when they have no single one.
  *
+ * One marker is a `Point`, several a `MultiPoint`, and likewise
+ * `LineString` / `MultiLineString` and `Polygon` / `MultiPolygon`. The result
+ * is a zero- or one-element array.
+ *
  * None rather than a lie, in three cases, and the caller is told by the empty
  * array in all three: there are no shapes; they are of mixed kinds, for which
  * the stored schema deliberately has no `GeometryCollection`; or an outline is
@@ -332,10 +362,10 @@ export const shapesGeometry = (
   const many = shapes.length > 1;
   if (first.type === 'marker') {
     const positions = shapes.map((shape) => geoFromCanvas(frame, shape.position));
+    const [head] = positions;
+    if (head === undefined) return [];
     return [
-      many
-        ? { type: 'MultiPoint', coordinates: positions }
-        : { type: 'Point', coordinates: positions[0] as GeoPosition },
+      many ? { type: 'MultiPoint', coordinates: positions } : { type: 'Point', coordinates: head },
     ];
   }
 
@@ -345,16 +375,18 @@ export const shapesGeometry = (
       ? [...vertices, vertices[0]]
       : vertices;
   });
+  const [ring] = rings;
+  if (ring === undefined) return [];
   if (first.type === 'line') {
     return [
       many
         ? { type: 'MultiLineString', coordinates: rings }
-        : { type: 'LineString', coordinates: rings[0] as readonly GeoPosition[] },
+        : { type: 'LineString', coordinates: ring },
     ];
   }
   return [
     many
-      ? { type: 'MultiPolygon', coordinates: rings.map((ring) => [ring]) }
-      : { type: 'Polygon', coordinates: [rings[0] as readonly GeoPosition[]] },
+      ? { type: 'MultiPolygon', coordinates: rings.map((outline) => [outline]) }
+      : { type: 'Polygon', coordinates: [ring] },
   ];
 };

@@ -44,9 +44,9 @@ catalog:
   # The OPTIONAL peer of `@thomasfosterau/components/entity-form`, and a
   # devDependency so that entry's browser suite and story run the real store.
   # Only that entry imports it: a consumer that never renders an
-  # `EntityForm` never installs it. `effect` is ITS required peer, pinned to
-  # the app catalog's exact release so the store here is
-  # the one the apps run. Nothing else in this workspace touches Effect.
+  # `EntityForm` never installs it. `effect` is ITS required peer (and an
+  # optional peer of the core package, `catalogs.peers`), pinned to the app
+  # catalog's exact release so the store here is the one the apps run.
   '@thomasfosterau/effect-forms-svelte': ^0.3.2
   effect: 4.1.3
   # Lucide icon set as Svelte 5 components. Catalogued and installed ahead of
@@ -213,6 +213,11 @@ catalog:
 # silently rewrite the range consumers are promised. `^0.3.1` is what 0.2.0
 # published; nothing `/entity-form` uses changed between 0.3.1 and the pin.
 #
+# `effect` is the other optional peer of `@thomasfosterau/components`, also
+# reached only from `/entity-form`, whose renderer imports `effect/Option`,
+# `effect/Predicate` and `effect/Record` (#312). `^4.0.0` is the form
+# library's own `effect` peer, so the two never ask for different copies.
+#
 # The `@thomasfosterau/charts` interpreter peers are each optional (only the
 # entry that renders through that framework imports it) and keep the floors
 # the former `thomasfosterau/charts` repo declared.
@@ -220,6 +225,7 @@ catalogs:
   peers:
     svelte: ^5.40.0
     '@thomasfosterau/effect-forms-svelte': ^0.3.1
+    effect: ^4.0.0
     prosemirror-model: ^1.0.0
     prosemirror-view: ^1.0.0
   # Published ranges of runtime `dependencies` whose dev pin above is exact.

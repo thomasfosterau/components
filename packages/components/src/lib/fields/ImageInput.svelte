@@ -50,7 +50,7 @@ A `FileInput` that also measures the chosen image and previews it.
     maxBytes?: number | undefined;
     /**
      * Shown when the chosen file exceeds `maxBytes`.
-     * @defaultValue `'That file is too large.'` (from `FileInput`)
+     * @defaultValue `'That file is too large. The limit is <maxBytes>.'` (from `FileInput`)
      */
     tooLargeMessage?: string | undefined;
     /** Called with the accepted file, or `undefined` when the selection is cleared. */

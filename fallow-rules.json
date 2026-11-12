@@ -16,7 +16,8 @@
       "kind": "banned-import",
       "specifiers": ["effect"],
       "files": ["packages/components/src/lib/**", "packages/mapbox/src/lib/**"],
-      "message": "`effect` is not a peer of the Svelte packages. Only the /entity-form entry reaches it, and only through @thomasfosterau/effect-forms-svelte (packages/components/AGENTS.md § Boundary)."
+      "exclude": ["packages/components/src/lib/forms/EntityForm.svelte"],
+      "message": "`effect` is an optional peer of @thomasfosterau/components reached only from the /entity-form renderer (forms/EntityForm.svelte), and no peer of the mapbox package; importing it anywhere else makes every consumer install it (packages/components/AGENTS.md § Boundary)."
     },
     {
       "id": "form-library-only-in-entity-form",

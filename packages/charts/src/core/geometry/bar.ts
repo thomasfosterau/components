@@ -2,7 +2,7 @@ import type { Channel } from '../../spec/index.ts';
 import { makeAccessor } from '../accessor.ts';
 import type { PositionalScale } from '../scale.ts';
 import type { DataRows, ResolvedScale } from '../types.ts';
-import { baselineOf, positionOf } from './position.ts';
+import { baselineOf, pixelRangeOf, positionOf } from './position.ts';
 import { colorOfDatum } from './series.ts';
 import type { BarGeometry, BarRect } from './types.ts';
 
@@ -24,7 +24,8 @@ interface BarArgs {
 /**
  * Builds bar chart geometry. Bars grow from the zero baseline, so negative
  * values produce bars below it. Band x-scales give bars their bandwidth;
- * continuous x-scales get a derived width. With a range channel (`x2` or
+ * continuous x-scales get a derived width (80% of an equal share of the plot
+ * width, at least 1 px). With a range channel (`x2` or
  * `y2`, spec 1.1) each bar spans from its start to its end instead: a
  * horizontal range bar (a Gantt row) for `x2`, a vertical one for `y2`.
  */
@@ -92,7 +93,7 @@ function barWidthOf(xScale: PositionalScale, count: number): number {
     return xScale.d3.bandwidth();
   }
   // Continuous x-scale: divide the range across the data with padding.
-  const range = xScale.resolved.range as ReadonlyArray<number>;
+  const range = pixelRangeOf(xScale);
   const extent = Math.abs(Math.max(...range) - Math.min(...range));
   return count > 0 ? Math.max(1, (extent / count) * 0.8) : 1;
 }

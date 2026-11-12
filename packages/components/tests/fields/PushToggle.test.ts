@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
-import PushToggle from '../../src/lib/fields/PushToggle.svelte';
+import PushToggle, { type PushEnableResult } from '../../src/lib/fields/PushToggle.svelte';
 
 const base = {
   available: true,
@@ -26,7 +26,9 @@ test('reads the current subscription on mount', async () => {
 });
 
 test('enabling calls enable with an AbortSignal and turns the switch on', async () => {
-  const enable = vi.fn(async (_signal: AbortSignal) => ({ _tag: 'enabled' as const }));
+  const enable = vi.fn<(signal: AbortSignal) => Promise<PushEnableResult>>(async () => ({
+    _tag: 'enabled',
+  }));
   const screen = await render(PushToggle, { ...base, enable });
   const control = screen.getByRole('switch');
   await control.click();
@@ -47,7 +49,7 @@ test('a denied permission leaves the switch off and says why', async () => {
 });
 
 test('disabling calls disable and turns the switch off', async () => {
-  const disable = vi.fn(async () => undefined);
+  const disable = vi.fn<(signal: AbortSignal) => Promise<unknown>>(async () => undefined);
   const screen = await render(PushToggle, { ...base, readSubscribed: async () => true, disable });
   const control = screen.getByRole('switch');
   await expect.element(control).toBeChecked();

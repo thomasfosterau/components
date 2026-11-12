@@ -62,7 +62,10 @@ A responsive `<img>` from a URL or an uploaded image id, optionally wrapped in `
      * @defaultValue `'100vw'`
      */
     sizes?: string | undefined;
-    /** Eager-load this image. Use for the one image above the fold; everything else stays lazy. */
+    /**
+     * Eager-load this image. Use for the one image above the fold; everything else stays lazy.
+     * @defaultValue `false`
+     */
     eager?: boolean | undefined;
   }
 

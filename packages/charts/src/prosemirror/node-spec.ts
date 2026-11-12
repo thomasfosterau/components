@@ -1,5 +1,5 @@
 import { encodeSpec, validateSpec, type ChartSpec } from '../spec/index.ts';
-import type { NodeSpec } from 'prosemirror-model';
+import type { Attrs, NodeSpec } from 'prosemirror-model';
 
 /** The canonical name for the chart node in a ProseMirror schema. */
 export const CHART_NODE_NAME = 'chart';
@@ -9,9 +9,15 @@ export const CHART_SPEC_ATTRIBUTE = 'data-chart-spec';
 
 /** Options for {@link createChartNodeSpec}. */
 export interface ChartNodeSpecOptions {
-  /** The node group. Defaults to 'block'. */
+  /**
+   * The node group.
+   * @defaultValue 'block'
+   */
   readonly group?: string | undefined;
-  /** Extra class for the rendered DOM element. */
+  /**
+   * Class of the serialised `<div>`.
+   * @defaultValue 'chart-node'
+   */
   readonly className?: string | undefined;
 }
 
@@ -21,6 +27,12 @@ export interface ChartNodeAttrs {
   readonly spec: ChartSpec | null;
 }
 
+/** The chart attrs of a node's `attrs`, which ProseMirror types as `any` values. */
+export function chartNodeAttrs(attrs: Attrs): ChartNodeAttrs {
+  const spec: ChartSpec | null = attrs['spec'];
+  return { spec };
+}
+
 /**
  * Creates the ProseMirror NodeSpec for a chart node.
  *
@@ -28,6 +40,13 @@ export interface ChartNodeAttrs {
  * spec — pure JSON, so document persistence (toJSON / fromJSON) carries the
  * spec with zero extra work. DOM serialisation stores the spec JSON in a
  * data attribute so copy/paste and HTML round-trips preserve it too.
+ *
+ * `toDOM` writes `<div class="chart-node" data-chart-spec="…">` with the
+ * encoded spec JSON (empty for a `null` spec). `parseDOM` reads it back and
+ * validates it: an invalid spec does not match the rule, leaving other rules
+ * to try. Nor does a newer `1.N` spec, since its parsed value drops what this
+ * version does not know and storing that would rewrite the document. The node
+ * is selectable and draggable.
  */
 export function createChartNodeSpec(options?: ChartNodeSpecOptions): NodeSpec {
   const className = options?.className ?? 'chart-node';
@@ -59,7 +78,7 @@ export function createChartNodeSpec(options?: ChartNodeSpecOptions): NodeSpec {
       },
     ],
     toDOM: (node) => {
-      const attrs = node.attrs as ChartNodeAttrs;
+      const attrs = chartNodeAttrs(node.attrs);
       return [
         'div',
         {

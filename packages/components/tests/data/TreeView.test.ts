@@ -460,6 +460,67 @@ describe('TreeView', () => {
     expect(lamiaceae.element().hasAttribute('aria-busy')).toBe(false);
   });
 
+  test('loadChildren: a rejection collapses the node, is reported and announced, and retries', async () => {
+    const failure = new Error('offline');
+    const loadChildren = vi
+      .fn<(node: TreeNode, signal: AbortSignal) => Promise<readonly TreeNode[]>>()
+      .mockRejectedValueOnce(failure)
+      .mockResolvedValueOnce([{ id: 'salvia', label: 'Salvia' }]);
+    const onLoadError = vi.fn<(node: TreeNode, error: unknown) => void>();
+    const screen = await render(TreeView, {
+      nodes: [{ id: 'lamiaceae', label: 'Lamiaceae', children: [] }],
+      label: 'Taxa',
+      loadChildren,
+      onLoadError,
+    });
+    const lamiaceae = screen.getByRole('treeitem', { name: 'Lamiaceae' });
+
+    await userEvent.tab();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect.element(lamiaceae).toHaveAttribute('aria-expanded', 'false');
+    expect(onLoadError).toHaveBeenCalledWith(expect.objectContaining({ id: 'lamiaceae' }), failure);
+    await expect.element(screen.getByRole('status')).toHaveTextContent('Could not load Lamiaceae');
+
+    await userEvent.keyboard('{ArrowRight}');
+    await expect.element(screen.getByRole('treeitem', { name: 'Salvia' })).toBeInTheDocument();
+    expect(loadChildren).toHaveBeenCalledTimes(2);
+    await expect.element(screen.getByRole('status')).toHaveTextContent('');
+  });
+
+  test('loadChildren: an abort is not a failure and reports nothing', async () => {
+    const onLoadError = vi.fn<(node: TreeNode, error: unknown) => void>();
+    const screen = await render(TreeView, {
+      nodes: [{ id: 'lamiaceae', label: 'Lamiaceae', children: [] }],
+      label: 'Taxa',
+      loadChildren: (_node: TreeNode, signal: AbortSignal) =>
+        new Promise<readonly TreeNode[]>((_resolve, reject) => {
+          signal.addEventListener('abort', () => reject(new Error('aborted')));
+        }),
+      onLoadError,
+    });
+
+    await userEvent.tab();
+    await userEvent.keyboard('{ArrowRight}{ArrowLeft}');
+    await expect
+      .element(screen.getByRole('treeitem', { name: 'Lamiaceae' }))
+      .toHaveAttribute('aria-expanded', 'false');
+    expect(onLoadError).not.toHaveBeenCalled();
+    await expect.element(screen.getByRole('status')).toHaveTextContent('');
+  });
+
+  test('loadErrorLabel replaces the announcement', async () => {
+    const screen = await render(TreeView, {
+      nodes: [{ id: 'lamiaceae', label: 'Lamiaceae', children: [] }],
+      label: 'Taxa',
+      loadChildren: () => Promise.reject(new Error('offline')),
+      loadErrorLabel: (node: TreeNode) => `${node.label} did not load`,
+    });
+
+    await userEvent.tab();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect.element(screen.getByRole('status')).toHaveTextContent('Lamiaceae did not load');
+  });
+
   test('spreads native attributes and merges class onto the tree', async () => {
     const screen = await render(TreeView, {
       nodes: taxa,

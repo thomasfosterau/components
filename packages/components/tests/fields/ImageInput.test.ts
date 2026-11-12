@@ -2,6 +2,7 @@ import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import ImageInput from '../../src/lib/fields/ImageInput.svelte';
 import { fileFromDataUrl, PNG_3x2, textFile } from './files.ts';
+import { instanceOf } from '../dom.ts';
 
 test('measures the picture’s intrinsic size and shows it under the preview', async () => {
   const screen = await render(ImageInput, {
@@ -26,7 +27,7 @@ test('the preview is an object URL named by previewAlt', async () => {
 
   const preview = screen.getByRole('img', { name: 'The photograph you chose' });
   await expect.element(preview).toBeInTheDocument();
-  expect((preview.element() as HTMLImageElement).src.startsWith('blob:')).toBe(true);
+  expect(instanceOf(preview.element(), HTMLImageElement).src.startsWith('blob:')).toBe(true);
 });
 
 test('the measured dimensions ride along as hidden inputs once `name` is set', async () => {

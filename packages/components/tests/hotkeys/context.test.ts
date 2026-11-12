@@ -16,6 +16,7 @@ import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import HotkeyNoProviderFixture from './fixtures/HotkeyNoProviderFixture.svelte';
 import HotkeyProviderFixture from './fixtures/HotkeyProviderFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 /** Active ids the consumer rendered, in match-precedence order. */
 const activeIds = (screen: Awaited<ReturnType<typeof render>>): string[] =>
@@ -38,9 +39,9 @@ test('getHotkeyRegistry throws a helpful error when nothing created one', async 
     thrown = error;
   }
 
-  expect(thrown).toBeInstanceOf(Error);
-  expect((thrown as Error).name).toBe('HotkeyRegistryMissing');
-  expect((thrown as Error).message).toMatch(/HotkeyRegistry not found in context/);
+  const error = instanceOf(thrown, Error);
+  expect(error.name).toBe('HotkeyRegistryMissing');
+  expect(error.message).toMatch(/HotkeyRegistry not found in context/);
 });
 
 test('registerHotkeys contributes the calling component’s actions, page scope first', async () => {

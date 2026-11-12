@@ -2,10 +2,10 @@
 The light/dark switch: sets `data-theme` on the document element and remembers the choice in `localStorage`.
 -->
 <!--
-  ThemeToggle — the light / dark switch: a daisyUI `swap` label around a
-  checkbox, which writes the chosen theme name to
-  `document.documentElement.dataset.theme` and remembers it in
-  `localStorage`.
+  ThemeToggle — the light / dark switch: a checkbox in a round ghost
+  button, with the sun / moon drawn by `Swap`, which writes the chosen
+  theme name to `document.documentElement.dataset.theme` and remembers it
+  in `localStorage`.
 
   Generic on purpose. The two theme NAMES are props, because this library
   ships tokens rather than a brand and an app may call its themes anything;
@@ -30,14 +30,17 @@ The light/dark switch: sets `data-theme` on the document element and remembers t
   that must never be able to stop the control rendering.
 
   ARIA contract: a real checkbox with `role="switch"` — on/off, not
-  checked/unchecked — named by `label`. Both icons are `aria-hidden`; they
-  are the visual half of the state the switch already announces. Note that
+  checked/unchecked — named by `label`, visually hidden inside its
+  `<label>`, which shows the focus ring while the switch has keyboard focus.
+  The icons are a `Swap` (itself `aria-hidden`): the visual half of the
+  state the switch already announces. Note that
   daisyUI's `theme-controller` class is deliberately NOT used: it applies a
   theme through CSS scoped to the checkbox, which would fight with the
   `data-theme` this component sets on the document element.
 -->
 <script lang="ts">
   import { Moon, Sun } from '@lucide/svelte';
+  import Swap from './Swap.svelte';
 
   interface Props {
     /** The theme name applied when the switch is off. */
@@ -95,8 +98,15 @@ The light/dark switch: sets `data-theme` on the document element and remembers t
   };
 </script>
 
-<label class={['swap swap-rotate btn btn-ghost btn-circle', className]}>
-  <input type="checkbox" role="switch" checked={dark} aria-label={label} {onchange} />
-  <Sun class="swap-off size-5" aria-hidden="true" />
-  <Moon class="swap-on size-5" aria-hidden="true" />
+{#snippet sun()}<Sun class="size-5" />{/snippet}
+{#snippet moon()}<Moon class="size-5" />{/snippet}
+
+<label
+  class={[
+    'btn btn-ghost btn-circle has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2',
+    className,
+  ]}
+>
+  <input type="checkbox" role="switch" class="sr-only" checked={dark} aria-label={label} {onchange} />
+  <Swap active={dark} effect="rotate" off={sun} on={moon} />
 </label>

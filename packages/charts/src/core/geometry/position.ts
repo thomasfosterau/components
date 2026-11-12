@@ -23,12 +23,17 @@ export function positionOf(scale: PositionalScale, value: FieldValue): number | 
   }
 }
 
+/** The pixel range of a positional scale: always numbers, whatever the scale kind. */
+export function pixelRangeOf(scale: PositionalScale): number[] {
+  return scale.resolved.range.filter((value): value is number => typeof value === 'number');
+}
+
 /**
  * The pixel position of the zero baseline for a y scale, clamped to the plot.
  * Non-linear y scales (temporal/categorical) baseline at the bottom of the range.
  */
 export function baselineOf(scale: PositionalScale): number {
-  const range = scale.resolved.range as ReadonlyArray<number>;
+  const range = pixelRangeOf(scale);
   const lo = Math.min(...range);
   const hi = Math.max(...range);
   if (scale.kind === 'linear') {

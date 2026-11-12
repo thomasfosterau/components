@@ -109,7 +109,10 @@ function parentLabels(
  * per encoded channel (a range's `x` / `x2` or `y` / `y2` as one column,
  * "start to end"; a channel repeating an earlier column's field is left
  * out), one row per datum. A `tree` lists each node with its parent, by
- * label where the spec has a `label` channel. Pure and DOM-free; it takes an
+ * label where the spec has a `label` channel. Each header is its channel's
+ * field, each cell is formatted by the declared type (numbers as written,
+ * dates as ISO 8601 or the date alone at UTC midnight, missing values empty),
+ * and the caption is `config.title`. Pure and DOM-free; it takes an
  * `UnsupportedMarkSpec` too, which is what the fallback renders.
  *
  * @throws {TypeError} when a datum value contradicts its channel's declared type.

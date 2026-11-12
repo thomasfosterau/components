@@ -7,6 +7,19 @@
   its container with CSS. Colours are the core palette's and the shared
   interpreter greys, not daisyUI tokens: the chart must look the same as the
   spec's other renderers, which have no theme.
+
+  Output: `<svg role="img" viewBox="0 0 {width} {height}">`, named by
+  `aria-label` from `config.title` (also drawn above the plot), followed by
+  the chart's data as a visually hidden `<table data-chart-table>` captioned
+  by the title, else `tableLabel`. The SVG's `role="img"` makes its own
+  children presentational, so the table is its sibling. For a newer `1.N`
+  spec whose mark it cannot draw it renders `<div data-chart-unsupported>`
+  with `unsupportedMessage` and the same table, visible (`class` lands on the
+  `<div>`). On an error it renders `fallback`, or by default
+  `<div role="alert" data-chart-error>` with the message. Rest attributes are
+  spread onto the `<svg>`; `class` also lands on the default fallback `<div>`,
+  and an `aria-label` replaces the one taken from `config.title`. Shipped as
+  `.svelte` source, so the consumer's Svelte compiles it.
 -->
 <script lang="ts">
   import type { ChartSpec } from '@thomasfosterau/charts';

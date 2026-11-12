@@ -20,29 +20,9 @@
   inside the target. `targets` renders several links in order ("Skip to
   search", "Skip to results") — no registration context, by design.
 -->
-<script module lang="ts">
-  /** Make the target take focus, as the fragment navigation alone may not. */
-  const focusTarget = (targetId: string): void => {
-    const element = document.getElementById(targetId);
-    if (element === null) return;
-    if (!element.hasAttribute('tabindex')) {
-      element.setAttribute('tabindex', '-1');
-      element.style.outline = 'none';
-      element.addEventListener(
-        'blur',
-        () => {
-          element.removeAttribute('tabindex');
-          element.style.removeProperty('outline');
-        },
-        { once: true },
-      );
-    }
-    element.focus();
-  };
-</script>
-
 <script lang="ts">
   import type { HTMLAnchorAttributes } from 'svelte/elements';
+  import { focusTarget } from './focus-target.ts';
 
   /** One skip destination: the target element's id and the link's text. */
   interface SkipTarget {
@@ -89,7 +69,7 @@
     ]}
     onclick={(event) => {
       onclick?.(event);
-      if (!event.defaultPrevented) focusTarget(link.id);
+      if (!event.defaultPrevented) void focusTarget(link.id);
     }}
   >
     {link.label}

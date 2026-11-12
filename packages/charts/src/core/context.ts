@@ -1,4 +1,4 @@
-import { isInlineData, type ChartSpec } from '../spec/index.ts';
+import { isInlineData, type Channel, type ChartSpec } from '../spec/index.ts';
 import { buildAreaGeometry } from './geometry/area.ts';
 import { buildBarGeometry } from './geometry/bar.ts';
 import { buildLineGeometry } from './geometry/line.ts';
@@ -32,6 +32,14 @@ import type {
  * fetching. When the spec's data is a reference (`data.ref`), the host must
  * resolve it and pass the rows; this function never fetches.
  *
+ * `x` maps onto `[0, plot.width]`. A continuous y (`quantitative`,
+ * `temporal`) maps onto `[plot.height, 0]`, so larger values sit higher; a
+ * categorical y (`nominal`, `ordinal`) maps onto `[0, plot.height]`, so the
+ * first category is the top band or point, as in Vega-Lite and ChartSpecKit.
+ * Without both `x` and `y` encodings the geometry is empty. Geometry is in
+ * plot coordinates: translate by `dimensions.margins.left` / `.top` to place
+ * it in the outer box. `data`, when passed, replaces the spec's inline values.
+ *
  * @param spec - A parsed portable chart spec.
  * @param box - The measured outer pixel box available to the chart.
  * @param data - Resolved data rows. Optional when the spec carries inline values.
@@ -49,8 +57,10 @@ export function computeContext(
   const rows = resolveRows(spec, data);
   const dimensions = computeDimensions(box, options?.margins);
 
-  // Positional scales: x → [0, plot width], y → [plot height, 0] (y inverted:
-  // larger values sit higher on screen).
+  // Positional scales: x → [0, plot width]. A continuous y (quantitative,
+  // temporal) → [plot height, 0], inverted so larger values sit higher on
+  // screen; a categorical y (nominal, ordinal) → [0, plot height], so the
+  // first category is the top band, as in Vega-Lite and ChartSpecKit (#305).
   const xPositional = spec.encoding.x
     ? resolvePositionalScale(
         spec.encoding.x,
@@ -65,7 +75,7 @@ export function computeContext(
     ? resolvePositionalScale(
         spec.encoding.y,
         spec.mark,
-        [dimensions.plot.height, 0],
+        yPixelRange(spec.encoding.y, dimensions.plot.height),
         rows,
         spec.scales?.y,
         spec.encoding.y2,
@@ -84,6 +94,11 @@ export function computeContext(
         : buildGeometry(spec, rows, xPositional, yPositional, colorScale, sizeScale),
     ticks: buildTicks(xPositional, yPositional),
   };
+}
+
+/** The y pixel range: top-down for categories, bottom-up for continuous values. */
+function yPixelRange(channel: Channel, height: number): readonly [number, number] {
+  return channel.type === 'nominal' || channel.type === 'ordinal' ? [0, height] : [height, 0];
 }
 
 function resolveRows(spec: ChartSpec, data?: DataRows): DataRows {

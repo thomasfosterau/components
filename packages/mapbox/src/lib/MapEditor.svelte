@@ -44,6 +44,28 @@ A plan-drawing surface for areas, paths and points on a snapping grid: select, d
   hand, the selection and the undo stack are the page's, so the page owns
   their controls and their names.
 
+  ## Pointer gestures
+
+  - `select` picks the shape under the press, drags it, and reshapes it: drag a
+    grip to move a vertex, alt-press a grip to remove it, drag a hollow
+    midpoint handle to insert a vertex and carry on dragging it. A locked
+    shape is never changed.
+  - `pan` moves the viewport.
+  - `draw-polygon` and `draw-line` place a corner per press and finish on a
+    double-press or a press back on the first corner. Both need `newShape`;
+    without it drawing is off. An outline finished short of a drawable shape
+    (three vertices for an area, two for a path) is removed.
+
+  ## Callbacks
+
+  `onchange(doc, edit)` fires on every change: each pointer move with
+  `edit.committed: false`, the release once with `committed: true`.
+  `onselect(ids)` fires when a press picks a shape (an empty set for nothing)
+  or drawing starts or discards one. `onviewportchange(viewport)` fires on a
+  pan or zoom. `newShape(kind, at)` runs on the first press of a drawing
+  gesture. `VectorDocument`, `Viewport` and `Point` are the core's, from
+  `@thomasfosterau/components/canvas`.
+
   ## A note on the grid
 
   The point a gesture reports is already snapped when `doc.grid.snap` is set,
@@ -142,7 +164,8 @@ A plan-drawing surface for areas, paths and points on a snapping grid: select, d
      */
     selected?: ReadonlySet<string> | undefined;
     /**
-     * The active tool.
+     * The active tool: `select` picks, drags and reshapes; `pan` moves the
+     * viewport; `draw-polygon` and `draw-line` draw an area or a path.
      * @defaultValue `'select'`
      */
     tool?: MapTool | undefined;
@@ -179,7 +202,10 @@ A plan-drawing surface for areas, paths and points on a snapping grid: select, d
      * @defaultValue the runtime's default locale
      */
     locales?: Intl.LocalesArgument | undefined;
-    /** Describes the surface's keys, through `aria-describedby`. */
+    /**
+     * Describes the surface's keys, through `aria-describedby`.
+     * @defaultValue a paragraph saying how the keys work
+     */
     keysDescription?: string | undefined;
     /**
      * Names the focused shape. `kind` is its type: `polygon`, `line` or `marker`.

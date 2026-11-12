@@ -99,11 +99,11 @@ The label, hint and errors frame around one control, handing it the `FieldContro
   // `<label for>` does nothing for a role-based control, so forward the click:
   // focus the control if it is focusable, else its first focusable descendant.
   const forwardClick = (): void => {
-    const control = document.getElementById(id);
-    if (control === null || control.matches(LABELABLE)) return;
-    const target = focusable(control)
-      ? control
-      : Array.from(control.querySelectorAll<HTMLElement>('*')).find(focusable);
+    const labelled = document.getElementById(id);
+    if (labelled === null || labelled.matches(LABELABLE)) return;
+    const target = focusable(labelled)
+      ? labelled
+      : Array.from(labelled.querySelectorAll<HTMLElement>('*')).find(focusable);
     target?.focus();
   };
 </script>

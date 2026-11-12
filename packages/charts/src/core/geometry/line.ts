@@ -7,7 +7,12 @@ import { positionOf } from './position.ts';
 import { splitSeries } from './series.ts';
 import type { LineGeometry, Series, SeriesPoint } from './types.ts';
 
-/** Builds line chart geometry: one series per colour category, each with points and an SVG path. */
+/**
+ * Builds line chart geometry: one series per colour category (one unsplit
+ * series without a colour encoding), each with points and an SVG path. Rows
+ * missing either position are skipped. Series splitting and colours need both
+ * `color` and `colorScale`.
+ */
 export function buildLineGeometry(args: {
   readonly data: DataRows;
   readonly x: Channel;

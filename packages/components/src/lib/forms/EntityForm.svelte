@@ -12,8 +12,9 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   The one component of this package that touches Effect, which is why it is a
   separate entry point (`@thomasfosterau/components/entity-form`) with
   `@thomasfosterau/effect-forms-svelte` an OPTIONAL peer: a consumer that
-  never imports this entry never installs the form library or `effect`. The
-  renderer itself imports only the store (`createForm`) and types.
+  never imports this entry never installs the form library or `effect`.
+  `effect` is an optional peer of this package for the same reason: the
+  renderer imports its `Option`, `Predicate` and `Record` modules.
 
   **Seeding.** `definition`, `mode`, `initial` and `initialRows` configure the
   store ONCE, at mount: a form never changes entity or mode mid-flight, and an
@@ -38,6 +39,10 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   `messages` (a failure the store never saw, such as a server action's
   `fail(500, { message })`) share one `FormErrors` block, store errors first.
 
+  Accessibility: each control is labelled by its `FormField`, field errors are
+  reached through `aria-describedby`, and root errors and `messages` are
+  `FormErrors` alerts (one `role="alert"` each).
+
   Every string that is not the definition's own (labels, submit labels and
   option labels are its message thunks) is a prop with an English default.
 -->
@@ -50,6 +55,9 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     type SelectEntry,
     type WidgetEntry,
   } from '@thomasfosterau/effect-forms-svelte';
+  import * as Option from 'effect/Option';
+  import * as P from 'effect/Predicate';
+  import * as R from 'effect/Record';
   import type { HTMLFormAttributes } from 'svelte/elements';
   import DateInput from '../fields/DateInput.svelte';
   import type { FieldControl } from '../fields/field-types.ts';
@@ -175,9 +183,9 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   };
 
   let rows: Record<string, unknown[]> = $state(
-    Object.fromEntries(
+    R.fromEntries(
       entries
-        .filter((entry) => entry._tag === 'widget' && entry.bridge === 'rows')
+        .filter((entry) => P.isTagged(entry, 'widget') && entry.bridge === 'rows')
         .map((entry) => [entry.key, [...(configured.initialRows[entry.key] ?? [])]]),
     ),
   );
@@ -205,9 +213,12 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
       label: entry.options.optionLabels[value]?.() ?? value,
     }));
 
-  const inputMode = (entry: ScalarEntry): 'numeric' | undefined =>
-    entry.options.inputmode ??
-    (configured.definition.fieldFor(entry.key).kind === 'number' ? 'numeric' : undefined);
+  const inputMode = (entry: ScalarEntry): Option.Option<'numeric'> =>
+    Option.orElse(Option.fromNullishOr(entry.options.inputmode), () =>
+      configured.definition.fieldFor(entry.key).kind === 'number'
+        ? Option.some('numeric')
+        : Option.none(),
+    );
 
   const showHiddenId = configured.mode === 'update' || configured.definition.clientId;
   const submitLabel = $derived(
@@ -215,7 +226,7 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   );
   const gated = $derived(
     entries.some(
-      (entry) => entry._tag === 'widget' && entry.options.gate === true && getField(entry.key) === '',
+      (entry) => P.isTagged(entry, 'widget') && entry.options.gate === true && getField(entry.key) === '',
     ),
   );
   // The empty path is the form's own (non-field) messages.
@@ -252,7 +263,7 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
       {...control}
       name={entry.key}
       type={entry.options.type === 'url' ? 'url' : 'text'}
-      inputmode={inputMode(entry)}
+      inputmode={Option.getOrUndefined(inputMode(entry))}
       placeholder={entry.options.placeholder?.()}
       bind:value={() => getField(entry.key), (next: string) => setField(entry.key, next)}
     />

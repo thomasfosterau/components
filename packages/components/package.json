@@ -111,10 +111,14 @@
   },
   "peerDependencies": {
     "@thomasfosterau/effect-forms-svelte": "catalog:peers",
+    "effect": "catalog:peers",
     "svelte": "catalog:peers"
   },
   "peerDependenciesMeta": {
     "@thomasfosterau/effect-forms-svelte": {
+      "optional": true
+    },
+    "effect": {
       "optional": true
     }
   }

@@ -1,6 +1,6 @@
 import type { Box, Dimensions, Margins } from './types.ts';
 
-/** Default margins, leaving room for axis ticks and labels. */
+/** Default margins (`{ top: 20, right: 20, bottom: 40, left: 48 }`), leaving room for axis ticks and labels. */
 export const DEFAULT_MARGINS: Margins = {
   top: 20,
   right: 20,

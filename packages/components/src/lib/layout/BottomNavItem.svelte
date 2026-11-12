@@ -9,7 +9,8 @@ One destination of a `BottomNav`: a link with an icon over its label, marked cur
   ARIA contract: the link's name is its `label`, plus the badge's text
   (`badgeLabel`, "3 new") in `VisuallyHidden` — never the icon, whose
   wrapper is `aria-hidden`. The current item is `aria-current="page"` and
-  `dock-active`; never `aria-selected` — these are links, not tabs.
+  `dock-active`, and shows `currentIcon` when given, so selection is not
+  colour alone; never `aria-selected` — these are links, not tabs.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
@@ -33,6 +34,8 @@ One destination of a `BottomNav`: a link with an icon over its label, marked cur
     badgeLabel?: ((badge: string | number) => string) | undefined;
     /** The icon. Decorative: its wrapper is `aria-hidden`. */
     icon: Snippet<[]>;
+    /** The icon while this item is current (a filled variant). Omitted, `icon`. */
+    currentIcon?: Snippet<[]> | undefined;
   }
 
   let {
@@ -42,6 +45,7 @@ One destination of a `BottomNav`: a link with an icon over its label, marked cur
     badge,
     badgeLabel = (value) => `${value} new`,
     icon,
+    currentIcon,
     class: className,
     ...rest
   }: Props = $props();
@@ -63,7 +67,7 @@ One destination of a `BottomNav`: a link with an icon over its label, marked cur
     ]}
   >
     <span aria-hidden="true" class="relative inline-flex size-5">
-      {@render icon()}
+      {@render (isCurrent ? (currentIcon ?? icon) : icon)()}
       {#if badge !== undefined}
         <span class="badge badge-primary badge-xs absolute -end-2 -top-1">{badge}</span>
       {/if}

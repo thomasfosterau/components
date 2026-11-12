@@ -58,7 +58,11 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
   change. `loadChildren` runs once per node, on its first expand (or when a
   caller expands it through `expanded`), and its signal aborts if the node
   collapses, or the tree unmounts, before it resolves; a rejection collapses
-  the node again, so expanding it retries.
+  the node again, so expanding it retries, and is reported twice: to the
+  caller through `onLoadError(node, error)`, and to the reader as
+  `loadErrorLabel(node)` in a polite `role="status"` region after the tree
+  (cleared when a later load succeeds). An abort is not a failure and
+  reports nothing.
 -->
 <script module lang="ts">
   /** Which multiple-selection chord a keydown is, if any. */
@@ -126,6 +130,13 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
     loadChildren?:
       | ((node: TreeNode<T>, signal: AbortSignal) => Promise<readonly TreeNode<T>[]>)
       | undefined;
+    /** A `loadChildren` call rejected (not an abort); the node has collapsed again. */
+    onLoadError?: ((node: TreeNode<T>, error: unknown) => void) | undefined;
+    /**
+     * Announced politely when a node's children fail to load.
+     * @defaultValue `(node) => \`Could not load ${node.label}\``
+     */
+    loadErrorLabel?: ((node: TreeNode<T>) => string) | undefined;
     /** A node was activated: Enter, or a click on a leaf. */
     onActivate?: ((node: TreeNode<T>) => void) | undefined;
     /**
@@ -150,6 +161,8 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
     selection = 'single',
     row,
     loadChildren,
+    onLoadError,
+    loadErrorLabel = (node) => `Could not load ${node.label}`,
     onActivate,
     loadingLabel = 'Loading',
     id = uid,
@@ -165,6 +178,8 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
 
   /** Children fetched by `loadChildren`, by parent id. */
   const loaded = new SvelteMap<string, readonly TreeNode<T>[]>();
+  /** The last load failure, announced politely; empty once a load succeeds. */
+  let loadError = $state('');
   /** Ids whose children are loading — what `aria-busy` reads. */
   const busy = new SvelteSet<string>();
   /** In-flight loads; plain, so the loading effect never tracks its own writes. */
@@ -247,11 +262,14 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
       if (controller.signal.aborted) return;
       loaded.set(node.id, children);
       settle(node.id, controller);
-    } catch {
+      loadError = '';
+    } catch (error: unknown) {
       if (controller.signal.aborted) return;
       // A failed load collapses the node, so expanding it again retries.
       settle(node.id, controller);
       expanded.delete(node.id);
+      loadError = loadErrorLabel(node);
+      onLoadError?.(node, error);
     }
   }
 
@@ -512,3 +530,4 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
   {@render branch(nodes, 1)}
 </ul>
 <span id={busyId} hidden>{loadingLabel}</span>
+<span role="status" class="sr-only">{loadError}</span>

@@ -2,6 +2,7 @@ import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import FileInput from '../../src/lib/fields/FileInput.svelte';
 import { textFile } from './files.ts';
+import { instanceOf } from '../dom.ts';
 
 test('is a native file input carrying its accept list', async () => {
   const screen = await render(FileInput, {
@@ -16,7 +17,7 @@ test('is a native file input carrying its accept list', async () => {
 });
 
 test('choosing a file reports it through onSelect', async () => {
-  const onSelect = vi.fn();
+  const onSelect = vi.fn<(file: File | undefined) => void>();
   const screen = await render(FileInput, {
     'aria-label': 'Attachment',
     onSelect,
@@ -30,7 +31,7 @@ test('choosing a file reports it through onSelect', async () => {
 });
 
 test('a file over maxBytes is refused, cleared from the control and explained', async () => {
-  const onSelect = vi.fn();
+  const onSelect = vi.fn<(file: File | undefined) => void>();
   const screen = await render(FileInput, {
     'aria-label': 'Attachment',
     maxBytes: 16,
@@ -47,7 +48,7 @@ test('a file over maxBytes is refused, cleared from the control and explained', 
     .toHaveTextContent('That file is larger than 16 bytes.');
   await expect.element(input).toHaveAttribute('aria-invalid', 'true');
   await expect.element(input).toHaveClass('file-input-error');
-  expect((input.element() as HTMLInputElement).value).toBe('');
+  expect(instanceOf(input.element(), HTMLInputElement).value).toBe('');
   expect(onSelect).toHaveBeenCalledWith(undefined);
 });
 
@@ -77,4 +78,17 @@ test('a file within the cap leaves no alert behind', async () => {
   await screen.getByTestId('file').upload(textFile('notes.txt', 10));
 
   expect(screen.getByRole('alert').elements()).toHaveLength(0);
+});
+
+test('the default too-large message names the limit, formatted', async () => {
+  const screen = await render(FileInput, {
+    'aria-label': 'Attachment',
+    maxBytes: 4_200_000,
+    'data-testid': 'file',
+  });
+
+  await screen.getByTestId('file').upload(textFile('big.txt', 4_300_000));
+  await expect
+    .element(screen.getByRole('alert'))
+    .toHaveTextContent('That file is too large. The limit is 4.2 MB.');
 });

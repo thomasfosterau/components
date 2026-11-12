@@ -105,7 +105,7 @@ describe('hreflang alternates', () => {
       locales: ['en-AU', 'es-419'],
     });
     const links = alternates();
-    expect(links.map((l) => l.lang ?? '').sort((a, b) => a.localeCompare(b))).toEqual([
+    expect(links.map((l) => l.lang ?? '').toSorted((a, b) => a.localeCompare(b))).toEqual([
       'en-AU',
       'es-419',
       'x-default',

@@ -64,7 +64,8 @@ const isPublished = (name, version) => {
     execFileSync('npm', ['view', `${name}@${version}`, 'version'], { stdio: 'pipe' });
     return true;
   } catch (error) {
-    const stderr = String(/** @type {{ stderr?: Buffer | string }} */ (error).stderr ?? '');
+    const stderr =
+      typeof error === 'object' && error !== null && 'stderr' in error ? String(error.stderr) : '';
     if (stderr.includes('E404')) return false;
     throw error;
   }

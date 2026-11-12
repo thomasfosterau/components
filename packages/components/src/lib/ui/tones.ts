@@ -437,3 +437,26 @@ export const indicatorPlacement: Record<IndicatorPlacement, string> = {
   'bottom-center': 'indicator-bottom indicator-center',
   'bottom-end': 'indicator-bottom indicator-end',
 };
+
+/** The transition a `Swap` uses between its faces. */
+export type SwapEffect = 'fade' | 'rotate' | 'flip';
+
+/** Literal daisyUI class per `SwapEffect` for `Swap`; a lookup table so Tailwind's scanner sees every class. */
+export const swapEffect: Record<SwapEffect, string> = {
+  fade: '',
+  rotate: 'swap-rotate',
+  flip: 'swap-flip',
+};
+
+/** How many lines an `ExpandableText` shows while collapsed. */
+export type ClampLines = 1 | 2 | 3 | 4 | 5 | 6;
+
+/** Literal Tailwind class per `ClampLines` for `ExpandableText`; a lookup table so Tailwind's scanner sees every class. */
+export const lineClamp: Record<ClampLines, string> = {
+  1: 'line-clamp-1',
+  2: 'line-clamp-2',
+  3: 'line-clamp-3',
+  4: 'line-clamp-4',
+  5: 'line-clamp-5',
+  6: 'line-clamp-6',
+};
