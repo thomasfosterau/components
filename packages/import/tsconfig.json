@@ -1,0 +1,20 @@
+{
+  // The whole package: the headless core, its suite and the config. The
+  // core's portability (no DOM, no Node) is re-checked by tsconfig.pure.json.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    // The Effect Language Service, run by the Effect-patched native `tsc`
+    // (the root `prepare`: `effect-tsgo patch --typescript`). The whole of
+    // `src` is Effect code, so its diagnostics land everywhere here. Warnings
+    // stay visible in the editor and in the `check` output but do not fail the
+    // exit code.
+    "plugins": [
+      {
+        "name": "@effect/language-service",
+        "ignoreEffectWarningsInTscExitCode": true
+      }
+    ]
+  },
+  "include": ["src", "tests", "vite.config.ts"]
+}

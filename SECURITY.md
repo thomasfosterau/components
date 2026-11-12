@@ -4,7 +4,7 @@
 
 Report security vulnerabilities privately through GitHub's [**Report a vulnerability**](https://github.com/thomasfosterau/components/security/advisories/new) form (_Security → Advisories_), **not** in a public issue. Include a description, reproduction steps, and the affected package and version. Expect a first response within a few days.
 
-The three packages are UI and chart libraries: they run in your application's browser bundle or server render and hold no credentials. The likeliest vulnerabilities are markup injection through a prop rendered as HTML, and an unsafe URL reaching an `href` or `src`; both are in scope.
+The four packages are UI, chart and data-import libraries: they run in your application's browser bundle or server render and hold no credentials. The likeliest vulnerabilities are markup injection through a prop rendered as HTML, and an unsafe URL reaching an `href` or `src`; both are in scope.
 
 ## Supply chain
 
