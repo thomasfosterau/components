@@ -64,7 +64,10 @@ export interface TreeOptions {
  */
 export type FieldType = 'quantitative' | 'ordinal' | 'nominal' | 'temporal';
 
-/** A mapping from a data field to a visual channel, with an explicit type. */
+/**
+ * A mapping from a data field to a visual channel, with an explicit type.
+ * Interpreters read values by the declared `type`, never by sniffing.
+ */
 export interface Channel {
   /** The name of the field in each datum that this channel reads. */
   readonly field: string;
@@ -72,7 +75,12 @@ export interface Channel {
   readonly type: FieldType;
 }
 
-/** Field-to-channel mappings. At minimum, `x` and `y` are expected for all v1 marks. */
+/**
+ * Field-to-channel mappings. Every v1 mark needs `x` and `y` to draw anything;
+ * `x2` / `y2` (spec 1.1) make a `bar` a range bar. `id` / `parent` / `label`
+ * (spec 1.1) belong to the `tree` mark, which takes no positional channels.
+ * `opacity` is parsed but not resolved by the core.
+ */
 export interface Encoding {
   readonly x?: Channel;
   readonly y?: Channel;
@@ -138,7 +146,10 @@ export interface ScaleHint {
   readonly domain?: ReadonlyArray<number | string>;
   /** Round the domain to human-friendly values. */
   readonly nice?: boolean;
-  /** Force the domain to include zero. */
+  /**
+   * Force the domain to include zero. The TS core defaults it to `true` on a
+   * bar chart's quantitative axes and `false` elsewhere; an explicit hint wins.
+   */
   readonly zero?: boolean;
 }
 
@@ -150,6 +161,7 @@ export interface Scales {
 
 /** Portable presentation hints honoured (or gracefully ignored) by every interpreter. */
 export interface Config {
+  /** The chart's title: its accessible name, and drawn above the plot by the Svelte and ProseMirror interpreters. */
   readonly title?: string;
   /** Whether tooltips are enabled. A trivial declarative hint — real interaction is per-platform. */
   readonly tooltip?: boolean;

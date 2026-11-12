@@ -32,6 +32,14 @@ import type {
  * fetching. When the spec's data is a reference (`data.ref`), the host must
  * resolve it and pass the rows; this function never fetches.
  *
+ * `x` maps onto `[0, plot.width]`. A continuous y (`quantitative`,
+ * `temporal`) maps onto `[plot.height, 0]`, so larger values sit higher; a
+ * categorical y (`nominal`, `ordinal`) maps onto `[0, plot.height]`, so the
+ * first category is the top band or point, as in Vega-Lite and ChartSpecKit.
+ * Without both `x` and `y` encodings the geometry is empty. Geometry is in
+ * plot coordinates: translate by `dimensions.margins.left` / `.top` to place
+ * it in the outer box. `data`, when passed, replaces the spec's inline values.
+ *
  * @param spec - A parsed portable chart spec.
  * @param box - The measured outer pixel box available to the chart.
  * @param data - Resolved data rows. Optional when the spec carries inline values.

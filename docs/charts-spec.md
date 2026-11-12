@@ -1,6 +1,6 @@
 # Chart spec
 
-The portable chart spec behind `@thomasfosterau/charts`: how the layers fit together, the invariants, worked example specs and the versioning rule. The package overview is the [charts README](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/README.md); every exported symbol is in the [API reference](https://github.com/thomasfosterau/components/blob/trunk/docs/charts-api.md); which interpreters honour which field is the [capability matrix](https://github.com/thomasfosterau/components/blob/trunk/docs/charts-capability-matrix.md).
+The portable chart spec behind `@thomasfosterau/charts`: how the layers fit together, the invariants, worked example specs and the versioning rule. The package overview is the [charts README](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/README.md); the API reference is the TSDoc on each export, which your editor shows on hover and which ships in the published `.d.ts`; which interpreters honour which field is the [capability matrix](https://github.com/thomasfosterau/components/blob/trunk/docs/charts-capability-matrix.md).
 
 ## Architecture
 
@@ -122,3 +122,165 @@ The per-interpreter status of this rule is the `specVersion` row of the [capabil
 - **What is implemented (#304):** `parseSpec` / `validateSpec` read `'1'` and `'1.1'` strictly, as before. A `specVersion` of the form `'1.N'` with N above 1 (no leading zero) is read as `'1.1'`: unknown keys anywhere are ignored and listed in the result's `degradation.ignored` with the declared version, the value's `specVersion` is `'1.1'` (so `encodeSpec` writes the known subset, not the original), and the 1.1 rules still hold for what it knows. An unknown `mark` fails validation with an error naming it and carries `unsupported` (`parseSpec` throws `UnsupportedMarkError`); `resolveChart` turns it into an `unsupported` outcome, which the Svelte and ProseMirror interpreters render as a visible data table. `'2'`, `'2.0'` and malformed versions are rejected.
 - **The JSON Schema stays strict** (owner decision on #304): `chart-spec.v1.json` describes only the versions it knows and closes every object, so validators keep catching typos. Only the parsers degrade.
 - **Interpreters that cannot degrade:** 0.1.0, the first release, shipped strict: it rejects any version above `'1.1'`, so the rule holds only for releases from this one on. ChartSpecKit's decoder does not degrade yet.
+
+## Using the entries
+
+Examples per entry. The API reference is the TSDoc on each export, which your editor shows on hover and which ships in the published `.d.ts`.
+
+### Parsing and validating (`@thomasfosterau/charts`)
+
+Throwing and result forms of validation, and what a newer `1.N` document does. Both are documented per function in the TSDoc.
+
+```ts
+import {
+  encodeSpec,
+  isDataRef,
+  parseSpec,
+  SpecValidationError,
+  validateSpec,
+} from '@thomasfosterau/charts';
+
+// `json` is an unknown value, e.g. a stored document attribute.
+
+// Throwing form, for trusted input.
+try {
+  const spec = parseSpec(json);
+  console.log(spec.mark, isDataRef(spec.data) ? spec.data.ref.kind : 'inline');
+} catch (error) {
+  if (error instanceof SpecValidationError) console.error(error.message);
+}
+
+// Result form, for user-supplied input.
+const result = validateSpec(json);
+if (result.ok) {
+  // A newer 1.N document: what this version ignored to read it.
+  if (result.degradation) console.warn('Ignored', result.degradation.ignored);
+  const persisted = encodeSpec(result.value); // plain JSON, ready to store
+} else if (result.unsupported) {
+  // A newer 1.N mark: show its data as a table (resolveChart does this for you).
+  console.warn(result.unsupported.spec.mark);
+} else {
+  console.error(result.errors.join('\n'));
+}
+```
+
+### Geometry (`@thomasfosterau/charts/core`)
+
+`(spec, box, rows)` in; dimensions, scales, geometry and ticks out, in plot coordinates.
+
+```ts
+import { parseSpec } from '@thomasfosterau/charts';
+import { computeContext } from '@thomasfosterau/charts/core';
+
+const spec = parseSpec({
+  specVersion: '1',
+  mark: 'bar',
+  encoding: {
+    x: { field: 'fruit', type: 'nominal' },
+    y: { field: 'count', type: 'quantitative' },
+  },
+  data: {
+    values: [
+      { fruit: 'apple', count: 3 },
+      { fruit: 'pear', count: 5 },
+    ],
+  },
+});
+
+const context = computeContext(spec, { width: 640, height: 360 }, undefined, {
+  margins: { left: 64 },
+});
+
+context.dimensions.plot; // { width: 556, height: 300 }
+context.ticks.x?.map((tick) => tick.label); // ['apple', 'pear']
+if (context.geometry.mark === 'bar') {
+  // `draw` stands in for your renderer.
+  for (const bar of context.geometry.bars) draw(bar.x, bar.y, bar.width, bar.height, bar.color);
+}
+```
+
+### Svelte (`@thomasfosterau/charts/svelte`)
+
+Published as `.svelte` source, so your app's Svelte compiles it. It renders the same under `svelte/server` and on the client.
+
+```svelte
+<script lang="ts">
+  import type { ChartSpec } from '@thomasfosterau/charts';
+  import type { DataRows } from '@thomasfosterau/charts/core';
+  import { Chart } from '@thomasfosterau/charts/svelte';
+
+  let { spec, rows }: { spec: ChartSpec; rows: DataRows } = $props();
+</script>
+
+<Chart {spec} data={rows} width={800} height={400} class="sales-chart">
+  {#snippet fallback(message)}
+    <p role="alert">{message}</p>
+  {/snippet}
+</Chart>
+```
+
+### ProseMirror (`@thomasfosterau/charts/prosemirror`)
+
+The chart node stores the spec in its attrs; the NodeView draws it at edit time. `prosemirror-state` in this example is your editor's dependency, not a peer of this package.
+
+```ts
+import {
+  CHART_NODE_NAME,
+  chartNodeViewFactory,
+  createChartNodeSpec,
+  type DataResolver,
+} from '@thomasfosterau/charts/prosemirror';
+import { Schema } from 'prosemirror-model';
+import { EditorState } from 'prosemirror-state';
+import { EditorView } from 'prosemirror-view';
+
+const schema = new Schema({
+  nodes: {
+    doc: { content: 'block+' },
+    paragraph: {
+      group: 'block',
+      content: 'text*',
+      toDOM: () => ['p', 0],
+      parseDOM: [{ tag: 'p' }],
+    },
+    text: {},
+    [CHART_NODE_NAME]: createChartNodeSpec(),
+  },
+});
+
+// `fetchRows` (your data API) and `spec` (the chart to insert) are the host app's.
+const resolveData: DataResolver = async (chart) =>
+  'ref' in chart.data ? fetchRows(chart.data.ref.id) : [];
+
+new EditorView(document.querySelector('#editor'), {
+  state: EditorState.create({
+    schema,
+    doc: schema.node('doc', null, [schema.node(CHART_NODE_NAME, { spec })]),
+  }),
+  nodeViews: { [CHART_NODE_NAME]: chartNodeViewFactory({ resolveData }) },
+});
+```
+
+### Vega-Lite (`@thomasfosterau/charts/vega`)
+
+No peer: it emits a plain Vega-Lite object, so bring your own `vega-embed`.
+
+```ts
+import { emitVegaLite, VegaLiteEmitError } from '@thomasfosterau/charts/vega';
+
+try {
+  // `rows` are the pre-resolved rows a query or node ref needs.
+  const vegaLite = emitVegaLite(spec, { rows, height: 300 });
+  await vegaEmbed('#chart', vegaLite);
+} catch (error) {
+  if (error instanceof VegaLiteEmitError) console.error(error.message);
+}
+```
+
+### JSON Schema (`@thomasfosterau/charts/schema.json`)
+
+The schema ([`schema/chart-spec.v1.json`](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/schema/chart-spec.v1.json), draft 2020-12) is generated from the same source as `parseSpec` and held equal to it by a test. Use it for codegen or for validating specs outside TypeScript.
+
+```ts
+import schema from '@thomasfosterau/charts/schema.json' with { type: 'json' };
+```

@@ -63,7 +63,12 @@ export class VegaLiteEmitError extends Error {
  *
  * This is the escape hatch / SSR fallback interpreter, and doubles as the
  * proof that the portable spec is genuinely Vega-Lite-shaped: marks and
- * typed encodings translate one-to-one.
+ * typed encodings translate one-to-one. `config.title` becomes `title`,
+ * `config.tooltip` becomes `mark.tooltip`, and `scales.x` / `scales.y` become
+ * the x and y `scale` (`domain`, `nice`, `zero`). Data comes from
+ * `options.rows` if given, else inline `values`, else a `url` ref's `id` as
+ * `url`. The test suite compiles every emitted spec with the real Vega-Lite
+ * compiler.
  *
  * Web-only `extensions` are ignored, per the capability matrix.
  *

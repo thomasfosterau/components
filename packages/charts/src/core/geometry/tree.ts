@@ -237,7 +237,11 @@ function linksOf(
  * text alternative. Pure and DOM-free; label widths are estimated from
  * character counts, as the pure path's tick layout does.
  *
- * @throws {Error} on a duplicate or missing id, an unknown parent, or a cycle; the message names the row.
+ * Leaves take equal breadth slots in depth-first order, each parent is centred
+ * over its first and last child, and depths are spread evenly along the other
+ * axis, so siblings never overlap.
+ *
+ * @throws {Error} on a duplicate or missing id, an unknown parent, or a cycle; the message names the row (1-based); `resolveChart` returns it as the message.
  */
 export function buildTreeGeometry(args: {
   readonly data: DataRows;

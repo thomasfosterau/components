@@ -5,7 +5,7 @@ import type { EditorView, NodeView } from 'prosemirror-view';
 import { chartNodeAttrs } from './node-spec.ts';
 import { renderContextToSvg, renderDataTable, renderTreeOutline } from './render-svg.ts';
 
-/** Resolves a data reference to rows. The host (CMS) owns how refs are fetched. */
+/** Resolves a spec's data reference to rows at edit time. The host (CMS) owns how refs are fetched. A stale promise never overwrites a newer render. */
 export type DataResolver = (spec: ChartSpec) => DataRows | Promise<DataRows>;
 
 /** Options for {@link ChartNodeView} / {@link chartNodeViewFactory}. */
@@ -14,11 +14,12 @@ export interface ChartNodeViewOptions {
    * The box used to compute geometry when the editor element has no
    * measurable width yet. The SVG scales to its container via viewBox,
    * so this only sets the aspect ratio and coordinate precision.
+   * @defaultValue `{ width: 640, height: 360 }`
    */
   readonly defaultBox?: Box | undefined;
   /** Resolves data refs at edit time. Without it, ref-data charts show a placeholder. */
   readonly resolveData?: DataResolver | undefined;
-  /** Extra class for the wrapper element. */
+  /** Class for the wrapper element; replaces `'chart-node-view'`. */
   readonly className?: string | undefined;
 }
 

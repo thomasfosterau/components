@@ -66,7 +66,9 @@ const taskOrder = (rows: ReadonlyArray<Datum>, field: string): string[] => [
  * (rows with an unreadable start go last; ties keep their input order). `y` is
  * the nominal `task`, `x` / `x2` are `start` / `end`, and `color` is the
  * nominal `group` when one is given. `scales.y.domain` lists the tasks in
- * start order, so the earliest task is the top row in every interpreter.
+ * start order, so the earliest task is the top row in every interpreter; with
+ * `time: 'quantitative'`, `scales.x.zero` is `false`. Pure: the input rows are
+ * not mutated.
  */
 export function ganttSpec(rows: ReadonlyArray<Datum>, options: GanttOptions): ChartSpec {
   const time = options.time ?? 'temporal';

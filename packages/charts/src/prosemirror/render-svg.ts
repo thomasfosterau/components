@@ -28,7 +28,9 @@ const DEFAULT_COLOR = CATEGORICAL_PALETTE[0]!;
  *
  * Pure string building — no DOM required — so it works in the ProseMirror
  * NodeView (via innerHTML), in server-side rendering, and in headless tests.
- * The SVG uses a viewBox so it scales to its container via CSS.
+ * The SVG uses a viewBox so it scales to its container via CSS. The root is
+ * `<svg role="img" viewBox="…">` with no `aria-label` (the title is drawn as
+ * `<text>`); the title, class and tick labels are XML-escaped.
  */
 export function renderContextToSvg(context: ChartContext, options?: RenderSvgOptions): string {
   const { outer, margins } = context.dimensions;

@@ -1,6 +1,6 @@
 # @thomasfosterau/charts
 
-The portable chart package: a durable chart spec (and its JSON Schema), a pure geometry core, and the interpreters of that spec (Svelte, ProseMirror, Vega-Lite). It was merged in from the former `thomasfosterau/charts` repo, where each layer was its own npm package; here each is a subpath entry of one package. Repo-wide rules are in the root [AGENTS.md](../../AGENTS.md); the entry points are in [README.md](README.md); the architecture and spec are in [docs/charts-spec.md](../../docs/charts-spec.md), the API reference in [docs/charts-api.md](../../docs/charts-api.md) and the capability matrix in [docs/charts-capability-matrix.md](../../docs/charts-capability-matrix.md).
+The portable chart package: a durable chart spec (and its JSON Schema), a pure geometry core, and the interpreters of that spec (Svelte, ProseMirror, Vega-Lite). It was merged in from the former `thomasfosterau/charts` repo, where each layer was its own npm package; here each is a subpath entry of one package. Repo-wide rules are in the root [AGENTS.md](../../AGENTS.md); the entry points are in [README.md](README.md); the architecture and spec are in [docs/charts-spec.md](../../docs/charts-spec.md), the API reference is the TSDoc on each export and the capability matrix in [docs/charts-capability-matrix.md](../../docs/charts-capability-matrix.md).
 
 ## Where it differs from the Svelte packages
 
