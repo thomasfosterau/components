@@ -7,6 +7,7 @@ import { userEvent } from 'vite-plus/test/browser';
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import ToolbarFixture from './fixtures/ToolbarFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 test('a named toolbar that is one Tab stop', async () => {
   const screen = await render(ToolbarFixture, {});
@@ -24,7 +25,7 @@ test('a named toolbar that is one Tab stop', async () => {
 test('→ moves across buttons, into the toggle sets and on to the link', async () => {
   const screen = await render(ToolbarFixture, {});
 
-  (screen.getByRole('button', { name: 'Undo' }).element() as HTMLElement).focus();
+  instanceOf(screen.getByRole('button', { name: 'Undo' }).element(), HTMLElement).focus();
   await userEvent.keyboard('{ArrowRight}');
   await expect.element(screen.getByRole('button', { name: 'Bold' })).toHaveFocus();
   await userEvent.keyboard('{ArrowRight}{ArrowRight}');
@@ -36,7 +37,7 @@ test('→ moves across buttons, into the toggle sets and on to the link', async 
 test('vertical: ↓ moves, → does not', async () => {
   const screen = await render(ToolbarFixture, { orientation: 'vertical' });
 
-  (screen.getByRole('button', { name: 'Undo' }).element() as HTMLElement).focus();
+  instanceOf(screen.getByRole('button', { name: 'Undo' }).element(), HTMLElement).focus();
   await userEvent.keyboard('{ArrowRight}');
   await expect.element(screen.getByRole('button', { name: 'Undo' })).toHaveFocus();
   await userEvent.keyboard('{ArrowDown}');

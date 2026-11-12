@@ -8,6 +8,7 @@ import { userEvent } from 'vite-plus/test/browser';
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import AccordionFixture from './fixtures/AccordionFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 test('every title is a native heading at headingLevel', async () => {
   const screen = await render(AccordionFixture, {});
@@ -60,7 +61,7 @@ test('required: the open item will not close, and says so', async () => {
   await expect.element(spring).toHaveAttribute('aria-disabled', 'true');
   // Playwright refuses to click an aria-disabled element; a reader's
   // activation still reaches it, so dispatch the click directly.
-  (spring.element() as HTMLButtonElement).click();
+  instanceOf(spring.element(), HTMLButtonElement).click();
   await expect.element(spring).toHaveAttribute('aria-expanded', 'true');
   await expect.element(screen.getByTestId('value')).toHaveTextContent('spring');
 });
@@ -79,7 +80,7 @@ test('↓ moves focus to the next header; a disabled item is skipped and inert',
   const screen = await render(AccordionFixture, {});
 
   const spring = screen.getByRole('button', { name: 'Spring', exact: true });
-  (spring.element() as HTMLButtonElement).focus();
+  instanceOf(spring.element(), HTMLButtonElement).focus();
   await userEvent.keyboard('{ArrowDown}');
   await expect.element(screen.getByRole('button', { name: 'Summer', exact: true })).toHaveFocus();
   await expect.element(screen.getByRole('button', { name: 'Autumn', exact: true })).toBeDisabled();

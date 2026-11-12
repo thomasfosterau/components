@@ -4,7 +4,7 @@ import * as barrel from '../src/lib/index.ts';
 import * as hotkeys from '../src/lib/hotkeys/index.ts';
 
 type Conditions = { readonly types: string; readonly svelte: string; readonly default: string };
-const entries = pkg.exports as unknown as Record<string, Conditions | string>;
+const entries: Record<string, Conditions | string> = pkg.exports;
 
 /** Every `src/lib` module an `exports` entry can point at, keyed by its `dist` path. */
 const sources = new Set(

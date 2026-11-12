@@ -2,6 +2,7 @@ import { parseSpec } from '../../src/spec/index.ts';
 import { describe, expect, it } from 'vite-plus/test';
 import { geometryOf } from './geometry-of.ts';
 import { computeContext, type Geometry } from '../../src/core/index.ts';
+import { instanceOf } from '../dom.ts';
 
 const box = { width: 100, height: 100 };
 const noMargins = { margins: { top: 0, right: 0, bottom: 0, left: 0 } };
@@ -83,8 +84,10 @@ describe('edge cases', () => {
         data: { values: [{ d: '2024-06-15', v: 1 }] },
       });
       const context = computeContext(spec, box, undefined, noMargins);
-      const [lo, hi] = context.scales.x!.domain as [Date, Date];
-      expect(hi.getTime() - lo.getTime()).toBe(2 * 24 * 60 * 60 * 1000);
+      const [lo, hi] = context.scales.x!.domain;
+      expect(instanceOf(hi, Date).getTime() - instanceOf(lo, Date).getTime()).toBe(
+        2 * 24 * 60 * 60 * 1000,
+      );
     });
 
     it('renders a single-point line as one point with a move-to path', () => {

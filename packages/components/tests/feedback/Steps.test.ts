@@ -8,6 +8,7 @@ import { render } from 'vitest-browser-svelte';
 import Steps from '../../src/lib/feedback/Steps.svelte';
 import type { StepItem } from '../../src/lib/feedback/Steps.svelte';
 import StepsFixture from './fixtures/StepsFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 const items: StepItem[] = [
   { id: 'plan', label: 'Plan' },
@@ -96,6 +97,6 @@ test('orientation and tone come from the literal tables; class merges last', asy
 test('renders right to left without overflowing', async () => {
   const screen = await render(StepsFixture, { items, dir: 'rtl' });
 
-  const list = screen.getByRole('list').element() as HTMLElement;
+  const list = instanceOf(screen.getByRole('list').element(), HTMLElement);
   expect(list.scrollWidth).toBeLessThanOrEqual(list.clientWidth + 1);
 });

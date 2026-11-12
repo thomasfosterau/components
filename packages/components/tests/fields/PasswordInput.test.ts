@@ -3,6 +3,7 @@ import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import PasswordInput from '../../src/lib/fields/PasswordInput.svelte';
 import PasswordInputFixture from './fixtures/PasswordInputFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 test('is a password field set up for a password manager to fill', async () => {
   const screen = await render(PasswordInputFixture, {});
@@ -41,7 +42,7 @@ test('the toggle is a pressed-state button that reveals the text without submitt
 test('the selection survives the type flip', async () => {
   const screen = await render(PasswordInput, { 'aria-label': 'Password', value: 'abcdefgh' });
 
-  const input = screen.getByLabelText('Password').element() as HTMLInputElement;
+  const input = instanceOf(screen.getByLabelText('Password').element(), HTMLInputElement);
   input.focus();
   input.setSelectionRange(2, 5);
   await userEvent.click(screen.getByRole('button', { name: 'Show password' }));

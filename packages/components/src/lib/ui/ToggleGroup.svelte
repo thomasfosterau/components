@@ -122,11 +122,10 @@ A set of toggle buttons answering one question, exclusively or independently, on
     value === undefined || value === '' ? [] : typeof value === 'string' ? [value] : value,
   );
 
-  const setters = toggleSetters<V>({
-    required: () => required,
-    assign: (next) => (value = next),
-    notify: () => onValueChange,
-  });
+  const setters = toggleSetters<V>(
+    () => ({ items, required, type, onValueChange }),
+    (next) => (value = next),
+  );
 
   const MOVE_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End']);
 

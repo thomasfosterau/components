@@ -3,6 +3,7 @@ import { afterEach, expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import type { FileRejection } from '../../src/lib/fields/file-validation.ts';
 import DropzoneFixture from './fixtures/DropzoneFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 const makeFile = (name: string, type: string, bytes = 10): File =>
   new File([new Uint8Array(bytes)], name, { type });
@@ -115,7 +116,7 @@ test('a wrapping form posts the listed files under name', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
   const data = onSubmitted.mock.calls[0]?.[0];
-  expect(data?.getAll('attachments').map((entry) => (entry as File).name)).toEqual([
+  expect(data?.getAll('attachments').map((entry) => instanceOf(entry, File).name)).toEqual([
     'a.pdf',
     'b.pdf',
   ]);

@@ -7,6 +7,7 @@ import {
   validateSpec,
   type ChartSpec,
 } from '../../src/spec/index.ts';
+import { instanceOf } from '../dom.ts';
 
 const validSpec = {
   specVersion: '1',
@@ -156,7 +157,7 @@ describe('SpecValidationError', () => {
     }
     expect(caught).toBeInstanceOf(SpecValidationError);
     expect(caught).toBeInstanceOf(Error);
-    const err = caught as SpecValidationError;
+    const err = instanceOf(caught, SpecValidationError);
     expect(err.name).toBe('SpecValidationError');
     expect(err.message).toContain('mark');
   });

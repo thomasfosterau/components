@@ -31,31 +31,34 @@ describe('JSON Schema artifact', () => {
   });
 
   it('requires specVersion, mark, encoding, and data', () => {
-    const chartSpec = emitted.$defs['ChartSpec'] as { required: string[] };
-    expect(chartSpec.required).toEqual(['specVersion', 'mark', 'encoding', 'data']);
+    expect(emitted.$defs['ChartSpec']?.['required']).toEqual([
+      'specVersion',
+      'mark',
+      'encoding',
+      'data',
+    ]);
   });
 
   it('rejects unknown top-level properties', () => {
-    const chartSpec = emitted.$defs['ChartSpec'] as { additionalProperties: boolean };
-    expect(chartSpec.additionalProperties).toBe(false);
+    expect(emitted.$defs['ChartSpec']?.['additionalProperties']).toBe(false);
   });
 
   describe('discriminated union emission (the handover §10 verification)', () => {
     // Swift Codable / kotlinx.serialization codegen needs the data union to be
     // an unambiguous oneOf whose branches are distinguishable by required keys.
     it('data emits as a clean oneOf of $refs', () => {
-      const data = emitted.$defs['Data'] as { oneOf: Array<{ $ref: string }> };
-      expect(data.oneOf).toEqual([{ $ref: '#/$defs/InlineData' }, { $ref: '#/$defs/DataRef' }]);
+      expect(emitted.$defs['Data']?.['oneOf']).toEqual([
+        { $ref: '#/$defs/InlineData' },
+        { $ref: '#/$defs/DataRef' },
+      ]);
     });
 
     it('the InlineData branch requires `values`', () => {
-      const inline = emitted.$defs['InlineData'] as { required: string[] };
-      expect(inline.required).toEqual(['values']);
+      expect(emitted.$defs['InlineData']?.['required']).toEqual(['values']);
     });
 
     it('the DataRef branch requires `ref`', () => {
-      const ref = emitted.$defs['DataRef'] as { required: string[] };
-      expect(ref.required).toEqual(['ref']);
+      expect(emitted.$defs['DataRef']?.['required']).toEqual(['ref']);
     });
   });
 
@@ -81,7 +84,7 @@ describe('JSON Schema artifact', () => {
       const json = JSON.stringify(emitted);
       const refs = [...json.matchAll(/"\$ref":"#\/\$defs\/([^"]+)"/g)].map((m) => m[1]);
       for (const ref of refs) {
-        expect(emitted.$defs[ref as string], `missing $defs entry: ${ref}`).toBeDefined();
+        expect(emitted.$defs[ref ?? ''], `missing $defs entry: ${ref}`).toBeDefined();
       }
     });
 

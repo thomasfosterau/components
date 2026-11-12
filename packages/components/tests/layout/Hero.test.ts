@@ -2,6 +2,7 @@ import { expect, test } from 'vite-plus/test';
 import { createRawSnippet } from 'svelte';
 import { render } from 'vitest-browser-svelte';
 import Hero from '../../src/lib/layout/Hero.svelte';
+import { instanceOf } from '../dom.ts';
 
 const actions = createRawSnippet(() => ({
   render: () =>
@@ -47,9 +48,10 @@ test('a background image is decorative CSS under an overlay, never an img', asyn
     backgroundImage: '/garden (1).jpg',
   });
 
-  const region = screen
-    .getByRole('region', { name: 'Grow more with less' })
-    .element() as HTMLElement;
+  const region = instanceOf(
+    screen.getByRole('region', { name: 'Grow more with less' }).element(),
+    HTMLElement,
+  );
   expect(region.querySelector('img')).toBeNull();
   expect(region.querySelector('.hero-overlay')).not.toBeNull();
   expect(region.style.backgroundImage).toContain('garden (1).jpg');
