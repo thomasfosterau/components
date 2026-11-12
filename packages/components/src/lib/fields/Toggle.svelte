@@ -13,6 +13,9 @@ A switch for an on/off setting that takes effect immediately, rather than a chec
   through `aria-describedby`, because a paragraph of explanation inside the
   label would be read as part of the name every time focus lands.
 
+  While `onChange` is in flight the switch is `aria-busy`. For a button that
+  stays pressed rather than a setting, see `ToggleButton`.
+
   Why the control is NOT `bind:checked`: the browser flips a checkbox the
   instant it is clicked, but `onChange` may refuse the change — the
   registration failed, the reader denied a permission, the server said no.

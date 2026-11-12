@@ -12,6 +12,10 @@ An inline reference marker that registers its source with the surrounding biblio
   is what makes the FIRST paint carry the right number; the effect is what
   keeps it right if the `citation` prop is swapped in place.
 
+  The marker's accessible name is `referenceLabel` (a bare "1" announces
+  nothing): a real `<a href="#ref-<id>">` when `linkToReference`, otherwise a
+  `<span>`.
+
   `link link-hover` rather than a fixed colour: a hard-coded blue is invisible
   in a dark theme and ignores whatever palette the consumer's `theme.css`
   declares.

@@ -3,9 +3,10 @@ A modal panel that slides in from an edge: a filters sheet, a mobile action shee
 -->
 <!--
   Drawer — `Dialog`'s contract at an edge of the screen. It shares
-  `DialogFrame` with `Dialog`, so the focus trap and return, Escape and
-  overlay dismissal, scroll lock, `aria-modal`, the title as the accessible
-  name and the labelled close button are one implementation.
+  `DialogFrame` with `Dialog`, so the `role="dialog"` with `aria-modal`, the focus
+  trap and return, Escape and overlay dismissal, scroll lock, the title as the
+  accessible name (kept as the name when `hideTitle` hides it) and the
+  labelled close button are one implementation.
 
   Not daisyUI's `drawer`: that is driven by a hidden checkbox and a
   `<label>` overlay, which gives no focus trap, no focus move or return, no

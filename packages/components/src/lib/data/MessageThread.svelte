@@ -8,7 +8,7 @@ A conversation: a named region holding an ordered list of `ChatBubble`s.
   `ChatBubble`s, each an `<li>`.
 
   `live` is for a thread that grows while it is read (live chat): the
-  section becomes `role="log"`, which announces appended messages politely.
+  section becomes `role="log"` (implicitly `aria-live="polite"`), which announces appended messages politely.
   Off by default, because a static comment history must not read itself
   out as it renders.
 -->

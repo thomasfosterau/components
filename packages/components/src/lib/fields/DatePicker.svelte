@@ -12,7 +12,10 @@ A segmented date field with a button that opens a calendar popover, on bits-ui `
 
   ARIA contract: the segment group as `DateField` (named by the
   `FormField` label through `labelId`); the trigger and dialog as
-  `PickerPopover`; the grid as `Calendar`.
+  `PickerPopover` — an icon-only button named by `triggerLabel` with
+  `aria-haspopup="dialog"` and `aria-expanded`, opening a `role="dialog"`
+  named by `calendarLabel`; the grid as `Calendar`. Picking a day closes the
+  popover and returns focus to the trigger.
 -->
 <script lang="ts">
   import type { DateValue } from '@internationalized/date';

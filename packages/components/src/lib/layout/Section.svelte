@@ -47,7 +47,10 @@ A titled block of a page: a heading, an optional count, optional actions, and ei
     count?: number | undefined;
     /** A line under the heading saying what the section contains. */
     description?: string | undefined;
-    /** Whether there is anything to show. Drives the empty state. */
+    /**
+     * Whether there is nothing to show. Drives the empty state.
+     * @defaultValue `false`
+     */
     empty?: boolean | undefined;
     /**
      * The default empty state's text.

@@ -11,6 +11,11 @@ A `Tip` anchored beside the trigger it is about, which renders inside it.
   `Popover.Content` computes and keeps that position via Floating UI, and
   handles focus containment and outside-click dismissal for free.
 
+  ARIA contract: the trigger carries bits-ui `Popover`'s dialog wiring
+  (`aria-haspopup="dialog"`, `aria-expanded`, `aria-controls`); the bubble
+  holds a `Tip`, so it keeps `Tip`'s `role="status"` with
+  `aria-live="polite"` and the dismiss button named by `dismissLabel`.
+
   `open` is NOT bound: it is a pure function of the tip's own state
   (`available` and not yet dismissed/completed), read back from the store. A
   tip shows because the store's rules say it may, never because the reader
