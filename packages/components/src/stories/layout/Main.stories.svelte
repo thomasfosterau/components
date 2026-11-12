@@ -1,6 +1,7 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import Main from '../../lib/layout/Main.svelte';
+  import SkipLink from '../../lib/layout/SkipLink.svelte';
 
   const { Story } = defineMeta({
     title: 'Layout/Main',
@@ -37,4 +38,20 @@
       </p>
     </Main>
   </main>
+</Story>
+
+<Story name="With a skip link">
+  <div class="space-y-4">
+    <p class="text-base-content/70">Press Tab: the skip link is the first stop, and Enter jumps into the content.</p>
+    <SkipLink target="story-main" />
+    <nav aria-label="Site" class="flex gap-4">
+      <a class="link" href="#home">Home</a>
+      <a class="link" href="#beds">Beds</a>
+      <a class="link" href="#harvests">Harvests</a>
+    </nav>
+    <Main id="story-main" class="space-y-2">
+      <h1 class="text-3xl font-semibold">Bed 4</h1>
+      <a class="link" href="#sown">Sown this season</a>
+    </Main>
+  </div>
 </Story>

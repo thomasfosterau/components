@@ -17,6 +17,9 @@ The page’s content column and the `<main>` landmark.
   prevent. A `<section>` is a `region` landmark only when it has an accessible
   name, so pass `aria-label`/`aria-labelledby` (spread through `rest`) when
   the nested block is one worth jumping to, and nothing when it is not.
+
+  As a `<main>` it takes `id="main-content"` unless given one, so
+  `<SkipLink />` (whose default target that is) works with no wiring.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
@@ -28,16 +31,26 @@ The page’s content column and the `<main>` landmark.
      * @defaultValue `'main'`
      */
     as?: 'main' | 'section' | undefined;
+    /**
+     * The element's id.
+     * @defaultValue `'main-content'` as a `<main>` (the `SkipLink` default target); none as a `<section>`
+     */
+    id?: string | undefined;
     /** The page content, inside the landmark and the content column. */
     children: Snippet<[]>;
   }
 
-  let { as = 'main', children, class: className, ...rest }: Props = $props();
+  let { as = 'main', id, children, class: className, ...rest }: Props = $props();
 </script>
 
 <!-- `min-w-0` is the one class worth imposing: a content column is nearly
      always a flex or grid child, and without it a wide table or a long
      unbroken URL inside pushes the whole layout sideways. -->
-<svelte:element this={as} {...rest} class={['min-w-0', className]}>
+<svelte:element
+  this={as}
+  {...rest}
+  id={id ?? (as === 'main' ? 'main-content' : undefined)}
+  class={['min-w-0', className]}
+>
   {@render children()}
 </svelte:element>
