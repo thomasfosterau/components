@@ -12,6 +12,7 @@
 import { expect, test, vi } from 'vite-plus/test';
 import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
+import type { SortState } from '../../src/lib/data/table-types.ts';
 import TableFixture from './fixtures/TableFixture.svelte';
 import { rows, type Row } from './fixtures/table-data.ts';
 
@@ -46,7 +47,7 @@ test('shows a visible caption when it is not hidden', async () => {
 });
 
 test('announces the sort state on the header and reports the change', async () => {
-  const onSort = vi.fn();
+  const onSort = vi.fn<(sort: SortState | undefined) => void>();
   const screen = await render(TableFixture, { onSort });
 
   const header = screen.getByRole('columnheader').elements()[0];
@@ -67,7 +68,7 @@ test('announces the sort state on the header and reports the change', async () =
 });
 
 test('sorts from the keyboard, because the control is a real button', async () => {
-  const onSort = vi.fn();
+  const onSort = vi.fn<(sort: SortState | undefined) => void>();
   const screen = await render(TableFixture, { onSort });
 
   await userEvent.tab();
@@ -86,7 +87,7 @@ test('leaves a column that is not sortable silent about sorting', async () => {
 });
 
 test('activates a row with Enter and with Space, not only with a click', async () => {
-  const onSelect = vi.fn();
+  const onSelect = vi.fn<(row: Row) => void>();
   const screen = await render(TableFixture, { sortable: false, onSelect });
 
   const first = screen.getByRole('button').nth(0);

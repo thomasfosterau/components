@@ -4,7 +4,7 @@ import { render } from 'vitest-browser-svelte';
 import FormActionsFixture from './fixtures/FormActionsFixture.svelte';
 
 test('the submit control really submits the form', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<() => void>();
   const screen = await render(FormActionsFixture, { submitLabel: 'Create garden', onSubmitted });
 
   await userEvent.click(screen.getByRole('button', { name: 'Create garden' }));
@@ -13,7 +13,7 @@ test('the submit control really submits the form', async () => {
 });
 
 test('Enter in a field submits too, because the button is type=submit', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<() => void>();
   const screen = await render(FormActionsFixture, { submitLabel: 'Create garden', onSubmitted });
 
   await userEvent.click(screen.getByRole('textbox', { name: 'Garden name' }));

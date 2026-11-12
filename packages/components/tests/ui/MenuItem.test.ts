@@ -42,7 +42,7 @@ test('a dropdown item with an href stays a real link', async () => {
 });
 
 test('a dropdown item without an href is a button that calls onSelect', async () => {
-  const onSignOut = vi.fn();
+  const onSignOut = vi.fn<() => void>();
   const screen = await render(MenuDropdownFixture, { onSignOut });
 
   await userEvent.click(screen.getByRole('button', { name: 'Ada Lovelace' }));

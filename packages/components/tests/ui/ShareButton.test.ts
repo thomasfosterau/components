@@ -37,9 +37,9 @@ test('renders a labelled button once the API is present', async () => {
 });
 
 test('shares exactly the payload it was given, and reports success', async () => {
-  const share = vi.fn(async () => undefined);
+  const share = vi.fn<(data: ShareData) => Promise<void>>(async () => undefined);
   installShare(share, true);
-  const onShare = vi.fn();
+  const onShare = vi.fn<(data: ShareData) => void>();
   const screen = await render(ShareButton, {
     title: 'A garden',
     text: 'Two of six survived.',
@@ -61,7 +61,7 @@ test('shares exactly the payload it was given, and reports success', async () =>
 test('a rejected or dismissed sheet goes to onError', async () => {
   const failure = new Error('AbortError');
   installShare(() => Promise.reject(failure), true);
-  const onError = vi.fn();
+  const onError = vi.fn<(error: unknown) => void>();
   const screen = await render(ShareButton, { title: 'A garden', onError });
 
   await userEvent.click(screen.getByRole('button', { name: 'Share' }));
@@ -70,9 +70,9 @@ test('a rejected or dismissed sheet goes to onError', async () => {
 });
 
 test('a payload canShare refuses never reaches share()', async () => {
-  const share = vi.fn(async () => undefined);
+  const share = vi.fn<(data: ShareData) => Promise<void>>(async () => undefined);
   installShare(share, false);
-  const onError = vi.fn();
+  const onError = vi.fn<(error: unknown) => void>();
   const screen = await render(ShareButton, { title: 'A garden', onError });
 
   await userEvent.click(screen.getByRole('button', { name: 'Share' }));

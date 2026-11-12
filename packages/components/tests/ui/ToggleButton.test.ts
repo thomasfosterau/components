@@ -10,7 +10,7 @@ import ToggleButton from '../../src/lib/ui/ToggleButton.svelte';
 import { htmlSnippet, textSnippet } from './snippets.ts';
 
 test('a click presses it; the name stays the same', async () => {
-  const onPressedChange = vi.fn();
+  const onPressedChange = vi.fn<(pressed: boolean) => void>();
   const screen = await render(ToggleButton, {
     children: textSnippet('Show frost dates'),
     onPressedChange,

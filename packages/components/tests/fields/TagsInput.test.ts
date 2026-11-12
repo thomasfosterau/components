@@ -114,7 +114,9 @@ test('with suggestions the input is a combobox and Enter on a highlighted option
 });
 
 test('async suggestions come from onSearch', async () => {
-  const onSearch = vi.fn(async (query: string) => [`${query}-one`, `${query}-two`]);
+  const onSearch = vi.fn<(query: string, signal: AbortSignal) => Promise<readonly string[]>>(
+    async (query) => [`${query}-one`, `${query}-two`],
+  );
   const screen = await render(TagsInputFixture, { onSearch });
 
   await userEvent.click(screen.getByRole('combobox', { name: 'Tags' }));
@@ -125,12 +127,12 @@ test('async suggestions come from onSearch', async () => {
 });
 
 test('a wrapping form posts one entry per tag', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(TagsInputFixture, { values: ['a', 'b'], onSubmitted });
 
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.getAll('tags')).toEqual(['a', 'b']);
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.getAll('tags')).toEqual(['a', 'b']);
 });
 
 test('inside FormField: label, hint, errors, and aria-required throughout', async () => {
@@ -143,7 +145,7 @@ test('inside FormField: label, hint, errors, and aria-required throughout', asyn
 });
 
 test('required is satisfied by a committed tag, never by uncommitted text', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(TagsInputFixture, { required: true, onSubmitted });
 
   const input = screen.getByLabelText(/Tags/);

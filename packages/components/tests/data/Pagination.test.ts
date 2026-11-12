@@ -118,7 +118,7 @@ test('prevNext renders both arms and a status, even on a single page', async () 
 });
 
 test('pages through a callback when there is no href, using real buttons', async () => {
-  const onPage = vi.fn();
+  const onPage = vi.fn<(offset: number) => void>();
   const screen = await render(Pagination, { offset: 20, limit: 20, total: 151, onPage });
 
   expect(screen.getByRole('link').elements()).toHaveLength(0);

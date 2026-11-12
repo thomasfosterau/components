@@ -16,7 +16,7 @@ test('is one textbox named by the FormField label, set up for one-time codes', a
 });
 
 test('typing the code binds it and calls onComplete exactly once', async () => {
-  const onComplete = vi.fn();
+  const onComplete = vi.fn<(code: string) => void>();
   const screen = await render(PinInputFormFixture, { onComplete });
 
   await userEvent.click(screen.getByLabelText('Sign-in code'));
@@ -94,7 +94,7 @@ test('inside FormField the hint describes it and errors mark it invalid', async 
 });
 
 test('name posts the full code from a wrapping form', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(PinInputFormFixture, { onSubmitted });
 
   await userEvent.click(screen.getByLabelText('Sign-in code'));
@@ -102,6 +102,6 @@ test('name posts the full code from a wrapping form', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
 
   expect(onSubmitted).toHaveBeenCalledOnce();
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.get('code')).toBe('654321');
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.get('code')).toBe('654321');
 });

@@ -21,7 +21,7 @@ test('purpose="new" asks for a new password, so a manager offers to generate one
 });
 
 test('the toggle is a pressed-state button that reveals the text without submitting', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(PasswordInputFixture, { onSubmitted });
 
   const toggle = screen.getByRole('button', { name: 'Show password' });
@@ -68,7 +68,7 @@ test('revealable={false} renders no toggle', async () => {
 });
 
 test('submitting the form hides the password again', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(PasswordInputFixture, { onSubmitted });
 
   await userEvent.click(screen.getByRole('button', { name: 'Show password' }));
@@ -76,8 +76,8 @@ test('submitting the form hides the password again', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
 
   expect(onSubmitted).toHaveBeenCalledOnce();
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.get('password')).toBe('hunter2hunter2');
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.get('password')).toBe('hunter2hunter2');
   await expect.element(screen.getByLabelText('Password')).toHaveAttribute('type', 'password');
   await expect
     .element(screen.getByRole('button', { name: 'Show password' }))

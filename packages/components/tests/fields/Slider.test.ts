@@ -15,7 +15,7 @@ test('is a named slider reporting its value and bounds', async () => {
 });
 
 test('ArrowRight steps by `step`, End jumps to max, and the bound value follows', async () => {
-  const onCommit = vi.fn();
+  const onCommit = vi.fn<(value: number | readonly number[]) => void>();
   const screen = await render(Slider, {
     label: 'Depth',
     min: 0,
@@ -155,18 +155,18 @@ test('inside FormField each range thumb reads the label then its own name', asyn
 });
 
 test('name posts one hidden input per thumb', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(SliderFormFixture, { range: true, onSubmitted });
 
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
   expect(onSubmitted).toHaveBeenCalledOnce();
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.getAll('sun')).toEqual(['2', '6']);
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.getAll('sun')).toEqual(['2', '6']);
 });
 
 test('onCommit fires once per key press', async () => {
-  const onCommit = vi.fn();
+  const onCommit = vi.fn<(value: number | readonly number[]) => void>();
   const screen = await render(Slider, { label: 'Depth', value: 10, onCommit });
 
   (screen.getByRole('slider').element() as HTMLElement).focus();

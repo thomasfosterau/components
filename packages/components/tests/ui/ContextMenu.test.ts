@@ -55,7 +55,7 @@ test('Escape closes it and focus returns to the region', async () => {
 });
 
 test('a menu item calls onSelect, and a link item stays a link', async () => {
-  const onRename = vi.fn();
+  const onRename = vi.fn<() => void>();
   const screen = await render(ContextMenuFixture, { onRename });
 
   await rightClick(screen.getByText('Rosa canina'));

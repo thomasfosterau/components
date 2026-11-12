@@ -16,7 +16,7 @@ test('is a native file input carrying its accept list', async () => {
 });
 
 test('choosing a file reports it through onSelect', async () => {
-  const onSelect = vi.fn();
+  const onSelect = vi.fn<(file: File | undefined) => void>();
   const screen = await render(FileInput, {
     'aria-label': 'Attachment',
     onSelect,
@@ -30,7 +30,7 @@ test('choosing a file reports it through onSelect', async () => {
 });
 
 test('a file over maxBytes is refused, cleared from the control and explained', async () => {
-  const onSelect = vi.fn();
+  const onSelect = vi.fn<(file: File | undefined) => void>();
   const screen = await render(FileInput, {
     'aria-label': 'Attachment',
     maxBytes: 16,

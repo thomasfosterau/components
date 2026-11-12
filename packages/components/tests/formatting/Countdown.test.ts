@@ -51,7 +51,7 @@ test('the spoken text changes at the minute, not the second', async () => {
 });
 
 test('at zero a status says completeLabel and onComplete fires exactly once', async () => {
-  const onComplete = vi.fn();
+  const onComplete = vi.fn<() => void>();
   const screen = await render(Countdown, {
     until: START + 3_000,
     label: 'Auction closes in',
@@ -66,7 +66,7 @@ test('at zero a status says completeLabel and onComplete fires exactly once', as
 });
 
 test('an instant already past renders complete without calling onComplete', async () => {
-  const onComplete = vi.fn();
+  const onComplete = vi.fn<() => void>();
   const screen = await render(Countdown, { until: START - 1_000, label: 'Opened', onComplete });
 
   expect(screen.container.querySelector('[role="status"]')?.textContent).toBe('Time is up');
@@ -75,7 +75,7 @@ test('an instant already past renders complete without calling onComplete', asyn
 });
 
 test('the interval stops on unmount', async () => {
-  const onComplete = vi.fn();
+  const onComplete = vi.fn<() => void>();
   const screen = await render(Countdown, { until: START + 3_000, label: 'Soon', onComplete });
 
   await screen.unmount();
