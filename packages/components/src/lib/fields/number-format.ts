@@ -87,10 +87,7 @@ export function parseNumber(
   }
   if (group.trim() === '') rest = rest.replace(SPACES, '');
   else rest = rest.split(group).join('').replace(SPACES, '');
-  rest = rest
-    .split(decimal)
-    .join('.')
-    .replace(/[−‒–]/g, '-');
+  rest = rest.split(decimal).join('.').replace(/[−‒–]/g, '-');
   if (!/^-?(\d+\.?\d*|\.\d+)$/.test(rest)) return Number.NaN;
   const parsed = Number(rest);
   return options?.style === 'percent' ? roundTo(parsed / 100, 15) : parsed;
