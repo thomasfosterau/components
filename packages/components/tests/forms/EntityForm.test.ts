@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
+import { createForm } from '@thomasfosterau/effect-forms-svelte';
 import EntityForm from '../../src/lib/forms/EntityForm.svelte';
 import { thingForm } from './fixtures/entity-form-definitions.ts';
 
@@ -166,5 +167,63 @@ describe('form-level messages', () => {
         Node.DOCUMENT_POSITION_FOLLOWING,
       );
     }
+  });
+});
+
+describe('errorSummary', () => {
+  it('renders no summary unless asked, and the plain FormErrors block instead', async () => {
+    const screen = await render(EntityForm, {
+      definition: thingForm,
+      mode: 'create',
+      messages: ['The server fell over.'],
+    });
+    expect(screen.getByRole('heading', { name: 'There is a problem' }).elements()).toHaveLength(0);
+    await expect.element(screen.getByText('The server fell over.')).toBeInTheDocument();
+  });
+
+  it('lists a posted failure as links to the fields, in entry order, and focuses itself', async () => {
+    let store: ReturnType<typeof createForm> | undefined;
+    const screen = await render(EntityForm, {
+      definition: thingForm,
+      mode: 'create',
+      initial: { parentId: 'a' },
+      errorSummary: true,
+      enhance: (form) => {
+        store = form;
+        return form.props;
+      },
+    });
+    const summary = screen.getByRole('alert', { name: 'There is a problem' });
+    expect(summary.elements()).toHaveLength(0);
+
+    // What a SvelteKit action's `fail()` repopulates the store with.
+    store?.setServerState(
+      { title: '', parentId: 'a', status: '' },
+      {
+        _errors: ['The server fell over.'],
+        status: { _errors: ['Choose a status'] },
+        title: { _errors: ['Enter a title'] },
+      },
+    );
+
+    await expect.element(summary.getByText('The server fell over.')).toBeInTheDocument();
+    const links = summary.getByRole('link').elements();
+    expect(links.map((link) => link.textContent?.trim())).toEqual([
+      'Enter a title',
+      'Choose a status',
+    ]);
+    await expect.element(summary).toHaveFocus();
+    await summary.getByRole('link', { name: 'Enter a title' }).click();
+    await expect.element(screen.getByRole('textbox', { name: /Title/ })).toHaveFocus();
+  });
+
+  it('takes its copy from the option', async () => {
+    const screen = await render(EntityForm, {
+      definition: thingForm,
+      mode: 'create',
+      errorSummary: { title: 'Fix these', titlePrefix: '' },
+      messages: ['Nope'],
+    });
+    await expect.element(screen.getByRole('alert', { name: 'Fix these' })).toBeInTheDocument();
   });
 });
