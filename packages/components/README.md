@@ -246,9 +246,10 @@ The landmarks a page is assembled from, and the blocks that sit inside them. Str
 | `BackToTop` | A "Back to top" link that appears on long pages | `target? = 'main-content'`, `threshold? = 800` (px), `variant? = 'inline'` (`'inline'\|'floating'`), `label? = 'Back to top'`, `scrollContainer?: HTMLElement` + `HTMLAnchorAttributes` | — | a real `<a href="#…">` with visible text (works without script); `hidden` (out of the tab order and the tree) until the reader scrolls past `threshold`, watched by an `IntersectionObserver`, not a scroll listener; activating it scrolls to the top (instantly under `prefers-reduced-motion`) and moves focus to the target as `SkipLink` does; never announced. `floating` honours `--back-to-top-offset` to stack above a FAB |
 | `Hero` | The top of a landing or "about" page: headline, copy and calls to action | `title: string \| Snippet`, `description?`, `headingLevel? = 1`, `align?: 'start' \| 'center'`, `backgroundImage?`, `actionsLabel? = 'Actions'` | `actions?`, `figure?`, `children?` | A `<section>` named by its heading; `actions` is a `role="group"`; a background image is decorative CSS under an overlay, never an `<img>`. A page has one `<h1>`: don't pair a `Hero` with a `PageHeader` at level 1 |
 | `PageHeader` | What the page is about, and what you can do to it | `title: string \| Snippet`, `subtitle?`, `headingLevel? = 1`, `actionsLabel? = 'Page actions'` | `eyebrow?`, `icon?`, `meta?`, `actions?`, `children?` | `title` is a real heading; `actions` is a `role="group"` named by `actionsLabel`; `icon` is `aria-hidden` |
-| `AppShell` | The responsive app frame | `navOpen? ⚓`, `navLabel? = 'Menu'`, `navTitle? = 'Navigation'` | `sidebar`, `header?({ triggerProps })`, `children` | the sidebar is a plain column from `lg` up and a `Drawer side="start"` below it, with exactly one `navigation` landmark in the tree at any width; close it on navigation with `afterNavigate(() => (navOpen = false))` |
+| `AppShell` | The responsive app frame | drawer mode: `navOpen? ⚓`, `navLabel? = 'Menu'`, `navTitle? = 'Navigation'`; adaptive mode: `destinations: readonly NavDestination[]`, `label? = 'Primary'`, `breakpoints? = { medium: 'md', expanded: 'lg' }` (`'sm'\|'md'`, `'lg'\|'xl'`), `badgeLabel? = (b) => \`${b} new\`` | `sidebar` (optional with `destinations`), `header?({ triggerProps })`, `brand?`, `account?`, `children` | drawer mode: the sidebar is a plain column from `lg` up and a `Drawer side="start"` below it; close it on navigation with `afterNavigate(() => (navOpen = false))`. Adaptive mode: a `BottomNav` below `medium`, a `NavigationRail` to `expanded`, the `sidebar` (or a `Sidebar` built from the destinations) from `expanded` up, the inactive tiers `display: none`. Either way exactly one `navigation` landmark is in the tree at any width |
 | `BottomNav` | The phone's primary navigation, on daisyUI `dock` | `label? = 'Primary'`, `size? = 'md'`, `fixed? = true` + `HTMLAttributes<HTMLElement>` | `children` (the `BottomNavItem`s) | `<nav aria-label>` around a list of links; no bits-ui and no `Menu`; fixed, it sets `--bottom-nav-height` on the root so the page can pad (`pb-(--bottom-nav-height)`) |
-| `BottomNavItem` | One destination | `href` (through the context), `label`, `current?` (else the context's `isCurrent`), `badge?`, `badgeLabel? = (b) => \`${b} new\``+`HTMLAnchorAttributes` | `icon` | the name is `label` plus the badge's words, never the icon (`aria-hidden`); current is `aria-current="page"` + `dock-active`, never `aria-selected` |
+| `BottomNavItem` | One destination | `href` (through the context), `label`, `current?` (else the context's `isCurrent`), `badge?`, `badgeLabel? = (b) => \`${b} new\``+`HTMLAnchorAttributes` | `icon`, `currentIcon?` (shown while current) | the name is `label` plus the badge's words, never the icon (`aria-hidden`); current is `aria-current="page"` + `dock-active`, never `aria-selected` |
+| `NavigationRail` | The medium-width primary navigation: an ~80px column | `destinations: readonly NavDestination[]`, `label? = 'Primary'`, `labels? = 'always'` (`'current'`: only the current label shows), `badgeLabel? = (b) => \`${b} new\``+`HTMLAttributes<HTMLDivElement>` | `header?` (a FAB, a menu button, the brand), `footer?` | `<nav aria-label>` around a list of links in tab order (no roving tabindex); current is `aria-current="page"` + `currentIcon` + the indicator pill, never colour alone; hidden labels are `VisuallyHidden` (still the names) and shown in a `Tooltip` on hover and focus; badges are named in words; each link is at least 48×48; `header`/`footer` sit outside the landmark |
 | `Breadcrumbs` | The ancestor trail | `items: readonly Crumb[]`, `label? = 'Breadcrumb'` | `item?(crumb, index)` | `<nav aria-label>` + `<ol>`; ancestors are links, the trailing crumb is text with `aria-current="page"` |
 | `Navbar` | The site banner | `label? = 'Primary'`, `menuLabel? = 'Menu'`, `menuOpen? ⚓` | `start`, `center?`, `end?`, `menu?` | `<header>` (`banner`) > `<nav aria-label>`; the responsive toggle is a bits-ui `Collapsible` |
 | `Footer` | The site footer | — + `HTMLAttributes<HTMLElement>` | `children`, `aside?` | `<footer>` (`contentinfo`); `aside` renders first |
@@ -271,7 +272,22 @@ The landmarks a page is assembled from, and the blocks that sit inside them. Str
 </BottomNav>
 ```
 
-`layout` also exports `types.ts` (`Crumb`, `TabItem`, `FilterOption`, `TabsMode`, `TabsVariant`, `tabsVariant`, `tabsSize`).
+**One set of destinations, three widths.** Declare the app's top-level destinations once, as `NavDestination`s (`href`, `label`, `icon`, `currentIcon?`, `badge?`, `compact?`), and give them to `AppShell`: a bottom bar on a phone, a `NavigationRail` on a tablet or a narrow window, a `Sidebar` on a desktop. `compact: false` keeps a destination out of the bar, which holds five at most. The tiers are switched by CSS, so server-rendered markup is right at every width, with one "Primary" landmark:
+
+```svelte
+<script lang="ts">
+  import { AppShell, type NavDestination } from '@thomasfosterau/components';
+  const destinations: readonly NavDestination[] = [
+    { href: '/gardens', label: 'Gardens', icon: gardensIcon },
+    { href: '/inbox', label: 'Inbox', icon: inboxIcon, currentIcon: inboxFilledIcon, badge: unread },
+    { href: '/settings', label: 'Settings', icon: settingsIcon, compact: false },
+  ];
+</script>
+
+<AppShell {destinations} {brand} {account}>{@render children()}</AppShell>
+```
+
+`layout` also exports `types.ts` (`Crumb`, `TabItem`, `FilterOption`, `TabsMode`, `TabsVariant`, `tabsVariant`, `tabsSize`) and `nav-destination.ts` (`NavDestination`, `NavBreakpoints`, `MediumAt`, `ExpandedAt` and the tier class tables `compactTier`, `compactPadding`, `mediumTier`, `expandedTier`).
 
 ```svelte
 <script lang="ts">
