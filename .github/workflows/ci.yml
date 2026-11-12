@@ -4,8 +4,8 @@ name: CI
 # vite.config.ts: the gates of AGENTS.md § Verification, in order, so a local
 # `vp run ci` and this workflow are the same thing. It runs once per Node line
 # the published packages support (`lts` and `latest`, both inside
-# package.json `engines.node`). The `ci` job at the end turns the matrix into
-# one stable check name for the ruleset.
+# package.json `engines.node`). The ruleset requires each leg by its check
+# name: `ci (node lts)` and `ci (node latest)`.
 
 on:
   pull_request:
@@ -21,7 +21,7 @@ concurrency:
 permissions: {}
 
 jobs:
-  test:
+  ci:
     name: ci (node ${{ matrix.node }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -69,17 +69,3 @@ jobs:
       # system binary (zizmor's `github-env`).
       - name: vp run ci
         run: vp run ci
-
-  # The one required check: green only when every matrix leg is.
-  ci:
-    name: ci
-    needs: [test]
-    if: always()
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions: {}
-    steps:
-      - name: Every Node line passed
-        env:
-          RESULT: ${{ needs.test.result }}
-        run: test "$RESULT" = success
