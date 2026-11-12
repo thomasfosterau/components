@@ -23,3 +23,5 @@ Field labels, submit labels and option labels come from the definition's own mes
 
 <EntityForm definition={bookForm} mode="update" initial={data.initial} cancelHref={`/books/${data.id}`} enhance={enhanceForm} />
 ```
+
+**Unsaved changes.** `saveBar` adds a `SaveBar` inside the form, shown while the store has tainted fields or a `rows` widget has been changed. Save is the form's own submit and Discard is the store's `reset()` (plus the rows' seed). `saveBarProps` passes `position`, labels and `confirmDiscard` through, and `bind:dirty` exposes the state for `createLeaveGuard({ dirty: () => dirty })`; see [Fields](components-fields.md#unsaved-changes-savebar-and-the-leave-guard).
