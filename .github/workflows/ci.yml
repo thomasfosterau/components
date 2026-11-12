@@ -1,102 +1,85 @@
 name: CI
 
-# ONE job, ONE required check. The pipeline is the ordered list of gates in
-# AGENTS.md § Verification; the task graph behind each lives in the
-# vite.config.ts files, not in GitHub Actions `needs:`. There is no stage to
-# deploy, no credential to inject and no service to provision.
-#
-# The one CI-only step is the Playwright browser install: `test:unit` and
-# `storybook:build` drive real Chromium at exactly the revision the pinned
-# `playwright` expects (see that entry in pnpm-workspace.yaml), which a fresh
-# runner does not carry.
+# One workflow, one command. The pipeline is the `ci` task in the root
+# vite.config.ts: the gates of AGENTS.md § Verification, in order, so a local
+# `vp run ci` and this workflow are the same thing. It runs once per Node line
+# the published packages support (`lts` and `latest`, both inside
+# package.json `engines.node`). The `ci` job at the end turns the matrix into
+# one stable check name for the ruleset.
 
 on:
   pull_request:
-    branches: [trunk]
-    types: [opened, reopened, synchronize, ready_for_review]
   push:
     branches: [trunk]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/trunk' }}
 
-# Nothing by default; the job grants exactly what it uses.
+# Nothing by default; each job grants exactly what it uses.
 permissions: {}
 
 jobs:
-  ci:
-    name: Check, test, build
+  test:
+    name: ci (node ${{ matrix.node }})
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [lts, latest]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      # Vite+ (`vp`), the Node.js and pnpm it manages, the pnpm store cache
+      # Vite+ (`vp`), the matrix's Node.js line, pnpm, the pnpm store cache
       # (keyed on pnpm-lock.yaml) and `vp install`, which on CI is a
       # frozen-lockfile install. The vite-plus version is the catalog pin in
-      # pnpm-workspace.yaml, so a toolchain bump needs nothing here; Node.js is
-      # resolved from package.json `engines.node`.
+      # pnpm-workspace.yaml, so a toolchain bump needs nothing here.
       #
       # Install scripts RUN: the root `prepare` applies `effect-tsgo patch
       # --typescript --oxlint`, without which packages/charts' `check` runs an
-      # unpatched `tsc` (no Effect diagnostics) and `vp lint` cannot load the
-      # `effecttsgo` rules the root vite.config.ts names. The allowed builds
-      # (pnpm-workspace.yaml `allowBuilds`) are the only other scripts.
-      #
-      # Later steps call the toolchain through `pnpm exec` (`pnpm exec vp
-      # check`): writing node_modules/.bin to `GITHUB_PATH` would let any file
-      # the install drops there shadow a system binary for every later step
-      # (zizmor's `github-env`).
+      # unpatched `tsc` and `vp lint` cannot load the `effecttsgo` rules. The
+      # allowed builds (pnpm-workspace.yaml `allowBuilds`) are the only other
+      # scripts.
       - name: Setup Vite+ and install dependencies
         uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
         with:
           version-file: pnpm-workspace.yaml
+          node-version: ${{ matrix.node }}
           cache: true
 
-      # The Vite+ task cache (`vp run`'s cached `check`, `build`, `test:unit`
-      # outputs). Keyed per commit with a prefix fallback, so a push restores
-      # the nearest earlier run and each task's own input fingerprint decides
-      # what re-runs.
+      # The Vite+ task cache, per Node line. Keyed per commit with a prefix
+      # fallback, so a push restores the nearest earlier run and each task's
+      # own input fingerprint decides what re-runs.
       - name: Restore the Vite+ task cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: node_modules/.vite/task-cache
-          key: vp-task-v1-${{ runner.os }}-${{ github.sha }}
+          key: vp-task-v1-${{ runner.os }}-node-${{ matrix.node }}-${{ github.sha }}
           restore-keys: |
-            vp-task-v1-${{ runner.os }}-
+            vp-task-v1-${{ runner.os }}-node-${{ matrix.node }}-
 
-      # Chromium + its apt system libraries, at exactly the revision the pinned
-      # `playwright` expects, so a `playwright` bump needs nothing else here.
-      - name: Install Chromium for the browser suites
-        run: pnpm exec playwright install --with-deps chromium
+      # Through `pnpm exec`, not node_modules/.bin on `GITHUB_PATH`: a file the
+      # install drops there must not shadow a system binary (zizmor's
+      # `github-env`).
+      - name: vp run ci
+        run: pnpm exec vp run ci
 
-      # The type-aware lint below reads the Svelte packages' tsconfigs, which
-      # extend the `$app/tsconfig` that `svelte-kit sync` writes; without it
-      # tsgolint reports `tsconfig-error` and types those packages as nothing.
-      - name: Generate the SvelteKit types
-        run: pnpm exec vp run -r sync
-
-      # Format and lint; lint is type-aware through oxlint-tsgolint
-      # (`lint.options.typeAware` in vite.config.ts).
-      - name: Format and lint
-        run: pnpm exec vp check
-
-      - name: Type check
-        run: pnpm exec vp run check
-
-      - name: Unit tests
-        run: pnpm exec vp run -r test:unit
-
-      - name: Build the packages
-        run: pnpm exec vp run -r build
-
-      - name: Build Storybook
-        run: pnpm exec vp run --filter ./packages/components storybook:build
-
-      - name: Audit dependencies
-        run: pnpm audit --audit-level high
+  # The one required check: green only when every matrix leg is.
+  ci:
+    name: ci
+    needs: [test]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Every Node line passed
+        env:
+          RESULT: ${{ needs.test.result }}
+        run: test "$RESULT" = success

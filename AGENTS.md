@@ -73,7 +73,7 @@ Invoke everything through `vp` — `vp run <script>`, `vp exec <bin>` (instead o
 
 ## Verification
 
-Before you report work as done, run the gates below in order — the same steps as `.github/workflows/ci.yml` — and quote each command with its final pass/fail. If a gate can't run here, say which and why in the PR body; never imply it ran.
+Before you report work as done, run the gates below in order and quote each command with its final pass/fail. `vp run ci` (the `ci` task in the root `vite.config.ts`) runs them all, fail-fast, and it is the only command `.github/workflows/ci.yml` runs, once per Node line (`lts`, `latest`); run the gates one by one when you need each verdict. If a gate can't run here, say which and why in the PR body; never imply it ran.
 
 1. `vp check` (on a fresh checkout, `vp run -r sync` first: the type-aware lint reads the Svelte packages' tsconfigs, which extend the `$app/tsconfig` that `svelte-kit sync` writes, and CI runs the same step before it)
 2. `vp run check`
