@@ -32,7 +32,7 @@ export function pageStep(current: number, direction: 1 | -1, scale: SliderScale)
   if (typeof step === 'number') {
     return current + direction * step * Math.max(1, Math.round((max - min) / 10 / step));
   }
-  const points = [...step].sort((a, b) => a - b);
+  const points = [...step].toSorted((a, b) => a - b);
   const jump = Math.max(1, Math.round(points.length / 10));
   const target = Math.min(
     points.length - 1,
