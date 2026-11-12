@@ -19,6 +19,7 @@ import { expect, test } from 'vite-plus/test';
 import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import { altPress, doublePress, drag, press } from './pointer.ts';
+import { instanceOf } from './dom.ts';
 import MapEditorFixture from './fixtures/MapEditorFixture.svelte';
 
 /**
@@ -289,7 +290,7 @@ test('drops the futures once the document has diverged from them', async () => {
 
 /** Give the surface keyboard focus, as Tab would. */
 const focus = async (screen: Awaited<ReturnType<typeof render>>): Promise<void> => {
-  (screen.getByRole('application').element() as SVGSVGElement).focus();
+  instanceOf(screen.getByRole('application').element(), SVGSVGElement).focus();
   await expect.element(screen.getByRole('application')).toHaveFocus();
 };
 
@@ -357,7 +358,7 @@ test('commits a held arrow when the surface loses focus before the release', asy
   await focus(screen);
 
   await userEvent.keyboard('{ArrowLeft>}');
-  (screen.getByRole('application').element() as SVGSVGElement).blur();
+  instanceOf(screen.getByRole('application').element(), SVGSVGElement).blur();
 
   await expect.poll(() => read(screen, 'history')).toBe('1/0');
   await userEvent.keyboard('{/ArrowLeft}');
@@ -435,13 +436,13 @@ test('enters a shape’s handles on Enter and walks vertices and midpoints in ou
 
 test('rings the focused vertex only while the surface has focus', async () => {
   const screen = await render(MapEditorFixture, { selection: ['near'] });
-  const surface = screen.getByRole('application').element();
+  const surface = instanceOf(screen.getByRole('application').element(), SVGSVGElement);
   const rings = (): number => surface.querySelectorAll('circle[aria-hidden="true"]').length;
   await focus(screen);
 
   await userEvent.keyboard('{Enter}');
   expect(rings()).toBe(1);
-  (surface as SVGSVGElement).blur();
+  surface.blur();
   await expect.poll(rings).toBe(0);
 });
 

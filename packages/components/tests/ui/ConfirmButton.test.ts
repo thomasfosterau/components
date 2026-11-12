@@ -7,7 +7,7 @@ import ConfirmButtonFormFixture from './fixtures/ConfirmButtonFormFixture.svelte
 const resolved = (): Promise<unknown> => Promise.resolve('ok');
 
 test('the destructive action is behind a second press', async () => {
-  const action = vi.fn(resolved);
+  const action = vi.fn<() => Promise<unknown>>(resolved);
   const screen = await render(ConfirmButtonFixture, { action, idleLabel: 'Delete this garden' });
 
   await userEvent.click(screen.getByRole('button', { name: 'Delete this garden' }));
@@ -18,7 +18,7 @@ test('the destructive action is behind a second press', async () => {
 });
 
 test('cancelling returns to the resting button', async () => {
-  const action = vi.fn(resolved);
+  const action = vi.fn<() => Promise<unknown>>(resolved);
   const screen = await render(ConfirmButtonFixture, { action, idleLabel: 'Delete this garden' });
 
   await userEvent.click(screen.getByRole('button', { name: 'Delete this garden' }));
@@ -31,7 +31,7 @@ test('cancelling returns to the resting button', async () => {
 });
 
 test('confirming runs the action', async () => {
-  const action = vi.fn(resolved);
+  const action = vi.fn<() => Promise<unknown>>(resolved);
   const screen = await render(ConfirmButtonFixture, { action });
 
   await userEvent.click(screen.getByRole('button', { name: 'Delete' }));
@@ -41,7 +41,9 @@ test('confirming runs the action', async () => {
 });
 
 test('a failure surfaces in an assertive alert carrying the error’s own message', async () => {
-  const action = vi.fn(() => Promise.reject(new Error('This garden still has 12 plants in it.')));
+  const action = vi.fn<() => Promise<unknown>>(() =>
+    Promise.reject(new Error('This garden still has 12 plants in it.')),
+  );
   const screen = await render(ConfirmButtonFixture, { action });
 
   await userEvent.click(screen.getByRole('button', { name: 'Delete' }));
@@ -53,7 +55,7 @@ test('a failure surfaces in an assertive alert carrying the error’s own messag
 });
 
 test('a rejection that is not an Error shows the failure message prop', async () => {
-  const action = vi.fn(() => Promise.reject('nope'));
+  const action = vi.fn<() => Promise<unknown>>(() => Promise.reject('nope'));
   const screen = await render(ConfirmButtonFixture, {
     action,
     failureMessage: 'That didn’t work. Try again.',
@@ -66,7 +68,7 @@ test('a rejection that is not an Error shows the failure message prop', async ()
 });
 
 test('redirectTo navigates through the components context once the action resolves', async () => {
-  const onNavigate = vi.fn();
+  const onNavigate = vi.fn<(url: string) => void>();
   const screen = await render(ConfirmButtonFixture, {
     action: resolved,
     redirectTo: '/gardens',

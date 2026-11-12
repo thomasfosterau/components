@@ -47,7 +47,7 @@ test('role="alert" is not doubled with an explicit aria-live', async () => {
 });
 
 test('the dismiss button is labelled and calls back', async () => {
-  const onDismiss = vi.fn();
+  const onDismiss = vi.fn<() => void>();
   const screen = await render(Alert, {
     tone: 'success',
     live: 'off',

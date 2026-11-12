@@ -50,7 +50,9 @@ test('a function value is read at click time', async () => {
 
 test('the status empties after resetAfter, so the next copy is announced again', async () => {
   stubClipboard(() => Promise.resolve());
-  const screen = await render(CopyButton, { value: 'x', resetAfter: 50 });
+  // Long enough that the matcher's polling cannot miss the "Copied" window
+  // on a loaded machine (at 50 ms it could, and then waited out the timeout).
+  const screen = await render(CopyButton, { value: 'x', resetAfter: 1000 });
 
   await userEvent.click(screen.getByRole('button', { name: 'Copy' }));
   await expect.element(screen.getByRole('status')).toHaveTextContent('Copied');

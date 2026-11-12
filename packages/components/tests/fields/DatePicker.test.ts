@@ -8,6 +8,7 @@ import { userEvent } from 'vite-plus/test/browser';
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import PickerFixture from './fixtures/PickerFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 test('the field is a group named by the label; the trigger is "Choose date"', async () => {
   const screen = await render(PickerFixture, {});
@@ -73,7 +74,10 @@ test('range: minDays={3} rejects a two-day span', async () => {
   const dialog = screen.getByRole('dialog', { name: 'Calendar' });
   await dialog.getByRole('button', { name: /20 October 2026/ }).click();
   // Too-short ends are disabled once a start is chosen, so click through the DOM.
-  (dialog.getByRole('button', { name: /21 October 2026/ }).element() as HTMLElement).click();
+  instanceOf(
+    dialog.getByRole('button', { name: /21 October 2026/ }).element(),
+    HTMLElement,
+  ).click();
   await userEvent.keyboard('{Escape}');
   await expect.element(screen.getByTestId('bound')).not.toHaveTextContent('2026-10-20..2026-10-21');
 });

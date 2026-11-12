@@ -14,6 +14,13 @@ export function firstLocale(locales: string | readonly string[] | undefined): st
   return typeof locales === 'string' ? locales : locales?.[0];
 }
 
+/** Whether no entry of `candidate` is `undefined`, which is all `definedProps` promises. */
+function hasNoUndefined<T extends Record<string, unknown>>(
+  candidate: Record<string, unknown>,
+): candidate is { [K in keyof T]?: Exclude<T[K], undefined> } {
+  return Object.values(candidate).every((value) => value !== undefined);
+}
+
 /**
  * Drop the `undefined` entries of an options object. The workspace compiles
  * with `exactOptionalPropertyTypes`, and bits-ui declares its optional props
@@ -23,9 +30,10 @@ export function firstLocale(locales: string | readonly string[] | undefined): st
 export function definedProps<T extends Record<string, unknown>>(
   options: T,
 ): { [K in keyof T]?: Exclude<T[K], undefined> } {
-  return Object.fromEntries(Object.entries(options).filter(([, value]) => value !== undefined)) as {
-    [K in keyof T]?: Exclude<T[K], undefined>;
-  };
+  const defined = Object.fromEntries(
+    Object.entries(options).filter(([, value]) => value !== undefined),
+  );
+  return hasNoUndefined<T>(defined) ? defined : {};
 }
 
 /**

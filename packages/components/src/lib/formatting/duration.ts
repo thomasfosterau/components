@@ -100,8 +100,13 @@ interface DurationFormatConstructor {
 
 /** `Intl.DurationFormat` when the runtime has it. */
 function nativeDurationFormat(): DurationFormatConstructor | undefined {
-  const intl = Intl as unknown as { DurationFormat?: DurationFormatConstructor };
-  return intl.DurationFormat;
+  const candidate: unknown = Reflect.get(Intl, 'DurationFormat');
+  return isDurationFormatConstructor(candidate) ? candidate : undefined;
+}
+
+/** `Intl.DurationFormat` is not in every `lib.d.ts`; a constructor is all that is checked. */
+function isDurationFormatConstructor(value: unknown): value is DurationFormatConstructor {
+  return typeof value === 'function';
 }
 
 /** `value` with the `undefined` and zero fields dropped, as `Intl.DurationFormat` wants. */

@@ -45,7 +45,7 @@ test('Space toggles it from the keyboard', async () => {
 });
 
 test('onChange is asked for the NEXT state', async () => {
-  const onChange = vi.fn(() => true);
+  const onChange = vi.fn<(next: boolean) => Promise<boolean> | boolean>(() => true);
   const screen = await render(Toggle, { label: 'Notify this browser', onChange });
 
   await userEvent.click(screen.getByRole('switch'));
@@ -55,7 +55,7 @@ test('onChange is asked for the NEXT state', async () => {
 });
 
 test('an onChange that returns false leaves the switch OFF — no lying control', async () => {
-  const onChange = vi.fn(async () => false);
+  const onChange = vi.fn<(next: boolean) => Promise<boolean> | boolean>(async () => false);
   const screen = await render(Toggle, { label: 'Notify this browser', onChange });
 
   const control = screen.getByRole('switch');
@@ -66,7 +66,7 @@ test('an onChange that returns false leaves the switch OFF — no lying control'
 });
 
 test('an onChange that refuses to turn OFF leaves the switch on', async () => {
-  const onChange = vi.fn(async () => true);
+  const onChange = vi.fn<(next: boolean) => Promise<boolean> | boolean>(async () => true);
   const screen = await render(Toggle, {
     label: 'Notify this browser',
     checked: true,
@@ -81,7 +81,7 @@ test('an onChange that refuses to turn OFF leaves the switch on', async () => {
 });
 
 test('a thrown onChange is treated as a refusal', async () => {
-  const onChange = vi.fn(() => {
+  const onChange = vi.fn<(next: boolean) => Promise<boolean> | boolean>(() => {
     throw new Error('the stage has no keys');
   });
   const screen = await render(Toggle, { label: 'Notify this browser', onChange });

@@ -28,6 +28,9 @@ import {
 import { dragShape, type MapShape } from '../src/lib/shapes.ts';
 import type { VectorDocument } from '@thomasfosterau/components/canvas';
 
+/** The ring's first corner, which a closed ring repeats. */
+const FIRST_CORNER: GeoPosition = [144.963321, -37.8141079];
+
 /**
  * A fence line in Melbourne, at the precision a GPS fix actually has.
  *
@@ -39,15 +42,18 @@ import type { VectorDocument } from '@thomasfosterau/components/canvas';
  * opposite of what this file is testing.
  */
 const RING: readonly GeoPosition[] = [
-  [144.963321, -37.8141079],
+  FIRST_CORNER,
   [144.963398, -37.814101300000004],
   [144.963412, -37.8141869],
   [144.963335, -37.81419390000001],
 ];
 
+/** {@link RING} closed, as GeoJSON writes a polygon's ring. */
+const CLOSED_RING: readonly GeoPosition[] = [...RING, FIRST_CORNER];
+
 const polygon: GeoGeometry = {
   type: 'Polygon',
-  coordinates: [[...RING, RING[0] as GeoPosition]],
+  coordinates: [CLOSED_RING],
 };
 
 /** Every ordinate of two geometries, so a comparison can be bit-for-bit. */
@@ -61,10 +67,17 @@ const soleGeometry = (frame: GeoFrame, shapes: readonly MapShape[]): GeoGeometry
   return geometry;
 };
 
+/** Whether `value` is a ring: a list of positions, each a list of numbers. */
+const isRing = (value: unknown): value is readonly GeoPosition[] =>
+  Array.isArray(value) &&
+  value.every(
+    (position) => Array.isArray(position) && position.every((ord) => typeof ord === 'number'),
+  );
+
 /** A polygon geometry's single ring. */
 const soleRing = (geometry: GeoGeometry): readonly GeoPosition[] => {
-  const [ring] = geometry.coordinates as readonly (readonly GeoPosition[])[];
-  if (ring === undefined) throw new Error('expected a polygon carrying one ring');
+  const [ring] = geometry.coordinates;
+  if (!isRing(ring)) throw new Error('expected a polygon carrying one ring');
   return ring;
 };
 
@@ -137,8 +150,8 @@ describe('importing a geometry', () => {
 
   it('reads a Point as a marker and a LineString as a line', () => {
     const point = geometryShapes(
-      frameOf({ type: 'Point', coordinates: RING[0] as GeoPosition }),
-      { type: 'Point', coordinates: RING[0] as GeoPosition },
+      frameOf({ type: 'Point', coordinates: FIRST_CORNER }),
+      { type: 'Point', coordinates: FIRST_CORNER },
       () => 'point',
     );
     expect(point.shapes[0]?.type).toBe('marker');
@@ -151,7 +164,7 @@ describe('importing a geometry', () => {
   it('makes one shape per member of a Multi geometry', () => {
     const multi: GeoGeometry = {
       type: 'MultiPolygon',
-      coordinates: [[[...RING, RING[0] as GeoPosition]], [[...RING, RING[0] as GeoPosition]]],
+      coordinates: [[CLOSED_RING], [CLOSED_RING]],
     };
     let seed = 0;
     const { shapes } = geometryShapes(frame, multi, () => `area-${(seed += 1)}`);
@@ -161,10 +174,7 @@ describe('importing a geometry', () => {
   it('refuses an area with a hole rather than quietly serving a disc', () => {
     const donut: GeoGeometry = {
       type: 'Polygon',
-      coordinates: [
-        [...RING, RING[0] as GeoPosition],
-        [...RING, RING[0] as GeoPosition],
-      ],
+      coordinates: [CLOSED_RING, CLOSED_RING],
     };
     expect(geometryShapes(frame, donut, () => 'area').unrepresentable).toEqual(['interior-ring']);
   });
@@ -187,6 +197,8 @@ describe('importing a geometry', () => {
 describe('exporting shapes', () => {
   const frame = frameOf(polygon);
   const imported = geometryShapes(frame, polygon, () => 'area').shapes;
+  const [firstImported] = imported;
+  if (firstImported === undefined) throw new Error('expected the polygon to import as a shape');
 
   it('returns the geometry it was given, ordinate for ordinate', () => {
     const out = soleGeometry(frame, imported);
@@ -228,12 +240,12 @@ describe('exporting shapes', () => {
   });
 
   it('has no single geometry for a mixed selection — the schema has no GeometryCollection', () => {
-    const marker: MapShape = { ...(imported[0] as MapShape), id: 'point', type: 'marker' };
+    const marker: MapShape = { ...firstImported, id: 'point', type: 'marker' };
     expect(shapesGeometry(frame, [...imported, marker])).toEqual([]);
   });
 
   it('has no geometry for an outline too short to be one, or for nothing at all', () => {
-    const stub: MapShape = { ...(imported[0] as MapShape), points: [{ x: 0, y: 0 }] };
+    const stub: MapShape = { ...firstImported, points: [{ x: 0, y: 0 }] };
     expect(shapesGeometry(frame, [stub])).toEqual([]);
     expect(shapesGeometry(frame, [])).toEqual([]);
   });

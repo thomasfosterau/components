@@ -1,7 +1,9 @@
 import { userEvent } from 'vite-plus/test/browser';
 import { afterEach, expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
+import type { FileRejection } from '../../src/lib/fields/file-validation.ts';
 import DropzoneFixture from './fixtures/DropzoneFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 const makeFile = (name: string, type: string, bytes = 10): File =>
   new File([new Uint8Array(bytes)], name, { type });
@@ -47,7 +49,7 @@ test('a drop of two files lists both and updates the bound files', async () => {
 });
 
 test('a file over maxBytes is rejected, explained, and reported to onSelect', async () => {
-  const onSelect = vi.fn();
+  const onSelect = vi.fn<(accepted: readonly File[], rejected: readonly FileRejection[]) => void>();
   const screen = await render(DropzoneFixture, { maxBytes: 100, onSelect });
 
   const big = makeFile('huge.pdf', 'application/pdf', 500);
@@ -61,7 +63,7 @@ test('a file over maxBytes is rejected, explained, and reported to onSelect', as
 });
 
 test('accept is enforced on drop', async () => {
-  const onSelect = vi.fn();
+  const onSelect = vi.fn<(accepted: readonly File[], rejected: readonly FileRejection[]) => void>();
   const screen = await render(DropzoneFixture, { accept: 'image/*', onSelect });
 
   const exe = makeFile('setup.exe', 'application/x-msdownload');
@@ -74,7 +76,7 @@ test('accept is enforced on drop', async () => {
 });
 
 test('maxFiles keeps the first files and rejects the rest as too many', async () => {
-  const onSelect = vi.fn();
+  const onSelect = vi.fn<(accepted: readonly File[], rejected: readonly FileRejection[]) => void>();
   const screen = await render(DropzoneFixture, { maxFiles: 2, onSelect });
 
   const three = [
@@ -103,7 +105,7 @@ test('a remove button removes its file and focus lands on the next one, then the
 });
 
 test('a wrapping form posts the listed files under name', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(DropzoneFixture, { onSubmitted });
 
   dropOn(screen.getByTestId('zone').element(), [
@@ -113,8 +115,8 @@ test('a wrapping form posts the listed files under name', async () => {
   await expect.element(screen.getByTestId('bound')).toHaveTextContent('a.pdf|b.pdf');
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.getAll('attachments').map((entry) => (entry as File).name)).toEqual([
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.getAll('attachments').map((entry) => instanceOf(entry, File).name)).toEqual([
     'a.pdf',
     'b.pdf',
   ]);

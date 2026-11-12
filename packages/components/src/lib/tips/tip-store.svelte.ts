@@ -15,9 +15,33 @@
  * @module
  */
 
-import type { TipConfig, TipState } from './types.ts';
+import type { TipConfig, TipState, TipStatus } from './types.ts';
 
 const DEFAULT_PREFIX = 'tips:';
+
+const TIP_STATUSES: ReadonlySet<unknown> = new Set<TipStatus>([
+  'pending',
+  'available',
+  'dismissed',
+  'completed',
+]);
+
+const isOptionalString = (value: unknown): boolean =>
+  value === undefined || typeof value === 'string';
+
+/** Whether `value` has the shape of a stored `TipState`. */
+const isTipState = (value: unknown): value is TipState =>
+  typeof value === 'object' &&
+  value !== null &&
+  'id' in value &&
+  typeof value.id === 'string' &&
+  'status' in value &&
+  TIP_STATUSES.has(value.status) &&
+  'displayCount' in value &&
+  typeof value.displayCount === 'number' &&
+  (!('lastShown' in value) || isOptionalString(value.lastShown)) &&
+  (!('dismissedAt' in value) || isOptionalString(value.dismissedAt)) &&
+  (!('completedAt' in value) || isOptionalString(value.completedAt));
 
 /**
  * The subset of the DOM `Storage` interface a tip store reads and writes, so a
@@ -133,7 +157,10 @@ export const createTipStore = (options: TipStoreOptions = {}): TipStore => {
       const raw = storage.getItem(`${prefix}${id}`);
       // Trusted only for its shape: it is this app's own write, and a corrupt
       // entry falls back to "never seen" rather than throwing at the reader.
-      if (raw !== null) stored = JSON.parse(raw) as TipState;
+      if (raw !== null) {
+        const parsed: unknown = JSON.parse(raw);
+        if (isTipState(parsed)) stored = parsed;
+      }
     } catch {
       /* unreadable or malformed — treat the tip as unseen */
     }

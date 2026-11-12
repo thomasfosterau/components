@@ -7,6 +7,7 @@ import {
   CHART_SPEC_ATTRIBUTE,
   createChartNodeSpec,
 } from '../../src/prosemirror/index.ts';
+import { instanceOf } from '../dom.ts';
 
 const schema = new Schema({
   nodes: {
@@ -65,7 +66,10 @@ describe('createChartNodeSpec', () => {
   describe('DOM serialisation (copy/paste and HTML round-trips)', () => {
     it('toDOM stores the encoded spec in the data attribute', () => {
       const node = schema.nodes[CHART_NODE_NAME].create({ spec: chartSpec });
-      const rendered = DOMSerializer.fromSchema(schema).serializeNode(node) as HTMLElement;
+      const rendered = instanceOf(
+        DOMSerializer.fromSchema(schema).serializeNode(node),
+        HTMLElement,
+      );
 
       expect(rendered.tagName).toBe('DIV');
       const raw = rendered.getAttribute(CHART_SPEC_ATTRIBUTE);
@@ -127,7 +131,10 @@ describe('createChartNodeSpec', () => {
         },
       });
       const node = customSchema.nodes['chart'].create({ spec: chartSpec });
-      const rendered = DOMSerializer.fromSchema(customSchema).serializeNode(node) as HTMLElement;
+      const rendered = instanceOf(
+        DOMSerializer.fromSchema(customSchema).serializeNode(node),
+        HTMLElement,
+      );
       expect(rendered.className).toBe('cms-chart');
     });
   });

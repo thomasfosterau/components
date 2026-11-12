@@ -8,6 +8,7 @@
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import SegmentBar from '../../src/lib/feedback/SegmentBar.svelte';
+import { instanceOf } from '../dom.ts';
 
 const storage = [
   { label: 'Photos', fraction: 0.62, tone: 'primary' as const },
@@ -31,7 +32,7 @@ test('the segments are hidden and sized by their fraction', async () => {
   const screen = await render(SegmentBar, { label: 'Storage', segments: storage });
 
   const bar = screen.getByRole('img').element();
-  const segments = [...bar.children] as HTMLElement[];
+  const segments = [...bar.children].map((child) => instanceOf(child, HTMLElement));
   expect(segments).toHaveLength(3);
   for (const segment of segments) expect(segment).toHaveAttribute('aria-hidden', 'true');
   // Svelte writes the inline style through the CSSOM, which normalises the
@@ -49,7 +50,7 @@ test('a fraction outside [0, 1] is clamped, in the label and in the width', asyn
 
   const bar = screen.getByRole('img');
   await expect.element(bar).toHaveAccessibleName('Beds surveyed: Surveyed 100%');
-  expect((bar.element().children[0] as HTMLElement | undefined)?.style.width).toBe('100%');
+  expect(instanceOf(bar.element().children[0], HTMLElement).style.width).toBe('100%');
 });
 
 test('a colourToken binds the segment’s custom property, never a colour value', async () => {
@@ -58,7 +59,7 @@ test('a colourToken binds the segment’s custom property, never a colour value'
     segments: [{ label: 'Genus', fraction: 0.5, colourToken: '--rank-genus' }],
   });
 
-  const segment = screen.getByRole('img').element().children[0] as HTMLElement;
+  const segment = instanceOf(screen.getByRole('img').element().children[0], HTMLElement);
   expect(segment.getAttribute('style')).toContain('--segment-colour: var(--rank-genus');
   expect(segment.className).toContain('bg-(--segment-colour)');
 });
@@ -69,7 +70,7 @@ test('a token that is not a custom-property name is dropped', async () => {
     segments: [{ label: 'Genus', fraction: 0.5, colourToken: 'red; position: fixed' }],
   });
 
-  const segment = screen.getByRole('img').element().children[0] as HTMLElement;
+  const segment = instanceOf(screen.getByRole('img').element().children[0], HTMLElement);
   expect(segment.getAttribute('style')).toContain('--segment-colour: var(--color-neutral');
   expect(segment.getAttribute('style')).not.toContain('position: fixed');
 });
@@ -88,7 +89,9 @@ test('showValues prints a percentage in a segment wide enough for it', async () 
 
   await expect.element(screen.getByText('54.1%')).toBeInTheDocument();
   // The marker is the last child, and decorative.
-  const children = [...screen.getByRole('img').element().children] as HTMLElement[];
+  const children = [...screen.getByRole('img').element().children].map((child) =>
+    instanceOf(child, HTMLElement),
+  );
   expect(children).toHaveLength(3);
   expect(children[2]).toHaveAttribute('aria-hidden', 'true');
   expect(children[2]?.style.left).toBe('50%');

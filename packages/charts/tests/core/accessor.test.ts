@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { makeAccessor } from '../../src/core/index.ts';
+import { instanceOf } from '../dom.ts';
 
 describe('makeAccessor', () => {
   describe('quantitative', () => {
@@ -29,19 +30,19 @@ describe('makeAccessor', () => {
     it('parses ISO 8601 strings into Dates', () => {
       const result = accessor({ date: '2024-03-15T12:00:00Z' });
       expect(result).toBeInstanceOf(Date);
-      expect((result as Date).toISOString()).toBe('2024-03-15T12:00:00.000Z');
+      expect(instanceOf(result, Date).toISOString()).toBe('2024-03-15T12:00:00.000Z');
     });
 
     it('parses date-only ISO strings', () => {
       const result = accessor({ date: '2024-03-15' });
       expect(result).toBeInstanceOf(Date);
-      expect((result as Date).getTime()).toBe(Date.UTC(2024, 2, 15));
+      expect(instanceOf(result, Date).getTime()).toBe(Date.UTC(2024, 2, 15));
     });
 
     it('parses epoch milliseconds', () => {
       const epoch = Date.UTC(2024, 0, 1);
       const result = accessor({ date: epoch });
-      expect((result as Date).getTime()).toBe(epoch);
+      expect(instanceOf(result, Date).getTime()).toBe(epoch);
     });
 
     it('returns null for missing fields and nulls', () => {

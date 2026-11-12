@@ -1,6 +1,7 @@
 import { userEvent } from 'vite-plus/test/browser';
 import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
+import type { MouseEventHandler } from 'svelte/elements';
 import Button from '../../src/lib/ui/Button.svelte';
 import { textSnippet } from './snippets.ts';
 
@@ -17,7 +18,7 @@ test('defaults to type="button" so it cannot submit a form by accident', async (
 });
 
 test('activates on Enter and on Space from the keyboard', async () => {
-  const onclick = vi.fn();
+  const onclick = vi.fn<MouseEventHandler<HTMLButtonElement>>();
   const screen = await render(Button, { children: textSnippet('Save changes'), onclick });
 
   await userEvent.tab();

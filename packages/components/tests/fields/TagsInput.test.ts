@@ -2,6 +2,7 @@ import { userEvent } from 'vite-plus/test/browser';
 import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import TagsInputFixture from './fixtures/TagsInputFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 const pasteInto = (element: Element, text: string): void => {
   const data = new DataTransfer();
@@ -114,7 +115,9 @@ test('with suggestions the input is a combobox and Enter on a highlighted option
 });
 
 test('async suggestions come from onSearch', async () => {
-  const onSearch = vi.fn(async (query: string) => [`${query}-one`, `${query}-two`]);
+  const onSearch = vi.fn<(query: string, signal: AbortSignal) => Promise<readonly string[]>>(
+    async (query) => [`${query}-one`, `${query}-two`],
+  );
   const screen = await render(TagsInputFixture, { onSearch });
 
   await userEvent.click(screen.getByRole('combobox', { name: 'Tags' }));
@@ -125,12 +128,12 @@ test('async suggestions come from onSearch', async () => {
 });
 
 test('a wrapping form posts one entry per tag', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(TagsInputFixture, { values: ['a', 'b'], onSubmitted });
 
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.getAll('tags')).toEqual(['a', 'b']);
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.getAll('tags')).toEqual(['a', 'b']);
 });
 
 test('inside FormField: label, hint, errors, and aria-required throughout', async () => {
@@ -143,11 +146,11 @@ test('inside FormField: label, hint, errors, and aria-required throughout', asyn
 });
 
 test('required is satisfied by a committed tag, never by uncommitted text', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(TagsInputFixture, { required: true, onSubmitted });
 
   const input = screen.getByLabelText(/Tags/);
-  const element = input.element() as HTMLInputElement;
+  const element = instanceOf(input.element(), HTMLInputElement);
   await userEvent.click(input);
   await userEvent.keyboard('herb');
   expect(element.validity.valid).toBe(false);
@@ -211,12 +214,12 @@ test('a paste replaces the selection before it is split', async () => {
   const input = screen.getByLabelText('Tags');
   await userEvent.click(input);
   await userEvent.keyboard('old');
-  (input.element() as HTMLInputElement).setSelectionRange(0, 3);
+  instanceOf(input.element(), HTMLInputElement).setSelectionRange(0, 3);
   pasteInto(input.element(), 'a, b');
   await expect.element(screen.getByTestId('bound')).toHaveTextContent(/^a\|b$/);
 
   await userEvent.keyboard('xz');
-  (input.element() as HTMLInputElement).setSelectionRange(1, 1);
+  instanceOf(input.element(), HTMLInputElement).setSelectionRange(1, 1);
   pasteInto(input.element(), 'y,w');
   await expect.element(screen.getByTestId('bound')).toHaveTextContent(/^a\|b\|xy\|wz$/);
 });

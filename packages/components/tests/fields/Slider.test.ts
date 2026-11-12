@@ -4,6 +4,7 @@ import { render } from 'vitest-browser-svelte';
 import Slider from '../../src/lib/fields/Slider.svelte';
 import SliderFormFixture from './fixtures/SliderFormFixture.svelte';
 import SliderLabelledFixture from './fixtures/SliderLabelledFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 test('is a named slider reporting its value and bounds', async () => {
   const screen = await render(Slider, { label: 'Hours of sun', min: 0, max: 12, value: 4 });
@@ -15,7 +16,7 @@ test('is a named slider reporting its value and bounds', async () => {
 });
 
 test('ArrowRight steps by `step`, End jumps to max, and the bound value follows', async () => {
-  const onCommit = vi.fn();
+  const onCommit = vi.fn<(value: number | readonly number[]) => void>();
   const screen = await render(Slider, {
     label: 'Depth',
     min: 0,
@@ -26,7 +27,7 @@ test('ArrowRight steps by `step`, End jumps to max, and the bound value follows'
   });
 
   const slider = screen.getByRole('slider', { name: 'Depth' });
-  (slider.element() as HTMLElement).focus();
+  instanceOf(slider.element(), HTMLElement).focus();
 
   await userEvent.keyboard('{ArrowRight}');
   await expect.element(slider).toHaveAttribute('aria-valuenow', '6');
@@ -41,7 +42,7 @@ test('Page Up and Page Down jump a tenth of the scale', async () => {
   const screen = await render(Slider, { label: 'Depth', min: 0, max: 100, value: 50 });
 
   const slider = screen.getByRole('slider', { name: 'Depth' });
-  (slider.element() as HTMLElement).focus();
+  instanceOf(slider.element(), HTMLElement).focus();
   await userEvent.keyboard('{PageUp}');
   await expect.element(slider).toHaveAttribute('aria-valuenow', '60');
   await userEvent.keyboard('{PageDown}{PageDown}');
@@ -89,7 +90,7 @@ test('range mode names each thumb and never lets low pass high', async () => {
   await expect.element(low).toHaveAttribute('aria-valuenow', '5');
   await expect.element(high).toHaveAttribute('aria-valuenow', '6');
 
-  (low.element() as HTMLElement).focus();
+  instanceOf(low.element(), HTMLElement).focus();
   await userEvent.keyboard('{ArrowRight}{ArrowRight}{ArrowRight}');
 
   const values = screen
@@ -155,21 +156,21 @@ test('inside FormField each range thumb reads the label then its own name', asyn
 });
 
 test('name posts one hidden input per thumb', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(SliderFormFixture, { range: true, onSubmitted });
 
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
   expect(onSubmitted).toHaveBeenCalledOnce();
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.getAll('sun')).toEqual(['2', '6']);
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.getAll('sun')).toEqual(['2', '6']);
 });
 
 test('onCommit fires once per key press', async () => {
-  const onCommit = vi.fn();
+  const onCommit = vi.fn<(value: number | readonly number[]) => void>();
   const screen = await render(Slider, { label: 'Depth', value: 10, onCommit });
 
-  (screen.getByRole('slider').element() as HTMLElement).focus();
+  instanceOf(screen.getByRole('slider').element(), HTMLElement).focus();
   await userEvent.keyboard('{ArrowRight}{ArrowRight}{ArrowRight}');
 
   expect(onCommit).toHaveBeenCalledTimes(3);

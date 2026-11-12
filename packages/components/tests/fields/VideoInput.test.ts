@@ -15,7 +15,7 @@ test('is a file input defaulting to video, with no progress bar to begin with', 
 });
 
 test('choosing a file hands it to the caller, which owns the transfer', async () => {
-  const onSelect = vi.fn();
+  const onSelect = vi.fn<(file: File | undefined) => void>();
   const screen = await render(VideoInput, {
     'aria-label': 'Video',
     accept: 'text/plain',

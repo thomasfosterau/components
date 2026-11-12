@@ -19,7 +19,7 @@ test('is a spinbutton named by its label, reporting value and bounds', async () 
 });
 
 test('ArrowUp increments; at max the Increase button is disabled', async () => {
-  const onCommit = vi.fn();
+  const onCommit = vi.fn<(value: number | undefined) => void>();
   const screen = await render(NumberFieldFixture, {
     value: 9,
     max: 10,
@@ -129,7 +129,7 @@ test('typed values are clamped to the bounds on commit', async () => {
 });
 
 test('a wrapping form posts the raw number, not the formatted text', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(NumberFieldFixture, {
     value: 1234.5,
     locales: 'de-DE',
@@ -139,8 +139,8 @@ test('a wrapping form posts the raw number, not the formatted text', async () =>
 
   await expect.element(screen.getByRole('spinbutton')).toHaveValue('1.234,5 cm');
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.get('width')).toBe('1234.5');
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.get('width')).toBe('1234.5');
 });
 
 test('holding Increase for a second steps more than once', async () => {

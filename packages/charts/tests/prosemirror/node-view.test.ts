@@ -58,9 +58,9 @@ const refRows: DataRows = [
 ];
 
 // The NodeView never touches the EditorView in these scenarios.
-const fakeView = {} as EditorView;
+const fakeView: EditorView = Object.create(null);
 
-function viewFor(spec: ChartSpec | null, options?: ConstructorParameters<typeof ChartNodeView>[2]) {
+function viewFor(spec: unknown, options?: ConstructorParameters<typeof ChartNodeView>[2]) {
   return new ChartNodeView(chartType.create({ spec }), fakeView, options);
 }
 
@@ -78,7 +78,7 @@ describe('ChartNodeView', () => {
   });
 
   it('renders a placeholder for an invalid spec (e.g. from a collaborative peer)', () => {
-    const view = viewFor({ bogus: true } as unknown as ChartSpec);
+    const view = viewFor({ bogus: true });
     expect(view.dom.textContent).toContain('Invalid chart spec');
   });
 

@@ -2,6 +2,7 @@ import { userEvent } from 'vite-plus/test/browser';
 import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import ComboboxFormFixture, { type Taxon } from './fixtures/ComboboxFormFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 const TAXA: readonly Taxon[] = [
   { id: 'rosa-canina', name: 'Rosa canina', rank: 'species' },
@@ -11,8 +12,8 @@ const TAXA: readonly Taxon[] = [
 
 /** Resolves after `ms`, honouring the abort signal the component passes it. */
 const slowSearch = (ms: number, calls: string[] = []) =>
-  vi.fn(
-    (query: string, signal: AbortSignal): Promise<readonly Taxon[]> =>
+  vi.fn<(query: string, signal: AbortSignal) => Promise<readonly Taxon[]>>(
+    (query, signal) =>
       new Promise((resolve, reject) => {
         calls.push(query);
         const timer = setTimeout(() => {
@@ -99,7 +100,7 @@ test('Escape closes the listbox without selecting anything', async () => {
 });
 
 test('Enter with nothing highlighted submits the wrapping form', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(ComboboxFormFixture, { items: TAXA, onSubmitted });
 
   const input = screen.getByRole('combobox', { name: 'Taxon' });
@@ -169,7 +170,7 @@ test('emptying the field closes the panel and forgets the results', async () => 
 });
 
 test('onSelect receives the committed item, from a static list', async () => {
-  const onSelect = vi.fn();
+  const onSelect = vi.fn<(item: Taxon) => void>();
   const screen = await render(ComboboxFormFixture, { items: TAXA, onSelect });
 
   await userEvent.fill(screen.getByRole('combobox', { name: 'Taxon' }), 'rugosa');
@@ -180,7 +181,7 @@ test('onSelect receives the committed item, from a static list', async () => {
 });
 
 test('onSelect receives the committed item, from an asynchronous search', async () => {
-  const onSelect = vi.fn();
+  const onSelect = vi.fn<(item: Taxon) => void>();
   const screen = await render(ComboboxFormFixture, {
     onSearch: slowSearch(0),
     debounceMs: 10,
@@ -194,7 +195,7 @@ test('onSelect receives the committed item, from an asynchronous search', async 
 });
 
 test('onQueryChange is called with the raw text on every keystroke', async () => {
-  const onQueryChange = vi.fn();
+  const onQueryChange = vi.fn<(query: string) => void>();
   const screen = await render(ComboboxFormFixture, { items: TAXA, onQueryChange });
 
   const input = screen.getByRole('combobox', { name: 'Taxon' });
@@ -266,7 +267,7 @@ test('portal={false} renders the listbox inside the root', async () => {
 });
 
 test('by default the form posts the selected id, not the typed text', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(ComboboxFormFixture, { items: TAXA, onSubmitted });
 
   const input = screen.getByRole('combobox', { name: 'Taxon' });
@@ -276,8 +277,8 @@ test('by default the form posts the selected id, not the typed text', async () =
   await userEvent.click(screen.getByRole('button', { name: 'Search' }));
 
   expect(onSubmitted).toHaveBeenCalledTimes(1);
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.getAll('taxonId')).toEqual(['rosa-canina']);
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.getAll('taxonId')).toEqual(['rosa-canina']);
 });
 
 test('postedValue="query" puts the name on the visible input and drops the hidden id input', async () => {
@@ -290,15 +291,18 @@ test('postedValue="query" puts the name on the visible input and drops the hidde
 
   // The server-rendered input itself is the posted control, which is what
   // keeps a plain GET search form working with JavaScript off.
-  const input = screen.getByRole('combobox', { name: 'Taxon' }).element() as HTMLInputElement;
+  const input = instanceOf(
+    screen.getByRole('combobox', { name: 'Taxon' }).element(),
+    HTMLInputElement,
+  );
   expect(input.name).toBe('query');
   expect(input.value).toBe('rosa');
   expect(screen.container.querySelectorAll('input[type="hidden"]')).toHaveLength(0);
 });
 
 test('postedValue="query": Enter submits the typed text even with an auto-highlighted match', async () => {
-  const onSubmitted = vi.fn();
-  const onSelect = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
+  const onSelect = vi.fn<(item: Taxon) => void>();
   const screen = await render(ComboboxFormFixture, {
     items: TAXA,
     name: 'query',
@@ -317,15 +321,15 @@ test('postedValue="query": Enter submits the typed text even with an auto-highli
   await userEvent.keyboard('{Enter}');
 
   expect(onSubmitted).toHaveBeenCalledTimes(1);
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.getAll('query')).toEqual(['rosa']);
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.getAll('query')).toEqual(['rosa']);
   expect(onSelect).not.toHaveBeenCalled();
   await expect.element(screen.getByTestId('selected')).toHaveTextContent('none');
 });
 
 test('postedValue="query": Enter after arrowing to an option commits it instead', async () => {
-  const onSubmitted = vi.fn();
-  const onSelect = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
+  const onSelect = vi.fn<(item: Taxon) => void>();
   const screen = await render(ComboboxFormFixture, {
     items: TAXA,
     name: 'query',
@@ -347,7 +351,7 @@ test('postedValue="query": Enter after arrowing to an option commits it instead'
 });
 
 test('postedValue="query": typing again after arrowing forgets the navigation', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(ComboboxFormFixture, {
     items: TAXA,
     name: 'query',
@@ -363,6 +367,6 @@ test('postedValue="query": typing again after arrowing forgets the navigation', 
   await userEvent.keyboard('{Enter}');
 
   expect(onSubmitted).toHaveBeenCalledTimes(1);
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.getAll('query')).toEqual(['rosa']);
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.getAll('query')).toEqual(['rosa']);
 });

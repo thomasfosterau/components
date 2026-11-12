@@ -120,7 +120,8 @@ function resolveLinear(
     d3Scale = d3Scale.nice();
   }
 
-  const finalDomain = d3Scale.domain() as [number, number];
+  const [finalMin = domain[0], finalMax = domain[1]] = d3Scale.domain();
+  const finalDomain: [number, number] = [finalMin, finalMax];
   return {
     kind: 'linear',
     d3: d3Scale,
@@ -167,7 +168,8 @@ function resolveUtc(
     d3Scale = d3Scale.nice();
   }
 
-  const finalDomain = d3Scale.domain() as [Date, Date];
+  const [finalStart = domain[0], finalEnd = domain[1]] = d3Scale.domain();
+  const finalDomain: [Date, Date] = [finalStart, finalEnd];
   return {
     kind: 'utc',
     d3: d3Scale,
@@ -304,12 +306,18 @@ function numericHintDomain(hint?: ScaleHint): [number, number] | undefined {
   return undefined;
 }
 
+/** A hint value as a valid `Date`, or `undefined`. */
+function hintDate(value: number | string | undefined): Date | undefined {
+  if (value === undefined) return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
 function temporalHintDomain(hint?: ScaleHint): [Date, Date] | undefined {
   if (!hint?.domain || hint.domain.length < 2) return undefined;
-  const min = new Date(hint.domain[0] as string | number);
-  const max = new Date(hint.domain[hint.domain.length - 1] as string | number);
-  if (!Number.isNaN(min.getTime()) && !Number.isNaN(max.getTime())) return [min, max];
-  return undefined;
+  const min = hintDate(hint.domain.at(0));
+  const max = hintDate(hint.domain.at(-1));
+  return min && max ? [min, max] : undefined;
 }
 
 function categoricalDomain(channel: Channel, data: DataRows, hint?: ScaleHint): string[] {

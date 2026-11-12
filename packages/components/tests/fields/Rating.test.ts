@@ -3,6 +3,7 @@ import { expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import Rating from '../../src/lib/fields/Rating.svelte';
 import RatingFormFixture from './fixtures/RatingFormFixture.svelte';
+import { instanceOf } from '../dom.ts';
 
 /** The bits-ui item wrappers, in order; each is one star. */
 function stars(root: HTMLElement): HTMLElement[] {
@@ -29,14 +30,14 @@ test('a click on the FormField label focuses it', async () => {
 test('ArrowRight adds a star; with allowHalf it adds half of one', async () => {
   const whole = await render(Rating, { label: 'Score', value: 3 });
   const slider = whole.getByRole('slider', { name: 'Score' });
-  (slider.element() as HTMLElement).focus();
+  instanceOf(slider.element(), HTMLElement).focus();
   await userEvent.keyboard('{ArrowRight}');
   await expect.element(slider).toHaveAttribute('aria-valuenow', '4');
   await whole.unmount();
 
   const half = await render(Rating, { label: 'Score', value: 3, allowHalf: true });
   const halfSlider = half.getByRole('slider', { name: 'Score' });
-  (halfSlider.element() as HTMLElement).focus();
+  instanceOf(halfSlider.element(), HTMLElement).focus();
   await userEvent.keyboard('{ArrowRight}');
   await expect.element(halfSlider).toHaveAttribute('aria-valuenow', '3.5');
   await expect.element(halfSlider).toHaveAttribute('aria-valuetext', '3.5 out of 5');
@@ -45,7 +46,7 @@ test('ArrowRight adds a star; with allowHalf it adds half of one', async () => {
 test('Home and End go to the ends', async () => {
   const screen = await render(Rating, { label: 'Score', value: 3 });
   const slider = screen.getByRole('slider');
-  (slider.element() as HTMLElement).focus();
+  instanceOf(slider.element(), HTMLElement).focus();
   await userEvent.keyboard('{End}');
   await expect.element(slider).toHaveAttribute('aria-valuenow', '5');
   await userEvent.keyboard('{Home}');
@@ -55,24 +56,24 @@ test('Home and End go to the ends', async () => {
 test('clicking the fourth star sets the bound value to 4', async () => {
   const screen = await render(RatingFormFixture, {});
 
-  const fourth = stars(screen.getByRole('slider').element() as HTMLElement)[3];
+  const fourth = stars(instanceOf(screen.getByRole('slider').element(), HTMLElement))[3];
   expect(fourth).toBeDefined();
   // The suite loads no Tailwind CSS, so a star has no box to aim a pointer at; dispatch the click.
-  (fourth as HTMLElement).click();
+  instanceOf(fourth, HTMLElement).click();
 
   await expect.element(screen.getByText('Bound: 4')).toBeInTheDocument();
   await expect.element(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '4');
 });
 
 test('a wrapping form posts the value under name', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(RatingFormFixture, { onSubmitted });
 
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
   expect(onSubmitted).toHaveBeenCalledOnce();
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.get('score')).toBe('3');
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.get('score')).toBe('3');
 });
 
 test('formatValue sets the spoken value', async () => {
@@ -93,7 +94,7 @@ test('readonly renders a named image with nothing focusable in it', async () => 
   const display = screen.getByRole('img', { name: '4.5 out of 5' });
   await expect.element(display).toBeInTheDocument();
   expect(screen.getByRole('slider').elements()).toHaveLength(0);
-  const root = display.element() as HTMLElement;
+  const root = instanceOf(display.element(), HTMLElement);
   expect(root.querySelectorAll('[tabindex], input, button')).toHaveLength(0);
   expect(root.tabIndex).toBe(-1);
 });
@@ -105,20 +106,20 @@ test('invalid sets aria-invalid', async () => {
 });
 
 test('disabled blocks keys and clicks and posts nothing', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(RatingFormFixture, { disabled: true, onSubmitted });
 
   const slider = screen.getByRole('slider');
   await expect.element(slider).toHaveAttribute('aria-disabled', 'true');
   await expect.element(slider).toHaveAttribute('tabindex', '-1');
 
-  (slider.element() as HTMLElement).focus();
+  instanceOf(slider.element(), HTMLElement).focus();
   await userEvent.keyboard('{ArrowRight}');
-  const fifth = stars(slider.element() as HTMLElement)[4];
-  (fifth as HTMLElement).click();
+  const fifth = stars(instanceOf(slider.element(), HTMLElement))[4];
+  instanceOf(fifth, HTMLElement).click();
   await expect.element(slider).toHaveAttribute('aria-valuenow', '3');
 
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.has('score')).toBe(false);
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.has('score')).toBe(false);
 });
