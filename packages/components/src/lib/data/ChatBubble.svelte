@@ -13,6 +13,15 @@ One message of a `MessageThread`: author, time, avatar, the body and a status li
   the colour. The `<article>` is the daisyUI `chat` grid itself, so its
   image / header / bubble / footer are its direct children, as
   `chat.css` requires.
+
+  `grouped` is for the second and later messages of a burst from one
+  author. The header stays in the DOM (the `<article>`'s name is built
+  from it) and is only visually hidden with `sr-only`, so "Ada Lovelace,
+  3 minutes ago" is still heard on every message. The avatar is not
+  repeated: its box stays (`invisible`, so it keeps its width but is
+  neither painted nor reachable) because daisyUI's `chat-start` /
+  `chat-end` grid places the bubble beside it, and without that box a
+  grouped bubble would sit out of line with the first.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
@@ -38,6 +47,14 @@ One message of a `MessageThread`: author, time, avatar, the body and a status li
      * @defaultValue `false`
      */
     relative?: boolean | undefined;
+    /**
+     * A later message in a burst from the same author: the header is kept
+     * for the accessible name but visually hidden, and the avatar is not
+     * shown again (its space is kept so bubbles stay aligned). The caller
+     * decides, e.g. `grouped={i > 0 && messages[i - 1].author === m.author}`.
+     * @defaultValue `false`
+     */
+    grouped?: boolean | undefined;
     /** Locale(s) for the time; falls back to the components context. */
     locales?: string | readonly string[] | undefined;
     /** The avatar (an `Avatar` or an image); decorative here. */
@@ -54,6 +71,7 @@ One message of a `MessageThread`: author, time, avatar, the body and a status li
     side = 'start',
     tone,
     relative = false,
+    grouped = false,
     locales,
     avatar,
     footer,
@@ -68,11 +86,11 @@ One message of a `MessageThread`: author, time, avatar, the body and a status li
 </script>
 
 <li>
-  <article {...rest} aria-labelledby={headerId} class={['chat', sideClass[side], className]}>
+  <article {...rest} aria-labelledby={headerId} class={['chat', sideClass[side], grouped && 'pt-0', className]}>
     {#if avatar}
-      <div class="chat-image avatar" aria-hidden="true">{@render avatar()}</div>
+      <div class={['chat-image avatar', grouped && 'invisible']} aria-hidden="true">{@render avatar()}</div>
     {/if}
-    <div class="chat-header" id={headerId}>
+    <div class={['chat-header', grouped && 'sr-only']} id={headerId}>
       {author}{#if sentAt !== undefined}<span class="sr-only">,</span>
         {#if relative}
           <RelativeTime value={sentAt} {locales} class="text-xs opacity-60" />

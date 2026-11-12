@@ -55,3 +55,20 @@ The tables, lists and pagers an index page and a detail page are built from. Two
   <DescriptionRow label="Website"><ExternalLink href={organisation.website}>{organisation.website}</ExternalLink></DescriptionRow>
 </DescriptionList>
 ```
+
+## Grouping a burst of chat messages
+
+`ChatBubble` takes `grouped` for the second and later messages of a run from one author. The caller computes the run, so `MessageThread` stays a plain list of children:
+
+```svelte
+<MessageThread label="Comments on Bed 4">
+  {#each messages as m, i (m.id)}
+    <ChatBubble author={m.author} sentAt={m.sentAt} grouped={i > 0 && messages[i - 1].author === m.author}>
+      {#snippet avatar()}<Avatar name={m.author} src={m.avatarUrl} />{/snippet}
+      {m.body}
+    </ChatBubble>
+  {/each}
+</MessageThread>
+```
+
+A grouped bubble keeps its header and is named as before ("Ada Lovelace, 3 minutes ago"); the header is only visually hidden (`sr-only`), because a reader moving from message to message would otherwise lose the author on every message after the first. The repeated avatar is not shown, but its box keeps its width (`invisible`) so the bubbles stay aligned, and the vertical padding between grouped bubbles is tightened. Group on the author, not on the time: a long pause inside a run is still one author, so pass your own test if a gap should start a new turn.
