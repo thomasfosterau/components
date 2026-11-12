@@ -60,6 +60,23 @@ catalog:
   # pinned EXACT to the `effect` pin above and moves with it (Dependabot's
   # `effect` group bumps the two together).
   '@effect/vitest': 4.1.3
+  # The REQUIRED peer of `@thomasfosterau/components-import` (packages/import,
+  # #139), and its devDependency so the suite reads real documents: the import
+  # engine's `sourceTableFromRegion` and `findRegion` take effect-document's
+  # `TableRegion`s and `Document`s, and its spec's `TableLocator` is
+  # effect-document's. 0.2.0 is the release that added `candidateTables`,
+  # `TableLocator`, `detect`, the CSV reader's `maxRows` and `sniffDialect`
+  # (effect-document#188), so no earlier one fits; the published range is
+  # `catalogs.peers`. Its own `effect` peer is `^4.0.0`, the same as ours.
+  '@thomasfosterau/effect-document': ^0.2.0
+  # effect-document's OPTIONAL peer, needed by its `/csv`, `/rtf`, `/ooxml*`
+  # and `/iwork*` readers (their grammars) and by nothing else. packages/import
+  # takes it as a devDependency only: its suite reads a CSV through `/csv`,
+  # while its published code imports `/schema` alone, so it is no peer of
+  # ours (an app installs it when it imports a reader subpath, as
+  # effect-document's own peer list asks). `^0.5.0` is effect-document
+  # 0.2.0's peer range; 0.6.0 is outside it.
+  '@thomasfosterau/effect-parse': ^0.5.0
   # Lucide icon set as Svelte 5 components. Catalogued and installed ahead of
   # its first consumer: the real components land on top of this scaffold and
   # every one that needs an affordance icon reaches for this rather than
@@ -238,6 +255,12 @@ catalog:
 # (packages/import), whose public API takes and returns Effect values (the
 # target `Schema`, `Effect`, `Stream`), so the app's copy is the one it uses.
 #
+# `@thomasfosterau/effect-document` is that package's second REQUIRED peer
+# (#139): `sourceTableFromRegion` and `findRegion` take the app's own
+# `TableRegion`s and `Document`s, so the app's copy is again the one it uses.
+# `^0.2.0` is the first release with `candidateTables` (effect-document#188);
+# under 0.x a caret admits only 0.2.x, so a 0.3.0 is a deliberate bump here.
+#
 # The `@thomasfosterau/charts` interpreter peers are each optional (only the
 # entry that renders through that framework imports it) and keep the floors
 # the former `thomasfosterau/charts` repo declared.
@@ -246,6 +269,7 @@ catalogs:
     svelte: ^5.40.0
     '@thomasfosterau/effect-forms-svelte': ^0.4.0
     effect: ^4.0.0
+    '@thomasfosterau/effect-document': ^0.2.0
     prosemirror-model: ^1.0.0
     prosemirror-view: ^1.0.0
   # Published ranges of runtime `dependencies` whose dev pin above is exact.

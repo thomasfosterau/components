@@ -105,7 +105,9 @@
       // packages/charts/src/spec and the /entity-form files that imports
       // `effect`: that pack bans `effect` per package (each rule names its
       // files), and leaves packages/import out on purpose, since `effect` is
-      // its required peer (packages/import/AGENTS.md § Boundary).
+      // its required peer (packages/import/AGENTS.md § Boundary). The same holds
+      // for `@thomasfosterau/effect-document`, its other required peer, which
+      // `effect-document-only-in-import` bans from every other package.
       { "from": "import", "allow": [] }
     ]
   },

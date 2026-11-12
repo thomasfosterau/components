@@ -3,24 +3,16 @@
  * cell values, whatever format they came from.
  *
  * It is the smallest shape both of `@thomasfosterau/effect-document`'s
- * candidate tables (#188) reduce to, so each adapter is a few lines:
- *
- * - a `WorksheetRegion`'s typed cells become values: `CellText` its string,
- *   `CellNumber` its number, `CellBoolean` its boolean, `CellDate` its `Date`
- *   (a plain cell is already one of these), a gap or `CellBlank` `undefined`,
- *   and the cells no single value stands for (`CellError`, `CellFormula`,
- *   `CellRichText`) their text;
- * - a `ProseTableRegion`'s `cells` grid is already rows of strings, and its
- *   `headerRows` says where the header is.
- *
- * Either grid then goes through {@link sourceTableFromGrid} with the spec's
- * `headerRow` and `skipRows`. That adapter lands with the effect-document
- * 0.2.0 dependency; until then a caller builds the grid itself.
+ * candidate tables (#188) reduce to: `sourceTableFromRegion` (`region.ts`)
+ * turns a `WorksheetRegion` or a `ProseTableRegion` into one, and
+ * {@link sourceTableFromGrid} turns any grid a caller built itself. Both read
+ * the header and the skipped rows the same way, here.
  *
  * @module
  */
 
 import * as Arr from 'effect/Array';
+import * as Option from 'effect/Option';
 import * as P from 'effect/Predicate';
 import type { ImportSource } from './spec.ts';
 
@@ -45,11 +37,44 @@ export interface SourceTable {
   readonly rows: ReadonlyArray<SourceRow>;
 }
 
+/** The rows a source keeps and where its header is: the spec's `headerRow` and `skipRows`. */
+export type SourceRead = Pick<ImportSource, 'headerRow' | 'skipRows'>;
+
 /** A header cell's text: its string, or the canonical text of any other value. */
-const headerText = (cell: SourceCell): string => {
+export const headerText = (cell: SourceCell): string => {
   if (P.isString(cell)) return cell;
   if (P.isDate(cell)) return Number.isNaN(cell.getTime()) ? '' : cell.toISOString();
   return cell === undefined ? '' : String(cell);
+};
+
+/** The header row's position in the whole table, counting skipped rows; none without a header. */
+export const headerIndex = (source: SourceRead): number | undefined =>
+  source.headerRow === undefined ? undefined : source.skipRows + source.headerRow;
+
+/**
+ * A {@link SourceTable} from the rows a table holds, each with its position
+ * in the table (ascending, and not necessarily every position: a worksheet
+ * holds only the rows that have cells), read as {@link sourceTableFromGrid}
+ * reads a grid.
+ */
+export const sourceTableFromRows = (
+  rows: ReadonlyArray<SourceRow>,
+  source: SourceRead,
+): SourceTable => {
+  const header = headerIndex(source);
+  const firstData = header === undefined ? source.skipRows : header + 1;
+  return {
+    headers:
+      header === undefined
+        ? []
+        : Arr.findFirst(rows, (row) => row.index === header).pipe(
+            Option.match({
+              onNone: () => [],
+              onSome: (row) => Arr.map(row.cells, headerText),
+            }),
+          ),
+    rows: Arr.filter(rows, (row) => row.index >= firstData),
+  };
 };
 
 /**
@@ -60,13 +85,9 @@ const headerText = (cell: SourceCell): string => {
  */
 export const sourceTableFromGrid = (
   grid: ReadonlyArray<ReadonlyArray<SourceCell>>,
-  source: Pick<ImportSource, 'headerRow' | 'skipRows'>,
-): SourceTable => {
-  const header = source.headerRow === undefined ? undefined : source.skipRows + source.headerRow;
-  const firstData = header === undefined ? source.skipRows : header + 1;
-  const rows = Arr.map(grid, (cells, index): SourceRow => ({ index, cells }));
-  return {
-    headers: header === undefined ? [] : Arr.map(grid[header] ?? [], headerText),
-    rows: Arr.drop(rows, firstData),
-  };
-};
+  source: SourceRead,
+): SourceTable =>
+  sourceTableFromRows(
+    Arr.map(grid, (cells, index): SourceRow => ({ index, cells })),
+    source,
+  );
