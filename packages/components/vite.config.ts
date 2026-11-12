@@ -116,22 +116,44 @@ export default defineConfig({
     ],
   },
 
+  // Two projects. `browser` is the suite (every `*.test.ts`); `ssr` runs the
+  // `*.ssr.test.ts` files under Node. Browser mode compiles `.svelte` files
+  // for the client, so `svelte/server`'s `render` cannot mount them there
+  // (it fails inside `assign_nodes`); under Node the Svelte plugin compiles
+  // them for the server, which is what a render-to-string test needs.
   test: {
-    include: ['tests/**/*.test.ts'],
-    // Registers the jest-dom matchers.
-    setupFiles: ['./tests/setup.ts'],
     testTimeout: 30_000,
-    // A REAL browser, not a DOM shim. This library's contract is focus order,
-    // keyboard handling and the accessibility tree — none of which a shim
-    // models faithfully — so the suite drives Chromium through Playwright.
-    // Headless everywhere: CI has no display, and neither does an agent
-    // session.
-    browser: {
-      enabled: true,
-      headless: true,
-      provider: playwright(),
-      instances: [{ browser: 'chromium' }],
-      screenshotFailures: false,
-    },
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'browser',
+          include: ['tests/**/*.test.ts'],
+          exclude: ['tests/**/*.ssr.test.ts', '**/node_modules/**'],
+          // Registers the jest-dom matchers.
+          setupFiles: ['./tests/setup.ts'],
+          // A REAL browser, not a DOM shim. This library's contract is focus
+          // order, keyboard handling and the accessibility tree — none of
+          // which a shim models faithfully — so the suite drives Chromium
+          // through Playwright. Headless everywhere: CI has no display, and
+          // neither does an agent session.
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'chromium' }],
+            screenshotFailures: false,
+          },
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'ssr',
+          include: ['tests/**/*.ssr.test.ts'],
+          environment: 'node',
+        },
+      },
+    ],
   },
 });

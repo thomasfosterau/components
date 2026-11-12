@@ -1,6 +1,7 @@
 <script module lang="ts">
-  import { Leaf, Sprout } from '@lucide/svelte';
+  import { Leaf, Sprout, User } from '@lucide/svelte';
   import { defineMeta } from '@storybook/addon-svelte-csf';
+  import type { NavDestination } from '../../lib/layout/nav-destination.ts';
   import Sidebar from '../../lib/layout/Sidebar.svelte';
   import Menu from '../../lib/ui/Menu.svelte';
   import MenuItem from '../../lib/ui/MenuItem.svelte';
@@ -17,7 +18,17 @@
       },
     },
   });
+
+  const destinations: readonly NavDestination[] = [
+    { href: '/posts', label: 'Posts', icon: posts },
+    { href: '/tags', label: 'Tags', icon: tags, badge: 3 },
+    { href: '/authors', label: 'Authors', icon: authors },
+  ];
 </script>
+
+{#snippet posts()}<Sprout class="size-5" />{/snippet}
+{#snippet tags()}<Leaf class="size-5" />{/snippet}
+{#snippet authors()}<User class="size-5" />{/snippet}
 
 <Story name="Primary navigation">
   <div class="flex h-96">
@@ -51,5 +62,11 @@
       <MenuItem href="/taxa">Taxa</MenuItem>
       <MenuItem href="/anatomy">Anatomy</MenuItem>
     </Sidebar>
+  </div>
+</Story>
+
+<Story name="From destinations">
+  <div class="flex h-96">
+    <Sidebar {destinations} title="Browse" />
   </div>
 </Story>

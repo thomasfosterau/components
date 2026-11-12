@@ -30,6 +30,13 @@ Structure only, never copy: every component takes the app's content as snippets 
 <AppShell {destinations} {brand} {account}>{@render children()}</AppShell>
 ```
 
+Without `AppShell`, `Sidebar` and `BottomNav` take the same list as `destinations`, so an app that lays out its own frame still declares them once. Both resolve hrefs and mark the current one through the components context; `BottomNav` leaves out `compact: false`, and either renders `children` after the destinations, so hand-written items still work. `AppShell` builds its sidebar and bottom bar this way.
+
+```svelte
+<Sidebar class="hidden sm:block" {destinations} />
+<BottomNav class="sm:hidden" {destinations} />
+```
+
 `layout` also exports `types.ts` (`Crumb`, `TabItem`, `FilterOption`, `TabsMode`, `TabsVariant`, `tabsVariant`, `tabsSize`) and `nav-destination.ts` (`NavDestination`, `NavBreakpoints`, `MediumAt`, `ExpandedAt`).
 
 ```svelte

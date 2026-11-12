@@ -18,6 +18,11 @@ The app shell’s navigation column: a brand mark, the primary links and an acco
   announce itself as an afterthought, and puts a second landmark around the
   `navigation` one, which a reader then has to step through twice.
 
+  Given `destinations` (#428), the links are built from the app's one list of
+  `NavDestination`s, the same declaration `AppShell` and `NavigationRail`
+  read, so an app without `AppShell` declares them once; `children` still
+  work, and render after them.
+
   ARIA contract: the navigation landmark is `Menu`'s. When `title` is shown,
   it is also the landmark's accessible name by default, so the name a reader
   hears is the text a reader sees. `brand` and `footer` are plain regions: the
@@ -26,10 +31,14 @@ The app shell’s navigation column: a brand mark, the primary links and an acco
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
+  import { getComponentsContext } from '../context.svelte.ts';
   import Menu from '../ui/Menu.svelte';
+  import MenuItem from '../ui/MenuItem.svelte';
   import type { HeadingLevel } from '../ui/tones.ts';
+  import VisuallyHidden from '../ui/VisuallyHidden.svelte';
+  import type { NavDestination } from './nav-destination.ts';
 
-  interface Props extends HTMLAttributes<HTMLElement> {
+  interface Props extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
     /**
      * Accessible name of the navigation landmark. Defaults to `title` when
      * one is shown, and to `Primary` when it is not.
@@ -46,8 +55,19 @@ The app shell’s navigation column: a brand mark, the primary links and an acco
     brand?: Snippet<[]> | undefined;
     /** A block pinned under the links — the signed-in account menu. */
     footer?: Snippet<[]> | undefined;
-    /** The `MenuItem`s. */
-    children: Snippet<[]>;
+    /**
+     * The app's top-level destinations, built into `MenuItem`s (the current
+     * one shows its `currentIcon`; a badge is named in words by `badgeLabel`).
+     * Rendered before `children`.
+     */
+    destinations?: readonly NavDestination[] | undefined;
+    /**
+     * A destination badge's text for assistive technology, after the label.
+     * @defaultValue `"<badge> new"`
+     */
+    badgeLabel?: ((badge: string | number) => string) | undefined;
+    /** Further `MenuItem`s, after the `destinations`. */
+    children?: Snippet<[]> | undefined;
   }
 
   let {
@@ -56,12 +76,22 @@ The app shell’s navigation column: a brand mark, the primary links and an acco
     headingLevel = 2,
     brand,
     footer,
+    destinations,
+    badgeLabel = (value) => `${value} new`,
     children,
     class: className,
     ...rest
   }: Props = $props();
 
   const navLabel = $derived(label ?? title ?? 'Primary');
+
+  const context = getComponentsContext();
+
+  /** A destination's icon: `currentIcon` while it is the current page. */
+  const iconOf = (destination: NavDestination): Snippet<[]> =>
+    destination.currentIcon !== undefined && context.isCurrent(context.href(destination.href))
+      ? destination.currentIcon
+      : destination.icon;
 </script>
 
 <div
@@ -81,7 +111,20 @@ The app shell’s navigation column: a brand mark, the primary links and an acco
         {title}
       </svelte:element>
     {/if}
-    <Menu label={navLabel}>{@render children()}</Menu>
+    <Menu label={navLabel}>
+      {#each destinations ?? [] as destination (destination.href)}
+        <MenuItem href={destination.href} icon={iconOf(destination)}>
+          {destination.label}
+          {#if destination.badge !== undefined}
+            <span aria-hidden="true" class="badge badge-primary badge-sm ms-auto">
+              {destination.badge}
+            </span>
+            <VisuallyHidden>{badgeLabel(destination.badge)}</VisuallyHidden>
+          {/if}
+        </MenuItem>
+      {/each}
+      {@render children?.()}
+    </Menu>
   </div>
 
   {#if footer}

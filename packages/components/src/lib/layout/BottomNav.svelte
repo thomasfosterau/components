@@ -14,6 +14,11 @@ The mobile primary navigation: three to five destinations in a bar at the bottom
   `aria-current`, which needs no primitive, and `Menu`'s dropdown runtime is
   exactly the always-loaded cost #129 removed.
 
+  Given `destinations` (#428), the items are built from the app's one list of
+  `NavDestination`s (all but `compact: false`), the same declaration
+  `AppShell` and `NavigationRail` read; `children` still work, and render
+  after them.
+
   ARIA contract: `<nav aria-label>` around a `<ul>` of links, so a screen
   reader hears "3 of 5". Tab order is DOM order — no roving tabindex.
 
@@ -26,8 +31,10 @@ The mobile primary navigation: three to five destinations in a bar at the bottom
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import { dockSize, type Size } from '../ui/tones.ts';
+  import BottomNavItem from './BottomNavItem.svelte';
+  import { compactDestinations, type NavDestination } from './nav-destination.ts';
 
-  interface Props extends HTMLAttributes<HTMLElement> {
+  interface Props extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
     /**
      * The landmark's accessible name.
      * @defaultValue `'Primary'`
@@ -43,14 +50,26 @@ The mobile primary navigation: three to five destinations in a bar at the bottom
      * @defaultValue `true`
      */
     fixed?: boolean | undefined;
-    /** The `BottomNavItem`s. */
-    children: Snippet<[]>;
+    /**
+     * The app's top-level destinations, built into `BottomNavItem`s; those
+     * with `compact: false` are left out. Rendered before `children`.
+     */
+    destinations?: readonly NavDestination[] | undefined;
+    /**
+     * A destination badge's text for assistive technology, after the label.
+     * @defaultValue `"<badge> new"`
+     */
+    badgeLabel?: ((badge: string | number) => string) | undefined;
+    /** Further `BottomNavItem`s, after the `destinations`. */
+    children?: Snippet<[]> | undefined;
   }
 
   let {
     label = 'Primary',
     size = 'md',
     fixed = true,
+    destinations,
+    badgeLabel = (value) => `${value} new`,
     class: className,
     children,
     ...rest
@@ -81,6 +100,16 @@ The mobile primary navigation: three to five destinations in a bar at the bottom
     bind:this={bar}
     class={['dock border-base-300 bg-base-100 border-t', !fixed && 'relative', dockSize[size]]}
   >
-    {@render children()}
+    {#each compactDestinations(destinations ?? []) as destination (destination.href)}
+      <BottomNavItem
+        href={destination.href}
+        label={destination.label}
+        icon={destination.icon}
+        currentIcon={destination.currentIcon}
+        badge={destination.badge}
+        {badgeLabel}
+      />
+    {/each}
+    {@render children?.()}
   </ul>
 </nav>

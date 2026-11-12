@@ -36,13 +36,10 @@ The responsive app frame: a sidebar column with a navigation drawer below `lg`, 
   import { Menu as MenuIcon } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
-  import { getComponentsContext } from '../context.svelte.ts';
   import Drawer from '../feedback/Drawer.svelte';
   import Button from '../ui/Button.svelte';
-  import MenuItem from '../ui/MenuItem.svelte';
   import VisuallyHidden from '../ui/VisuallyHidden.svelte';
   import BottomNav from './BottomNav.svelte';
-  import BottomNavItem from './BottomNavItem.svelte';
   import NavigationRail from './NavigationRail.svelte';
   import Sidebar from './Sidebar.svelte';
   import {
@@ -128,19 +125,6 @@ The responsive app frame: a sidebar column with a navigation drawer below `lg`, 
     class: className,
     ...rest
   }: Props = $props();
-
-  const context = getComponentsContext();
-
-  /** The destinations the compact bar holds: all but `compact: false`. */
-  const inBar = (list: readonly NavDestination[]): readonly NavDestination[] =>
-    list.filter((destination) => destination.compact !== false);
-
-  /** A destination's icon in the built sidebar: `currentIcon` while it is the current page. */
-  const sidebarIcon = (destination: NavDestination): Snippet<[]> =>
-    destination.currentIcon !== undefined &&
-    context.isCurrent(context.href(destination.href))
-      ? destination.currentIcon
-      : destination.icon;
 </script>
 
 {#snippet drawerMode(column: Snippet<[]>)}
@@ -170,19 +154,7 @@ The responsive app frame: a sidebar column with a navigation drawer below `lg`, 
 {/snippet}
 
 {#snippet builtSidebar(list: readonly NavDestination[])}
-  <Sidebar {label} {brand} footer={account}>
-    {#each list as destination (destination.href)}
-      <MenuItem href={destination.href} icon={sidebarIcon(destination)}>
-        {destination.label}
-        {#if destination.badge !== undefined}
-          <span aria-hidden="true" class="badge badge-primary badge-sm ms-auto">
-            {destination.badge}
-          </span>
-          <VisuallyHidden>{badgeLabel(destination.badge)}</VisuallyHidden>
-        {/if}
-      </MenuItem>
-    {/each}
-  </Sidebar>
+  <Sidebar destinations={list} {label} {brand} footer={account} {badgeLabel} />
 {/snippet}
 
 {#snippet adaptiveMode(list: readonly NavDestination[])}
@@ -194,18 +166,7 @@ The responsive app frame: a sidebar column with a navigation drawer below `lg`, 
       <NavigationRail destinations={list} {label} header={brand} footer={account} {badgeLabel} />
     </div>
     <div class={['min-w-0 flex-1', compactPadding[breakpoints.medium]]}>{@render children()}</div>
-    <BottomNav {label} class={compactTier[breakpoints.medium]}>
-      {#each inBar(list) as destination (destination.href)}
-        <BottomNavItem
-          href={destination.href}
-          label={destination.label}
-          icon={destination.icon}
-          currentIcon={destination.currentIcon}
-          badge={destination.badge}
-          {badgeLabel}
-        />
-      {/each}
-    </BottomNav>
+    <BottomNav destinations={list} {label} {badgeLabel} class={compactTier[breakpoints.medium]} />
   </div>
 {/snippet}
 
