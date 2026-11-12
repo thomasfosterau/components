@@ -138,7 +138,7 @@ catalog:
   typescript: 'npm:@typescript/typescript6@6.0.2'
   # vite-plus pins `oxlint`, `oxfmt`, `vitest` and the `@vitest/*` packages
   # to exact versions. `vitest` and `@vitest/browser-playwright` FOLLOW that
-  # pin (vite-plus 1.4.0 -> 5.0.5; oxlint 1.89.0, oxlint-tsgolint 7.0.2004) rather than running ahead of it (#47).
+  # pin (vite-plus 1.5.1 -> 5.1.0; oxlint 1.91.0, oxlint-tsgolint 7.0.2005) rather than running ahead of it (#47).
   # Dependabot's `toolchain` group (.github/dependabot.yml) bumps
   # `vite-plus`, `vitest` and `@vitest/*` together in one PR (#88). Before
   # merging that PR, push by hand: `vite` (ignored by Dependabot) to
@@ -149,7 +149,7 @@ catalog:
   # is an `@effect/tsgo` bump that CI passes on its own.
   # `vite` is the same release published under its aliased core package.
   vite-plus: 1.5.1
-  vite: npm:@voidzero-dev/vite-plus-core@1.4.0
+  vite: npm:@voidzero-dev/vite-plus-core@1.5.1
   vitest: 5.1.0
   # Istanbul coverage for the root `test:coverage` task, whose
   # `coverage/coverage-final.json` `fallow audit` reads for per-function CRAP
@@ -163,9 +163,9 @@ catalog:
   # overwrites the native `tsc` and vite-plus's `oxlint` / `oxlint-tsgolint`
   # with Effect-patched builds matched by gitHead, so this pins in lockstep
   # with `@typescript/native` below and with the `oxlint` / `oxlint-tsgolint`
-  # vite-plus carries: 0.63.0 supports typescript 7.0.2, oxlint 1.88.0 –
-  # 1.90.0 and tsgolint 7.0.2004 / 7.0.2005; vite-plus 1.4.0 carries oxlint
-  # 1.89.0 and tsgolint 7.0.2004. Each @effect/tsgo release hard-errors
+  # vite-plus carries: 0.67.7 supports typescript 7.0.2, oxlint 1.89.0 /
+  # 1.91.0 – 1.93.0 and tsgolint 7.0.2004 – 7.0.2006; vite-plus 1.5.1 carries
+  # oxlint 1.91.0 and tsgolint 7.0.2005. Each @effect/tsgo release hard-errors
   # (UnsupportedTargetPackageVersionError) on any other component version,
   # failing the patch. Read the `components` table in
   # node_modules/@effect/tsgo/dist/effect-tsgo.cjs before bumping any of the
