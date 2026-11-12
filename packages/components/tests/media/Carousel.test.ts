@@ -1,5 +1,5 @@
 import { createRawSnippet } from 'svelte';
-import { expect, test } from 'vite-plus/test';
+import { afterEach, expect, test, vi } from 'vite-plus/test';
 import { userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import Carousel from '../../src/lib/media/Carousel.svelte';
@@ -10,6 +10,28 @@ const pause = (ms: number): Promise<void> =>
   new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+/**
+ * Make the carousel scroll instantly (`prefers-reduced-motion: reduce`), so
+ * the strip's geometry is final when a click returns. A smooth scroll is an
+ * animation the browser may throttle or abandon when this page is not in
+ * the foreground: `test:coverage` runs the components and mapbox browser
+ * projects side by side, and a stalled scroll whose `scrollend` releases the
+ * carousel leaves the index where the strip really is, the start (#418).
+ * Call before `render`: the carousel reads the query when it mounts.
+ */
+const scrollInstantly = (): void => {
+  const original = window.matchMedia.bind(window);
+  vi.spyOn(window, 'matchMedia').mockImplementation((query) => {
+    const list = original(query);
+    if (!query.includes('prefers-reduced-motion')) return list;
+    return Object.defineProperty(list, 'matches', { value: true });
+  });
+};
 
 test('is a region named by label, with the carousel role description', async () => {
   const screen = await render(CarouselFixture);
@@ -28,6 +50,7 @@ test('each slide is a group named by its position', async () => {
 });
 
 test('Next and Previous move the bound index and the current picker, and are disabled at the ends', async () => {
+  scrollInstantly();
   const screen = await render(CarouselFixture, { count: 2 });
   const previous = screen.getByRole('button', { name: 'Previous slide' });
   const next = screen.getByRole('button', { name: 'Next slide' });
@@ -52,6 +75,7 @@ test('Next and Previous move the bound index and the current picker, and are dis
 });
 
 test('a picker scrolls to its slide', async () => {
+  scrollInstantly();
   const screen = await render(CarouselFixture);
 
   await screen.getByRole('button', { name: 'Slide 4' }).click();
