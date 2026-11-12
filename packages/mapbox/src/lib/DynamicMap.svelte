@@ -33,6 +33,11 @@ The interactive Mapbox GL map, panned and zoomed, with a fallback when WebGL is 
   on a phone traps the reader — `panHintLabel` says so, once, and then gets out
   of the way.
 -->
+<script module lang="ts">
+  /** The teardown before the map exists: nothing to undo. */
+  const noop = (): void => {};
+</script>
+
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
   import type { MapCamera, MapStyle } from './types.ts';
@@ -94,7 +99,7 @@ The interactive Mapbox GL map, panned and zoomed, with a fallback when WebGL is 
     // The teardown has to survive the await: `$effect`'s returned function runs
     // whether or not the import has resolved, so it closes over a mutable slot
     // rather than the map itself.
-    let dispose = (): void => {};
+    let dispose = noop;
     let cancelled = false;
 
     void (async () => {

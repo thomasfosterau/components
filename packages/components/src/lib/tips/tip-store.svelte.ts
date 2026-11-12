@@ -102,6 +102,16 @@ export interface TipStoreOptions {
   readonly prefix?: string | undefined;
 }
 
+/** Whether a tip's `frequency` lets it show again now, given when it last showed. */
+const frequencyAllows = (config: TipConfig, state: TipState): boolean => {
+  if (state.lastShown === undefined) return true;
+  const frequency = config.frequency ?? 'immediate';
+  if (frequency === 'immediate') return true;
+  if (frequency === 'once') return false;
+  const since = Date.now() - new Date(state.lastShown).getTime();
+  return since >= (INTERVALS[frequency] ?? 0);
+};
+
 /**
  * Build a tip store over the given storage.
  *
@@ -138,15 +148,6 @@ export const createTipStore = (options: TipStoreOptions = {}): TipStore => {
     } catch {
       /* storage refused; the in-memory state still drives this session */
     }
-  };
-
-  const frequencyAllows = (config: TipConfig, state: TipState): boolean => {
-    if (state.lastShown === undefined) return true;
-    const frequency = config.frequency ?? 'immediate';
-    if (frequency === 'immediate') return true;
-    if (frequency === 'once') return false;
-    const since = Date.now() - new Date(state.lastShown).getTime();
-    return since >= (INTERVALS[frequency] ?? 0);
   };
 
   return {

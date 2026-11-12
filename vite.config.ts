@@ -158,7 +158,6 @@ export default defineConfig({
       // whose count reaches zero goes back to `error` and its line is deleted.
       'typescript/no-unsafe-type-assertion': 'warn', // 115 sites, mostly test doubles and DOM lookups
       'vitest/require-mock-type-parameters': 'warn', // 74 sites, `vi.fn()` without a signature
-      'unicorn/consistent-function-scoping': 'warn', // 5 sites, 4 in `.svelte`
       'unicorn/no-array-sort': 'warn', // 5 sites; `toSorted` raises the published browser baseline
       'unicorn/no-array-reverse': 'warn', // 1 site, same reason
       'no-shadow': 'warn', // 2 sites, both in `.svelte`

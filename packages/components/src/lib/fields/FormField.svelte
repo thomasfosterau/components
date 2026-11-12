@@ -29,6 +29,12 @@ The label, hint and errors frame around one control, handing it the `FieldContro
   them to the first message is a decision the call site should make, not one
   this frame makes for it.
 -->
+<script module lang="ts">
+  /** Takes focus from a forwarded label click: in the tab order and not disabled. */
+  const focusable = (element: HTMLElement): boolean =>
+    element.tabIndex >= 0 && !element.hasAttribute('disabled');
+</script>
+
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
@@ -95,8 +101,6 @@ The label, hint and errors frame around one control, handing it the `FieldContro
   const forwardClick = (): void => {
     const control = document.getElementById(id);
     if (control === null || control.matches(LABELABLE)) return;
-    const focusable = (element: HTMLElement): boolean =>
-      element.tabIndex >= 0 && !element.hasAttribute('disabled');
     const target = focusable(control)
       ? control
       : Array.from(control.querySelectorAll<HTMLElement>('*')).find(focusable);
