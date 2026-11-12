@@ -110,7 +110,7 @@
     "vitest-browser-svelte": "catalog:"
   },
   "peerDependencies": {
-    "@thomasfosterau/effect-forms-svelte": "catalog:",
+    "@thomasfosterau/effect-forms-svelte": "catalog:peers",
     "svelte": "catalog:peers"
   },
   "peerDependenciesMeta": {

@@ -204,9 +204,14 @@ catalog:
 # scripts/publish.mjs) rewrites `catalog:peers` to this literal range, so the
 # packed package.json files carry `"svelte": "^5.40.0"`. The floor is
 # 5.40.0 because that is the `svelte` peer of
-# `@thomasfosterau/effect-forms-svelte@0.2.0`, the optional peer behind the
-# `/entity-form` entry (#85). Raising the floor is a published-behaviour change
-# and takes a changeset.
+# `@thomasfosterau/effect-forms-svelte` (0.2.0 through 0.3.x), the optional
+# peer behind the `/entity-form` entry (#85). Raising the floor is a
+# published-behaviour change and takes a changeset.
+#
+# `@thomasfosterau/effect-forms-svelte` itself is ranged here too, not taken
+# from its dev pin above (#338): a Dependabot bump of the pin must not
+# silently rewrite the range consumers are promised. `^0.3.1` is what 0.2.0
+# published; nothing `/entity-form` uses changed between 0.3.1 and the pin.
 #
 # The `@thomasfosterau/charts` interpreter peers are each optional (only the
 # entry that renders through that framework imports it) and keep the floors
@@ -214,6 +219,7 @@ catalog:
 catalogs:
   peers:
     svelte: ^5.40.0
+    '@thomasfosterau/effect-forms-svelte': ^0.3.1
     prosemirror-model: ^1.0.0
     prosemirror-view: ^1.0.0
   # Published ranges of runtime `dependencies` whose dev pin above is exact.
