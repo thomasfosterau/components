@@ -17,7 +17,8 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
   - `<table role="grid">`, named by its caption and described by the
     edit hint, with `aria-rowcount` / `aria-colcount` for the whole result
     and `aria-rowindex` / `aria-colindex` on what is on screen (the pager
-    windows it). Header cells are `columnheader`s (`aria-sort` when
+    or `virtual` windows it) — every index is the row's place in the whole
+    result, never in the DOM. Header cells are `columnheader`s (`aria-sort` when
     sortable), body cells `gridcell`s — a `rowHeader` column's are
     `rowheader`s — and a cell the reader cannot edit is `aria-readonly`.
     With a selection column each row carries `aria-selected`.
@@ -46,6 +47,21 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     the reason through a polite live region.
   - `'batch'` mode: commits accumulate in `changes`; a changed cell shows a
     dot and is described as `changedLabel`.
+
+  `virtual` (for a large import, #427): every row of the result is in the
+  grid's matrix but only a window of them is in the DOM. The window is
+  `VirtualList`'s — the same `VirtualWindow` and `windowParts` from
+  `virtual.svelte.ts`, not a second implementation — drawn as `<tr>`s
+  between two `aria-hidden` spacer rows, because a `VirtualList` element
+  cannot sit inside a `<tbody>`. Rows are a fixed `rowHeight`, so a move's
+  target row is scrolled into view, rendered and focused in one synchronous
+  step (no measuring round-trip). Keyboard moves, a commit's move and the
+  error summary's buttons all scroll their row into the window before
+  focusing it; Page Up / Page Down move by a viewport of rows. The row
+  holding focus (the active cell, or the cell being edited) stays mounted
+  however far the reader scrolls; so does the active cell once focus has
+  left, because it is the grid's Tab stop. The header row is
+  pinned (`table-pin-rows`) and rows do not wrap.
 
   A `cell` snippet that renders its own link or button adds a Tab stop the
   grid does not manage; give an editable grid plain cells.
@@ -87,6 +103,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     type GridPoint,
   } from './grid-keys.ts';
   import { columnClass, tableSize } from './table-classes.ts';
+  import { VirtualWindow } from './virtual.svelte.ts';
   import {
     columnAriaSort,
     nextSortState,
@@ -124,6 +141,12 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     pageStep: number;
     /** Bring a row on screen (its page, past the filter). */
     onReveal: (row: T) => void;
+    /** Window `rows` (all of them, unpaged) instead of rendering every one. */
+    virtual: boolean;
+    /** `virtual`: each body row's fixed height in px; by `size` when `undefined`. */
+    rowHeight: number | undefined;
+    /** `virtual`: the scrolling body's maximum height, a CSS length. */
+    viewportHeight: string;
     caption: string | undefined;
     captionHidden: boolean | undefined;
     size: Size | undefined;
@@ -163,6 +186,9 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     rowOffset,
     pageStep,
     onReveal,
+    virtual,
+    rowHeight,
+    viewportHeight,
     caption,
     captionHidden = false,
     size = 'md',
@@ -248,8 +274,38 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
   const offset = $derived(layout.offset);
   const pageKeys = $derived(rows.map((row) => rowKey(row)));
   const pageState = $derived(pageSelectionState(selected, pageKeys));
-  const bounds = $derived({ rows: rows.length + 1, cols: shownColumns.length + offset, page: pageStep });
+
+  /**
+   * `virtual`'s default row heights: a daisyUI table row of each size, with
+   * room for the `sm` field primitive an editing cell holds.
+   */
+  const rowHeights: Record<Size, number> = { xs: 36, sm: 40, md: 48, lg: 64, xl: 76 };
+  const pitch = $derived(rowHeight ?? rowHeights[size]);
+
+  let viewport: HTMLDivElement | undefined = $state();
+  let headerRow: HTMLTableRowElement | undefined = $state();
+  let tbody: HTMLTableSectionElement | undefined = $state();
+
+  /** `virtual`: `VirtualList`'s windowing over the body rows, at a fixed pitch. */
+  const rowWindow = new VirtualWindow({
+    count: () => rows.length,
+    keyAt: (index) => pageKeys[index] ?? index,
+    estimateSize: () => pitch,
+    overscan: () => 6,
+    measure: () => false,
+  });
+  /** Page Up / Page Down: a page of rows, or in `virtual` a viewport's worth. */
+  const page = $derived(virtual ? Math.max(1, Math.floor(rowWindow.viewportSize / pitch)) : pageStep);
+  const bounds = $derived({ rows: rows.length + 1, cols: shownColumns.length + offset, page });
   const at = $derived(clampPoint(active, bounds));
+  /**
+   * `virtual`: the window, plus the active cell's row wherever it is. Focus
+   * in the grid is always on the active cell (`onfocusin` makes it so), so
+   * this keeps a focused cell or an open editor mounted however far the
+   * reader scrolls — and keeps the roving Tab stop in the DOM after focus
+   * has left, so Tab returns to it.
+   */
+  const parts = $derived(virtual ? rowWindow.parts(at.row > 0 ? at.row - 1 : undefined) : []);
 
   const batch = $derived(new Map(changes.map((change) => [cellKey(change.rowKey, change.column), change])));
   const lookup: CellLookup<T> = {
@@ -270,6 +326,43 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
       : [...found, entry];
   });
   const errorIndex = $derived(new Map(errors.map((error, index) => [error.key, index])));
+
+  /**
+   * `virtual`: read the scroller into the window. The body is visible from
+   * below the (sticky) header row to the scroller's bottom edge, so a row
+   * scrolled to `'auto'` is never left under the header.
+   */
+  function measureWindow(): void {
+    if (viewport === undefined || tbody === undefined) return;
+    const top = viewport.getBoundingClientRect().top + viewport.clientTop;
+    const visibleTop = Math.max(top, headerRow?.getBoundingClientRect().bottom ?? top);
+    rowWindow.viewportSize = Math.max(top + viewport.clientHeight - visibleTop, 0);
+    rowWindow.scrollOffset = visibleTop - tbody.getBoundingClientRect().top;
+  }
+
+  $effect(() => {
+    const target = viewport;
+    if (!virtual || target === undefined) return;
+    measureWindow();
+    const onChange = (): void => measureWindow();
+    target.addEventListener('scroll', onChange, { passive: true });
+    const resize = new ResizeObserver(onChange);
+    resize.observe(target);
+    return () => {
+      target.removeEventListener('scroll', onChange);
+      resize.disconnect();
+    };
+  });
+
+  /** `virtual`: scroll body row `index` (0-based) fully into view, so the window renders it. */
+  function bringIntoView(index: number): void {
+    if (!virtual || viewport === undefined) return;
+    measureWindow();
+    const delta = rowWindow.alignedOffset(index, 'auto') - rowWindow.scrollOffset;
+    if (Math.abs(delta) < 1) return;
+    viewport.scrollBy({ top: delta, behavior: 'instant' });
+    measureWindow();
+  }
 
   const select = (next: Set<string>): void => {
     selected = next;
@@ -298,6 +391,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
 
   function focusPoint(point: GridPoint): void {
     active = point;
+    if (point.row > 0) bringIntoView(point.row - 1);
     flushSync();
     const cell = cellElement(point);
     const target = cell?.querySelector('[data-grid-target]') ?? cell;
@@ -626,7 +720,13 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     this={column.rowHeader ? 'th' : 'td'}
     scope={column.rowHeader ? 'row' : undefined}
     role={column.rowHeader ? 'rowheader' : 'gridcell'}
-    class={['relative', column.rowHeader && 'font-normal', columnClass(column)]}
+    class={[
+      'relative',
+      column.rowHeader && 'font-normal',
+      // A fixed-height row: the editor's field takes the cell's vertical padding.
+      virtual && edit?.key === key && 'py-0',
+      columnClass(column),
+    ]}
     data-grid-row={point.row}
     data-grid-col={point.col}
     aria-colindex={point.col + 1}
@@ -651,7 +751,15 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     id={own?.id}
     aria-rowindex={rowOffset + index + 2}
     aria-selected={selectable ? selected.has(key) : undefined}
-    class={['hover:bg-base-200', selectable && selected.has(key) && 'bg-base-200', own?.class]}
+    style:height={virtual ? `${pitch}px` : undefined}
+    class={[
+      'hover:bg-base-200',
+      selectable && selected.has(key) && 'bg-base-200',
+      // `table-zebra` counts `nth-child`, which the spacers would throw off.
+      virtual && zebra && index % 2 === 1 && 'bg-base-200',
+      virtual && 'whitespace-nowrap',
+      own?.class,
+    ]}
   >
     {#if selectable}{@render selectCell(row, key, index + 1)}{/if}
     {#each shownColumns as column, col (column.key)}
@@ -695,14 +803,33 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
   </div>
 {/snippet}
 
+{#snippet spacer(size: number)}
+  <tr aria-hidden="true" style:height="{size}px">
+    <td colspan={shownColumns.length + offset} style:padding="0" style:border="0"></td>
+  </tr>
+{/snippet}
+
+{#snippet virtualRows()}
+  {#each parts as part, position (part.kind === 'row' ? `r${pageKeys[part.index]}` : `s${position}`)}
+    {#if part.kind === 'spacer'}
+      {@render spacer(part.size)}
+    {:else}
+      {@const row = rows[part.index]}
+      {#if row !== undefined}{@render bodyRow(row, part.index)}{/if}
+    {/if}
+  {/each}
+{/snippet}
+
 {#snippet body()}
-  <tbody>
+  <tbody bind:this={tbody}>
     {#if rows.length === 0}
       <tr>
         <td role="gridcell" colspan={shownColumns.length + offset} class="text-base-content/60 py-8 text-center">
           {#if emptyState}{@render emptyState()}{:else}{emptyMessage}{/if}
         </td>
       </tr>
+    {:else if virtual}
+      {@render virtualRows()}
     {:else}
       {#each rows as row, index (rowKey(row))}
         {@render bodyRow(row, index)}
@@ -729,7 +856,15 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
 {@render errorSummary()}
 {@render descriptions()}
 
-<div class="overflow-x-auto">
+<!-- `virtual`: this is the scroller the window reads; its height and the
+     table's zero row spacing are inline because the row arithmetic depends
+     on them. -->
+<div
+  bind:this={viewport}
+  class="overflow-x-auto"
+  style:max-height={virtual ? viewportHeight : undefined}
+  style:overflow-y={virtual ? 'auto' : undefined}
+>
   <table
     {...rest}
     bind:this={table}
@@ -741,10 +876,11 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     class={[
       'table bg-base-100',
       tableSize[size],
-      zebra && 'table-zebra',
-      pinRows && 'table-pin-rows',
+      zebra && !virtual && 'table-zebra',
+      (pinRows || virtual) && 'table-pin-rows',
       className,
     ]}
+    style:border-spacing={virtual ? '0' : undefined}
     {onkeydown}
     {onfocusin}
     {onfocusout}
@@ -755,7 +891,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
       </caption>
     {/if}
     <thead>
-      <tr aria-rowindex={1}>
+      <tr bind:this={headerRow} aria-rowindex={1}>
         {#if selectable}{@render selectHeader()}{/if}
         {#each shownColumns as column, col (column.key)}
           {@render columnHeader(column, col + offset)}

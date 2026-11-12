@@ -12,6 +12,7 @@ import { render } from 'vitest-browser-svelte';
 import type { CellChange } from '../../src/lib/data/table-types.ts';
 import DataGridFixture from './fixtures/DataGridFixture.svelte';
 import EditableDataGridFixture from './fixtures/EditableDataGridFixture.svelte';
+import VirtualDataGridFixture from './fixtures/VirtualDataGridFixture.svelte';
 
 /** The body rows' first data cells (past any selection cell), in render order. */
 const names = (): string[] =>
@@ -478,4 +479,154 @@ test('an editing grid keeps row selection, as a column of boxes the grid moves t
     .toHaveFocus();
   await userEvent.keyboard('{ArrowDown}{ArrowRight}');
   expect(focusedText()).toBe('Basil');
+});
+
+// `virtual`: 5,000 rows of 40 px in a 400 px scroller (#427).
+
+const frame = (): Promise<void> => new Promise((resolve) => requestAnimationFrame(() => resolve()));
+
+/** The `aria-rowindex` of every body row in the DOM, in DOM order. */
+const rowIndexes = (): number[] =>
+  [...document.querySelectorAll('tbody tr[aria-rowindex]')].map((row) =>
+    Number(row.getAttribute('aria-rowindex')),
+  );
+
+/** The scroller the grid windows against: the table's parent. */
+function scrollerOf(grid: Element): HTMLElement {
+  const scroller = grid.parentElement;
+  if (scroller === null) throw new Error('no scroller');
+  return scroller;
+}
+
+async function scrollTo(scroller: HTMLElement, top: number): Promise<void> {
+  scroller.scrollTop = top;
+  scroller.dispatchEvent(new Event('scroll'));
+  await frame();
+  await frame();
+}
+
+/** The `aria-rowindex` of the row holding focus. */
+const focusedRowIndex = (): number =>
+  Number(document.activeElement?.closest('tr')?.getAttribute('aria-rowindex'));
+
+test('a virtual grid of 5,000 rows holds only a window, with absolute row indexes', async () => {
+  const screen = await render(VirtualDataGridFixture);
+  const grid = screen.getByRole('grid', { name: 'Plants' });
+  await expect.element(grid).toHaveAttribute('aria-rowcount', '5001');
+  await expect.poll(() => rowIndexes().length).toBeGreaterThan(0);
+  expect(rowIndexes().length).toBeLessThan(40);
+  expect(rowIndexes()[0]).toBe(2);
+  // No pager: the whole result is one scrolling grid.
+  expect(screen.getByRole('navigation', { name: 'Pagination' }).elements()).toHaveLength(0);
+
+  await scrollTo(scrollerOf(grid.element()), 2500 * 40);
+  await expect.poll(rowIndexes).toContain(2502);
+  const shown = rowIndexes();
+  expect(shown.length).toBeLessThan(40);
+  // The first row is the active cell's, the grid's Tab stop, kept mounted;
+  // the rest are the window.
+  const [tabStopRow, ...inWindow] = shown;
+  expect(tabStopRow).toBe(2);
+  expect(Math.min(...inWindow)).toBeGreaterThan(2480);
+  expect(Math.max(...inWindow)).toBeLessThan(2530);
+  // A row's index is its place in the whole result: row 2,501 is "Plant 2500".
+  const row = grid.element().querySelector('tr[aria-rowindex="2501"]');
+  expect(row?.textContent).toContain('Plant 2500');
+  // The spacers standing in for the rest are hidden.
+  const spacers = [...grid.element().querySelectorAll('tbody tr:not([aria-rowindex])')];
+  expect(spacers).toHaveLength(2);
+  expect(spacers[0]?.previousElementSibling?.getAttribute('aria-rowindex')).toBe('2');
+  for (const spacer of spacers) expect(spacer).toHaveAttribute('aria-hidden', 'true');
+});
+
+test('a virtual grid navigates past its window by keyboard, rendering each row first', async () => {
+  const screen = await render(VirtualDataGridFixture);
+  await userEvent.click(screen.getByRole('gridcell', { name: 'Plant 1', exact: true }));
+  expect(focusedText()).toBe('Plant 1');
+
+  // Page Down moves by a viewport of rows, well past the initial window.
+  await userEvent.keyboard('{PageDown}{PageDown}{PageDown}{PageDown}');
+  const paged = focusedRowIndex();
+  expect(paged).toBeGreaterThan(30);
+  expect(focusedText()).toBe(`Plant ${paged - 1}`);
+  await userEvent.keyboard('{ArrowDown}{ArrowDown}');
+  expect(focusedText()).toBe(`Plant ${paged + 1}`);
+  await userEvent.keyboard('{PageUp}');
+  expect(focusedRowIndex()).toBeLessThan(paged + 2);
+
+  await userEvent.keyboard('{Control>}{End}{/Control}');
+  expect(focusedText()).toBe('Chile');
+  expect(focusedRowIndex()).toBe(5001);
+  await userEvent.keyboard('{Home}');
+  expect(focusedText()).toBe('Plant 5000');
+  expect(rowIndexes().length).toBeLessThan(40);
+
+  await userEvent.keyboard('{Control>}{Home}{/Control}');
+  expect(focusedText()).toBe('Name');
+  await userEvent.keyboard('{ArrowDown}');
+  expect(focusedText()).toBe('Plant 1');
+  expect(screen.getByRole('grid').element().querySelectorAll('[tabindex="0"]')).toHaveLength(1);
+});
+
+test('a virtual grid keeps the focused cell, and an open editor, mounted while scrolled away', async () => {
+  const screen = await render(VirtualDataGridFixture);
+  const grid = screen.getByRole('grid').element();
+  const scroller = scrollerOf(grid);
+  const first = screen.getByRole('gridcell', { name: 'Plant 1', exact: true });
+  await userEvent.click(first);
+
+  await scrollTo(scroller, 3000 * 40);
+  await expect.poll(rowIndexes).toContain(3002);
+  // Still in the DOM, first in index order, and still focused.
+  expect(rowIndexes()[0]).toBe(2);
+  expect(document.activeElement).toBe(first.element());
+  // Moving from it brings its neighbour back into the window.
+  await userEvent.keyboard('{ArrowDown}');
+  expect(focusedText()).toBe('Plant 2');
+  expect(focusedRowIndex()).toBe(3);
+
+  // An open editor survives the same.
+  await userEvent.keyboard('{Enter}');
+  const input = screen.getByRole('textbox', { name: 'Name' });
+  await expect.element(input).toHaveFocus();
+  await scrollTo(scroller, 4000 * 40);
+  await expect.poll(rowIndexes).toContain(4002);
+  await expect.element(input).toHaveFocus();
+  await userEvent.keyboard(' edited{Enter}');
+  expect(screen.getByTestId('changes').element().textContent).toContain(
+    'p2.name:Plant 2>Plant 2 edited',
+  );
+  // Enter moved down, scrolling row 4 back into view.
+  expect(focusedText()).toBe('Plant 3');
+
+  // Once focus leaves the grid, the active row stays mounted as its Tab
+  // stop, so Shift+Tab from after the grid returns to it.
+  const after = screen.getByRole('button', { name: 'After' });
+  after.element().focus();
+  await scrollTo(scroller, 4000 * 40 + 1);
+  await expect.poll(rowIndexes).toContain(4002);
+  expect(rowIndexes()[0]).toBe(4);
+  expect(grid.querySelectorAll('[tabindex="0"]')).toHaveLength(1);
+  await userEvent.tab({ shift: true });
+  expect(focusedText()).toBe('Plant 3');
+});
+
+test('a virtual grid’s error summary scrolls a distant row into the window and focuses its cell', async () => {
+  const screen = await render(VirtualDataGridFixture);
+  await expect.element(screen.getByRole('status').first()).toHaveTextContent('1 cell has an error');
+  expect(rowIndexes()).not.toContain(4201);
+
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Plant 4200, Count: Must not be negative.' }),
+  );
+  const cell = screen.getByRole('gridcell', { name: '-4' });
+  await expect.element(cell).toHaveFocus();
+  expect(focusedRowIndex()).toBe(4201);
+  await expect.element(cell).toHaveAttribute('aria-invalid', 'true');
+  await expect.element(cell).toHaveAccessibleDescription('Must not be negative.');
+  // Scrolled into view, below the header, not merely mounted.
+  const scroller = scrollerOf(screen.getByRole('grid').element());
+  const box = cell.element().getBoundingClientRect();
+  expect(box.bottom).toBeLessThanOrEqual(scroller.getBoundingClientRect().bottom + 1);
+  expect(box.top).toBeGreaterThanOrEqual(scroller.getBoundingClientRect().top);
 });

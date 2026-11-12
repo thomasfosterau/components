@@ -139,6 +139,46 @@ export function alignedOffset(
   }
 }
 
+/**
+ * One entry of a windowed body, in index order: a rendered row, or a spacer
+ * standing in for the unrendered rows between two rendered ones.
+ */
+export type VirtualPart =
+  | { readonly kind: 'row'; readonly index: number }
+  | { readonly kind: 'spacer'; readonly size: number };
+
+/**
+ * What a windowed body renders: the rows in `range`, the `pinned` row (the
+ * one holding focus) even when it is outside the range, and a spacer for
+ * every gap, so DOM order is index order and the scroll height is the whole
+ * list's. Shared by `VirtualList` and the virtual editing `DataGrid`.
+ */
+export function windowParts(
+  offsets: Float64Array,
+  range: VirtualRange,
+  pinned: number | undefined,
+): VirtualPart[] {
+  const count = offsets.length - 1;
+  const out: VirtualPart[] = [];
+  let cursor = 0;
+  const take = (from: number, to: number): void => {
+    if (from > cursor) {
+      out.push({ kind: 'spacer', size: offsetAt(offsets, from) - offsetAt(offsets, cursor) });
+    }
+    for (let index = Math.max(from, cursor); index < to; index += 1)
+      out.push({ kind: 'row', index });
+    cursor = Math.max(cursor, to);
+  };
+  const pin = pinned !== undefined && pinned >= 0 && pinned < count ? pinned : undefined;
+  if (pin !== undefined && pin < range.start) take(pin, pin + 1);
+  take(range.start, range.end);
+  if (pin !== undefined && pin >= range.end) take(pin, pin + 1);
+  if (cursor < count) {
+    out.push({ kind: 'spacer', size: offsetAt(offsets, count) - offsetAt(offsets, cursor) });
+  }
+  return out;
+}
+
 /** Getters, so the component's current props are read at call time. */
 export interface VirtualWindowOptions {
   readonly count: () => number;
@@ -191,6 +231,11 @@ export class VirtualWindow {
   /** Where row `index` starts, in px into the list. */
   offsetOf(index: number): number {
     return offsetAt(this.offsets, index);
+  }
+
+  /** The rendered rows and spacers, keeping row `pinned` mounted wherever it is. */
+  parts(pinned: number | undefined): VirtualPart[] {
+    return windowParts(this.offsets, this.range, pinned);
   }
 
   /** The scroll offset that puts row `index` where `align` says. */
