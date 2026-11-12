@@ -42,12 +42,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      # Vite+ provides Node.js and the pnpm that package.json's `packageManager`
+      # names; the install stays the explicit `--ignore-scripts` step below.
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
         with:
-          node-version: '*'
-          check-latest: true
-          cache: pnpm
+          node-version: 'lts'
+          cache: true
+          run-install: false
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Select mode
@@ -71,12 +73,14 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      # Vite+ provides Node.js and the pnpm that package.json's `packageManager`
+      # names; the install stays the explicit `--ignore-scripts` step below.
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
         with:
-          node-version: '*'
-          check-latest: true
-          cache: pnpm
+          node-version: 'lts'
+          cache: true
+          run-install: false
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Create or update the version PR
@@ -115,24 +119,24 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-
+      # Vite+ provides Node.js and the pnpm that package.json's `packageManager`
+      # names; the install stays the explicit `--ignore-scripts` step below.
+      #
       # No `registry-url`: that writes an `.npmrc` whose `_authToken` reads
       # `NODE_AUTH_TOKEN`, and a configured token — even an empty placeholder
       # — is what npm tries instead of OIDC.
       #
       # The job publishes with the npm this Node bundles; there is no npm
       # upgrade step (#84). Trusted Publishing needs npm >= 11.5.1, which
-      # every Node release since 24.5.0 bundles.
-      #
-      # Never `latest`: setup-node resolves it to the first nodejs.org index
-      # entry, pre-releases included, so Release would publish on an alpha.
-      # `*` + `check-latest` is the newest stable release.
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      # every Node release since 24.5.0 bundles, so the Node is pinned to the
+      # latest LTS rather than left to `engines`, whose range admits Node 22
+      # (npm 10).
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
         with:
-          node-version: '*'
-          check-latest: true
-          cache: pnpm
+          node-version: 'lts'
+          cache: true
+          run-install: false
 
       # `--ignore-scripts`, unlike CI's setup action: no install script runs in
       # the job that holds `id-token: write`. Nothing on the build path needs
