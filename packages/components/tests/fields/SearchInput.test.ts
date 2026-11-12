@@ -12,7 +12,7 @@ test('the label names the field even with nothing visible beside it', async () =
 });
 
 test('onInput fires on every keystroke', async () => {
-  const onInput = vi.fn();
+  const onInput = vi.fn<(query: string) => void>();
   const screen = await render(SearchInput, { label: 'Search taxa', onInput });
 
   await userEvent.fill(screen.getByRole('searchbox'), 'rosa');
@@ -22,7 +22,7 @@ test('onInput fires on every keystroke', async () => {
 });
 
 test('Enter submits the current text', async () => {
-  const onSubmit = vi.fn();
+  const onSubmit = vi.fn<(query: string) => void>();
   const screen = await render(SearchInput, { label: 'Search taxa', value: 'rosa', onSubmit });
 
   await userEvent.click(screen.getByRole('searchbox'));
@@ -32,8 +32,8 @@ test('Enter submits the current text', async () => {
 });
 
 test('the clear button is labelled, empties the field and reports both callbacks', async () => {
-  const onInput = vi.fn();
-  const onClear = vi.fn();
+  const onInput = vi.fn<(query: string) => void>();
+  const onClear = vi.fn<() => void>();
   const screen = await render(SearchInput, {
     label: 'Search taxa',
     value: 'rosa',

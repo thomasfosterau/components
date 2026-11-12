@@ -157,7 +157,6 @@ export default defineConfig({
       // follow-up pays them down. A new site is a defect, not headroom; a rule
       // whose count reaches zero goes back to `error` and its line is deleted.
       'typescript/no-unsafe-type-assertion': 'warn', // 115 sites, mostly test doubles and DOM lookups
-      'vitest/require-mock-type-parameters': 'warn', // 74 sites, `vi.fn()` without a signature
     },
     // Nothing that ships may import a module SvelteKit only resolves inside an
     // app (AGENTS.md § Common pitfalls). The package tsconfigs extend

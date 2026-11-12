@@ -65,14 +65,14 @@ test('clicking the fourth star sets the bound value to 4', async () => {
 });
 
 test('a wrapping form posts the value under name', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(RatingFormFixture, { onSubmitted });
 
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
   expect(onSubmitted).toHaveBeenCalledOnce();
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.get('score')).toBe('3');
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.get('score')).toBe('3');
 });
 
 test('formatValue sets the spoken value', async () => {
@@ -105,7 +105,7 @@ test('invalid sets aria-invalid', async () => {
 });
 
 test('disabled blocks keys and clicks and posts nothing', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(RatingFormFixture, { disabled: true, onSubmitted });
 
   const slider = screen.getByRole('slider');
@@ -119,6 +119,6 @@ test('disabled blocks keys and clicks and posts nothing', async () => {
   await expect.element(slider).toHaveAttribute('aria-valuenow', '3');
 
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.has('score')).toBe(false);
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.has('score')).toBe(false);
 });

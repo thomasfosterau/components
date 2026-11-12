@@ -57,12 +57,12 @@ test('Escape closes the listbox and focus returns to the trigger', async () => {
 });
 
 test('a wrapping form posts one entry per selected value', async () => {
-  const onSubmitted = vi.fn();
+  const onSubmitted = vi.fn<(data: FormData) => void>();
   const screen = await render(MultiSelectFixture, { values: ['Moist', 'Full sun'], onSubmitted });
 
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
-  const data = onSubmitted.mock.calls[0]?.[0] as FormData;
-  expect(data.getAll('conditions')).toEqual(['Full sun', 'Moist']);
+  const data = onSubmitted.mock.calls[0]?.[0];
+  expect(data?.getAll('conditions')).toEqual(['Full sun', 'Moist']);
 });
 
 test('a disabled option cannot be selected', async () => {
