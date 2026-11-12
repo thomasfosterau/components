@@ -11,10 +11,12 @@ afterEach(() => {
 /** Make `prefers-reduced-motion: reduce` match (or not) for this test. */
 const reduceMotion = (reduce: boolean): void => {
   const original = window.matchMedia.bind(window);
-  vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
-    ...original(query),
-    matches: query.includes('prefers-reduced-motion') ? reduce : original(query).matches,
-  }));
+  vi.spyOn(window, 'matchMedia').mockImplementation((query) => {
+    const list = original(query);
+    if (!query.includes('prefers-reduced-motion')) return list;
+    // An own `matches` shadows the prototype getter on this one instance.
+    return Object.defineProperty(list, 'matches', { value: reduce });
+  });
 };
 
 test('at the top of the page it is out of the accessibility tree; past the threshold it appears', async () => {
