@@ -72,6 +72,20 @@
       "message": "@thomasfosterau/charts is independent of the Svelte packages (packages/charts/AGENTS.md § Boundary)."
     },
     {
+      "id": "import-core-independent",
+      "kind": "banned-import",
+      "specifiers": [
+        "svelte",
+        "$app",
+        "$env",
+        "@thomasfosterau/components",
+        "@thomasfosterau/components-mapbox",
+        "@thomasfosterau/charts"
+      ],
+      "files": ["packages/import/src/**"],
+      "message": "The `.` entry of @thomasfosterau/components-import is headless: plain TypeScript over Effect that an app server can import, with no Svelte and none of the other packages. The UI lands in its own `./svelte` entry (packages/import/AGENTS.md § Boundary)."
+    },
+    {
       "id": "svelte-packages-independent-of-charts",
       "kind": "banned-import",
       "specifiers": ["@thomasfosterau/charts"],

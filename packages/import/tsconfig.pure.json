@@ -1,0 +1,12 @@
+{
+  // The headless core must run anywhere an app's code does: the browser that
+  // maps the rows, the server that replays a `{ file, spec }`, and a Web
+  // Worker later. With no `dom` lib and no ambient `@types/*`, any `document`,
+  // `window` or `node:` reference in `src` fails `check`.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["esnext"],
+    "types": []
+  },
+  "include": ["src"]
+}

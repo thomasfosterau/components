@@ -22,6 +22,7 @@
     "packages/charts/src/prosemirror/index.ts",
     "packages/charts/src/svelte/index.ts",
     "packages/charts/src/vega/index.ts",
+    "packages/import/src/index.ts",
     "packages/*/src/stories/**/*.stories.{ts,svelte}",
     "packages/*/tests/**/*.test.ts",
     "packages/*/tests/setup.ts",
@@ -39,16 +40,21 @@
     "packages/charts/swift/**"
   ],
   "ignoreDependencies": [
-    // The root's `workspace:*` dependencies on the three packages exist for
+    // The root's `workspace:*` dependencies on the four packages exist for
     // the task graph, not for an import: they are the edges the root `check`
     // task's `{ from: 'dependencies' }` follows into every package.
     "@thomasfosterau/charts",
     "@thomasfosterau/components",
+    "@thomasfosterau/components-import",
     "@thomasfosterau/components-mapbox",
     // Used for their bins only: `tsc` (packages/charts `check`, TS7) and
     // `svelte-package` (the Svelte packages' `build`).
     "@typescript/native",
-    "@sveltejs/package"
+    "@sveltejs/package",
+    // Not a package: the name packages/charts' and packages/import's
+    // tsconfig.json give the `@effect/language-service` compiler plugin,
+    // which the Effect-patched native `tsc` (`@effect/tsgo`) serves itself.
+    "@effect/language-service"
   ],
   "rulePacks": ["fallow-rules.json"],
   "rules": {
@@ -79,7 +85,8 @@
       { "name": "charts-core", "patterns": ["packages/charts/src/core/**"] },
       { "name": "charts-svelte", "patterns": ["packages/charts/src/svelte/**"] },
       { "name": "charts-prosemirror", "patterns": ["packages/charts/src/prosemirror/**"] },
-      { "name": "charts-vega", "patterns": ["packages/charts/src/vega/**"] }
+      { "name": "charts-vega", "patterns": ["packages/charts/src/vega/**"] },
+      { "name": "import", "patterns": ["packages/import/src/**"] }
     ],
     "rules": [
       { "from": "components", "allow": [] },
@@ -91,7 +98,15 @@
       // (packages/charts/tsconfig.svelte.json).
       { "from": "charts-svelte", "allow": [] },
       { "from": "charts-prosemirror", "allow": ["charts-spec", "charts-core"] },
-      { "from": "charts-vega", "allow": ["charts-spec", "charts-core"] }
+      { "from": "charts-vega", "allow": ["charts-spec", "charts-core"] },
+      // The headless core reaches no other package by relative path; the
+      // package-name and Svelte bans are fallow-rules.json's
+      // `import-core-independent`. It is the one place outside
+      // packages/charts/src/spec and the /entity-form files that imports
+      // `effect`: that pack bans `effect` per package (each rule names its
+      // files), and leaves packages/import out on purpose, since `effect` is
+      // its required peer (packages/import/AGENTS.md § Boundary).
+      { "from": "import", "allow": [] }
     ]
   },
   "duplicates": {
