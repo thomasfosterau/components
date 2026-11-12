@@ -156,7 +156,7 @@ export default defineConfig({
       // these rules found when they were turned on, at `warn` until the
       // follow-up pays them down. A new site is a defect, not headroom; a rule
       // whose count reaches zero goes back to `error` and its line is deleted.
-      'typescript/no-unsafe-type-assertion': 'warn', // 115 sites, mostly test doubles and DOM lookups
+      'typescript/no-unsafe-type-assertion': 'warn', // 102 sites, mostly test doubles and DOM lookups
       'no-shadow': 'warn', // 2 sites, both in `.svelte`
     },
     // Nothing that ships may import a module SvelteKit only resolves inside an
