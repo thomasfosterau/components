@@ -144,13 +144,10 @@ updates:
           ]
     assignees:
       - thomasfosterau
-  # Each action updates in its own PR (no group). `directories`, not `directory: '/'`: the
-  # local composite action under .github/actions/setup pins actions too, and
-  # `/` covers only .github/workflows (the Swift workflow included).
+  # Each action updates in its own PR (no group). `/` covers .github/workflows
+  # (the Swift workflow included).
   - package-ecosystem: 'github-actions'
-    directories:
-      - '/'
-      - '/.github/actions/setup'
+    directory: '/'
     schedule:
       interval: 'weekly'
       day: 'monday'
