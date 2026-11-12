@@ -106,6 +106,20 @@ A range bar is a `bar` with an end channel: one row per task (`y`), a bar from i
 }
 ```
 
+The first task is the top row in every interpreter. `ganttSpec` builds the same shape from plain rows, sorting them by start and listing the tasks in that order in `scales.y.domain`:
+
+```ts
+import { ganttSpec } from '@thomasfosterau/charts';
+
+const spec = ganttSpec(rows, {
+  task: 'task',
+  start: 'start',
+  end: 'end',
+  group: 'bed',
+  title: 'Planting calendar',
+});
+```
+
 ### Example: a plant taxonomy (spec 1.1)
 
 A `tree` draws one node per row, joined to the row its `parent` names (`null` for a root). Nodes are laid out tidily: leaves in depth-first order, each parent centred over its children.
@@ -192,6 +206,7 @@ if (result.ok) {
 | `encodeSpec(spec: ChartSpec): unknown` | Encodes a spec back to a plain JSON-safe value for persisting (for example into ProseMirror node attrs). Throws if `spec` does not satisfy the schema. |
 | `isInlineData(data: Data): data is InlineData` | `true` when the spec's data is inline `values`. |
 | `isDataRef(data: Data): data is DataRef` | `true` when the spec's data is an external `ref`. |
+| `ganttSpec(rows: readonly Datum[], options: GanttOptions): ChartSpec` | Builds a spec 1.1 range-bar chart (a Gantt): the rows sorted by `options.start` (an unreadable start goes last; ties keep input order). `y` is the nominal `task`, `x` / `x2` are `start` / `end`, and `color` is the nominal `group` when given. `scales.y.domain` lists the tasks in start order, so the earliest is the top row in every interpreter; with `time: 'quantitative'`, `scales.x.zero` is `false`. `GanttOptions` is `{ task; start; end; group?; title?; time? = 'temporal' }` (field names; `time` is `'temporal' \| 'quantitative'`). Pure: the input rows are not mutated. |
 
 #### Classes and constants
 
@@ -270,7 +285,7 @@ Geometry is in **plot** coordinates: translate by `dimensions.margins.left` / `.
 | --- | --- |
 | `resolveChart(spec: unknown, box: Box, data?: DataRows, options?: ResolveChartOptions): ResolvedChart` | `validateSpec` then `computeContext` and `buildDataTable`, with every failure returned as a message instead of thrown: `Invalid chart spec: …`, a data `ref` with no `data` passed, or the error the core threw. A newer `1.N` spec draws from its known subset (`degradation` says what was ignored); one whose mark is unknown resolves to `unsupported` with its `table`, which the interpreters show in place of a drawing. The bundled Svelte `Chart` component renders its `error` message as its fallback. |
 | `buildDataTable(spec: ChartSpec \| UnsupportedMarkSpec, rows: DataRows, options?: DataTableOptions): DataTable` | The chart's data as a table, the text alternative every interpreter renders: one column per encoded channel headed by its field (`x` with `x2`, or `y` with `y2`, as one "start to end" column; a channel repeating an earlier column's field is left out), one row per datum, each cell formatted by the declared type (numbers as written, dates as ISO 8601, the date alone at UTC midnight, missing values empty). A `tree` lists each node (its label, else its id) with its parent, named by label where there is a `label` channel. The caption is `config.title`. Throws `TypeError` when a value contradicts its declared type. |
-| `computeContext(spec: ChartSpec, box: Box, data?: DataRows, options?: ComputeContextOptions): ChartContext` | Turns a parsed spec, the measured outer box and resolved rows into a `ChartContext`. `data`, when passed, is used instead of the spec's inline values; it is required when the spec's data is a `ref` (otherwise throws `Error`). Throws `TypeError` when a value contradicts its channel's declared type. x maps onto `[0, plot.width]` and y onto `[plot.height, 0]`, so larger values sit higher. Without both `x` and `y` encodings the geometry is empty. |
+| `computeContext(spec: ChartSpec, box: Box, data?: DataRows, options?: ComputeContextOptions): ChartContext` | Turns a parsed spec, the measured outer box and resolved rows into a `ChartContext`. `data`, when passed, is used instead of the spec's inline values; it is required when the spec's data is a `ref` (otherwise throws `Error`). Throws `TypeError` when a value contradicts its channel's declared type. x maps onto `[0, plot.width]`. A continuous y (`quantitative`, `temporal`) maps onto `[plot.height, 0]`, so larger values sit higher; a categorical y (`nominal`, `ordinal`) maps onto `[0, plot.height]`, so the first category is the top band or point, as in Vega-Lite and ChartSpecKit. Without both `x` and `y` encodings the geometry is empty. |
 | `computeDimensions(outer: Box, margins?: Partial<Margins>): Dimensions` | Fills missing margins from `DEFAULT_MARGINS` and subtracts them from the box; the plot width and height are clamped at zero. |
 | `makeAccessor(channel: Channel): (datum: Datum) => FieldValue` | A typed reader for one channel: `quantitative` → finite number, `temporal` → `Date` (ISO 8601 string or epoch ms), `ordinal` / `nominal` → string (numbers and booleans stringified). Missing and `null` values read as `null`; a value contradicting the declared type throws `TypeError`. |
 | `resolvePositionalScale(channel: Channel, mark: Mark, pixelRange: readonly [number, number], data: DataRows, hint?: ScaleHint): PositionalScale` | Builds an x or y scale from the channel's type: `quantitative` → linear, `temporal` → UTC time, `ordinal` / `nominal` → band (padding 0.1) for `bar`, point (padding 0.5) otherwise. A continuous `hint.domain` with at least two entries supplies its first and last as the domain (otherwise the data extent is used); a categorical one is used whole. `hint.zero` (default `true` on a `bar` mark, else `false`) extends a linear domain to include zero, and `hint.nice` rounds linear and UTC domains. A single-value domain is padded (±1, or ±1 day). |
@@ -547,8 +562,8 @@ The v1 mark set is deliberately the intersection of the native charting vocabula
 | --- | --- | --- | --- | --- | --- | --- |
 | `quantitative` | ✅ linear scale | ✅ | 🔵 `Double` plottable | 🔵 | 🔵 | Values must be finite JSON numbers |
 | `temporal` | ✅ UTC scale | ✅ | 🔵 `Date` plottable | 🔵 | 🔵 | ISO 8601 strings or epoch ms; decoders reconstruct dates from the declared type, never sniff |
-| `ordinal` | ✅ band/point scale | ✅ | 🟡 treated as categorical | 🟡 | 🔵 | Ordering is data order |
-| `nominal` | ✅ band/point scale | ✅ | 🔵 `String` plottable | 🔵 | 🔵 |  |
+| `ordinal` | ✅ band/point scale | ✅ | 🟡 treated as categorical | 🟡 | 🔵 | Ordering is data order; on `y`, the first category is at the top in every interpreter |
+| `nominal` | ✅ band/point scale | ✅ | 🔵 `String` plottable | 🔵 | 🔵 | On `y`, the first category is at the top in every interpreter |
 
 ### Data
 
