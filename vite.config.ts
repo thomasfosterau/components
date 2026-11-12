@@ -258,6 +258,10 @@ export default defineConfig({
           // `EntityForm` component's props), and `packages/charts`' spec
           // types describe a JSON document, whose keys are present or absent.
           'effect/prefer-option-over-null': 'error',
+          // The owner's family-wide decision (2026-11-12): a conditional
+          // spread of an empty object (`...(cond ? { a } : {})`) is spelled
+          // as explicit construction instead.
+          'effect/no-conditional-empty-object-spread': 'error',
         },
       },
       // The `/entity-form` renderer: `effect` is an optional peer of this
