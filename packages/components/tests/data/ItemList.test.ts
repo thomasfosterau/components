@@ -53,6 +53,37 @@ test('feed mode: Page Down / Page Up move focus between articles', async () => {
   expect(document.activeElement).toBe(articles[1]);
 });
 
+test('feed mode: Ctrl+End / Ctrl+Home leave the feed for the focusable element after / before it', async () => {
+  const screen = await render(ItemListFixture, {
+    feed: true,
+    label: 'Recent posts',
+    surround: true,
+  });
+
+  screen.getByRole('link', { name: 'Herb spiral' }).element().focus();
+  await userEvent.keyboard('{Control>}{End}{/Control}');
+  await expect.element(screen.getByRole('button', { name: 'After the feed' })).toHaveFocus();
+
+  screen.getByRole('link', { name: 'Herb spiral' }).element().focus();
+  await userEvent.keyboard('{Control>}{Home}{/Control}');
+  await expect.element(screen.getByRole('button', { name: 'Before the feed' })).toHaveFocus();
+});
+
+test('feed mode: with nothing focusable on that side, Ctrl+End is left to the browser', async () => {
+  const screen = await render(ItemListFixture, { feed: true, label: 'Recent posts' });
+
+  const link = screen.getByRole('link', { name: 'Herb spiral' }).element();
+  link.focus();
+  const event = new KeyboardEvent('keydown', {
+    key: 'End',
+    ctrlKey: true,
+    bubbles: true,
+    cancelable: true,
+  });
+  link.dispatchEvent(event);
+  expect(event.defaultPrevented).toBe(false);
+});
+
 test('lazyRender lets the browser skip off-screen rows, keeping them in the DOM', async () => {
   const screen = await render(ItemListFixture, { lazyRender: true });
 
