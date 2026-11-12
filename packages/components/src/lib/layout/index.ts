@@ -34,6 +34,7 @@ export { default as ListDetailLayout } from './ListDetailLayout.svelte';
 export { default as Main } from './Main.svelte';
 export { default as SkipLink } from './SkipLink.svelte';
 export { default as Navbar } from './Navbar.svelte';
+export { default as NavigationRail } from './NavigationRail.svelte';
 export { default as PageHeader } from './PageHeader.svelte';
 export { default as Section } from './Section.svelte';
 export { default as Sidebar } from './Sidebar.svelte';
@@ -42,5 +43,6 @@ export { default as SupportingPane } from './SupportingPane.svelte';
 export { default as Tabs } from './Tabs.svelte';
 export { default as VStack } from './VStack.svelte';
 
+export type { ExpandedAt, MediumAt, NavBreakpoints, NavDestination } from './nav-destination.ts';
 export * from './space.ts';
 export * from './types.ts';
