@@ -2,7 +2,7 @@
 
 A data import mapper: take a table a user has (a CSV, a worksheet, a table in a document) and turn it into records of your app's [Effect Schema](https://effect.website), with every row that does not fit reported field by field and cell by cell. The mapping is a plain, versioned JSON spec, so you can store it and offer it again as a preset.
 
-This release is the headless core: the target descriptor, the spec and the mapping engine. The Svelte UI follows as a `./svelte` entry.
+This is the headless core: the target descriptor, the spec and the mapping engine. The Svelte UI follows as a `./svelte` entry. **Not yet published:** the package is `private` until the effect-document adapter and the UI land ([#139](https://github.com/thomasfosterau/components/issues/139)).
 
 ## Install
 

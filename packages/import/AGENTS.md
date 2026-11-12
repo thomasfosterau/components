@@ -8,6 +8,7 @@ It has packages/charts' shape (see [its AGENTS.md](../charts/AGENTS.md)): plain 
 
 - **Effect is the public API, not an implementation detail.** `importTarget` returns an `Effect`, `applyMapping` a `Stream`, the spec and descriptor are Effect Schemas and the errors are `Schema.TaggedError`s. So `effect` is the one required peer (`catalog:peers`, `^4.0.0`) rather than a dependency, and there is no `check-dist-types` script: the published `.d.mts` names `effect` on purpose. The code is developed on the workspace pin and written to run on 4.0.0.
 - **The whole of `src` and `tests` is Effect code** (`effectFiles` in the root `vite.config.ts`), so every Effect lint rule applies to the suite too.
+- **Private until it is usable.** `package.json` says `"private": true` and the package carries no changeset, so a Release run never tries to publish a package npm has no trusted publisher for. The PR that completes the usable surface (the effect-document adapter and the UI) removes `private`, adds the changeset, and flags the owner's one-time npm bootstrap ([PUBLISHING.md](../../PUBLISHING.md) §3).
 - **No Svelte yet.** `./svelte` arrives in slice 3, as `svelte-package` output after `vp pack` (charts' `/svelte` is the model), consuming this core through its published entry.
 
 ## Boundary
