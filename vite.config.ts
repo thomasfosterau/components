@@ -152,11 +152,6 @@ export default defineConfig({
       // `message` to a required one: a signature change, not a redundant
       // constructor, which is the only shape this rule reports here.
       'no-useless-constructor': 'off',
-      // Staged adoption of the categories above (#310): the sites
-      // these rules found when they were turned on, at `warn` until the
-      // follow-up pays them down. A new site is a defect, not headroom; a rule
-      // whose count reaches zero goes back to `error` and its line is deleted.
-      'typescript/no-unsafe-type-assertion': 'warn', // 102 sites, mostly test doubles and DOM lookups
     },
     // Nothing that ships may import a module SvelteKit only resolves inside an
     // app (AGENTS.md § Common pitfalls). The package tsconfigs extend
