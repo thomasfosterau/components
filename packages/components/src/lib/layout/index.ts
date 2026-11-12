@@ -18,6 +18,7 @@
  */
 
 export { default as AppShell } from './AppShell.svelte';
+export { default as BackToTop } from './BackToTop.svelte';
 export { default as BottomNav } from './BottomNav.svelte';
 export { default as BottomNavItem } from './BottomNavItem.svelte';
 export { default as Breadcrumbs } from './Breadcrumbs.svelte';
