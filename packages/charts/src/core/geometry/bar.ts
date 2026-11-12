@@ -24,7 +24,8 @@ interface BarArgs {
 /**
  * Builds bar chart geometry. Bars grow from the zero baseline, so negative
  * values produce bars below it. Band x-scales give bars their bandwidth;
- * continuous x-scales get a derived width. With a range channel (`x2` or
+ * continuous x-scales get a derived width (80% of an equal share of the plot
+ * width, at least 1 px). With a range channel (`x2` or
  * `y2`, spec 1.1) each bar spans from its start to its end instead: a
  * horizontal range bar (a Gantt row) for `x2`, a vertical one for `y2`.
  */

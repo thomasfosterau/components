@@ -9,9 +9,15 @@ export const CHART_SPEC_ATTRIBUTE = 'data-chart-spec';
 
 /** Options for {@link createChartNodeSpec}. */
 export interface ChartNodeSpecOptions {
-  /** The node group. Defaults to 'block'. */
+  /**
+   * The node group.
+   * @defaultValue 'block'
+   */
   readonly group?: string | undefined;
-  /** Extra class for the rendered DOM element. */
+  /**
+   * Class of the serialised `<div>`.
+   * @defaultValue 'chart-node'
+   */
   readonly className?: string | undefined;
 }
 
@@ -34,6 +40,13 @@ export function chartNodeAttrs(attrs: Attrs): ChartNodeAttrs {
  * spec — pure JSON, so document persistence (toJSON / fromJSON) carries the
  * spec with zero extra work. DOM serialisation stores the spec JSON in a
  * data attribute so copy/paste and HTML round-trips preserve it too.
+ *
+ * `toDOM` writes `<div class="chart-node" data-chart-spec="…">` with the
+ * encoded spec JSON (empty for a `null` spec). `parseDOM` reads it back and
+ * validates it: an invalid spec does not match the rule, leaving other rules
+ * to try. Nor does a newer `1.N` spec, since its parsed value drops what this
+ * version does not know and storing that would rewrite the document. The node
+ * is selectable and draggable.
  */
 export function createChartNodeSpec(options?: ChartNodeSpecOptions): NodeSpec {
   const className = options?.className ?? 'chart-node';

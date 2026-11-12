@@ -5,7 +5,7 @@ import type { EditorView, NodeView } from 'prosemirror-view';
 import { chartNodeAttrs } from './node-spec.ts';
 import { renderContextToSvg, renderDataTable, renderTreeOutline } from './render-svg.ts';
 
-/** Resolves a data reference to rows. The host (CMS) owns how refs are fetched. */
+/** Resolves a spec's data reference to rows at edit time. The host (CMS) owns how refs are fetched. A stale promise never overwrites a newer render. */
 export type DataResolver = (spec: ChartSpec) => DataRows | Promise<DataRows>;
 
 /** Options for {@link ChartNodeView} / {@link chartNodeViewFactory}. */
@@ -14,11 +14,12 @@ export interface ChartNodeViewOptions {
    * The box used to compute geometry when the editor element has no
    * measurable width yet. The SVG scales to its container via viewBox,
    * so this only sets the aspect ratio and coordinate precision.
+   * @defaultValue `{ width: 640, height: 360 }`
    */
   readonly defaultBox?: Box | undefined;
   /** Resolves data refs at edit time. Without it, ref-data charts show a placeholder. */
   readonly resolveData?: DataResolver | undefined;
-  /** Extra class for the wrapper element. */
+  /** Class for the wrapper element; replaces `'chart-node-view'`. */
   readonly className?: string | undefined;
 }
 
@@ -30,6 +31,20 @@ const DEFAULT_BOX: Box = { width: 640, height: 360 };
  * A NodeView is imperative DOM — exactly why the pure Layer 2 core pays off:
  * this class owns a plain <div>, computes geometry via the `/core` entry, and sets
  * SVG markup. No framework, no reactivity.
+ *
+ * `dom` is a `<div class="chart-node-view">` holding the rendered SVG. The
+ * spec is re-validated on every render, and the chart's data is appended as a
+ * visually hidden `<table data-chart-table>` after the SVG. For a newer `1.N`
+ * spec whose mark it cannot draw it shows
+ * `<div class="chart-node-view__unsupported" data-chart-unsupported>` with the
+ * message and the table, visible (`Unsupported chart type` when that spec's
+ * data is a `ref`, since `resolveData` takes a `ChartSpec`). Otherwise it
+ * shows a `<div class="chart-node-view__placeholder">` with a message: no
+ * chart configured, invalid spec, data stored externally when there is no
+ * `resolveData`, loading, failed to load, or the core's error. It measures its
+ * own width and keeps `defaultBox`'s aspect ratio. `update` re-renders for a
+ * node of the same type (and returns `false` for any other), `ignoreMutation`
+ * returns `true`, and `destroy` drops any pending async resolution.
  */
 export class ChartNodeView implements NodeView {
   /** The wrapper element ProseMirror mounts; it holds the SVG or a placeholder message. */

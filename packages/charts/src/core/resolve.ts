@@ -77,7 +77,8 @@ function resolveUnsupported(
 
 /**
  * Validates a spec and computes its geometry and data table, turning every
- * failure into a message rather than a throw: an invalid spec, a data
+ * failure into a message rather than a throw (`Invalid chart spec: …` for an
+ * invalid spec): an invalid spec, a data
  * reference with no resolved rows, or an error from {@link computeContext}.
  * A newer `1.N` spec with a mark this interpreter does not know resolves to
  * `unsupported`, which the interpreters render as a visible data table. The

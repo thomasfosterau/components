@@ -6,7 +6,7 @@
  * through the package boundary. A type-parity test asserts these stay
  * structurally identical to the schema-derived types.
  *
- * Design invariants (see the README § Capability matrix):
+ * Design invariants (see the capability matrix, https://github.com/thomasfosterau/components/blob/trunk/docs/charts-capability-matrix.md):
  * - Grammar-level only: marks and encodings, never geometry, pixels, or
  *   renderer names.
  * - Every encoding channel carries an explicit `type`; interpreters
@@ -29,7 +29,7 @@ export const SPEC_VERSION = '1.1';
  * The spec versions this interpreter knows. `'1.1'` adds the `x2` / `y2`
  * range channels and the `tree` mark; every `'1'` spec is a valid `'1.1'`
  * spec. A newer `'1.N'` document is parsed as `'1.1'`, its unknown keys
- * ignored (`validateSpec` reports them). See the README § Spec versioning
+ * ignored (`validateSpec` reports them). See https://github.com/thomasfosterau/components/blob/trunk/docs/charts-spec.md#spec-versioning
  * for the minor-version rule.
  */
 export type SpecVersion = '1' | '1.1';
@@ -42,7 +42,7 @@ export type SpecVersion = '1' | '1.1';
  * `tree` (spec 1.1): a hierarchy of labelled nodes joined by links, laid
  * out by the core. It is the first mark outside the intersection, allowed
  * because the core lays it out with no renderer dependency and every
- * interpreter column has a normative degradation (README § Capability matrix).
+ * interpreter column has a normative degradation (https://github.com/thomasfosterau/components/blob/trunk/docs/charts-capability-matrix.md).
  */
 export type Mark = 'bar' | 'line' | 'point' | 'area' | 'tree';
 
@@ -64,7 +64,10 @@ export interface TreeOptions {
  */
 export type FieldType = 'quantitative' | 'ordinal' | 'nominal' | 'temporal';
 
-/** A mapping from a data field to a visual channel, with an explicit type. */
+/**
+ * A mapping from a data field to a visual channel, with an explicit type.
+ * Interpreters read values by the declared `type`, never by sniffing.
+ */
 export interface Channel {
   /** The name of the field in each datum that this channel reads. */
   readonly field: string;
@@ -72,7 +75,12 @@ export interface Channel {
   readonly type: FieldType;
 }
 
-/** Field-to-channel mappings. At minimum, `x` and `y` are expected for all v1 marks. */
+/**
+ * Field-to-channel mappings. Every v1 mark needs `x` and `y` to draw anything;
+ * `x2` / `y2` (spec 1.1) make a `bar` a range bar. `id` / `parent` / `label`
+ * (spec 1.1) belong to the `tree` mark, which takes no positional channels.
+ * `opacity` is parsed but not resolved by the core.
+ */
 export interface Encoding {
   readonly x?: Channel;
   readonly y?: Channel;
@@ -138,7 +146,10 @@ export interface ScaleHint {
   readonly domain?: ReadonlyArray<number | string>;
   /** Round the domain to human-friendly values. */
   readonly nice?: boolean;
-  /** Force the domain to include zero. */
+  /**
+   * Force the domain to include zero. The TS core defaults it to `true` on a
+   * bar chart's quantitative axes and `false` elsewhere; an explicit hint wins.
+   */
   readonly zero?: boolean;
 }
 
@@ -150,6 +161,7 @@ export interface Scales {
 
 /** Portable presentation hints honoured (or gracefully ignored) by every interpreter. */
 export interface Config {
+  /** The chart's title: its accessible name, and drawn above the plot by the Svelte and ProseMirror interpreters. */
   readonly title?: string;
   /** Whether tooltips are enabled. A trivial declarative hint — real interaction is per-platform. */
   readonly tooltip?: boolean;

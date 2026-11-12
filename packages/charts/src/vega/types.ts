@@ -43,7 +43,7 @@ export type VegaLiteData =
   | { readonly values: ReadonlyArray<Record<string, unknown>> }
   | { readonly url: string };
 
-/** A single-view Vega-Lite specification. */
+/** The single-view Vega-Lite subset the emitter produces, typed structurally rather than imported from `vega-lite`. */
 export interface VegaLiteSpec {
   readonly $schema: string;
   readonly title?: string;

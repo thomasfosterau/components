@@ -16,7 +16,9 @@ import type { DataRows, DomainValue, ResolvedScale } from './types.ts';
 
 /**
  * Default categorical palette (Tableau 10). Interpreters may override; the
- * core resolves concrete colours so geometry is directly drawable.
+ * core resolves concrete colours so geometry is directly drawable. Colours
+ * repeat past ten categories, and the bundled interpreters draw uncoloured
+ * marks in the first entry.
  */
 export const CATEGORICAL_PALETTE: ReadonlyArray<string> = [
   '#4e79a7',
@@ -62,6 +64,13 @@ export type PositionalScale =
  * - `temporal` → UTC time (UTC for cross-platform determinism)
  * - `ordinal`/`nominal` → band for bar marks (bars need bandwidth),
  *   point for line/point/area marks (single positions)
+ *
+ * Band padding is 0.1 and point padding 0.5. A continuous `hint.domain` with
+ * at least two entries supplies its first and last as the domain (otherwise
+ * the data extent is used); a categorical one is used whole. `hint.zero`
+ * (default `true` on a `bar` mark, else `false`) extends a linear domain to
+ * include zero, and `hint.nice` rounds linear and UTC domains. A single-value
+ * domain is padded (±1, or ±1 day).
  */
 export function resolvePositionalScale(
   channel: Channel,
@@ -236,6 +245,8 @@ function resolveCategorical(
  * - `ordinal`/`nominal` → categorical palette
  * - `quantitative`/`temporal` → normalised [0, 1] linear scale; interpreters
  *   map the normalised value onto their own gradient
+ *
+ * Categories take palette colours in first-seen order.
  */
 export function resolveColorScale(channel: Channel, data: DataRows): ResolvedScale {
   if (channel.type === 'ordinal' || channel.type === 'nominal') {
@@ -278,7 +289,8 @@ export function resolveColorScale(channel: Channel, data: DataRows): ResolvedSca
 /**
  * Resolves the size scale for point marks: quantitative values map onto a
  * radius range with square-root scaling so symbol *area* is proportional to
- * the value.
+ * the value. Only numeric (quantitative) values map; its `kind` reads
+ * `'linear'`.
  */
 export function resolveSizeScale(channel: Channel, data: DataRows): ResolvedScale {
   const accessor = makeAccessor(channel);

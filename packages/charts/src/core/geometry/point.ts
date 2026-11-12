@@ -6,7 +6,10 @@ import { positionOf } from './position.ts';
 import { colorOfDatum } from './series.ts';
 import type { PointCircle, PointGeometry } from './types.ts';
 
-/** Builds scatter/point chart geometry: one circle per datum. */
+/**
+ * Builds scatter/point chart geometry: one circle per datum. The radius comes
+ * from `sizeScale`, else `DEFAULT_POINT_RADIUS`.
+ */
 export function buildPointGeometry(args: {
   readonly data: DataRows;
   readonly x: Channel;
