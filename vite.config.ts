@@ -253,6 +253,13 @@ export default defineConfig({
           // their names), never by named import. `recommended` already sets
           // it to `error`; it is pinned here so a preset change cannot drop it.
           'effect/prefer-namespace-imports': 'error',
+          // The owner's family-wide decision (2026-11-11): in Effect code an
+          // optional value is `Option`, never `T | null` / `T | undefined`.
+          // Pinned for the same reason as the rule above. The one file it
+          // cannot apply to is turned off below with the reason (the
+          // `EntityForm` component's props), and `packages/charts`' spec
+          // types describe a JSON document, whose keys are present or absent.
+          'effect/prefer-option-over-null': 'error',
         },
       },
       // The `/entity-form` renderer: `effect` is an optional peer of this
