@@ -1,5 +1,54 @@
 # @thomasfosterau/components-mapbox
 
+## 0.2.1
+
+### Patch Changes
+
+- 68e2369: Ship `CHANGELOG.md` in the published tarball, so the release notes can be read from `node_modules`.
+- 73b78ad: Move README-only detail (pointer gestures, GeoJSON import and export behaviour, the static URL builder, setup notes) into the components' and functions' doc comments.
+- Updated dependencies [9f53870]
+- Updated dependencies [7aa2738]
+- Updated dependencies [86bacc2]
+- Updated dependencies [cb3f67b]
+- Updated dependencies [ef9e721]
+- Updated dependencies [6db0d60]
+- Updated dependencies [68e2369]
+- Updated dependencies [b54bc28]
+- Updated dependencies [39fd56a]
+- Updated dependencies [79bca1b]
+- Updated dependencies [f7555c3]
+- Updated dependencies [997267f]
+- Updated dependencies [3db54ca]
+- Updated dependencies [a38ca26]
+- Updated dependencies [3b25d65]
+- Updated dependencies [75ab32f]
+- Updated dependencies [f1879e3]
+- Updated dependencies [3eb8680]
+- Updated dependencies [354da77]
+- Updated dependencies [d430bea]
+- Updated dependencies [a8e5d40]
+- Updated dependencies [7bcf07d]
+- Updated dependencies [bbfa889]
+- Updated dependencies [0ca5f78]
+- Updated dependencies [dd816c5]
+- Updated dependencies [bcf17cb]
+- Updated dependencies [358def9]
+- Updated dependencies [02c9a15]
+- Updated dependencies [4ae400f]
+- Updated dependencies [ee91c53]
+- Updated dependencies [97ca323]
+- Updated dependencies [3c3e3dd]
+- Updated dependencies [0791dc5]
+- Updated dependencies [3c5fead]
+- Updated dependencies [10559d3]
+- Updated dependencies [71fee82]
+- Updated dependencies [f928c70]
+- Updated dependencies [3f0a379]
+- Updated dependencies [db4c330]
+- Updated dependencies [9462b18]
+- Updated dependencies [844c76f]
+  - @thomasfosterau/components@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes

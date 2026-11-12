@@ -1,5 +1,26 @@
 # @thomasfosterau/charts
 
+## 0.2.0
+
+### Minor Changes
+
+- b127260: **Breaking (0.x minor): a categorical `y` now runs top-down.** In the core, and so in the Svelte and ProseMirror interpreters, a `nominal` or `ordinal` `y` puts its first category at the top band or point. Before this release it was at the bottom. This matches what Vega-Lite and ChartSpecKit already drew, so one spec now reads the same in every interpreter. A continuous `y` (`quantitative`, `temporal`) is unchanged and still runs bottom-up.
+
+  **Migration.** A chart that relied on the old order (the first category at the bottom) can restore it by reversing its categories in `scales.y.domain`. That also flips it in Vega-Lite and Swift, so the interpreters stay in agreement. A chart that passed a reversed `scales.y.domain` to work around the old order can drop it.
+
+  New: `ganttSpec(rows, { task, start, end, group?, title?, time? })`, a pure builder for a spec 1.1 range-bar Gantt. It sorts the rows by start, so the earliest task is the top row in every interpreter.
+
+- 691db3c: Degrade newer `1.N` specs, and render every chart's data as a table.
+
+  - `parseSpec` / `validateSpec` read a `specVersion` of `'1.N'` above `'1.1'` as `'1.1'`, ignoring keys they do not know and reporting them (with the declared version) as the result's `degradation`. An unknown mark fails validation with `unsupported` (the spec's known fields), and `parseSpec` throws the new `UnsupportedMarkError`, a `SpecValidationError`. `'1'` and `'1.1'` stay strict, other majors are rejected, and the JSON Schema is unchanged. `SpecValidationError#name` is now typed `string`.
+  - `/core`: `buildDataTable` turns a spec and its rows into a text table (a range as "start to end", a tree's nodes with their parents). `resolveChart` returns it as `table`, passes `degradation` through, and resolves an unknown mark to a new `'unsupported'` kind; code that treats every non-`'error'` result as `'ready'` must handle it.
+  - `/svelte` `Chart` renders the table visually hidden beside the SVG, and visible for an unsupported mark (new `tableLabel`, `rangeSeparator` and `unsupportedMessage` props). `/prosemirror` adds `renderDataTable` and does the same in the NodeView; `parseDOM` does not take a newer `1.N` spec. `/vega` throws `'unsupported-mark'` for any mark it does not know.
+
+### Patch Changes
+
+- 68e2369: Ship `CHANGELOG.md` in the published tarball, so the release notes can be read from `node_modules`.
+- 7739ecc: Doc comments: the exports now carry the defaults, throws, scale rules, geometry details and markup the README's API reference used to hold (`computeContext`, `resolvePositionalScale`, the geometry builders, `buildDataTable`, `ganttSpec`, `emitVegaLite`, `createChartNodeSpec`, `ChartNodeView`, the Svelte `Chart` and more). The README is short; the spec and capability matrix are guides under `docs/`.
+
 ## 0.1.0
 
 ### Minor Changes
