@@ -1,5 +1,5 @@
 <!-- @component
-A `Table` with client-side sorting, filtering across every column and paging, for a list that is already entirely in hand — and, with `editing`, an APG grid of editable cells.
+A `Table` with client-side sorting, filtering across every column and paging, for a list that is already entirely in hand — and, with `editing`, an APG grid of editable cells, paged or (`virtual`) windowed for thousands of rows.
 -->
 <!--
   DataGrid — the three controls a reader wants over a list that is already
@@ -33,6 +33,18 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
   its save settles (cell) or until the caller clears `changes` (batch).
   `onSelect` does not apply to an editing grid — a row cannot be both a
   button and a row of cells.
+
+  `virtual` (editing grids only) replaces paging with windowing, for an
+  import of thousands of rows: the whole sorted, filtered result is one
+  scrolling grid at most `viewportHeight` tall, only the rows in view (and
+  a few either side) are in the DOM, and `aria-rowcount` / `aria-rowindex`
+  still count the whole result. Rows are a fixed `rowHeight` and do not
+  wrap. Arrow keys, Page Up / Page Down, Ctrl+Home / Ctrl+End and the error
+  summary reach any row, scrolling it into the window first, and the
+  active cell's row (focused, editing, or the Tab stop) stays mounted while
+  scrolled away. Paging stays the
+  default; `paginated` and the pager do not apply to a virtual grid. A
+  read-only list that long belongs in `VirtualList`.
 
   ARIA contract: the `Table`'s and the `Pagination`'s. The filter is a
   `<input type="search">` with a real label (visually hidden, because the
@@ -194,6 +206,24 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
      */
     changedLabel?: string | undefined;
     /**
+     * An editing grid: window the rows (`VirtualList`'s windowing) instead of
+     * paging them, so only the rows in view are in the DOM. For thousands of
+     * rows. Ignored while `editing` is `'none'`.
+     * @defaultValue `false`
+     */
+    virtual?: boolean | undefined;
+    /**
+     * `virtual`: every body row's height in px. Rows are fixed at it, so it
+     * must fit a row's content on one line, an open editor included.
+     * @defaultValue by `size`: `36` (xs), `40` (sm), `48` (md), `64` (lg), `76` (xl)
+     */
+    rowHeight?: number | undefined;
+    /**
+     * `virtual`: the scrolling grid's maximum height, any CSS length.
+     * @defaultValue `'32rem'`
+     */
+    viewportHeight?: string | undefined;
+    /**
      * Locale(s) for `Intl` formatting.
      * @defaultValue the components context's `locale()`
      */
@@ -248,6 +278,9 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
       `${error.column.header} for ${rowName(error.row)} was not saved: ${error.message}`,
     saveFailedLabel = 'The change could not be saved.',
     changedLabel = 'Changed',
+    virtual = false,
+    rowHeight,
+    viewportHeight = '32rem',
     locales = getComponentsContext().locale(),
     class: className,
     ...rest
@@ -266,6 +299,9 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
   let page = $state(0);
 
   const limit = $derived(chosenSize === 0 ? pageSize : chosenSize);
+  /** A virtual editing grid windows the whole result instead of paging it. */
+  const windowed = $derived(virtual && editing !== 'none');
+  const paged = $derived(paginated && !windowed);
 
   const filtered = $derived.by(() => {
     const needle = filter.trim().toLowerCase();
@@ -296,7 +332,7 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
   });
 
   const total = $derived(sorted.length);
-  const pageCount = $derived(paginated ? Math.max(1, Math.ceil(total / limit)) : 1);
+  const pageCount = $derived(paged ? Math.max(1, Math.ceil(total / limit)) : 1);
   // A filter that shrinks the result out from under the current page would
   // otherwise leave the reader looking at an empty body with rows they cannot
   // reach. Clamping in a derivation rather than in the filter's handler keeps
@@ -304,7 +340,7 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
   // shrank without anyone typing.
   const current = $derived(Math.min(page, pageCount - 1));
   const visible = $derived(
-    paginated ? sorted.slice(current * limit, current * limit + limit) : sorted,
+    paged ? sorted.slice(current * limit, current * limit + limit) : sorted,
   );
   const from = $derived(total === 0 ? 0 : current * limit + 1);
   const to = $derived(Math.min((current + 1) * limit, total));
@@ -315,7 +351,7 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
     const indexOf = (): number => sorted.findIndex((candidate) => rowKey(candidate) === key);
     if (indexOf() === -1) filter = '';
     const index = indexOf();
-    if (paginated && index !== -1) page = Math.floor(index / limit);
+    if (paged && index !== -1) page = Math.floor(index / limit);
   }
 
   /** A new sort re-orders the whole result, so the reader's place in the old order means nothing. */
@@ -378,9 +414,12 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
       {editing}
       {onCellCommit}
       rowCount={total}
-      rowOffset={paginated ? current * limit : 0}
-      pageStep={paginated ? limit : 10}
+      rowOffset={paged ? current * limit : 0}
+      pageStep={paged ? limit : 10}
       onReveal={reveal}
+      virtual={windowed}
+      {rowHeight}
+      {viewportHeight}
       {caption}
       {captionHidden}
       {size}
@@ -414,7 +453,7 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
     />
   {/if}
 
-  {#if paginated && total > 0}
+  {#if paged && total > 0}
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-2">
         <p class="text-base-content/70 text-sm tabular-nums">{showingLabel(from, to, total)}</p>

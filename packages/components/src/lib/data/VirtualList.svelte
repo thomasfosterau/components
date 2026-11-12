@@ -160,27 +160,13 @@ A list of thousands of rows that mounts only the rows in or near the viewport, w
 
   /** The window, any pinned row outside it, and spacers for every gap, in index order. */
   const parts = $derived.by((): readonly Part[] => {
-    const { start, end } = view.range;
     const pinned = pinnedKey === undefined ? undefined : indexByKey.get(pinnedKey);
-    const out: Part[] = [];
-    let cursor = 0;
-    const take = (from: number, to: number): void => {
-      if (from > cursor) {
-        out.push({ kind: 'spacer', id: `s${out.length}`, size: view.offsetOf(from) - view.offsetOf(cursor) });
-      }
-      for (const [offset, item] of items.slice(from, to).entries()) {
-        const index = from + offset;
-        out.push({ kind: 'row', id: `r${String(keys[index])}`, item, index });
-      }
-      cursor = Math.max(cursor, to);
-    };
-    if (pinned !== undefined && pinned < start) take(pinned, pinned + 1);
-    take(start, end);
-    if (pinned !== undefined && pinned >= end) take(pinned, pinned + 1);
-    if (cursor < items.length) {
-      out.push({ kind: 'spacer', id: `s${out.length}`, size: view.totalSize - view.offsetOf(cursor) });
-    }
-    return out;
+    return view.parts(pinned).flatMap((part, position): Part[] => {
+      if (part.kind === 'spacer') return [{ kind: 'spacer', id: `s${position}`, size: part.size }];
+      const item = items[part.index];
+      if (item === undefined) return [];
+      return [{ kind: 'row', id: `r${String(keys[part.index])}`, item, index: part.index }];
+    });
   });
 
   /** Read the viewport's position relative to the list into the window. */

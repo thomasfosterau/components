@@ -11,6 +11,7 @@ import {
   rowOffsets,
   visibleRange,
   VirtualWindow,
+  windowParts,
 } from '../../src/lib/data/virtual.svelte.ts';
 
 test('fixed sizes: offsets are multiples of the size', () => {
@@ -103,4 +104,38 @@ test('VirtualWindow ignores measurements when rows are fixed', () => {
   });
   view.setSize(0, 500);
   expect(view.totalSize).toBe(90);
+});
+
+test('window parts: the range between spacers, plus a pinned row outside it, in index order', () => {
+  const offsets = rowOffsets(100, () => 10);
+  expect(windowParts(offsets, { start: 0, end: 3 }, undefined)).toEqual([
+    { kind: 'row', index: 0 },
+    { kind: 'row', index: 1 },
+    { kind: 'row', index: 2 },
+    { kind: 'spacer', size: 970 },
+  ]);
+  // A row pinned before the window keeps its place, with a spacer either side.
+  expect(windowParts(offsets, { start: 50, end: 52 }, 10)).toEqual([
+    { kind: 'spacer', size: 100 },
+    { kind: 'row', index: 10 },
+    { kind: 'spacer', size: 390 },
+    { kind: 'row', index: 50 },
+    { kind: 'row', index: 51 },
+    { kind: 'spacer', size: 480 },
+  ]);
+  // Pinned after the window, or inside it, or out of the list altogether.
+  expect(windowParts(offsets, { start: 0, end: 1 }, 99)).toEqual([
+    { kind: 'row', index: 0 },
+    { kind: 'spacer', size: 980 },
+    { kind: 'row', index: 99 },
+  ]);
+  expect(windowParts(offsets, { start: 0, end: 2 }, 1)).toHaveLength(3);
+  expect(windowParts(offsets, { start: 0, end: 2 }, 500)).toHaveLength(3);
+  expect(
+    windowParts(
+      rowOffsets(0, () => 10),
+      { start: 0, end: 0 },
+      undefined,
+    ),
+  ).toEqual([]);
 });

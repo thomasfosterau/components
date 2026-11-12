@@ -135,6 +135,25 @@
 
   const lineKey = (contact: Contact): string => contact.line;
 
+  const givenNames = ['Ada', 'Grace', 'Alan', 'Katherine', 'Edsger', 'Barbara', 'Donald', 'Frances'];
+  const familyNames = ['Lovelace', 'Hopper', 'Turing', 'Johnson', 'Dijkstra', 'Liskov', 'Knuth', 'Allen'];
+
+  // A 5,000-row import generated here (no network), with a problem every
+  // 750 lines so the error summary has distant rows to reach (#427).
+  const pick = (list: readonly string[], index: number): string => list[index % list.length] ?? '';
+
+  const largeImport: readonly Contact[] = Array.from({ length: 5000 }, (_, index) => {
+    const given = pick(givenNames, index);
+    const family = pick(familyNames, Math.floor(index / givenNames.length));
+    const broken = index % 750 === 749;
+    return {
+      line: String(index + 2),
+      name: index % 1500 === 1499 ? '' : `${given} ${family}`,
+      email: broken ? `${given.toLowerCase()}@example` : `${given.toLowerCase()}.${index}@example.org`,
+      age: 18 + ((index * 13) % 70),
+    };
+  });
+
   const patch = <T,>(row: T, change: CellChange<T>): T => ({ ...row, [change.column]: change.to });
 
   const { Story } = defineMeta({
@@ -155,6 +174,8 @@
   let prices = $state<readonly Product[]>(products);
   let contacts = $state<readonly Contact[]>(imported);
   let pending = $state<CellChange<Contact>[]>([]);
+  let bulk = $state<readonly Contact[]>(largeImport);
+  let bulkPending = $state<CellChange<Contact>[]>([]);
 
   /** A pretend server: half a second, and it refuses any price over 100. */
   async function savePrice(change: CellChange<Product>, signal: AbortSignal): Promise<void> {
@@ -171,6 +192,14 @@
       pending.reduce((row, change) => (change.rowKey === row.line ? patch(row, change) : row), contact),
     );
     pending = [];
+  }
+
+  function saveBulk(): void {
+    const byLine = Map.groupBy(bulkPending, (change) => change.rowKey);
+    bulk = bulk.map((contact) =>
+      (byLine.get(contact.line) ?? []).reduce((row, change) => patch(row, change), contact),
+    );
+    bulkPending = [];
   }
 </script>
 
@@ -258,6 +287,29 @@
     />
     <Button onclick={saveBatch} disabled={pending.length === 0}>
       Save {pending.length} change{pending.length === 1 ? '' : 's'}
+    </Button>
+  </div>
+</Story>
+
+<Story name="Large import (virtual, 5,000 rows)">
+  <!-- `virtual` windows the rows instead of paging them: only the rows in
+       view are in the DOM, yet every row states its place in all 5,001, the
+       arrow and Page keys reach any row, and each summary entry scrolls its
+       distant row into view and focuses the cell. -->
+  <div class="space-y-3">
+    <DataGrid
+      rows={bulk}
+      columns={contactColumns}
+      rowKey={lineKey}
+      filterable
+      caption="Imported contacts (5,000)"
+      editing="batch"
+      virtual
+      viewportHeight="28rem"
+      bind:changes={bulkPending}
+    />
+    <Button onclick={saveBulk} disabled={bulkPending.length === 0}>
+      Save {bulkPending.length} change{bulkPending.length === 1 ? '' : 's'}
     </Button>
   </div>
 </Story>
