@@ -1,7 +1,21 @@
 import { assert, describe, it } from '@effect/vitest';
+import type * as Document from '@thomasfosterau/effect-document/schema';
 import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
-import { decodeImportSpec, ImportSpec, type FieldMapping } from '../src/index.ts';
+import { decodeImportSpec, ImportSpec, TableLocator, type FieldMapping } from '../src/index.ts';
+
+/** Mutual assignability in both directions. */
+type Equals<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;
+
+/**
+ * Compile-time: what the `TableLocator` Schema decodes is effect-document's
+ * `TableLocator`, and so is the exported type. `check` fails on drift.
+ */
+const locatorParity: [
+  Equals<Schema.Schema.Type<typeof TableLocator>, Document.TableLocator>,
+  Equals<TableLocator, Document.TableLocator>,
+  Equals<ImportSpec['source']['table'], Document.TableLocator>,
+] = [true, true, true];
 
 /** One field of every `FieldMapping` kind, so the version-1 format is pinned whole. */
 const everyKind = {
@@ -94,4 +108,15 @@ describe('ImportSpec', () => {
       assert.strictEqual(error._tag, 'SchemaError');
     }),
   );
+});
+
+describe('TableLocator', () => {
+  it('is effect-document’s locator type (compile-time)', () => {
+    assert.deepStrictEqual(locatorParity, [true, true, true]);
+  });
+
+  it('decodes a locator effect-document gives', () => {
+    const locator: Document.TableLocator = [2, 'body', 0];
+    assert.deepStrictEqual(Schema.decodeSync(TableLocator)(locator), locator);
+  });
 });

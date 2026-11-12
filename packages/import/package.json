@@ -37,11 +37,14 @@
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
+    "@thomasfosterau/effect-document": "catalog:",
+    "@thomasfosterau/effect-parse": "catalog:",
     "@types/node": "catalog:",
     "effect": "catalog:",
     "typescript": "catalog:"
   },
   "peerDependencies": {
+    "@thomasfosterau/effect-document": "catalog:peers",
     "effect": "catalog:peers"
   }
 }

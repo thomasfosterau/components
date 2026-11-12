@@ -2,6 +2,8 @@
  * `@thomasfosterau/components-import`: the headless core of the data import
  * mapper. The target descriptor, the mapping spec and the engine; plain
  * TypeScript over Effect, with no DOM, so an app server can import it too.
+ * Documents come from `@thomasfosterau/effect-document`: its candidate
+ * tables are the sources.
  *
  * @module
  */
@@ -37,7 +39,14 @@ export {
   TemplateMapping,
   ValueMapMapping,
 } from './spec.ts';
-export { sourceTableFromGrid, type SourceCell, type SourceRow, type SourceTable } from './table.ts';
+export { findRegion, regionRead, sourceTableFromRegion } from './region.ts';
+export {
+  sourceTableFromGrid,
+  type SourceCell,
+  type SourceRead,
+  type SourceRow,
+  type SourceTable,
+} from './table.ts';
 export {
   EnumMember,
   FieldDescriptor,

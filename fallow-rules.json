@@ -86,6 +86,13 @@
       "message": "The `.` entry of @thomasfosterau/components-import is headless: plain TypeScript over Effect that an app server can import, with no Svelte and none of the other packages. The UI lands in its own `./svelte` entry (packages/import/AGENTS.md § Boundary)."
     },
     {
+      "id": "effect-document-only-in-import",
+      "kind": "banned-import",
+      "specifiers": ["@thomasfosterau/effect-document", "@thomasfosterau/effect-parse"],
+      "files": ["packages/components/src/**", "packages/mapbox/src/**", "packages/charts/src/**"],
+      "message": "@thomasfosterau/effect-document is a required peer of @thomasfosterau/components-import alone (packages/import/AGENTS.md § Boundary); importing it from another package makes every consumer of that package install it."
+    },
+    {
       "id": "svelte-packages-independent-of-charts",
       "kind": "banned-import",
       "specifiers": ["@thomasfosterau/charts"],

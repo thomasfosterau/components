@@ -11,6 +11,7 @@
  * @module
  */
 
+import type { TableLocator as DocumentTableLocator } from '@thomasfosterau/effect-document/schema';
 import * as Schema from 'effect/Schema';
 
 /** A whole number from zero up: a row or column position, or a count. */
@@ -19,19 +20,20 @@ const Index = Schema.Int.check(Schema.isGreaterThanOrEqualTo(0));
 /**
  * Where a table is in its document: block indexes from the top, then
  * list-item, slide, shape and table-cell indexes, and parts such as
- * `"caption"` or `"body"`.
+ * `"caption"` or `"body"`, as `candidateTables` in
+ * `@thomasfosterau/effect-document` locates it (#188); `findRegion` finds the
+ * table again.
  *
- * Structurally identical to `TableLocator` in `@thomasfosterau/effect-document`
- * (`ReadonlyArray<number | string>`, from its candidate tables, #188). It is
- * defined here until that package's 0.2.0 release, when it becomes upstream's
- * type.
+ * The type is upstream's `TableLocator`. This Schema is how a stored spec
+ * decodes one (upstream has a type only); tests/spec.test.ts pins that the
+ * two stay mutually assignable.
  */
 export const TableLocator = Schema.Array(Schema.Union([Index, Schema.String])).annotate({
   identifier: 'TableLocator',
   description: 'Where the table is in its document, as effect-document locates it.',
 });
-/** The decoded type of {@link TableLocator}: `ReadonlyArray<number | string>`. */
-export type TableLocator = typeof TableLocator.Type;
+/** effect-document's `TableLocator`, which {@link TableLocator} decodes: `ReadonlyArray<number | string>`. */
+export type TableLocator = DocumentTableLocator;
 
 /**
  * A source column: by its header name, with a position to fall back on.
