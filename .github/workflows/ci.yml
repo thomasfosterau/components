@@ -64,11 +64,11 @@ jobs:
           restore-keys: |
             vp-task-v1-${{ runner.os }}-node-${{ matrix.node }}-
 
-      # Through `pnpm exec`, not node_modules/.bin on `GITHUB_PATH`: a file the
-      # install drops there must not shadow a system binary (zizmor's
-      # `github-env`).
+      # `vp` is the global CLI setup-vp put on PATH. Nothing here adds
+      # node_modules/.bin to `GITHUB_PATH`, so no installed file can shadow a
+      # system binary (zizmor's `github-env`).
       - name: vp run ci
-        run: pnpm exec vp run ci
+        run: vp run ci
 
   # The one required check: green only when every matrix leg is.
   ci:
