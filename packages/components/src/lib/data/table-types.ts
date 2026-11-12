@@ -14,6 +14,7 @@
  */
 
 import type { Snippet } from 'svelte';
+import type { FieldControl, FieldOptionInput } from '../fields/field-types.ts';
 
 /**
  * One column of a table.
@@ -60,6 +61,97 @@ export interface TableColumn<T> {
   readonly hideable?: boolean | undefined;
   /** Hidden until the reader shows it, while the table's `hiddenColumns` is unset. */
   readonly defaultHidden?: boolean | undefined;
+  /**
+   * Whether an editing `DataGrid` lets the reader edit this column's cells —
+   * for every row, or per row. `Table` ignores it.
+   */
+  readonly editable?: boolean | ((row: T) => boolean) | undefined;
+  /**
+   * The control an editable cell edits with: one of the library's own field
+   * primitives, or a snippet for anything else.
+   * @defaultValue `'text'`
+   */
+  readonly editor?: CellEditor<T> | undefined;
+  /**
+   * The value the editor starts from and a change's `from` — the raw value
+   * (a `boolean`, a `DateValue`), where `value` is the text shown and sorted.
+   * @defaultValue `value`
+   */
+  readonly editValue?: ((row: T) => unknown) | undefined;
+  /** The choices of a `'select'` editor. */
+  readonly options?: readonly FieldOptionInput[] | undefined;
+  /**
+   * The messages an edited value fails with; empty when it is valid. Also run
+   * over every row's current value, so data that arrives invalid is marked.
+   */
+  readonly validate?: ((value: unknown, row: T) => readonly string[]) | undefined;
+  /**
+   * A `'text'` editor's typed text to the value committed.
+   * @defaultValue the text itself
+   */
+  readonly parse?: ((input: string) => unknown) | undefined;
+  /**
+   * A value to text: a `'text'` editor's starting text, and an edited cell's
+   * content until the caller's `rows` catch up.
+   * @defaultValue locale-formatted numbers and dates, an option's label, else `String(value)`
+   */
+  readonly format?: ((value: unknown) => string) | undefined;
+}
+
+/** How a `DataGrid` takes edits: not at all, one cell at a time, or collected for one save. */
+export type TableEditing = 'none' | 'cell' | 'batch';
+
+/** One committed edit: which cell, and what it held before and after. */
+export interface CellChange<T> {
+  /** The edited row's `rowKey`. */
+  readonly rowKey: string;
+  /** The edited column's `key`. */
+  readonly column: string;
+  /** The row as the caller supplied it, before the edit. */
+  readonly row: T;
+  /** The column's `editValue` for the row before the edit. */
+  readonly from: unknown;
+  /** The committed value. */
+  readonly to: unknown;
+}
+
+/** What a snippet editor is handed. */
+export interface CellEditorContext<T> {
+  /** The value being edited — the draft, once `update` has been called. */
+  readonly value: unknown;
+  /** The row being edited. */
+  readonly row: T;
+  /** Replace the draft, which Enter or Tab then commits. */
+  readonly update: (value: unknown) => void;
+  /** Commit, and leave focus on the cell; with an argument, commit that value. */
+  readonly commit: (value?: unknown) => void;
+  /** Discard the draft and leave focus on the cell. */
+  readonly cancel: () => void;
+  /**
+   * The wiring to spread on the control: its `id`, `labelId` (the column
+   * header, for `aria-labelledby`), and the cell's error description.
+   */
+  readonly control: FieldControl;
+}
+
+/**
+ * A cell's editor: a field primitive (`TextInput`, `NumberField`, `Select`,
+ * `Checkbox`, `DateField`) by name, or a snippet. A `'checkbox'` cell has no
+ * edit mode — its box is in the cell, and Space toggles and commits it.
+ */
+export type CellEditor<T> =
+  | 'text'
+  | 'number'
+  | 'select'
+  | 'checkbox'
+  | 'date'
+  | Snippet<[CellEditorContext<T>]>;
+
+/** One cell in error, as the error summary lists it. */
+export interface CellError<T> {
+  readonly row: T;
+  readonly column: TableColumn<T>;
+  readonly message: string;
 }
 
 /**
