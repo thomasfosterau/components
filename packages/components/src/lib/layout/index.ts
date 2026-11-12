@@ -43,6 +43,6 @@ export { default as SupportingPane } from './SupportingPane.svelte';
 export { default as Tabs } from './Tabs.svelte';
 export { default as VStack } from './VStack.svelte';
 
-export * from './nav-destination.ts';
+export type { ExpandedAt, MediumAt, NavBreakpoints, NavDestination } from './nav-destination.ts';
 export * from './space.ts';
 export * from './types.ts';

@@ -287,7 +287,7 @@ The landmarks a page is assembled from, and the blocks that sit inside them. Str
 <AppShell {destinations} {brand} {account}>{@render children()}</AppShell>
 ```
 
-`layout` also exports `types.ts` (`Crumb`, `TabItem`, `FilterOption`, `TabsMode`, `TabsVariant`, `tabsVariant`, `tabsSize`) and `nav-destination.ts` (`NavDestination`, `NavBreakpoints`, `MediumAt`, `ExpandedAt` and the tier class tables `compactTier`, `compactPadding`, `mediumTier`, `expandedTier`).
+`layout` also exports `types.ts` (`Crumb`, `TabItem`, `FilterOption`, `TabsMode`, `TabsVariant`, `tabsVariant`, `tabsSize`) and `nav-destination.ts` (`NavDestination`, `NavBreakpoints`, `MediumAt`, `ExpandedAt`).
 
 ```svelte
 <script lang="ts">
