@@ -18,6 +18,8 @@
     previousLabel?: string | undefined;
     nextLabel?: string | undefined;
     paginationLabel?: string | undefined;
+    selection?: 'none' | 'single' | 'multiple' | undefined;
+    onSelect?: ((row: Row) => void) | undefined;
   }
 
   let {
@@ -34,7 +36,11 @@
     previousLabel,
     nextLabel,
     paginationLabel,
+    selection,
+    onSelect,
   }: Props = $props();
+
+  let selected = $state(new Set<string>());
 </script>
 
 <DataGrid
@@ -53,4 +59,9 @@
   {previousLabel}
   {nextLabel}
   {paginationLabel}
+  {selection}
+  {onSelect}
+  bind:selected
 />
+
+<p data-testid="selected">{[...selected].toSorted().join(',')}</p>

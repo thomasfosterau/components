@@ -1,9 +1,10 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import Table from '../../lib/data/Table.svelte';
-  import type { SortState, TableColumn } from '../../lib/data/table-types.ts';
+  import type { SortState, TableBulkActions, TableColumn } from '../../lib/data/table-types.ts';
   import Badge from '../../lib/ui/Badge.svelte';
   import Link from '../../lib/ui/Link.svelte';
+  import ToolbarButton from '../../lib/ui/ToolbarButton.svelte';
 
   interface Plant {
     readonly id: string;
@@ -59,10 +60,43 @@
   const tones = { Growing: 'success', Harvested: 'neutral', Failed: 'error' } as const;
 
   let selected = $state('');
+
+  // Bulk archive: the page owns the rows and the selection.
+  let growing = $state<readonly Plant[]>(plants);
+  let picked = $state(new Set<string>());
+  let archived = $state<readonly string[]>([]);
+
+  // Single select.
+  let chosen = $state(new Set<string>(['2']));
+
+  // Column visibility. A real page would persist `hidden` (a preference, a
+  // query parameter); a story must not write to `localStorage`, so it only
+  // shows the set the page would save.
+  let hidden = $state(new Set<string>(['family']));
+  const wideColumns: readonly TableColumn<Plant>[] = $derived.by(() => [
+    { key: 'name', header: 'Plant', value: (plant) => plant.name },
+    { key: 'family', header: 'Family', value: (plant) => plant.family },
+    { key: 'sown', header: 'Sown', value: (plant) => plant.sown },
+    { key: 'count', header: 'Seedlings', value: (plant) => plant.count, align: 'end' },
+    { key: 'status', header: 'Status', value: (plant) => plant.status, cell: statusCell, hideable: false },
+  ]);
 </script>
 
 {#snippet nameCell(plant: Plant)}
   <Link href={`/plants/${plant.id}`}>{plant.name}</Link>
+{/snippet}
+
+{#snippet archiveActions({ selected: keys, clear }: TableBulkActions)}
+  <ToolbarButton
+    onclick={() => {
+      archived = [...archived, ...growing.filter((plant) => keys.has(plant.id)).map((plant) => plant.name)];
+      growing = growing.filter((plant) => !keys.has(plant.id));
+      clear();
+    }}
+  >
+    Archive
+  </ToolbarButton>
+  <ToolbarButton onclick={clear}>Clear selection</ToolbarButton>
 {/snippet}
 
 {#snippet statusCell(plant: Plant)}
@@ -160,4 +194,53 @@
     caption="Everything sown this season"
     emptyMessage="Nothing sown yet — start with something quick."
   />
+</Story>
+
+<Story name="Bulk archive">
+  <!-- A checkbox column, a tri-state select-all over the rows shown, and a
+       toolbar of bulk actions that appears while anything is selected. -->
+  <div class="space-y-2">
+    <Table
+      rows={growing}
+      columns={plainColumns}
+      {rowKey}
+      caption="Seedlings"
+      selection="multiple"
+      bind:selected={picked}
+      bulkActions={archiveActions}
+    />
+    <p class="text-base-content/70 text-sm">Archived: {archived.length === 0 ? '—' : archived.join(', ')}</p>
+  </div>
+</Story>
+
+<Story name="Single select">
+  <div class="space-y-2">
+    <Table
+      rows={plants}
+      columns={plainColumns}
+      {rowKey}
+      caption="Choose the bed’s lead plant"
+      selection="single"
+      bind:selected={chosen}
+    />
+    <p class="text-base-content/70 text-sm">
+      Lead: {plants.find((plant) => chosen.has(plant.id))?.name ?? '—'}
+    </p>
+  </div>
+</Story>
+
+<Story name="Column visibility">
+  <!-- "Plant" names the row and cannot be hidden; "Status" opts out with
+       `hideable: false`. Hiding removes the cells, not just their paint. -->
+  <div class="space-y-2">
+    <Table
+      rows={plants}
+      columns={wideColumns}
+      {rowKey}
+      caption="Everything sown this season"
+      columnMenu
+      bind:hiddenColumns={hidden}
+    />
+    <p class="text-base-content/70 text-sm">Saved preference: hidden = [{[...hidden].join(', ')}]</p>
+  </div>
 </Story>

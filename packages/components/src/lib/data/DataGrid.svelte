@@ -19,6 +19,10 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
   filter the current page only, which reads as data loss rather than as a
   limitation.
 
+  Selection and hidden columns are `Table`'s, passed straight through.
+  Selections are keyed by `rowKey`, so they survive a sort, a filter and a
+  page change; the select-all header covers the page on screen.
+
   ARIA contract: the `Table`'s and the `Pagination`'s. The filter is a
   `<input type="search">` with a real label (visually hidden, because the
   control sits in a toolbar where a visible label would be the only one), and
@@ -31,9 +35,15 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
   import type { Size } from '../ui/tones.ts';
   import Pagination from './Pagination.svelte';
   import Table from './Table.svelte';
-  import type { SortState, TableColumn, TableRowAttributes } from './table-types.ts';
+  import type {
+    SortState,
+    TableChoiceProps,
+    TableColumn,
+    TableRowAttributes,
+  } from './table-types.ts';
 
-  interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+  /** `Table`'s selection and column props, passed through; `selected` and `hiddenColumns` bind. */
+  interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'>, TableChoiceProps<T> {
     /** Every row; sorting, filtering and paging happen here. */
     rows: readonly T[];
     /** Column definitions: header, cell renderer, sort key. */
@@ -153,6 +163,17 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
     nextLabel = 'Next',
     paginationLabel = 'Pagination',
     sortLabel,
+    selection,
+    selected = $bindable(new Set<string>()),
+    onSelectionChange,
+    selectRowLabel,
+    selectAllLabel,
+    selectColumnLabel,
+    bulkActions,
+    selectedCountLabel,
+    hiddenColumns = $bindable(undefined),
+    columnMenu,
+    columnMenuLabel,
     locales = getComponentsContext().locale(),
     class: className,
     ...rest
@@ -240,6 +261,17 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
     {emptyMessage}
     {emptyState}
     {sortLabel}
+    {selection}
+    {onSelectionChange}
+    {selectRowLabel}
+    {selectAllLabel}
+    {selectColumnLabel}
+    {bulkActions}
+    {selectedCountLabel}
+    {columnMenu}
+    {columnMenuLabel}
+    bind:selected
+    bind:hiddenColumns
     bind:sort
     onSort={() => {
       // A new sort re-orders the whole result, so the reader's place in the

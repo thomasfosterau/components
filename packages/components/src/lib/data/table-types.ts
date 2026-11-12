@@ -52,6 +52,82 @@ export interface TableColumn<T> {
    * `'sr-only'` keeps a header for screen readers over visible cells.
    */
   readonly headerClass?: string | undefined;
+  /**
+   * Whether the reader may hide this column from the columns menu. The first
+   * column names the row and is never hideable, whatever this says.
+   * @defaultValue `true`
+   */
+  readonly hideable?: boolean | undefined;
+  /** Hidden until the reader shows it, while the table's `hiddenColumns` is unset. */
+  readonly defaultHidden?: boolean | undefined;
+}
+
+/**
+ * How a table lets the reader pick rows. `'multiple'` adds a checkbox column
+ * with a select-all header; `'single'` a radio column; `'none'` neither.
+ */
+export type TableSelection = 'none' | 'single' | 'multiple';
+
+/** What `Table`'s `bulkActions` snippet is handed while rows are selected. */
+export interface TableBulkActions {
+  /** The selected row keys, on every page. */
+  readonly selected: ReadonlySet<string>;
+  /** Empties the selection. */
+  readonly clear: () => void;
+}
+
+/**
+ * The row-selection and column-visibility props `Table` takes and `DataGrid`
+ * passes through — declared once so the two cannot drift.
+ */
+export interface TableChoiceProps<T> {
+  /**
+   * Let the reader pick rows: a checkbox column (`'multiple'`) or a radio
+   * column (`'single'`).
+   * @defaultValue `'none'`
+   */
+  selection?: TableSelection | undefined;
+  /**
+   * The selected rows' `rowKey`s, on every page. Bindable.
+   * @defaultValue an empty set
+   */
+  selected?: Set<string> | undefined;
+  /** Called with the new selection whenever the reader changes it. */
+  onSelectionChange?: ((selected: Set<string>) => void) | undefined;
+  /**
+   * Accessible name of a row's checkbox or radio.
+   * @defaultValue `"Select <first column's value>"`
+   */
+  selectRowLabel?: ((row: T) => string) | undefined;
+  /**
+   * Accessible name of the select-all checkbox.
+   * @defaultValue `'Select all on this page'`
+   */
+  selectAllLabel?: string | undefined;
+  /**
+   * The selection column's header text (screen readers only) in `'single'` mode.
+   * @defaultValue `'Select'`
+   */
+  selectColumnLabel?: string | undefined;
+  /** Bulk actions shown while anything is selected — `ToolbarButton`s. */
+  bulkActions?: Snippet<[TableBulkActions]> | undefined;
+  /**
+   * The count shown, announced and naming the bulk-action toolbar.
+   * @defaultValue `"<n> selected"`
+   */
+  selectedCountLabel?: ((count: number) => string) | undefined;
+  /**
+   * The `key`s of the columns not drawn. Bindable; the caller persists it.
+   * @defaultValue the columns marked `defaultHidden`
+   */
+  hiddenColumns?: Set<string> | undefined;
+  /** Offer the reader a "Columns" menu to hide and show columns. */
+  columnMenu?: boolean | undefined;
+  /**
+   * The columns menu's trigger text and accessible name.
+   * @defaultValue `'Columns'`
+   */
+  columnMenuLabel?: string | undefined;
 }
 
 /** What `Table`'s `rowAttributes` may set on a body row's `<tr>`. */
@@ -96,4 +172,55 @@ export function columnAriaSort(
 ): 'ascending' | 'descending' | 'none' {
   if (sort === undefined || sort.key !== key) return 'none';
   return sort.direction === 'asc' ? 'ascending' : 'descending';
+}
+
+/**
+ * Whether the reader may hide the column at `index`: never the first, which
+ * names the row, and otherwise unless the column says `hideable: false`.
+ */
+export function isColumnHideable<T>(column: TableColumn<T>, index: number): boolean {
+  return index > 0 && column.hideable !== false;
+}
+
+/**
+ * The hidden column keys a table starts from when the caller has not bound
+ * `hiddenColumns`: those declared `defaultHidden` that may be hidden at all.
+ */
+export function defaultHiddenColumns<T>(columns: readonly TableColumn<T>[]): Set<string> {
+  return new Set(
+    columns
+      .filter((column, index) => column.defaultHidden === true && isColumnHideable(column, index))
+      .map((column) => column.key),
+  );
+}
+
+/**
+ * How much of the page in hand is selected — what the tri-state select-all
+ * header shows. An empty page reads `'none'`.
+ */
+export function pageSelectionState(
+  selected: ReadonlySet<string>,
+  pageKeys: readonly string[],
+): 'none' | 'some' | 'all' {
+  const count = pageKeys.filter((key) => selected.has(key)).length;
+  if (count === 0) return 'none';
+  return count === pageKeys.length ? 'all' : 'some';
+}
+
+/**
+ * `selected` with every key in `keys` added (`include`) or removed. Rows
+ * outside `keys` keep their state, so selecting on page 2 never drops page 1.
+ * Always a new `Set`, so a bound caller sees the change.
+ */
+export function withKeys(
+  selected: ReadonlySet<string>,
+  keys: readonly string[],
+  include: boolean,
+): Set<string> {
+  const next = new Set(selected);
+  for (const key of keys) {
+    if (include) next.add(key);
+    else next.delete(key);
+  }
+  return next;
 }
