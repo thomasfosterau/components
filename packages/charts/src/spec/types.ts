@@ -6,7 +6,7 @@
  * through the package boundary. A type-parity test asserts these stay
  * structurally identical to the schema-derived types.
  *
- * Design invariants (see the README § Capability matrix):
+ * Design invariants (see the capability matrix, https://github.com/thomasfosterau/components/blob/trunk/docs/charts-capability-matrix.md):
  * - Grammar-level only: marks and encodings, never geometry, pixels, or
  *   renderer names.
  * - Every encoding channel carries an explicit `type`; interpreters
@@ -29,7 +29,7 @@ export const SPEC_VERSION = '1.1';
  * The spec versions this interpreter knows. `'1.1'` adds the `x2` / `y2`
  * range channels and the `tree` mark; every `'1'` spec is a valid `'1.1'`
  * spec. A newer `'1.N'` document is parsed as `'1.1'`, its unknown keys
- * ignored (`validateSpec` reports them). See the README § Spec versioning
+ * ignored (`validateSpec` reports them). See https://github.com/thomasfosterau/components/blob/trunk/docs/charts-spec.md#spec-versioning
  * for the minor-version rule.
  */
 export type SpecVersion = '1' | '1.1';
@@ -42,7 +42,7 @@ export type SpecVersion = '1' | '1.1';
  * `tree` (spec 1.1): a hierarchy of labelled nodes joined by links, laid
  * out by the core. It is the first mark outside the intersection, allowed
  * because the core lays it out with no renderer dependency and every
- * interpreter column has a normative degradation (README § Capability matrix).
+ * interpreter column has a normative degradation (https://github.com/thomasfosterau/components/blob/trunk/docs/charts-capability-matrix.md).
  */
 export type Mark = 'bar' | 'line' | 'point' | 'area' | 'tree';
 

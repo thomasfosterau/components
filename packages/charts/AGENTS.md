@@ -1,6 +1,6 @@
 # @thomasfosterau/charts
 
-The portable chart package: a durable chart spec (and its JSON Schema), a pure geometry core, and the interpreters of that spec (Svelte, ProseMirror, Vega-Lite). It was merged in from the former `thomasfosterau/charts` repo, where each layer was its own npm package; here each is a subpath entry of one package. Repo-wide rules are in the root [AGENTS.md](../../AGENTS.md); the architecture, entry points and capability matrix are in [README.md](README.md).
+The portable chart package: a durable chart spec (and its JSON Schema), a pure geometry core, and the interpreters of that spec (Svelte, ProseMirror, Vega-Lite). It was merged in from the former `thomasfosterau/charts` repo, where each layer was its own npm package; here each is a subpath entry of one package. Repo-wide rules are in the root [AGENTS.md](../../AGENTS.md); the entry points are in [README.md](README.md); the architecture and spec are in [docs/charts-spec.md](../../docs/charts-spec.md), the API reference in [docs/charts-api.md](../../docs/charts-api.md) and the capability matrix in [docs/charts-capability-matrix.md](../../docs/charts-capability-matrix.md).
 
 ## Where it differs from the Svelte packages
 
@@ -24,7 +24,7 @@ Everything here is plain TypeScript except the `/svelte` entry (`src/svelte`), s
 
 - **`schema/chart-spec.v1.json` is generated, committed and published** (`./schema.json` export). `tests/spec/json-schema.test.ts` fails when it disagrees with the Effect source; regenerate with `vp run --filter ./packages/charts emit-schema`. The formatter ignores it (root `vite.config.ts`).
 - **For the versions it knows (`'1'`, `'1.1'`), the JSON Schema closes objects exactly where `parseSpec` rejects unknown keys.** Both pass `onExcessProperty: 'error'` (`src/spec/parse.ts`'s strict decode, `src/spec/internal/json-schema.ts`); change them together. A newer `1.N` document is degraded by the parser alone (`onExcessProperty: 'ignore'`, a separate decode in `parse.ts`): the schema stays strict and its `specVersion` enum lists only the known versions (owner decision on #304), so the degrading path must never reach `buildJsonSchema`, and changing it must leave the `emit-schema` output byte-identical.
-- **A new spec field or mark gets a capability-matrix row** ([README § Capability matrix](README.md#capability-matrix)) in the same change, and a matching change to `swift/ChartSpecKit`.
+- **A new spec field or mark gets a capability-matrix row** ([capability matrix](../../docs/charts-capability-matrix.md)) in the same change, and a matching change to `swift/ChartSpecKit`.
 
 ## Testing
 
@@ -33,3 +33,16 @@ Everything here is plain TypeScript except the `/svelte` entry (`src/svelte`), s
 - **Why not browser mode.** These suites are parsing, geometry, Vega-Lite compilation and SSR string output (the Svelte entry's included, through `svelte/server`), and the schema test reads the committed artifact from disk with `node:fs` — none of it is focus order or the accessibility tree, which is what the Svelte packages need a real browser for.
 - **Suites that mount into a DOM opt in per file** with `// @vitest-environment happy-dom` (the ProseMirror NodeView). The Svelte entry has no client suite: the suite compiles `.svelte` for the server, and Svelte's `mount` exists only in its browser build, which would need a second Vitest project resolving `browser` conditions. It has no client-only logic to test there: it is one `$derived` over `resolveChart`, which the core suite covers, and markup the SSR suite renders.
 - **`swift/ChartSpecKit` is tested by its own workflow**, [`.github/workflows/chartspeckit.yml`](../../.github/workflows/chartspeckit.yml) (`swift test` on macOS). No session image has a Swift toolchain, so say so rather than claim it ran.
+
+## Commands
+
+From the workspace root (the repo-wide gates are in the root [AGENTS.md](../../AGENTS.md)):
+
+```sh
+vp run --filter ./packages/charts test:unit    # Vitest under Node (happy-dom where a suite mounts)
+vp run --filter ./packages/charts check        # tsc, plus the DOM-free re-check of spec + core
+vp run --filter ./packages/charts build        # vp pack -> dist/, then the Effect-leak check
+vp run --filter ./packages/charts emit-schema  # regenerate schema/chart-spec.v1.json
+```
+
+The Swift package is tested by its own workflow (`swift test` in `swift/ChartSpecKit`, on macOS).
