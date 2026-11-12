@@ -113,20 +113,22 @@ A `Toggle` that subscribes this browser to Web Push, or unsubscribes it, through
   const controller = new AbortController();
   $effect(() => () => controller.abort());
 
+  /** The current subscription, read once. */
+  const readInitial = async (): Promise<void> => {
+    try {
+      subscribed = await readSubscribed(controller.signal);
+    } catch {
+      // Unreadable is reported as off (the initial state); the switch still works.
+    }
+  };
+
   $effect(() => {
     if (!available) return;
     if (!supported) {
       notice = 'unsupported';
       return;
     }
-    void readSubscribed(controller.signal).then(
-      (value) => {
-        subscribed = value;
-      },
-      () => {
-        // Unreadable is reported as off; the switch still works.
-      },
-    );
+    void readInitial();
   });
 
   const apply = async (next: boolean): Promise<boolean> => {
