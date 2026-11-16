@@ -134,7 +134,7 @@ catalog:
   # focus handling. A runtime `dependency`, not a peer: consumers should not
   # have to know the library exists.
   bits-ui: ^2.21.0
-  daisyui: ^5.7.50
+  daisyui: ^5.8.0
   # The ONLY consumer is the Vitest browser provider above (`playwright: "*"`
   # peer); this repo has no Playwright test suite of its own, which is why it
   # takes `playwright` rather than the app repos' `@playwright/test`.
