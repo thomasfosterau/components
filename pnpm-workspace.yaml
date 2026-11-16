@@ -52,7 +52,7 @@ catalog:
   # peer `@thomasfosterau/effect-ext` (`^0.1.0 || ^0.2.0`) is not catalogued:
   # nothing here imports it, and pnpm's auto-installed peer resolves it inside
   # that range (0.2.x today, not the newer 0.3.x the range excludes).
-  '@thomasfosterau/effect-forms-svelte': ^0.4.0
+  '@thomasfosterau/effect-forms-svelte': ^0.4.1
   effect: 4.1.3
   # `it.effect` / `layer` for the suites that run Effect (packages/import's
   # headless core), imported beside `vite-plus/test`. Each release peers
@@ -267,7 +267,7 @@ catalog:
 catalogs:
   peers:
     svelte: ^5.40.0
-    '@thomasfosterau/effect-forms-svelte': ^0.4.0
+    '@thomasfosterau/effect-forms-svelte': ^0.4.1
     effect: ^4.0.0
     '@thomasfosterau/effect-document': ^0.2.0
     prosemirror-model: ^1.0.0
