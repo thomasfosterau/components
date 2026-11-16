@@ -76,7 +76,7 @@ catalog:
   # ours (an app installs it when it imports a reader subpath, as
   # effect-document's own peer list asks). `^0.5.0` is effect-document
   # 0.2.0's peer range; 0.6.0 is outside it.
-  '@thomasfosterau/effect-parse': ^0.5.0
+  '@thomasfosterau/effect-parse': ^0.6.1
   # Lucide icon set as Svelte 5 components. Catalogued and installed ahead of
   # its first consumer: the real components land on top of this scaffold and
   # every one that needs an affordance icon reaches for this rather than
