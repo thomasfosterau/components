@@ -10,6 +10,22 @@ on:
 permissions: {}
 
 jobs:
+  verify-lockfile:
+    name: Verify actions.lock
+    if: github.repository == 'thomasfosterau/components' && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - run: gh extension install github/gh-actions-lock --pin v0.4.1
+      - run: gh actions-lock --verify
+
   select:
     name: Select mode
     if: github.repository == 'thomasfosterau/components' && github.actor != 'dependabot[bot]'
@@ -36,7 +52,7 @@ jobs:
 
   version:
     name: Version packages
-    needs: select
+    needs: [verify-lockfile, select]
     if: needs.select.outputs.mode == 'version'
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -55,7 +71,7 @@ jobs:
         with:
           version-file: pnpm-workspace.yaml
           node-version: lts
-          cache: true
+          cache: false
           run-install: |
             - args: ['--frozen-lockfile', '--ignore-scripts']
       - name: Create or update the version PR
@@ -75,7 +91,7 @@ jobs:
 
   publish:
     name: Publish to npm
-    needs: select
+    needs: [verify-lockfile, select]
     if: needs.select.outputs.mode == 'publish'
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -97,7 +113,7 @@ jobs:
         with:
           version-file: pnpm-workspace.yaml
           node-version: lts
-          cache: true
+          cache: false
           run-install: |
             - args: ['--frozen-lockfile', '--ignore-scripts']
       - run: vp run -r build

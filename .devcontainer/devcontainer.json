@@ -1,17 +1,14 @@
 {
   "name": "components",
-  // The Vite+ base image: Node + pnpm + the vp CLI. The tag is the catalog's
-  // `vite-plus` pin (pnpm-workspace.yaml); move it in the same PR that bumps
-  // vite-plus, since Dependabot's devcontainers updates cover only the features.
-  "image": "ghcr.io/voidzero-dev/vite-plus:1.4.0",
+  // The tag matches the catalog's `vite-plus` pin.
+  "image": "ghcr.io/voidzero-dev/vite-plus:1.5.1",
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers-extra/features/ripgrep:1": {},
     "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
     "ghcr.io/devcontainer-community/devcontainer-features/jq:1": {}
   },
-  // The browser suites and `storybook:build` need the Chromium the pinned `playwright` expects.
-  "postCreateCommand": "vp install --frozen-lockfile && vp exec playwright install --with-deps chromium",
+  "postCreateCommand": "vp install --frozen-lockfile",
   // Storybook's dev server (`vp run --filter ./packages/components storybook`).
   "forwardPorts": [6006],
   "customizations": {
