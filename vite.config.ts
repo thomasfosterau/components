@@ -46,6 +46,12 @@ export default defineConfig({
           'playwright install chromium && vp run -r sync && vp check && vp run check && vp run -r test:unit && vp run -r build && vp run --filter ./packages/components storybook:build && pnpm audit --audit-level high',
         cache: false,
       },
+      // Fallow's change-set audit, run by the pre-commit hook; it reads the coverage map.
+      'fallow:audit': {
+        command: 'vp exec fallow audit --base origin/trunk --quiet',
+        dependsOn: ['test:coverage'],
+        cache: false,
+      },
       // Every package's `check`, reached through the root's workspace dependencies.
       check: {
         command: "echo 'check: all type gates green'",

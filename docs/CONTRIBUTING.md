@@ -14,9 +14,10 @@
 [Vite+](https://viteplus.dev) (`vp`) manages Node, pnpm and every tool. Use `vp` rather than `pnpm`/`npx` (`vp exec <bin>`, `vp run <task>`); the exceptions are `pnpm changeset` and the release path.
 
 - Every external version lives in the `pnpm-workspace.yaml` catalog; a `package.json` names only `catalog:`, `catalog:peers` or `workspace:*`. After editing the catalog, run `vp install` and commit `pnpm-lock.yaml`.
-- `vp install` also installs the git hooks (pre-commit formats and lints staged files) and patches `tsc`/oxlint with `@effect/tsgo`.
+- `vp install` also patches `tsc`/oxlint with `@effect/tsgo`.
 - The browser suites need the exact Chromium the pinned `playwright` expects: `vp exec playwright install chromium`.
-- [Fallow](https://fallow.tools) checks dead code, duplication, complexity and the import boundaries (`.fallowrc.json`, `fallow-rules.json`). Use `vp run fallow:audit` (after `vp run test:coverage`) to review your change; its findings are guidance, not dogma, but the boundaries are real.
+- `vp install` also installs the git hooks: pre-commit runs `vp staged` (format and lint the staged files), then `vp run fallow:audit`.
+- [Fallow](https://fallow.tools) checks dead code, duplication, complexity and the import boundaries (`.fallowrc.json`, `fallow-rules.json`). `vp run fallow:audit` audits your change against `origin/trunk` (after refreshing the coverage map it reads), and blocks the commit on a `fail` verdict. Its findings are guidance, not dogma, but the boundaries are real.
 
 | Command | What it does |
 | --- | --- |
@@ -63,7 +64,7 @@ Test logic and behaviour that can regress: keyboard handling, focus, ARIA, edge 
 
 ## Before pushing
 
-Run `vp run ci` (or the gates one by one: `vp check`, `vp run check`, `vp run -r test:unit`, `vp run -r build`, `vp run --filter ./packages/components storybook:build`, `pnpm audit --audit-level high`). Say in the PR body which gates you couldn't run and why. Optionally, `vp run test:coverage && vp run fallow:audit`.
+Run `vp run ci` (or the gates one by one: `vp check`, `vp run check`, `vp run -r test:unit`, `vp run -r build`, `vp run --filter ./packages/components storybook:build`, `pnpm audit --audit-level high`). Say in the PR body which gates you couldn't run and why.
 
 `packages/charts/swift/ChartSpecKit` is tested only by its own macOS workflow.
 

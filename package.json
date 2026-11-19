@@ -15,9 +15,7 @@
     "prepare": "vp config && effect-tsgo patch --typescript --oxlint",
     "changeset": "changeset",
     "version": "changeset version",
-    "release": "vp run -r build && node scripts/publish.mjs",
-    "fallow": "fallow --summary",
-    "fallow:audit": "fallow audit"
+    "release": "node scripts/publish.mjs"
   },
   "dependencies": {
     "@thomasfosterau/charts": "workspace:*",
@@ -38,8 +36,13 @@
     "vite-plus": "catalog:",
     "vitest": "catalog:"
   },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "lts"
+    }
+  },
   "engines": {
-    "node": "^22.18.0 || ^24.11.0 || >=26.0.0",
     "pnpm": ">=11"
   },
   "packageManager": "pnpm@11.26.0"

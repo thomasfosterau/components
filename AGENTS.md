@@ -19,4 +19,4 @@ Read [README.md](README.md) and [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) fir
 
 ## Fallow
 
-A PreToolUse hook runs `fallow audit` before `git commit` / `git push` and blocks on a `fail` verdict (only findings the change introduces count). Run `vp run test:coverage` first, or every function scores as uncovered. Fix the findings rather than working around the gate; `vp exec fallow explain <issue-type>` explains one.
+The pre-commit hook runs `vp run fallow:audit`, which runs the test suites for coverage first, so commits are slow; don't bypass it. Fix what it reports rather than working around it; `vp exec fallow explain <issue-type>` explains a finding.
