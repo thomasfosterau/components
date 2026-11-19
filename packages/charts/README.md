@@ -1,6 +1,6 @@
 # @thomasfosterau/charts
 
-A portable, renderer-agnostic charting system built around a durable chart specification: the spec and its JSON Schema, a pure TypeScript geometry core, and interpreters for Svelte, ProseMirror and Vega-Lite, plus a Swift package, [`ChartSpecKit`](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/swift/ChartSpecKit), that decodes the same JSON.
+A portable, renderer-agnostic charting system built around a durable chart specification: the spec and its JSON Schema, a pure TypeScript geometry core, and interpreters for Svelte, ProseMirror and Vega-Lite.
 
 It is unrelated to `Chart` from [`@thomasfosterau/components/charts`](https://github.com/thomasfosterau/components/blob/trunk/packages/components/README.md), which takes its own series props rather than this spec.
 

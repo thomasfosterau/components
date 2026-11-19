@@ -4,7 +4,7 @@
  * one, so every interpreter renders it.
  *
  * A Gantt reads top-down. The core draws a categorical `y` with the first
- * category at the top, as Vega-Lite and ChartSpecKit do, so the
+ * category at the top, as Vega-Lite does, so the
  * builder only has to put the tasks in start order in `scales.y.domain`.
  * There is no per-interpreter domain trick.
  *

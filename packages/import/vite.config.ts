@@ -40,9 +40,17 @@ export default defineConfig({
       },
       'test:unit': {
         command: 'vp test run tests && vp test run --config vite.svelte.config.ts',
-        dependsOn: [{ task: 'build', from: 'dependencies' }],
+        dependsOn: [
+          { task: 'build', from: 'dependencies' },
+          '@thomasfosterau/monorepo#browser:install',
+        ],
         cache: {
-          env: ['VITEST_MAX_WORKERS', 'NODE_OPTIONS', 'PLAYWRIGHT_BROWSERS_PATH'],
+          env: [
+            'VITEST_MAX_WORKERS',
+            'NODE_OPTIONS',
+            'PLAYWRIGHT_BROWSERS_PATH',
+            'PLAYWRIGHT_CHROMIUM_EXECUTABLE',
+          ],
           input: cacheInputs,
           output: [],
         },

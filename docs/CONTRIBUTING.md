@@ -15,7 +15,7 @@
 
 - Every external version lives in the `pnpm-workspace.yaml` catalog; a `package.json` names only `catalog:`, `catalog:peers` or `workspace:*`. After editing the catalog, run `vp install` and commit `pnpm-lock.yaml`.
 - `vp install` also patches `tsc`/oxlint with `@effect/tsgo`.
-- The browser suites need the exact Chromium the pinned `playwright` expects: `vp exec playwright install chromium`.
+- The browser suites need the exact Chromium the pinned `playwright` expects. Their tasks depend on the root `browser:install` task, which installs it on first use; set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use a Chromium you already have instead.
 - `vp install` also installs the git hooks: pre-commit runs `vp staged` (format and lint the staged files), then `vp run fallow:audit`.
 - [Fallow](https://fallow.tools) checks dead code, duplication, complexity and the import boundaries (`.fallowrc.json`, `fallow-rules.json`). `vp run fallow:audit` audits your change against `origin/trunk` (after refreshing the coverage map it reads), and blocks the commit on a `fail` verdict. Its findings are guidance, not dogma, but the boundaries are real.
 
@@ -45,11 +45,11 @@
 
 ### Effect
 
-Effect appears only in `packages/import`, `packages/charts/src/spec` and the `/entity-form` entry (`fallow-rules.json` enforces this); the Svelte packages and the rest of `packages/charts` stay plain TypeScript so consumers never need `effect`, and nothing Effect may reach a published type of `@thomasfosterau/charts`.
+Use Effect wherever it makes the code better. The one rule: using these packages must not require writing Effect code, where practical. Public surfaces (component props, callbacks, exported functions and types) take and return plain values: `T | undefined` rather than `Option`, `(…, signal: AbortSignal) => Promise<T>` rather than an `Effect`, a returned or thrown error rather than an Effect error channel. Run the Effect inside and adapt at that edge, as `packages/import/src/svelte/session.ts` does. The exceptions are entries built for Effect apps: `packages/import`'s core, whose API is Effect, and `/entity-form`, which renders an Effect form definition. Importing `effect` from an entry that didn't before can turn an optional peer into a required one: check the package's `peerDependenciesMeta` and say so in the changeset.
 
-Within that Effect code, use Effect idioms throughout and strongly prefer Effect v4's own modules (`Option`, `Array`, `Match`, `Schema`, `Stream`, tagged errors) over hand-rolled equivalents; convert existing code where practical. Exceptions: Svelte component code, non-Effect third-party APIs (adapt them at the edge), and hot paths where measured performance needs plain code. If you find non-idiomatic code you can't fix trivially, file an issue listing the sites and the idiomatic replacement.
+In Effect code, use Effect idioms throughout and strongly prefer Effect v4's own modules (`Option`, `Array`, `Match`, `Schema`, `Stream`, tagged errors) over hand-rolled equivalents; convert existing code where practical. Exceptions: Svelte component code, non-Effect third-party APIs (adapt them at the edge), and hot paths where measured performance needs plain code. If you find non-idiomatic code you can't fix trivially, file an issue listing the sites and the idiomatic replacement.
 
-The Effect lint rules apply to those files: namespace imports under the canonical aliases (`Arr`, `P`, `R`, `Str`, `Eq`, `Bool`), `Option` for absence, explicit construction instead of conditional empty spreads. Read `node_modules/effect/dist/*.d.ts` rather than guessing at an API.
+The Effect lint rules apply to the files listed in `effectFiles` (root `vite.config.ts`); add a file there when it starts using Effect. They require namespace imports under the canonical aliases (`Arr`, `P`, `R`, `Str`, `Eq`, `Bool`), `Option` for absence, explicit construction instead of conditional empty spreads. Read `node_modules/effect/dist/*.d.ts` rather than guessing at an API.
 
 ### Comments
 
@@ -65,8 +65,6 @@ Test logic and behaviour that can regress: keyboard handling, focus, ARIA, edge 
 ## Before pushing
 
 Run `vp run ci` (or the gates one by one: `vp check`, `vp run check`, `vp run -r test:unit`, `vp run -r build`, `vp run --filter ./packages/components storybook:build`, `pnpm audit --audit-level high`). Say in the PR body which gates you couldn't run and why.
-
-`packages/charts/swift/ChartSpecKit` is tested only by its own macOS workflow.
 
 ## Changesets
 

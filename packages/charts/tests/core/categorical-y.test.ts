@@ -1,6 +1,6 @@
 /**
  * A categorical y runs top-down: the first category is the top band
- * or point, as Vega-Lite and ChartSpecKit draw it, so one spec reads the
+ * or point, as Vega-Lite draws it, so one spec reads the
  * same in every interpreter. A continuous y still runs bottom-up.
  */
 import { describe, expect, it } from 'vite-plus/test';

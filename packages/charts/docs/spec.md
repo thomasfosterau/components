@@ -10,7 +10,7 @@ The system has three layers with different lifespans, languages, and owners. **T
 | --- | --- | --- |
 | **1 — Spec** | Durable, declarative, language-neutral JSON chart description. Grammar-of-graphics level: mark + encodings + declared types + data reference. Never geometry, pixels, or renderer names. | [`@thomasfosterau/charts`](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/README.md#entry-points) + [`schema/chart-spec.v1.json`](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/schema/chart-spec.v1.json) |
 | **2 — Core** | Pure, synchronous TypeScript. Turns `(spec, box, data)` into scales, dimensions, and geometry. No DOM, no reactivity, no rendering. | [`@thomasfosterau/charts/core`](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/README.md#entry-points) |
-| **3 — Interpreters** | Per-platform renderers: ProseMirror NodeView, Vega-Lite, Swift, Svelte/SvelteKit, Kotlin/Compose, media targets. Each reads the spec and renders it idiomatically. | `/prosemirror`, `/svelte`, `/vega`, [`swift/ChartSpecKit`](https://github.com/thomasfosterau/components/tree/trunk/packages/charts/swift/ChartSpecKit) |
+| **3 — Interpreters** | Per-platform renderers: ProseMirror NodeView, Vega-Lite, Swift, Svelte/SvelteKit, Kotlin/Compose, media targets. Each reads the spec and renders it idiomatically. | `/prosemirror`, `/svelte`, `/vega` |
 
 Only the spec (Layer 1) and its emitted JSON Schema may cross a language boundary. Swift and Kotlin interpreters decode the same spec JSON; they never consume the TypeScript core.
 
@@ -121,7 +121,7 @@ The per-interpreter status of this rule is the `specVersion` row of the [capabil
 - **Degradation across minors is defined:** an interpreter given a newer `1.x` spec ignores channels it does not know, and renders a mark it does not know through the data-table fallback, never an empty plot. A new major version is a break, and an interpreter rejects it with a clear error.
 - **What is implemented:** `parseSpec` / `validateSpec` read `'1'` and `'1.1'` strictly, as before. A `specVersion` of the form `'1.N'` with N above 1 (no leading zero) is read as `'1.1'`: unknown keys anywhere are ignored and listed in the result's `degradation.ignored` with the declared version, the value's `specVersion` is `'1.1'` (so `encodeSpec` writes the known subset, not the original), and the 1.1 rules still hold for what it knows. An unknown `mark` fails validation with an error naming it and carries `unsupported` (`parseSpec` throws `UnsupportedMarkError`); `resolveChart` turns it into an `unsupported` outcome, which the Svelte and ProseMirror interpreters render as a visible data table. `'2'`, `'2.0'` and malformed versions are rejected.
 - **The JSON Schema stays strict**: `chart-spec.v1.json` describes only the versions it knows and closes every object, so validators keep catching typos. Only the parsers degrade.
-- **Interpreters that cannot degrade:** 0.1.0, the first release, shipped strict: it rejects any version above `'1.1'`, so the rule holds only for releases from this one on. ChartSpecKit's decoder does not degrade yet.
+- **Interpreters that cannot degrade:** 0.1.0, the first release, shipped strict: it rejects any version above `'1.1'`, so the rule holds only for releases from this one on.
 
 ## Using the entries
 

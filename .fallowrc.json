@@ -23,13 +23,7 @@
     "packages/import/vite.svelte.config.ts",
     "**/svelte.config.js"
   ],
-  "ignorePatterns": [
-    "**/dist/**",
-    "**/.svelte-kit/**",
-    "**/storybook-static/**",
-    "**/coverage/**",
-    "packages/charts/swift/**"
-  ],
+  "ignorePatterns": ["**/dist/**", "**/.svelte-kit/**", "**/storybook-static/**", "**/coverage/**"],
   "ignoreDependencies": [
     // The root depends on the packages only so `check` reaches them.
     "@thomasfosterau/components",

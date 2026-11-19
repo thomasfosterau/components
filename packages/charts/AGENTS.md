@@ -14,7 +14,7 @@ A durable chart spec and its JSON Schema, a pure geometry core, and interpreters
 
 - Layers depend downward only: `spec` ← `core` ← interpreters, by relative import, never one interpreter to another. The exception: `src/svelte` imports the package by name, because it is copied into `dist/svelte` on its own.
 - `spec` and `core` are DOM-free and Node-free (`tsconfig.pure.json`).
-- Effect stays inside `src/spec` and never reaches a published type: `scripts/check-dist-types.ts` fails `build` otherwise. It is published as `effect ^4.0.0`, so the code must run on 4.0.0.
+- Effect never reaches a published type: `scripts/check-dist-types.ts` fails `build` otherwise. It is published as `effect ^4.0.0`, so the code must run on 4.0.0.
 - Nothing here imports `@thomasfosterau/components`, or the reverse.
 - The interpreters share `resolveChart` (`src/core/resolve.ts`) for validation and error messages.
 
@@ -22,4 +22,4 @@ A durable chart spec and its JSON Schema, a pure geometry core, and interpreters
 
 - `schema/chart-spec.v1.json` is generated, committed and published; regenerate it with `vp run --filter ./packages/charts emit-schema`. A test fails when it drifts.
 - For known versions the JSON Schema closes objects exactly where `parseSpec` rejects unknown keys; change both together. A newer `1.N` document is degraded by the parser alone, and must leave the emitted schema byte-identical.
-- A new spec field or mark gets a capability-matrix row and a matching change to `swift/ChartSpecKit`, which only its own macOS workflow tests.
+- A new spec field or mark gets a capability-matrix row.

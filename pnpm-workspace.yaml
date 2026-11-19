@@ -112,7 +112,7 @@ peerDependencyRules:
     vitest: '*'
     '@sveltejs/kit': '*'
 
-# Minutes: hold new third-party releases for 8 hours.
-minimumReleaseAge: 480
+# Minutes: hold new third-party releases for 24 hours.
+minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - '@thomasfosterau/*'

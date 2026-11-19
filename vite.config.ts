@@ -8,7 +8,7 @@ import { recommended as effectTsgoRecommended } from '@effect/tsgo/oxlint-preset
 import effect from '@enfect/oxlint';
 import { defineConfig } from 'vite-plus';
 
-/** The only files that import Effect; the Effect lint presets apply to these alone. */
+/** The files that use Effect; the Effect lint presets apply to these. Add a file when it starts using Effect. */
 const effectFiles = [
   // packages/charts: Effect Schema parses the spec and emits its JSON Schema.
   'packages/charts/src/spec/parse.ts',
@@ -39,11 +39,22 @@ export default defineConfig({
 
   run: {
     tasks: {
-      // What ci.yml runs. Chromium first (a no-op when present), then `sync`,
-      // which the type-aware lint and svelte-check read.
+      // What ci.yml runs. `sync` first: the type-aware lint and svelte-check
+      // read it. The browser suites install Chromium through `browser:install`.
       ci: {
         command:
-          'playwright install chromium && vp run -r sync && vp check && vp run check && vp run -r test:unit && vp run -r build && vp run --filter ./packages/components storybook:build && pnpm audit --audit-level high',
+          'vp run -r sync && vp check && vp run check && vp run -r test:unit && vp run -r build && vp run --filter ./packages/components storybook:build && pnpm audit --audit-level high',
+        cache: false,
+      },
+      // The Chromium the pinned `playwright` expects, for the browser suites,
+      // which depend on this task; a no-op when it is already installed.
+      // Skipped when `PLAYWRIGHT_CHROMIUM_EXECUTABLE` names a preinstalled
+      // Chromium (an agent session's /opt/pw-browsers/chromium), and the
+      // system libraries too only where `PLAYWRIGHT_INSTALL_DEPS` is set (the
+      // devcontainer).
+      'browser:install': {
+        command:
+          'bash -c \'[ -n "${PLAYWRIGHT_CHROMIUM_EXECUTABLE:-}" ] || playwright install ${PLAYWRIGHT_INSTALL_DEPS:+--with-deps} chromium\'',
         cache: false,
       },
       // Fallow's change-set audit, run by the pre-commit hook; it reads the coverage map.
@@ -65,6 +76,7 @@ export default defineConfig({
       'test:coverage': {
         command: 'vp test run --coverage --maxWorkers=1',
         dependsOn: [
+          'browser:install',
           '@thomasfosterau/components#sync',
           '@thomasfosterau/components#build',
           '@thomasfosterau/components-mapbox#sync',

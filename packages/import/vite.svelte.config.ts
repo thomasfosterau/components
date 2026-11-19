@@ -14,6 +14,9 @@ import { fileURLToPath } from 'node:url';
 import { playwright } from 'vite-plus/test/browser-playwright';
 import { defineConfig } from 'vite-plus';
 
+/** A preinstalled Chromium (an agent session's /opt/pw-browsers/chromium); unset, Playwright uses its own download. */
+const chromium = process.env['PLAYWRIGHT_CHROMIUM_EXECUTABLE'];
+
 export default defineConfig({
   plugins: [svelte()],
 
@@ -48,7 +51,9 @@ export default defineConfig({
     browser: {
       enabled: true,
       headless: true,
-      provider: playwright(),
+      provider: playwright({
+        launchOptions: chromium === undefined ? {} : { executablePath: chromium },
+      }),
       instances: [{ browser: 'chromium' }],
       screenshotFailures: false,
     },

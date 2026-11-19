@@ -4,7 +4,8 @@ The core library. `svelte-package` copies `src/lib/` into `dist/` uncompiled; th
 
 ## Boundary
 
-- **`effect` and `@thomasfosterau/effect-forms-svelte` are reachable only from `forms/EntityForm.svelte`**, through the `./entity-form` entry, which no barrel re-exports. Both are optional peers; importing them anywhere else would make every consumer install them. `fallow-rules.json` enforces it.
+- **`@thomasfosterau/effect-forms-svelte` is reachable only from the `./entity-form` entry**, which no barrel re-exports: it is an optional peer, and importing it anywhere else would make every consumer install it. `fallow-rules.json` enforces it.
+- **`effect` is an optional peer**, today reached only from `./entity-form`. Other code may use it internally, but that makes it a required peer of that entry (say so in the changeset), and no Effect type reaches a prop or export (docs/CONTRIBUTING.md § Effect).
 - **Nothing heavy on the root barrel.** `src/lib/index.ts` is loaded on every page of every consumer.
 - **The public surface is `exports`**: the root barrel, `src/lib/<family>/index.ts` for `citations`, `canvas`, `charts`, `tips`, `seo` and `hotkeys`, `forms/entity-form.ts` and `theme.css`. Changing anything reachable from them needs a changeset.
 

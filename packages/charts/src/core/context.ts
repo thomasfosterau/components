@@ -35,7 +35,7 @@ import type {
  * `x` maps onto `[0, plot.width]`. A continuous y (`quantitative`,
  * `temporal`) maps onto `[plot.height, 0]`, so larger values sit higher; a
  * categorical y (`nominal`, `ordinal`) maps onto `[0, plot.height]`, so the
- * first category is the top band or point, as in Vega-Lite and ChartSpecKit.
+ * first category is the top band or point, as in Vega-Lite.
  * Without both `x` and `y` encodings the geometry is empty. Geometry is in
  * plot coordinates: translate by `dimensions.margins.left` / `.top` to place
  * it in the outer box. `data`, when passed, replaces the spec's inline values.
@@ -60,7 +60,7 @@ export function computeContext(
   // Positional scales: x → [0, plot width]. A continuous y (quantitative,
   // temporal) → [plot height, 0], inverted so larger values sit higher on
   // screen; a categorical y (nominal, ordinal) → [0, plot height], so the
-  // first category is the top band, as in Vega-Lite and ChartSpecKit.
+  // first category is the top band, as in Vega-Lite.
   const xPositional = spec.encoding.x
     ? resolvePositionalScale(
         spec.encoding.x,

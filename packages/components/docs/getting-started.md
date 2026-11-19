@@ -9,7 +9,7 @@ Four rules hold across every component:
 - **daisyUI semantic classes, never raw colour.** `bg-base-200`, `text-error`, `btn-primary` — never a hex, an `oklch()` or `bg-green-700`.
 - **bits-ui owns interaction.** Anything with focus management, keyboard semantics, a popover or an ARIA relationship between elements is built on a bits-ui primitive. Native elements are used where they already give the semantics (`<details>`, `<progress>`, `<time>`, `<data>`, `<dl>`).
 - **Every user-facing string is a prop with an English default.** There is no message catalogue — `dismissLabel = 'Dismiss'`, `previousLabel = 'Previous'`. Accessible-name props end in `Label`. An i18n app passes its own messages at the call site.
-- **No Effect outside `/entity-form`.** Async callbacks are `(…, signal: AbortSignal) => Promise<T>`; optional values are `T | undefined`. Effect adapters stay in the consuming app.
+- **No Effect required outside `/entity-form`.** Async callbacks are `(…, signal: AbortSignal) => Promise<T>`; optional values are `T | undefined`. Effect adapters stay in the consuming app.
 
 Every component spreads the native attributes of the element it renders and merges the caller's `class` last, so nothing here ever swallows an `id`, an `aria-*` attribute or a `data-*` hook.
 

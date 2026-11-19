@@ -12,14 +12,6 @@
       "message": "SvelteKit resolves this only inside an app, and src/lib ships. Take it as a prop or from getComponentsContext()."
     },
     {
-      "id": "no-effect-in-svelte-packages",
-      "kind": "banned-import",
-      "specifiers": ["effect"],
-      "files": ["packages/components/src/lib/**", "packages/mapbox/src/lib/**"],
-      "exclude": ["packages/components/src/lib/forms/EntityForm.svelte"],
-      "message": "`effect` is an optional peer of @thomasfosterau/components reached only from the /entity-form renderer (forms/EntityForm.svelte), and no peer of the mapbox package; importing it anywhere else makes every consumer install it (packages/components/AGENTS.md § Boundary)."
-    },
-    {
       "id": "form-library-only-in-entity-form",
       "kind": "banned-import",
       "specifiers": ["@thomasfosterau/effect-forms-svelte"],
@@ -55,14 +47,6 @@
       "files": ["packages/components/src/lib/**"],
       "exclude": ["packages/components/src/lib/ui/context-menu.ts"],
       "message": "ContextMenu is reached only through its own @thomasfosterau/components/context-menu entry (ui/context-menu.ts), so the root barrel never loads it."
-    },
-    {
-      "id": "effect-only-in-charts-spec",
-      "kind": "banned-import",
-      "specifiers": ["effect"],
-      "files": ["packages/charts/src/**"],
-      "exclude": ["packages/charts/src/spec/**"],
-      "message": "Effect stays inside packages/charts/src/spec, and never in a published type (packages/charts/AGENTS.md § Boundary)."
     },
     {
       "id": "charts-independent",

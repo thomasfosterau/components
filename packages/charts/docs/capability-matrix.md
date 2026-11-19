@@ -16,7 +16,7 @@ For every spec field and mark type, this records which interpreters honour it an
 
 - **TS core** — `@thomasfosterau/charts/core` (`computeContext`). Web interpreters that sit on the core — the ProseMirror NodeView (`/prosemirror`) and the Svelte component (`/svelte`) — inherit this column.
 - **Vega-Lite** — `@thomasfosterau/charts/vega` (`emitVegaLite`), the spec → Vega-Lite emitter (escape hatch / SSR fallback), validated against the real Vega-Lite compiler
-- **Swift Charts** — `swift/ChartSpecKit`: the `ChartSpec` Codable decoder plus a swappable SwiftUI renderer whose default backend is Apple Swift Charts. Compiled and tested in CI (`.github/workflows/chartspeckit.yml`); renderer statuses stay 🔵 until each is verified on device
+- **Swift Charts** — the planned Swift/SwiftUI interpreter, decoding the same spec JSON and rendering through Apple Swift Charts
 - **Compose** — the planned Kotlin/Android interpreter (charting approach not yet chosen; envelope may constrain further)
 - **Media** — planned PDF / raster image / video targets (most likely built on the TS core)
 
