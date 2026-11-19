@@ -2,7 +2,7 @@
 A data import as a guided flow: pick a file, match its columns to the app's fields, and import the records the app's Schema decodes.
 -->
 <!--
-  ImportMapper — the three steps of slice 3 of #139 in order: `ImportSource`
+  ImportMapper — its three steps in order: `ImportSource`
   (pick the file, detect its format, choose a table), `ImportFieldMap`
   (match columns to target fields, pre-filled from the headers) and
   `ImportSubmit` (map every row, report issues, hand the records to

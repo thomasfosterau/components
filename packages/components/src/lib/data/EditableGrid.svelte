@@ -47,7 +47,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     the reason through a polite live region.
   - `'batch'` mode: commits accumulate in `changes`; a changed cell shows a
     dot and is described as `changedLabel`.
-  - Undo (`undo`, #424): in navigation mode Ctrl/⌘+Z undoes the last
+  - Undo (`undo`): in navigation mode Ctrl/⌘+Z undoes the last
     committed edit and Ctrl/⌘+Shift+Z or Ctrl+Y redoes it; in edit mode
     those keys are the editor control's own. An undo in `'batch'` puts the
     cell's previous value back into `changes` (so undoing a cell's only edit

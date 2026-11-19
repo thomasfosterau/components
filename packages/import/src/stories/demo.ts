@@ -11,7 +11,7 @@ import { candidateTables, type TableRegion } from '@thomasfosterau/effect-docume
 import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
 
-/** A contact list, the issue's example target (#139). */
+/** A contact list, the example target. */
 const Contact = Schema.Struct({
   name: Schema.String.annotate({ title: 'Full name', importAliases: ['contact'] }),
   email: Schema.String.check(Schema.isPattern(/@/u)).annotate({
