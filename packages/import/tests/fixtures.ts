@@ -3,7 +3,7 @@
 import * as Schema from 'effect/Schema';
 import type { FieldMapping, ImportSpec } from '../src/index.ts';
 
-/** The issue's example target, less the email check's pattern detail. */
+/** The example target, less the email check's pattern detail. */
 export const Contact = Schema.Struct({
   name: Schema.String.annotate({
     title: 'Full name',
