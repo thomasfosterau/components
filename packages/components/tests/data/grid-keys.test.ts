@@ -8,6 +8,7 @@ import {
   clampPoint,
   gridEditKey,
   gridEditStart,
+  gridHistoryKey,
   gridMove,
   isPrintableKey,
   pointAfterCommit,
@@ -100,4 +101,15 @@ test('after a commit: down a row, or on in reading order between body rows', () 
     col: 0,
   });
   expect(pointAfterCommit('cancel', { row: 1, col: 1 }, bounds)).toEqual({ row: 1, col: 1 });
+});
+
+test('Ctrl/⌘+Z undoes; Ctrl/⌘+Shift+Z and Ctrl+Y redo; nothing else does', () => {
+  expect(gridHistoryKey(key('z', { ctrlKey: true }))).toBe('undo');
+  expect(gridHistoryKey(key('z', { metaKey: true }))).toBe('undo');
+  expect(gridHistoryKey(key('Z', { ctrlKey: true, shiftKey: true }))).toBe('redo');
+  expect(gridHistoryKey(key('Z', { metaKey: true, shiftKey: true }))).toBe('redo');
+  expect(gridHistoryKey(key('y', { ctrlKey: true }))).toBe('redo');
+  expect(gridHistoryKey(key('y', { metaKey: true }))).toBeUndefined();
+  expect(gridHistoryKey(key('z'))).toBeUndefined();
+  expect(gridHistoryKey(key('z', { ctrlKey: true, altKey: true }))).toBeUndefined();
 });

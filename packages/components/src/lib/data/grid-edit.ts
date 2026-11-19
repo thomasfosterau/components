@@ -156,3 +156,74 @@ export function rejectionMessage(reason: unknown, fallback: string): string {
   if (reason instanceof Error && reason.message !== '') return reason.message;
   return typeof reason === 'string' && reason !== '' ? reason : fallback;
 }
+
+/**
+ * One undoable step: the cells a single commit changed, each with the value
+ * it held just before (`from`) and the value committed (`to`). A step is a
+ * list so that a commit of many cells at once (a range paste) undoes as one.
+ */
+export type EditStep<T> = readonly CellChange<T>[];
+
+/** An editing grid's undo history: steps to undo, newest last, and steps to redo, newest last. */
+export interface EditHistory<T> {
+  readonly past: readonly EditStep<T>[];
+  readonly future: readonly EditStep<T>[];
+}
+
+/** How many steps the history keeps; the oldest falls off. */
+export const historyLimit = 100;
+
+/** A history with nothing to undo or redo. */
+export const emptyHistory = <T>(): EditHistory<T> => ({ past: [], future: [] });
+
+/** `history` with a new step: undoable, and every step that could be redone is gone. */
+export function withStep<T>(history: EditHistory<T>, step: EditStep<T>): EditHistory<T> {
+  return { past: [...history.past, step].slice(-historyLimit), future: [] };
+}
+
+/** The step one undo (`'undo'`) or redo (`'redo'`) replays, and the history after it; `undefined` when there is none. */
+export function travel<T>(
+  history: EditHistory<T>,
+  direction: 'undo' | 'redo',
+): { readonly step: EditStep<T>; readonly history: EditHistory<T> } | undefined {
+  const from = direction === 'undo' ? history.past : history.future;
+  const step = from.at(-1);
+  if (step === undefined) return undefined;
+  const rest = from.slice(0, -1);
+  return direction === 'undo'
+    ? { step, history: { past: rest, future: [...history.future, step] } }
+    : { step, history: { past: [...history.past, step], future: rest } };
+}
+
+/**
+ * `history` without `step` (found by identity) — for a commit whose save was
+ * rejected, so it never happened — or with it moved back onto the top of
+ * `restore`, for an undo or redo whose save was rejected.
+ */
+export function withoutStep<T>(
+  history: EditHistory<T>,
+  step: EditStep<T>,
+  restore?: keyof EditHistory<T>,
+): EditHistory<T> {
+  const past = history.past.filter((entry) => entry !== step);
+  const future = history.future.filter((entry) => entry !== step);
+  if (restore === 'past') return { past: [...past, step], future };
+  if (restore === 'future') return { past, future: [...future, step] };
+  return { past, future };
+}
+
+/**
+ * `history`, or an empty one once a row it names is no longer among
+ * `rowKeys`: the rows were replaced, so replaying an old edit onto them
+ * would write into data the reader never edited.
+ */
+export function historyFor<T>(
+  history: EditHistory<T>,
+  rowKeys: ReadonlySet<string>,
+): EditHistory<T> {
+  const steps = [...history.past, ...history.future];
+  if (steps.length === 0) return history;
+  return steps.every((step) => step.every((change) => rowKeys.has(change.rowKey)))
+    ? history
+    : emptyHistory();
+}

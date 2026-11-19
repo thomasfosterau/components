@@ -96,6 +96,20 @@ export function gridEditStart(event: GridKeyEvent): GridEditStart | undefined {
   return isPrintableKey(event) ? 'type' : undefined;
 }
 
+/** What an undo key does: undo the last committed edit, or redo the last undone one. */
+export type GridHistoryKey = 'undo' | 'redo';
+
+/**
+ * Whether a navigation-mode key is undo (Ctrl/⌘+Z) or redo (Ctrl/⌘+Shift+Z,
+ * or Ctrl+Y). Edit mode leaves these to the editor's own control.
+ */
+export function gridHistoryKey(event: GridKeyEvent): GridHistoryKey | undefined {
+  if (event.altKey || !(event.ctrlKey || event.metaKey)) return undefined;
+  const key = event.key.toLowerCase();
+  if (key === 'z') return event.shiftKey ? 'redo' : 'undo';
+  return key === 'y' && event.ctrlKey && !event.shiftKey ? 'redo' : undefined;
+}
+
 /** What an edit-mode key does, if anything: commit and move, or cancel. */
 export function gridEditKey(event: GridKeyEvent): GridEditKey | undefined {
   if (event.key === 'Escape') return 'cancel';

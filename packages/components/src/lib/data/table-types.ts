@@ -147,10 +147,14 @@ export type CellEditor<T> =
   | 'date'
   | Snippet<[CellEditorContext<T>]>;
 
-/** One cell in error, as the error summary lists it. */
-export interface CellError<T> {
+/** One cell of an editing grid: its row and its column. */
+export interface CellTarget<T> {
   readonly row: T;
   readonly column: TableColumn<T>;
+}
+
+/** One cell in error, as the error summary lists it. */
+export interface CellError<T> extends CellTarget<T> {
   readonly message: string;
 }
 

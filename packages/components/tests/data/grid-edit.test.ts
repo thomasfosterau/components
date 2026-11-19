@@ -10,12 +10,19 @@ import {
   cellKey,
   currentValue,
   editorText,
+  emptyHistory,
   formatCellValue,
+  historyFor,
+  historyLimit,
   isCellEditable,
   rejectionMessage,
   sameCellValue,
+  travel,
   withChange,
+  withoutStep,
+  withStep,
   type CellLookup,
+  type EditHistory,
 } from '../../src/lib/data/grid-edit.ts';
 import type { CellChange, TableColumn } from '../../src/lib/data/table-types.ts';
 
@@ -103,4 +110,43 @@ test('a rejection’s message, or the fallback', () => {
   expect(rejectionMessage('Offline', 'Failed')).toBe('Offline');
   expect(rejectionMessage(undefined, 'Failed')).toBe('Failed');
   expect(rejectionMessage(new Error(''), 'Failed')).toBe('Failed');
+});
+
+test('undo and redo walk the history one step at a time', () => {
+  const first = [change(6)];
+  const second = [change(7, 6)];
+  const history = withStep(withStep(emptyHistory<Item>(), first), second);
+  const undone = travel(history, 'undo');
+  expect(undone?.step).toBe(second);
+  expect(undone?.history).toEqual({ past: [first], future: [second] });
+  const redone = travel(undone?.history ?? emptyHistory(), 'redo');
+  expect(redone?.step).toBe(second);
+  expect(redone?.history).toEqual(history);
+  expect(travel(emptyHistory<Item>(), 'undo')).toBeUndefined();
+  expect(travel(history, 'redo')).toBeUndefined();
+});
+
+test('a new step clears the redo side, and the oldest steps fall off', () => {
+  const step = [change(6)];
+  const after: EditHistory<Item> = { past: [], future: [step] };
+  expect(withStep(after, [change(8)]).future).toEqual([]);
+  let long = emptyHistory<Item>();
+  for (let at = 0; at <= historyLimit; at += 1) long = withStep(long, [change(at)]);
+  expect(long.past).toHaveLength(historyLimit);
+  expect(long.past[0]).toEqual([change(1)]);
+});
+
+test('a rejected step leaves the history, or goes back where it came from', () => {
+  const first = [change(6)];
+  const second = [change(7, 6)];
+  const history: EditHistory<Item> = { past: [first], future: [second] };
+  expect(withoutStep(history, second)).toEqual({ past: [first], future: [] });
+  expect(withoutStep(history, second, 'past')).toEqual({ past: [first, second], future: [] });
+  expect(withoutStep(history, first, 'future')).toEqual({ past: [], future: [second, first] });
+});
+
+test('the history is dropped once a row it names is gone', () => {
+  const history = withStep(emptyHistory<Item>(), [change(6)]);
+  expect(historyFor(history, new Set(['a', 'b']))).toBe(history);
+  expect(historyFor(history, new Set(['b']))).toEqual(emptyHistory());
 });
