@@ -10,11 +10,8 @@
     "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
     "ghcr.io/devcontainer-community/devcontainer-features/jq:1": {}
   },
-  // Same provisioning as an agent session: the pinned Vite+ CLI, vp/vpx links,
-  // the frozen install and `svelte-kit sync` (see that file's header). The hook
-  // installs no browser, so the Chromium the pinned `playwright` expects (for
-  // the browser-mode suites and `storybook:build`) is installed after it.
-  "postCreateCommand": "bash .claude/hooks/session-start.sh && pnpm exec playwright install --with-deps chromium",
+  // The browser suites and `storybook:build` need the Chromium the pinned `playwright` expects.
+  "postCreateCommand": "vp install --frozen-lockfile && vp exec playwright install --with-deps chromium",
   // Storybook's dev server (`vp run --filter ./packages/components storybook`).
   "forwardPorts": [6006],
   "customizations": {
