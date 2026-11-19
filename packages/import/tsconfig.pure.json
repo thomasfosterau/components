@@ -8,5 +8,7 @@
     "lib": ["esnext"],
     "types": []
   },
-  "include": ["src"]
+  "include": ["src"],
+  // The UI runs in a browser by design.
+  "exclude": ["src/svelte", "src/stories"]
 }

@@ -41,6 +41,13 @@ export {
 } from './spec.ts';
 export { findRegion, regionRead, sourceTableFromRegion } from './region.ts';
 export {
+  columnRef,
+  fingerprintOf,
+  suggestMapping,
+  type ColumnSuggestion,
+  type MatchSignal,
+} from './suggest.ts';
+export {
   sourceTableFromGrid,
   type SourceCell,
   type SourceRead,
