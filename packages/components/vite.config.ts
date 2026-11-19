@@ -71,14 +71,27 @@ export default defineConfig({
       // `@thomasfosterau/components/canvas` — this package's own built `dist/`.
       // The sibling's `sync` too: its stories are compiled here, and its
       // tsconfig extends the `$app/tsconfig` that its own `sync` writes (#55).
+      // packages/import's `build` as well: its stories are compiled here too,
+      // and its UI imports its core by the package's name, which resolves to
+      // that package's built `dist/`.
       storybook: {
         command: 'storybook dev -p 6006 --no-open',
-        dependsOn: ['sync', 'build', '@thomasfosterau/components-mapbox#sync'],
+        dependsOn: [
+          'sync',
+          'build',
+          '@thomasfosterau/components-mapbox#sync',
+          '@thomasfosterau/components-import#build',
+        ],
         cache: false,
       },
       'storybook:build': {
         command: 'storybook build',
-        dependsOn: ['sync', 'build', '@thomasfosterau/components-mapbox#sync'],
+        dependsOn: [
+          'sync',
+          'build',
+          '@thomasfosterau/components-mapbox#sync',
+          '@thomasfosterau/components-import#build',
+        ],
         cache: {
           output: ['storybook-static/**'],
         },

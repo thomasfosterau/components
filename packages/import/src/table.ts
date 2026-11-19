@@ -14,6 +14,7 @@
 import * as Arr from 'effect/Array';
 import * as Option from 'effect/Option';
 import * as P from 'effect/Predicate';
+import * as Str from 'effect/String';
 import type { ImportSource } from './spec.ts';
 
 /** One cell's value; `undefined` is an empty cell (a gap, or a blank). */
@@ -39,6 +40,10 @@ export interface SourceTable {
 
 /** The rows a source keeps and where its header is: the spec's `headerRow` and `skipRows`. */
 export type SourceRead = Pick<ImportSource, 'headerRow' | 'skipRows'>;
+
+/** A header name as preset matching compares it: trimmed, lower-cased, inner whitespace collapsed. */
+export const normaliseHeader = (header: string): string =>
+  Str.toLowerCase(Str.trim(header)).replace(/\s+/gu, ' ');
 
 /** A header cell's text: its string, or the canonical text of any other value. */
 export const headerText = (cell: SourceCell): string => {

@@ -1,0 +1,20 @@
+{
+  // The `./svelte` entry, its stories and its browser suite, which `tsc`
+  // cannot read: `svelte-check` type-checks them (`check`) and
+  // `svelte-package` emits their declarations from this file (`build`). The
+  // entry imports the headless core by the package's own name, because
+  // `svelte-package` copies `src/svelte` alone into `dist/svelte`, where a
+  // relative `../index.ts` would point at nothing; `paths` points that name at
+  // the source, so neither task needs this package's `dist/`. In a consumer it
+  // resolves to the published `dist/index.mjs`. `@thomasfosterau/components`
+  // resolves through its `exports` to its built `dist/`, hence `check`'s and
+  // `build`'s edge to that package's `build`.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node", "vite/client"],
+    "paths": {
+      "@thomasfosterau/components-import": ["./src/index.ts"]
+    }
+  },
+  "include": ["src/svelte", "src/stories", "tests/svelte", "vite.svelte.config.ts"]
+}

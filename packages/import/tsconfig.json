@@ -1,6 +1,8 @@
 {
-  // The whole package: the headless core, its suite and the config. The
-  // core's portability (no DOM, no Node) is re-checked by tsconfig.pure.json.
+  // The headless core, its suite and the configs. The core's portability (no
+  // DOM, no Node) is re-checked by tsconfig.pure.json. The `./svelte` entry,
+  // its stories and its browser suite are `.svelte` or import it, which `tsc`
+  // cannot read: tsconfig.svelte.json covers them.
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "types": ["node"],
@@ -16,5 +18,6 @@
       }
     ]
   },
-  "include": ["src", "tests", "vite.config.ts"]
+  "include": ["src", "tests", "vite.config.ts"],
+  "exclude": ["src/svelte", "src/stories", "tests/svelte"]
 }

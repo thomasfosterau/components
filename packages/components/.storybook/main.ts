@@ -9,11 +9,13 @@ import type { StorybookConfig } from '@storybook/sveltekit';
  */
 const config: StorybookConfig = {
   // ONE Storybook for the design system, reaching across into the sibling
-  // packages/mapbox rather than a second install there: two Storybooks for one
-  // design system is two review surfaces that can disagree.
+  // packages/mapbox and packages/import rather than a second install there:
+  // two Storybooks for one design system is two review surfaces that can
+  // disagree.
   stories: [
     '../src/**/*.stories.@(ts|svelte)',
     '../../mapbox/src/stories/**/*.stories.@(ts|svelte)',
+    '../../import/src/stories/**/*.stories.@(ts|svelte)',
   ],
   addons: ['@storybook/addon-svelte-csf', '@storybook/addon-a11y'],
   framework: {

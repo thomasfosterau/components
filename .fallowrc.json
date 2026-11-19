@@ -23,6 +23,7 @@
     "packages/charts/src/svelte/index.ts",
     "packages/charts/src/vega/index.ts",
     "packages/import/src/index.ts",
+    "packages/import/src/svelte/index.ts",
     "packages/*/src/stories/**/*.stories.{ts,svelte}",
     "packages/*/tests/**/*.test.ts",
     "packages/*/tests/setup.ts",
@@ -30,6 +31,7 @@
     "packages/charts/scripts/*.ts",
     "scripts/publish.mjs",
     "**/vite.config.ts",
+    "packages/import/vite.svelte.config.ts",
     "**/svelte.config.js"
   ],
   "ignorePatterns": [
@@ -86,7 +88,8 @@
       { "name": "charts-svelte", "patterns": ["packages/charts/src/svelte/**"] },
       { "name": "charts-prosemirror", "patterns": ["packages/charts/src/prosemirror/**"] },
       { "name": "charts-vega", "patterns": ["packages/charts/src/vega/**"] },
-      { "name": "import", "patterns": ["packages/import/src/**"] }
+      { "name": "import", "patterns": ["packages/import/src/*.ts"] },
+      { "name": "import-svelte", "patterns": ["packages/import/src/svelte/**"] }
     ],
     "rules": [
       { "from": "components", "allow": [] },
@@ -108,7 +111,14 @@
       // its required peer (packages/import/AGENTS.md § Boundary). The same holds
       // for `@thomasfosterau/effect-document`, its other required peer, which
       // `effect-document-only-in-import` bans from every other package.
-      { "from": "import", "allow": [] }
+      { "from": "import", "allow": [] },
+      // The UI reaches the core by the package's own name, never by relative
+      // path: svelte-package copies src/svelte alone into dist/svelte
+      // (packages/import/tsconfig.svelte.json). fallow resolves that name to
+      // the core's source through the workspace link, so the zone has to
+      // allow the edge it cannot tell apart from a relative one; the charts
+      // zones above report the same imports for the same reason.
+      { "from": "import-svelte", "allow": ["import"] }
     ]
   },
   "duplicates": {

@@ -83,7 +83,26 @@
         "@thomasfosterau/charts"
       ],
       "files": ["packages/import/src/**"],
-      "message": "The `.` entry of @thomasfosterau/components-import is headless: plain TypeScript over Effect that an app server can import, with no Svelte and none of the other packages. The UI lands in its own `./svelte` entry (packages/import/AGENTS.md § Boundary)."
+      "exclude": ["packages/import/src/svelte/**", "packages/import/src/stories/**"],
+      "message": "The `.` entry of @thomasfosterau/components-import is headless: plain TypeScript over Effect that an app server can import, with no Svelte and none of the other packages. The UI is its own `./svelte` entry, src/svelte (packages/import/AGENTS.md § Boundary)."
+    },
+    {
+      "id": "import-ui-boundary",
+      "kind": "banned-import",
+      "specifiers": [
+        "$app",
+        "$env",
+        "@thomasfosterau/components-mapbox",
+        "@thomasfosterau/charts",
+        "@thomasfosterau/effect-parse",
+        "@thomasfosterau/effect-document/csv",
+        "@thomasfosterau/effect-document/rtf",
+        "@thomasfosterau/effect-document/ooxml",
+        "@thomasfosterau/effect-document/pdf",
+        "@thomasfosterau/effect-document/iwork"
+      ],
+      "files": ["packages/import/src/svelte/**"],
+      "message": "The `./svelte` entry of @thomasfosterau/components-import reaches the core library through @thomasfosterau/components and effect-document through its root and /schema only: the app passes the formats it accepts, so the entry loads no reader (and no effect-parse) of its own (packages/import/AGENTS.md § Boundary)."
     },
     {
       "id": "effect-document-only-in-import",

@@ -28,9 +28,14 @@ const effectFiles = [
   'packages/charts/src/spec/internal/**',
   // packages/import: the headless core is Effect code throughout (Schema
   // decodes the rows, Stream carries them), and so is its suite, which runs
-  // under `@effect/vitest`.
-  'packages/import/src/**',
-  'packages/import/tests/**',
+  // under `@effect/vitest`. So is the `./svelte` entry's `session.ts`, which
+  // runs the core for the UI. The entry's components and their browser suite
+  // are not: they are the UI side of the `(…, signal) => Promise<T>` boundary
+  // (packages/import/AGENTS.md § Boundary), Svelte code whose props are
+  // `T | undefined`, which awaits `session.ts`'s promises in `try` / `catch`.
+  'packages/import/src/*.ts',
+  'packages/import/src/svelte/*.ts',
+  'packages/import/tests/*.ts',
   // packages/components: the `/entity-form` entry and its story / fixtures.
   'packages/components/src/lib/forms/entity-form.ts',
   'packages/components/src/lib/forms/EntityForm.svelte',
@@ -305,7 +310,7 @@ export default defineConfig({
       // would report it: the rule has nothing to say about a suite that must
       // use that API.
       {
-        files: ['packages/import/tests/**'],
+        files: ['packages/import/tests/*.ts'],
         plugins: effectTsgoRecommended.plugins,
         rules: { 'effecttsgo/unstable-api-usage': 'off' },
       },
@@ -317,6 +322,19 @@ export default defineConfig({
       {
         files: ['packages/import/src/table.ts'],
         rules: { 'effect/prefer-option-over-null': 'off' },
+      },
+      // `session.ts` is where the UI meets the engine. Its exported types are
+      // the `./svelte` components' prop and callback types (`FieldChoice`'s
+      // `column`, `mapTable`'s `onProgress`), which stay `T | undefined` as
+      // every component's props do (AGENTS.md § Effect). And it is the edge
+      // that runs each Effect, once per user action, as a promise the
+      // components await with an `AbortSignal`: running it is its job.
+      {
+        files: ['packages/import/src/svelte/session.ts'],
+        rules: {
+          'effect/prefer-option-over-null': 'off',
+          'effect/effect-run-in-body': 'off',
+        },
       },
       // `parseSpec` / `validateSpec` take arbitrary JSON and `encodeSpec`
       // returns it: they ARE the parse boundary these two rules ask callers
@@ -335,9 +353,10 @@ export default defineConfig({
 
   // The root vitest run behind `test:coverage`: each package's own
   // vite.config.ts is one project (browser mode for the Svelte packages, Node
-  // for packages/charts), so one run covers all three.
+  // for packages/charts and packages/import), plus packages/import's browser
+  // suite for its `./svelte` entry, so one run covers them all.
   test: {
-    projects: ['packages/*/vite.config.ts'],
+    projects: ['packages/*/vite.config.ts', 'packages/import/vite.svelte.config.ts'],
     coverage: {
       provider: 'istanbul',
       reporter: ['text-summary', 'json-summary', 'json'],
@@ -345,7 +364,7 @@ export default defineConfig({
       include: [
         'packages/*/src/lib/**/*.{ts,svelte}',
         'packages/charts/src/**/*.{ts,svelte}',
-        'packages/import/src/**/*.ts',
+        'packages/import/src/**/*.{ts,svelte}',
       ],
       exclude: ['**/*.d.ts'],
     },

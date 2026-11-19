@@ -17,7 +17,7 @@ import * as SchemaIssue from 'effect/SchemaIssue';
 import * as Str from 'effect/String';
 import * as Stream from 'effect/Stream';
 import { type ColumnMapping, ColumnRef, FieldMapping, type ImportSpec } from './spec.ts';
-import type { SourceCell, SourceRow, SourceTable } from './table.ts';
+import { normaliseHeader, type SourceCell, type SourceRow, type SourceTable } from './table.ts';
 import type { ImportTarget, TargetSchema } from './target.ts';
 
 /** A cell of the source table: its row (`SourceRow.index`) and column position. */
@@ -99,10 +99,6 @@ type FieldPlan =
     }
   | { readonly key: string; readonly from: 'constant'; readonly value: Schema.Json }
   | { readonly key: string; readonly from: 'skip' };
-
-/** A header name as preset matching compares it: trimmed, lower-cased, inner whitespace collapsed. */
-const normaliseHeader = (header: string): string =>
-  Str.toLowerCase(Str.trim(header)).replace(/\s+/gu, ' ');
 
 /** The position `ref` names in a table with these headers (see {@link ColumnRef}). */
 const resolveColumn = (headers: ReadonlyArray<string>, ref: ColumnRef): Option.Option<number> => {

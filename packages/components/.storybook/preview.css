@@ -8,6 +8,7 @@
 @import 'tailwindcss';
 @source '../src';
 @source '../../mapbox/src';
+@source '../../import/src';
 @plugin "daisyui" {
   themes: false;
 }
