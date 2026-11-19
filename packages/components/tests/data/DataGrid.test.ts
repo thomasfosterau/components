@@ -425,6 +425,145 @@ test('batch mode collects changes and marks each changed cell', async () => {
   expect(document.querySelector('[data-testid="rows"]')?.textContent).toContain('Basil=30');
 });
 
+const undoKey = '{Control>}z{/Control}';
+const redoKey = '{Control>}{Shift>}Z{/Shift}{/Control}';
+
+test('batch mode: undo takes the last edit back out of changes, and redo puts it back', async () => {
+  const screen = await render(EditableDataGridFixture, { editing: 'batch' });
+  await userEvent.click(screen.getByRole('gridcell', { name: '30' }));
+  await userEvent.keyboard('31{Enter}');
+  await userEvent.keyboard('{ArrowUp}{ArrowLeft}');
+  await userEvent.keyboard('Thai basil{Enter}');
+  expect(changeList()).toBe('basil.count:30>31,basil.name:Basil>Thai basil');
+
+  await userEvent.keyboard(undoKey);
+  expect(changeList()).toBe('basil.count:30>31');
+  // Focus goes to the cell that changed, and the undo is announced.
+  expect(focusedText()).toBe('Basil');
+  await expect.element(screen.getByText('Undid Name for Basil')).toBeInTheDocument();
+
+  await userEvent.keyboard(undoKey);
+  expect(changeList()).toBe('');
+  expect(focusedText()).toBe('30');
+  // Nothing left to undo: another press changes nothing.
+  await userEvent.keyboard(undoKey);
+  expect(changeList()).toBe('');
+
+  await userEvent.keyboard(redoKey);
+  expect(changeList()).toBe('basil.count:30>31');
+  await expect.element(screen.getByText('Redid Count for Basil')).toBeInTheDocument();
+  await userEvent.keyboard('{Control>}y{/Control}');
+  expect(changeList()).toBe('basil.count:30>31,basil.name:Basil>Thai basil');
+  // A redo restores every edit: a further redo has nothing to do.
+  await userEvent.keyboard(redoKey);
+  expect(changeList()).toBe('basil.count:30>31,basil.name:Basil>Thai basil');
+});
+
+test('batch mode: undoing a second edit to a cell restores the first, not the original', async () => {
+  const screen = await render(EditableDataGridFixture, { editing: 'batch' });
+  await userEvent.click(screen.getByRole('gridcell', { name: '30' }));
+  await userEvent.keyboard('31{Enter}{ArrowUp}');
+  await userEvent.keyboard('32{Enter}{ArrowUp}');
+  expect(changeList()).toBe('basil.count:30>32');
+
+  await userEvent.keyboard(undoKey);
+  expect(changeList()).toBe('basil.count:30>31');
+  await expect.element(screen.getByRole('gridcell', { name: '31' })).toBeInTheDocument();
+  await userEvent.keyboard(undoKey);
+  expect(changeList()).toBe('');
+  // A new edit after an undo leaves nothing to redo.
+  await userEvent.keyboard('40{Enter}{ArrowUp}');
+  await userEvent.keyboard(redoKey);
+  expect(changeList()).toBe('basil.count:30>40');
+});
+
+test('cell mode: undo and redo are commits, handed to onCellCommit', async () => {
+  const onCellCommit = vi.fn<(change: CellChange<unknown>, signal: AbortSignal) => Promise<void>>(
+    async () => {},
+  );
+  const screen = await render(EditableDataGridFixture, { onCellCommit });
+  await userEvent.click(screen.getByRole('gridcell', { name: '30' }));
+  await userEvent.keyboard('12{Enter}');
+  await expect.element(screen.getByRole('gridcell', { name: '12' })).toBeInTheDocument();
+
+  await userEvent.keyboard(undoKey);
+  expect(onCellCommit).toHaveBeenCalledTimes(2);
+  expect(onCellCommit.mock.calls[1]?.[0]).toMatchObject({
+    rowKey: 'basil',
+    column: 'count',
+    from: 12,
+    to: 30,
+  });
+  await expect.element(screen.getByRole('gridcell', { name: '30' })).toHaveFocus();
+  await expect.element(screen.getByText('Undid Count for Basil')).toBeInTheDocument();
+
+  await userEvent.keyboard('{Control>}y{/Control}');
+  expect(onCellCommit).toHaveBeenCalledTimes(3);
+  expect(onCellCommit.mock.calls[2]?.[0]).toMatchObject({ column: 'count', from: 30, to: 12 });
+  await expect.element(screen.getByRole('gridcell', { name: '12' })).toBeInTheDocument();
+});
+
+test('cell mode: a rejected undo rolls back and can be tried again', async () => {
+  let refuse = false;
+  const onCellCommit = vi.fn<(change: CellChange<unknown>, signal: AbortSignal) => Promise<void>>(
+    async () => {
+      if (refuse) throw new Error('Offline');
+    },
+  );
+  const screen = await render(EditableDataGridFixture, { onCellCommit });
+  await userEvent.click(screen.getByRole('gridcell', { name: '30' }));
+  await userEvent.keyboard('12{Enter}');
+  await expect.element(screen.getByRole('gridcell', { name: '12' })).toBeInTheDocument();
+
+  refuse = true;
+  await userEvent.keyboard(undoKey);
+  const cell = screen.getByRole('gridcell', { name: '12' });
+  await expect.element(cell).toHaveAttribute('aria-invalid', 'true');
+  await expect.element(cell).toHaveAccessibleDescription('Offline');
+
+  refuse = false;
+  await userEvent.keyboard(undoKey);
+  expect(onCellCommit).toHaveBeenCalledTimes(3);
+  expect(onCellCommit.mock.calls[2]?.[0]).toMatchObject({ from: 12, to: 30 });
+  await expect
+    .element(screen.getByRole('gridcell', { name: '30' }))
+    .not.toHaveAttribute('aria-invalid');
+});
+
+test('cell mode: an edit whose save was rejected is not undone', async () => {
+  const onCellCommit = vi.fn<(change: CellChange<unknown>, signal: AbortSignal) => Promise<void>>(
+    async () => {
+      throw new Error('No');
+    },
+  );
+  const screen = await render(EditableDataGridFixture, { onCellCommit });
+  await userEvent.click(screen.getByRole('gridcell', { name: '30' }));
+  await userEvent.keyboard('12{Enter}');
+  await expect
+    .element(screen.getByRole('gridcell', { name: '30' }))
+    .toHaveAttribute('aria-invalid', 'true');
+  await userEvent.keyboard(undoKey);
+  expect(onCellCommit).toHaveBeenCalledOnce();
+});
+
+test('with undo off, the undo keys do nothing', async () => {
+  const screen = await render(EditableDataGridFixture, { editing: 'batch', undo: false });
+  await userEvent.click(screen.getByRole('gridcell', { name: '30' }));
+  await userEvent.keyboard('31{Enter}');
+  await userEvent.keyboard(undoKey);
+  expect(changeList()).toBe('basil.count:30>31');
+});
+
+test('in an open editor the undo keys are the control’s own', async () => {
+  const screen = await render(EditableDataGridFixture, { editing: 'batch' });
+  await userEvent.click(screen.getByRole('gridcell', { name: '30' }));
+  await userEvent.keyboard('31{Enter}{ArrowUp}{Enter}');
+  await expect.element(screen.getByRole('spinbutton', { name: 'Count' })).toHaveFocus();
+  await userEvent.keyboard(undoKey);
+  await userEvent.keyboard('{Escape}');
+  expect(changeList()).toBe('basil.count:30>31');
+});
+
 test('a date cell edits with the library DateField', async () => {
   const onCellCommit = vi.fn<(change: CellChange<unknown>, signal: AbortSignal) => Promise<void>>(
     async () => {},

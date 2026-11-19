@@ -47,6 +47,19 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     the reason through a polite live region.
   - `'batch'` mode: commits accumulate in `changes`; a changed cell shows a
     dot and is described as `changedLabel`.
+  - Undo (`undo`, #424): in navigation mode Ctrl/⌘+Z undoes the last
+    committed edit and Ctrl/⌘+Shift+Z or Ctrl+Y redoes it; in edit mode
+    those keys are the editor control's own. An undo in `'batch'` puts the
+    cell's previous value back into `changes` (so undoing a cell's only edit
+    drops it from the list); in `'cell'` it is a commit like any other,
+    `onCellCommit({ from: current, to: previous })`, busy until it settles
+    and rolled back if rejected — the step then stays where it was. Focus
+    moves to the cell when it is on screen, and `undoneLabel` /
+    `redoneLabel` is announced through the polite region. The history
+    (`grid-edit.ts`) is a stack of steps, each the `CellChange`s of one
+    commit; a commit whose save is rejected leaves it, a new commit empties
+    the redo side, and the whole history is dropped once a row it names
+    leaves `allRows`.
 
   `virtual` (for a large import, #427): every row of the result is in the
   grid's matrix but only a window of them is in the DOM. The window is
@@ -68,7 +81,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
 -->
 <script lang="ts" generics="T">
   import { CircleAlert } from '@lucide/svelte';
-  import { flushSync, tick, type Snippet } from 'svelte';
+  import { flushSync, tick, untrack, type Snippet } from 'svelte';
   import type { HTMLTableAttributes } from 'svelte/elements';
   import { SvelteMap, SvelteSet } from 'svelte/reactivity';
   import Checkbox from '../fields/Checkbox.svelte';
@@ -83,23 +96,32 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     cellKey,
     currentValue,
     editorText,
+    emptyHistory,
     formatCellValue,
+    historyFor,
     isCellEditable,
     namedEditor,
     originalValue,
     rejectionMessage,
     sameCellValue,
+    travel,
     withChange,
+    withoutStep,
+    withStep,
     type CellLookup,
+    type EditHistory,
+    type EditStep,
   } from './grid-edit.ts';
   import {
     clampPoint,
     gridEditKey,
     gridEditStart,
+    gridHistoryKey,
     gridMove,
     pointAfterCommit,
     type GridEditKey,
     type GridEditStart,
+    type GridHistoryKey,
     type GridPoint,
   } from './grid-keys.ts';
   import { columnClass, tableSize } from './table-classes.ts';
@@ -112,6 +134,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     type CellChange,
     type CellEditorContext,
     type CellError,
+    type CellTarget,
     type SortState,
     type TableChoiceProps,
     type TableColumn,
@@ -172,6 +195,12 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     saveFailedLabel: string;
     /** A changed cell's description in batch mode. */
     changedLabel: string;
+    /** Keep an undo history, which Ctrl/⌘+Z and Ctrl/⌘+Shift+Z walk. */
+    undo: boolean;
+    /** What is announced when an edit is undone. */
+    undoneLabel: (target: CellTarget<T>) => string;
+    /** What is announced when an edit is redone. */
+    redoneLabel: (target: CellTarget<T>) => string;
   }
 
   let {
@@ -207,6 +236,9 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     commitErrorLabel,
     saveFailedLabel,
     changedLabel,
+    undo,
+    undoneLabel,
+    redoneLabel,
     selection = 'none',
     selected = $bindable(new Set<string>()),
     onSelectionChange,
@@ -250,6 +282,17 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
   /** `'cell'` mode: why a cell's last save was rejected. */
   const saveErrors = new SvelteMap<string, string>();
   const controllers = new Map<string, AbortController>();
+  /** The undo history; immutable values, replaced on every change. */
+  let history = $state.raw<EditHistory<T>>(emptyHistory());
+
+  // Replaced rows invalidate the history: an old edit replayed onto new data
+  // would write values the reader never typed there.
+  $effect.pre(() => {
+    const keys = new Set(allRows.map((row) => rowKey(row)));
+    untrack(() => {
+      history = historyFor(history, keys);
+    });
+  });
 
   $effect(() => () => {
     for (const controller of controllers.values()) controller.abort();
@@ -443,7 +486,16 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     return column.parse === undefined ? text : column.parse(text);
   }
 
-  function settle(change: CellChange<T>, column: TableColumn<T>, controller: AbortController, failure: unknown): void {
+  /** What a rejected save does to the undo history, beyond rolling the cell back. */
+  type OnRejected = () => void;
+
+  function settle(
+    change: CellChange<T>,
+    column: TableColumn<T>,
+    controller: AbortController,
+    failure: unknown,
+    onRejected: OnRejected,
+  ): void {
     if (controller.signal.aborted) return;
     const key = cellKey(change.rowKey, change.column);
     controllers.delete(key);
@@ -453,6 +505,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     const message = rejectionMessage(failure, saveFailedLabel);
     saveErrors.set(key, message);
     announcement = commitErrorLabel({ row: change.row, column, message });
+    onRejected();
   }
 
   async function persist(
@@ -460,6 +513,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     change: CellChange<T>,
     column: TableColumn<T>,
     controller: AbortController,
+    onRejected: OnRejected,
   ): Promise<void> {
     let failure: unknown;
     try {
@@ -467,11 +521,11 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     } catch (reason) {
       failure = reason ?? saveFailedLabel;
     }
-    settle(change, column, controller, failure);
+    settle(change, column, controller, failure, onRejected);
   }
 
   /** `'cell'` mode: show the value at once, and hand it to `onCellCommit`. */
-  function save(change: CellChange<T>, column: TableColumn<T>): void {
+  function save(change: CellChange<T>, column: TableColumn<T>, onRejected: OnRejected): void {
     const key = cellKey(change.rowKey, change.column);
     controllers.get(key)?.abort();
     controllers.delete(key);
@@ -483,15 +537,72 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     pending.set(key, change.to);
     busy.add(key);
     announcement = '';
-    void persist(onCellCommit, change, column, controller);
+    void persist(onCellCommit, change, column, controller, onRejected);
   }
 
-  function apply(row: T, column: TableColumn<T>, value: unknown): void {
+  /**
+   * Put `value` in a cell: into `changes` (batch), or through a save (cell)
+   * whose rejection runs `onRejected`.
+   */
+  function write(row: T, column: TableColumn<T>, value: unknown, onRejected: OnRejected): void {
     const key = rowKey(row);
     const change = { rowKey: key, column: column.key, row, from: originalValue(column, row), to: value };
     saveErrors.delete(cellKey(key, column.key));
     if (editing === 'batch') changes = withChange(changes, change);
-    else save(change, column);
+    else save(change, column, onRejected);
+  }
+
+  /** A reader's commit: written, and recorded as one undoable step. */
+  function apply(row: T, column: TableColumn<T>, value: unknown): void {
+    const previous = currentValue(lookup, column, row);
+    if (!undo || sameCellValue(previous, value)) {
+      write(row, column, value, () => {});
+      return;
+    }
+    const step: EditStep<T> = [{ rowKey: rowKey(row), column: column.key, row, from: previous, to: value }];
+    history = withStep(history, step);
+    write(row, column, value, () => {
+      history = withoutStep(history, step);
+    });
+  }
+
+  /** A step's cells as they stand now, or `undefined` if any is gone or no longer editable. */
+  function stepTargets(step: EditStep<T>): (CellTarget<T> & { readonly change: CellChange<T> })[] | undefined {
+    const targets: (CellTarget<T> & { readonly change: CellChange<T> })[] = [];
+    for (const change of step) {
+      const row = allRows.find((candidate) => rowKey(candidate) === change.rowKey);
+      const column = columns.find((candidate) => candidate.key === change.column);
+      if (row === undefined || column === undefined || !isCellEditable(column, row, editing)) return undefined;
+      targets.push({ row, column, change });
+    }
+    return targets;
+  }
+
+  /** Undo or redo one step: write each cell's earlier or later value, focus the first and announce it. */
+  function replay(direction: GridHistoryKey): void {
+    const moved = travel(history, direction);
+    if (moved === undefined) return;
+    const { step } = moved;
+    history = moved.history;
+    const targets = stepTargets(step);
+    const first = targets?.[0];
+    if (targets === undefined || first === undefined) {
+      history = withoutStep(history, step);
+      return;
+    }
+    const restore = direction === 'undo' ? 'past' : 'future';
+    for (const { row, column, change } of targets) {
+      write(row, column, direction === 'undo' ? change.from : change.to, () => {
+        history = withoutStep(history, step, restore);
+      });
+    }
+    const index = rows.findIndex((candidate) => rowKey(candidate) === rowKey(first.row));
+    const col = shownColumns.indexOf(first.column);
+    if (index !== -1 && col !== -1) focusPoint({ row: index + 1, col: col + offset });
+    // Cleared first, so the same words twice in a row are announced twice.
+    announcement = '';
+    flushSync();
+    announcement = (direction === 'undo' ? undoneLabel : redoneLabel)(first);
   }
 
   /**
@@ -532,6 +643,12 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
   }
 
   function navigationKey(event: KeyboardEvent): void {
+    const direction = undo ? gridHistoryKey(event) : undefined;
+    if (direction !== undefined) {
+      event.preventDefault();
+      replay(direction);
+      return;
+    }
     const next = gridMove(event, at, bounds);
     if (next !== undefined) {
       event.preventDefault();

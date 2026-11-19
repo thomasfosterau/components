@@ -176,6 +176,7 @@
   let pending = $state<CellChange<Contact>[]>([]);
   let bulk = $state<readonly Contact[]>(largeImport);
   let bulkPending = $state<CellChange<Contact>[]>([]);
+  let draftPrices = $state<CellChange<Product>[]>([]);
 
   /** A pretend server: half a second, and it refuses any price over 100. */
   async function savePrice(change: CellChange<Product>, signal: AbortSignal): Promise<void> {
@@ -288,6 +289,31 @@
     <Button onclick={saveBatch} disabled={pending.length === 0}>
       Save {pending.length} change{pending.length === 1 ? '' : 's'}
     </Button>
+  </div>
+</Story>
+
+<Story name="Undo and redo (batch editing)">
+  <!-- Edit a few cells, then with a cell focused (not open) press Ctrl/⌘+Z
+       to undo the last edit and Ctrl/⌘+Shift+Z or Ctrl+Y to redo it. Each
+       undo rewrites `changes`, listed below, moves focus to the cell and is
+       announced; undoing a cell's only edit takes it off the list. -->
+  <div class="space-y-3">
+    <DataGrid
+      rows={products}
+      columns={productColumns}
+      rowKey={productKey}
+      paginated={false}
+      caption="Price list draft"
+      editing="batch"
+      bind:changes={draftPrices}
+    />
+    <ul class="text-sm" aria-label="Pending changes">
+      {#each draftPrices as change (`${change.rowKey}.${change.column}`)}
+        <li>{change.rowKey} {change.column}: {String(change.from)} → {String(change.to)}</li>
+      {:else}
+        <li class="text-base-content/70">No pending changes.</li>
+      {/each}
+    </ul>
   </div>
 </Story>
 

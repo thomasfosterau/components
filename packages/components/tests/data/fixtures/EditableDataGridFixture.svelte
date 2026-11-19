@@ -28,6 +28,7 @@
     selection?: 'none' | 'single' | 'multiple' | undefined;
     errorsLabel?: ((count: number) => string) | undefined;
     changedLabel?: string | undefined;
+    undo?: boolean | undefined;
     /** Apply each `'cell'` commit to the rows before resolving, as a caller would. */
     persist?: boolean | undefined;
     initial?: readonly Plant[] | undefined;
@@ -42,6 +43,7 @@
     selection,
     errorsLabel,
     changedLabel,
+    undo,
     persist = true,
     more = false,
     initial = [
@@ -146,6 +148,7 @@
   {selection}
   {errorsLabel}
   {changedLabel}
+  {undo}
   bind:changes
 />
 

@@ -32,7 +32,11 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
   way the caller's `rows` stay the truth: an edit is shown over them until
   its save settles (cell) or until the caller clears `changes` (batch).
   `onSelect` does not apply to an editing grid — a row cannot be both a
-  button and a row of cells.
+  button and a row of cells. An editing grid keeps an undo history
+  (`undo`, on by default): Ctrl/⌘+Z undoes the last committed edit and
+  Ctrl/⌘+Shift+Z or Ctrl+Y redoes it, while a cell is focused rather than
+  open. In `'batch'` an undo rewrites `changes`; in `'cell'` it is one more
+  `onCellCommit`, from the saved value back to the earlier one.
 
   `virtual` (editing grids only) replaces paging with windowing, for an
   import of thousands of rows: the whole sorted, filtered result is one
@@ -62,6 +66,7 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
   import type {
     CellChange,
     CellError,
+    CellTarget,
     SortState,
     TableChoiceProps,
     TableColumn,
@@ -206,6 +211,27 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
      */
     changedLabel?: string | undefined;
     /**
+     * An editing grid: keep an undo history of committed edits. Ctrl/⌘+Z
+     * undoes the last one and Ctrl/⌘+Shift+Z (or Ctrl+Y) redoes it, with
+     * focus on a cell of the grid (in an open editor those keys are the
+     * control's own). `'batch'` restores `changes` to its previous state;
+     * `'cell'` calls `onCellCommit` with the inverse change, busy and rolled
+     * back like any other commit. The history is dropped when a row it
+     * names leaves `rows`.
+     * @defaultValue `true`
+     */
+    undo?: boolean | undefined;
+    /**
+     * What is announced when an edit is undone.
+     * @defaultValue `"Undid <header> for <first column's value>"`
+     */
+    undoneLabel?: ((target: CellTarget<T>) => string) | undefined;
+    /**
+     * What is announced when an edit is redone.
+     * @defaultValue `"Redid <header> for <first column's value>"`
+     */
+    redoneLabel?: ((target: CellTarget<T>) => string) | undefined;
+    /**
      * An editing grid: window the rows (`VirtualList`'s windowing) instead of
      * paging them, so only the rows in view are in the DOM. For thousands of
      * rows. Ignored while `editing` is `'none'`.
@@ -278,6 +304,9 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
       `${error.column.header} for ${rowName(error.row)} was not saved: ${error.message}`,
     saveFailedLabel = 'The change could not be saved.',
     changedLabel = 'Changed',
+    undo = true,
+    undoneLabel = (target) => `Undid ${target.column.header} for ${rowName(target.row)}`,
+    redoneLabel = (target) => `Redid ${target.column.header} for ${rowName(target.row)}`,
     virtual = false,
     rowHeight,
     viewportHeight = '32rem',
@@ -436,6 +465,9 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
       {commitErrorLabel}
       {saveFailedLabel}
       {changedLabel}
+      {undo}
+      {undoneLabel}
+      {redoneLabel}
       {selection}
       {onSelectionChange}
       {selectRowLabel}
