@@ -1,5 +1,5 @@
 /**
- * `Sidebar` and `BottomNav` built from `destinations` (#428): the same
+ * `Sidebar` and `BottomNav` built from `destinations`: the same
  * `NavDestination` list `AppShell` and `NavigationRail` read, rendered as
  * links resolved and marked current through the components context, with
  * `children` still working beside them.

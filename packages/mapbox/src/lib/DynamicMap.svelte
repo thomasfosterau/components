@@ -16,9 +16,7 @@ The interactive Mapbox GL map, panned and zoomed, with a fallback when WebGL is 
     claim false; importing it here means it arrives only where a map does.
   - A failed load must degrade, not throw: no WebGL, a blocked or 404'd
     bundle, and a constructor that throws all land on the same `catch` below,
-    and `unavailableLabel`. That is the branch the browser tests drive, by
-    mocking `mapbox-gl` with a `Map` whose constructor throws
-    (packages/mapbox/AGENTS.md § Testing).
+    which shows `unavailableLabel`.
 
   ## ARIA contract
 

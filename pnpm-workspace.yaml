@@ -1,99 +1,24 @@
-# pnpm workspace — four publishable packages (`packages/components`,
-# `packages/mapbox`, `packages/charts`, `packages/import`).
-#
-# The `catalog:` protocol pins versions that MUST be singletons across the
-# workspace. `svelte` especially: two copies break the compiler's runtime
-# identity (`$state` proxies, context keys, snippet types) in ways that only
-# show up at render time.
-#
-# EVERY external dependency version lives here — package.json files reference
-# only `catalog:` / `catalog:peers` (or `workspace:*` for internal packages).
-# `catalogMode: strict` enforces this only in commands that write a specifier:
-# `pnpm add` writes `catalog:` (creating the entry if there is none), and
-# `pnpm add` / `pnpm update <pkg>@<range>` fail with
-# ERR_PNPM_CATALOG_VERSION_MISMATCH on a version outside the catalog's range.
-# `pnpm install` accepts a literal hand-edited into a package.json, so review
-# is what keeps literals out.
-# After editing this catalog, ALWAYS run `pnpm install` and commit the
-# regenerated pnpm-lock.yaml — a stale lockfile fails every CI job at once
-# with ERR_PNPM_LOCKFILE_CONFIG_MISMATCH.
-#
-# Versions are kept in lockstep with the owner's app repos wherever the two overlap, so a component
-# authored here compiles identically in the app that consumes it. The three
-# entries that deliberately differ are commented below.
+# Every external version lives here; package.json files use only `catalog:`,
+# `catalog:peers`, `catalog:published` or `workspace:*`.
 packages:
   - packages/*
 
 catalogMode: strict
 
 catalog:
-  # A REQUIRED peer of bits-ui (its date and calendar primitives import it),
-  # declared as a runtime `dependency` of packages/components rather than left
-  # to peer resolution, because a consumer should not have to know bits-ui's
-  # peer list to use a Dialog.
+  # A required peer of bits-ui, made a dependency of packages/components so consumers needn't know it.
   '@internationalized/date': ^3.8.1
-  # The REQUIRED peer of `@thomasfosterau/components-mapbox` — and the reason
-  # that package exists at all, adjacent to `packages/components` rather than
-  # inside it: a component whose behaviour needs a specific third-party engine
-  # lives in its own package, so the core library stays free of it. Installed
-  # here as a devDependency of packages/mapbox too, so that package's own browser
-  # suite and its stories load the real module. The range is what consumers
-  # must satisfy.
   'mapbox-gl': ^3.35.0
   '@changesets/cli': ^3.0.3
-  # The OPTIONAL peer of `@thomasfosterau/components/entity-form`, and a
-  # devDependency so that entry's browser suite and story run the real store.
-  # Only that entry imports it: a consumer that never renders an
-  # `EntityForm` never installs it. `effect` is ITS required peer (and an
-  # optional peer of the core package, `catalogs.peers`), pinned to the app
-  # catalog's exact release so the store here is the one the apps run.
-  # 0.4.0 is the optics release (#440): fields are addressed by typed
-  # focuses (`form.root.key(k)`) rather than string paths. Its new required
-  # peer `@thomasfosterau/effect-ext` (`^0.1.0 || ^0.2.0`) is not catalogued:
-  # nothing here imports it, and pnpm's auto-installed peer resolves it inside
-  # that range (0.2.x today, not the newer 0.3.x the range excludes).
+  # Optional peer of `/entity-form`; a devDependency for its suite and story.
   '@thomasfosterau/effect-forms-svelte': ^0.4.1
   effect: 4.1.4
-  # `it.effect` / `layer` for the suites that run Effect (packages/import's
-  # headless core), imported beside `vite-plus/test`. Each release peers
-  # `effect` at its own version and `vitest` at `>=5.0.0 <6.0.0`, so it is
-  # pinned EXACT to the `effect` pin above and moves with it (Dependabot's
-  # `effect` group bumps the two together).
+  # Peers `effect` at its own exact version: moves with `effect`.
   '@effect/vitest': 4.1.4
-  # The REQUIRED peer of `@thomasfosterau/components-import` (packages/import,
-  # #139), and its devDependency so the suite reads real documents: the import
-  # engine's `sourceTableFromRegion` and `findRegion` take effect-document's
-  # `TableRegion`s and `Document`s, and its spec's `TableLocator` is
-  # effect-document's. 0.2.0 is the release that added `candidateTables`,
-  # `TableLocator`, `detect`, the CSV reader's `maxRows` and `sniffDialect`
-  # (effect-document#188), so no earlier one fits; the published range is
-  # `catalogs.peers`. Its own `effect` peer is `^4.0.0`, the same as ours.
   '@thomasfosterau/effect-document': ^0.2.0
-  # effect-document's OPTIONAL peer, needed by its `/csv`, `/rtf`, `/ooxml*`
-  # and `/iwork*` readers (their grammars) and by nothing else. packages/import
-  # takes it as a devDependency only: its suite reads a CSV through `/csv`,
-  # while its published code imports `/schema` alone, so it is no peer of
-  # ours (an app installs it when it imports a reader subpath, as
-  # effect-document's own peer list asks). `^0.5.0` is effect-document
-  # 0.2.0's peer range; 0.6.0 is outside it.
+  # effect-document's optional peer for its readers; packages/import's suite reads CSV with it.
   '@thomasfosterau/effect-parse': ^0.6.1
-  # Lucide icon set as Svelte 5 components. Catalogued and installed ahead of
-  # its first consumer: the real components land on top of this scaffold and
-  # every one that needs an affordance icon reaches for this rather than
-  # inlining an `<svg>`.
   '@lucide/svelte': ^1.73.0
-  # `@thomasfosterau/charts` (packages/charts) — the portable chart spec, its
-  # geometry core and its non-Svelte interpreters, merged in from the former
-  # `thomasfosterau/charts` repo. `d3-scale` / `d3-shape` are the core's
-  # runtime dependencies. `prosemirror-*` are optional peers of the
-  # `/prosemirror` entry, installed here as devDependencies so its suite runs
-  # the real library; their published ranges are under `catalogs.peers`.
-  # `vega` / `vega-lite` are dev-only: the `/vega` entry emits a plain Vega-Lite object and its suite
-  # validates that against the real compiler. `happy-dom` is that package's
-  # DOM for the client-side suites, which run under Node rather than browser
-  # mode (packages/charts/AGENTS.md § Testing). The package's runtime `effect`
-  # is developed on the `effect` entry above and published as
-  # `catalogs.published.effect` (`^4.0.0`).
   '@types/d3-scale': ^4.0.9
   '@types/d3-shape': ^3.1.8
   d3-scale: ^4.0.3
@@ -103,167 +28,50 @@ catalog:
   prosemirror-view: ^1.42.9
   vega: ^6.2.0
   vega-lite: ^6.4.3
-  # Storybook 10 over the SvelteKit framework preset — the Svelte 5 + Vite
-  # pipeline a `svelte-package` library uses too — plus the Svelte CSF addon
-  # so snippet-taking components can be storied in `.svelte`, and the a11y
-  # addon because accessibility is part of this library's contract rather
-  # than a review afterthought.
   '@storybook/addon-a11y': ^10.6.7
   '@storybook/addon-svelte-csf': ^5.1.6
   '@storybook/sveltekit': ^10.6.7
-  # SvelteKit is a BUILD-TIME dependency here, not a runtime one: `svelte-kit
-  # sync` generates the package's ambient types and `svelte-package` emits
-  # `dist/`. Nothing in `src/lib/` may import `$app/*` — see
-  # packages/components/AGENTS.md.
+  # Build-time only: `svelte-kit sync` and `svelte-package`.
   '@sveltejs/kit': 3.2.0
   '@sveltejs/package': 3.0.2
   '@sveltejs/vite-plugin-svelte': ^7.3.1
   '@tailwindcss/vite': ^4.3.5
   '@testing-library/jest-dom': ^7.0.1
   '@types/node': ^26.6.6
-  # Vitest browser mode: the Playwright provider is its own package as of
-  # v4 and pins `vitest` EXACTLY, so it must track the `vitest` entry below,
-  # which in turn tracks vite-plus's own pin (vite-plus also peers this
-  # package at that exact version).
-  # `@vitest/browser` itself arrives through vite-plus, so it is not
-  # catalogued separately.
+  # Pins `vitest` exactly, so it follows the `vitest` entry below.
   '@vitest/browser-playwright': 5.1.0
-  # Headless Svelte 5 primitives. Every component whose behaviour is more
-  # than "render these attributes" — menus, dialogs, comboboxes, tooltips —
-  # is built on a bits-ui primitive rather than on hand-rolled keyboard and
-  # focus handling. A runtime `dependency`, not a peer: consumers should not
-  # have to know the library exists.
   bits-ui: ^2.21.0
   daisyui: ^5.8.0
-  # The ONLY consumer is the Vitest browser provider above (`playwright: "*"`
-  # peer); this repo has no Playwright test suite of its own, which is why it
-  # takes `playwright` rather than the app repos' `@playwright/test`.
-  #
-  # PINNED EXACT, because each release expects one exact Chromium revision
-  # (1.63.0 -> 1243, `browsers.json` in playwright-core) and refuses any
-  # other. It is NOT tied to a session image: CI installs its own browser
-  # (`pnpm exec playwright install --with-deps chromium`) on every run, so a
-  # bump is an ordinary catalog change. A session whose image pre-installs a
-  # different revision under `PLAYWRIGHT_BROWSERS_PATH` runs `pnpm exec
-  # playwright install chromium` once, or reports the browser gates as not
-  # run (AGENTS.md § Verification).
-  #
-  # Floor 1.60.0: 1.56.1-1.59.x extract the browser zip with a yauzl stream
-  # that marks itself destroyed before its buffered tail drains, and Node
-  # >= 26.1.0 no longer resumes a destroyed stream (nodejs/node#62557), so
-  # `playwright install` hangs forever on Node `latest` (#81).
+  # Exact: each release expects one Chromium revision. 1.56.1–1.59.x hang
+  # extracting the browser on Node >= 26.1.0.
   playwright: 1.65.1
   storybook: ^10.6.7
   svelte-check: ^4.7.8
   svelte: ^5.57.3
   tailwindcss: ^4.3.5
-  # The TS6 JS compiler, aliased so the package stays importable as
-  # `typescript`: svelte-check drives TypeScript through its JS API, which
-  # TypeScript 7 (the native Go compiler) does not ship until 7.1. The app
-  # repos pair this with `@typescript/native` for their pure-TS surfaces;
-  # there is no pure-TS surface here worth a second compiler, so this is the
-  # only one.
+  # TS6 under the `typescript` name, for svelte-check (which needs the JS API).
   typescript: 'npm:@typescript/typescript6@6.0.2'
-  # vite-plus pins `oxlint`, `oxfmt`, `vitest` and the `@vitest/*` packages
-  # to exact versions. `vitest` and `@vitest/browser-playwright` FOLLOW that
-  # pin (vite-plus 1.6.0 -> 5.1.0; oxlint 1.93.0, oxlint-tsgolint 7.0.2006) rather than running ahead of it (#47).
-  # Dependabot's `toolchain` group (.github/dependabot.yml) bumps
-  # `vite-plus`, `vitest` and `@vitest/*` together in one PR (#88). Before
-  # merging that PR, push by hand: `vite` (ignored by Dependabot) to
-  # `npm:@voidzero-dev/vite-plus-core@` the new vite-plus version, and
-  # `vitest` / `@vitest/browser-playwright` to the version the new vite-plus's
-  # `dependencies` / `peerDependencies` name if the group took them past it.
-  # A group PR that doesn't bump vite-plus itself is closed unmerged, unless it
-  # is an `@effect/tsgo` bump that CI passes on its own.
-  # `vite` is the same release published under its aliased core package.
+  # vite-plus pins oxlint, oxfmt and vitest exactly: `vitest`, `@vitest/*` and
+  # the `vite` alias follow it.
   vite-plus: 1.6.0
   vite: npm:@voidzero-dev/vite-plus-core@1.6.0
   vitest: 5.1.0
-  # Istanbul coverage for the root `test:coverage` task, whose
-  # `coverage/coverage-final.json` `fallow audit` reads for per-function CRAP
-  # scores. Istanbul rather than v8 because it instruments in the transform,
-  # so the browser-mode suites report too. It pins `vitest` EXACTLY, so it
-  # moves with `vitest` above (Dependabot's `toolchain` group).
   '@vitest/coverage-istanbul': 5.1.0
-  # Effect Language Service as a native (TypeScript-Go) binary, and the source
-  # of the `@effect/tsgo/oxlint-presets` lint preset the root vite.config.ts
-  # extends. `effect-tsgo patch --typescript --oxlint` (the root `prepare`)
-  # overwrites the native `tsc` and vite-plus's `oxlint` / `oxlint-tsgolint`
-  # with Effect-patched builds matched by gitHead, so this pins in lockstep
-  # with `@typescript/native` below and with the `oxlint` / `oxlint-tsgolint`
-  # vite-plus carries: 0.69.0 supports typescript 7.0.2, oxlint 1.91.0 –
-  # 1.93.0 and tsgolint 7.0.2005 – 7.0.2007; vite-plus 1.6.0 carries
-  # oxlint 1.93.0 and tsgolint 7.0.2006. Each @effect/tsgo release hard-errors
-  # (UnsupportedTargetPackageVersionError) on any other component version,
-  # failing the patch. Read the `components` table in
-  # node_modules/@effect/tsgo/dist/effect-tsgo.cjs before bumping any of the
-  # three. Dependabot's `toolchain` group brings `@effect/tsgo` with
-  # vite-plus; the `@typescript/native` alias moves by hand
-  # (.github/dependabot.yml).
+  # `effect-tsgo patch` (the root `prepare`) supports only the TypeScript,
+  # oxlint and tsgolint versions in its `components` table
+  # (node_modules/@effect/tsgo/dist/effect-tsgo.cjs); check it before bumping
+  # this, `@typescript/native` or `vite-plus`.
   '@effect/tsgo': 0.69.0
-  # TS7, the native Go compiler (bin `tsc`), Effect-patched by the `prepare`
-  # above. It type-checks packages/charts (the one pure-TS package, and the one
-  # whose `src/spec` is Effect code). The Svelte packages stay on the TS6
-  # `typescript` alias, because svelte-check needs the JS API.
+  # TS7, Effect-patched by `prepare`; type-checks packages/charts and packages/import.
   '@typescript/native': npm:typescript@7.0.2
-  # The Effect oxlint rules (`effect.configs.recommended` in the root
-  # vite.config.ts, every rule at `error`, the `anti-slop` set included),
-  # scoped there to the files that import Effect. It replaces
-  # `@mpsuesser/oxlint-plugin-effect` under the same `effect/` rule namespace.
-  # It depends on `effect` 4.1.0 exactly, but lints on whichever copy the
-  # singleton override below forces; the dev pin is not raised for it. Loads
-  # into vite-plus's oxlint but ranges `@oxlint/plugins`, so Dependabot
-  # proposes it on its own, outside the `toolchain` group.
   '@enfect/oxlint': 0.10.0
-  # Dead code, duplication, complexity and architecture boundaries
-  # (.fallowrc.json); the PreToolUse gate (.claude/hooks/fallow-gate.sh) runs
-  # its audit before every agent `git commit` / `git push`.
   fallow: 3.43.1
-  # `render` + locators for Svelte components under Vitest browser mode. The
-  # app repos use @testing-library/svelte under happy-dom instead; this repo
-  # runs the real browser, and this is the renderer Vitest browser mode
-  # documents for Svelte.
   vitest-browser-svelte: ^3.1.0
 
-# Published peer ranges, kept apart from the default catalog because a peer
-# range is a promise to consumers, not the version this workspace builds and
-# tests against: `svelte` above is the dev pin (^5.57.1), `svelte` here is
-# the floor both published manifests declare. `pnpm pack` (the release path,
-# scripts/publish.mjs) rewrites `catalog:peers` to this literal range, so the
-# packed package.json files carry `"svelte": "^5.40.0"`. The floor is
-# 5.40.0 because that is the `svelte` peer of
-# `@thomasfosterau/effect-forms-svelte` (0.2.0 through 0.4.x), the optional
-# peer behind the `/entity-form` entry (#85). Raising the floor is a
-# published-behaviour change and takes a changeset.
-#
-# `@thomasfosterau/effect-forms-svelte` itself is ranged here too, not taken
-# from its dev pin above (#338): a Dependabot bump of the pin must not
-# silently rewrite the range consumers are promised. `^0.4.0` since #440:
-# 0.4.0 replaced the string paths, `posted` / `valid` and the widget props
-# type that `/entity-form` uses with typed focuses, `isPosted` / `isValid`
-# and `WidgetOwnProps`, so no earlier release fits and the range is not a
-# union. 0.4.0 also requires `@thomasfosterau/effect-ext` (`^0.1.0 ||
-# ^0.2.0`) and Node >= 22.18.0; both reach a consumer through the form
-# library's own manifest, not through this package's.
-#
-# `effect` is the other optional peer of `@thomasfosterau/components`, also
-# reached only from `/entity-form`, whose renderer imports `effect/Layer`,
-# `effect/Option`, `effect/Predicate` and `effect/Record` (#312, #440).
-# `^4.0.0` is the form library's own `effect` peer (0.4.0 included), so the
-# two never ask for different copies. It
-# is also the one REQUIRED peer of `@thomasfosterau/components-import`
-# (packages/import), whose public API takes and returns Effect values (the
-# target `Schema`, `Effect`, `Stream`), so the app's copy is the one it uses.
-#
-# `@thomasfosterau/effect-document` is that package's second REQUIRED peer
-# (#139): `sourceTableFromRegion` and `findRegion` take the app's own
-# `TableRegion`s and `Document`s, so the app's copy is again the one it uses.
-# `^0.2.0` is the first release with `candidateTables` (effect-document#188);
-# under 0.x a caret admits only 0.2.x, so a 0.3.0 is a deliberate bump here.
-#
-# The `@thomasfosterau/charts` interpreter peers are each optional (only the
-# entry that renders through that framework imports it) and keep the floors
-# the former `thomasfosterau/charts` repo declared.
+# Ranges promised to consumers, written into the packed manifests by `pnpm pack`.
+# Raising one is a published change and needs a changeset. `svelte` is
+# effect-forms-svelte's own floor; `effect` is `^4.0.0` unless a dependency
+# requires more.
 catalogs:
   peers:
     svelte: ^5.40.0
@@ -272,28 +80,11 @@ catalogs:
     '@thomasfosterau/effect-document': ^0.2.0
     prosemirror-model: ^1.0.0
     prosemirror-view: ^1.0.0
-  # Published ranges of runtime `dependencies` whose dev pin above is exact.
-  # `pnpm pack` writes these into the packed manifest, so a consumer's own
-  # `effect` dedupes with this package's instead of a second copy installing
-  # beside it. The owner's policy: `effect` is `^4.0.0`, raised only when a
-  # dependency of the package requires more, naming that dependency here.
-  # Nothing forces more for `@thomasfosterau/charts` (its other dependencies,
-  # `d3-scale` and `d3-shape`, have no Effect dependency), and its suite
-  # passes at 4.0.0.
   published:
     effect: ^4.0.0
 
+# Singletons whose duplication would break at runtime, not in any gate.
 overrides:
-  # Singletons. See the `catalog:` note at the top: `svelte` and `vite` are
-  # the two whose duplication is invisible to every gate and fatal at
-  # runtime, and `vitest` is forced to the catalog singleton so vite-plus,
-  # the browser provider (exact `vitest` peer) and the packages share one
-  # copy. `effect` is a fourth whose duplication no gate notices: two copies
-  # break `Context` / `Layer` / `Schema` identity at runtime. Only one
-  # resolves today; this is insurance.
-  # `vite@*` / `vitest@*` are the keys `vp migrate` manages under pnpm: the
-  # `@*` range leaves importers' own `catalog:` specifiers intact and forces
-  # only the semver ranges transitive and peer declarations use.
   svelte: 'catalog:'
   '@sveltejs/kit': 'catalog:'
   effect: 'catalog:'
@@ -302,19 +93,13 @@ overrides:
 
 nodeLinker: hoisted
 
-# Install scripts are opt-in. `playwright` is deliberately ABSENT: its
-# postinstall downloads a browser bundle, which CI installs explicitly in its
-# own step and a session installs on demand (AGENTS.md § Verification).
+# `playwright` is absent on purpose: its browser is installed explicitly.
 allowBuilds:
   '@tailwindcss/oxide': true
   esbuild: true
-  # fallow verifies its platform binary's signature at install time.
   fallow: true
 
-# Storybook 10.6 declares `vite-plus: "^0.1.15 || ^0.2.0"` and this workspace
-# is on 1.4.0 — the toolchain is deliberately ahead of what the addon ecosystem
-# has caught up to, and the same goes for `vite` / `vitest` / `@sveltejs/kit`,
-# all of which are forced to one catalog singleton by the overrides above.
+# Storybook's peer ranges lag the toolchain; the overrides above force one copy.
 peerDependencyRules:
   allowAny:
     - vite
@@ -327,17 +112,7 @@ peerDependencyRules:
     vitest: '*'
     '@sveltejs/kit': '*'
 
-# Supply-chain delay (owner's policy): hold newly published versions for 8
-# hours before pnpm will install them, so a compromised release has a window to
-# get pulled before it reaches this workspace. Unit is MINUTES, not seconds
-# (`opts.minimumReleaseAge * 60 * 1e3` in pnpm's own source), so 8 h = 480.
-# Dependabot's `cooldown` (.github/dependabot.yml) takes whole days only, so it
-# is 1 day: longer than this, so it never proposes a version pnpm would refuse.
-# `vp migrate` adds the toolchain (vite-plus, oxlint, vitest, ...) to the
-# exclusions below; they are dropped again, so the wait covers them too.
+# Minutes: hold new third-party releases for 8 hours.
 minimumReleaseAge: 480
-# First-party releases are exempt: `@thomasfosterau/*` is published by the
-# owner (from this repo and its siblings), so holding it only delays adoption
-# of a release the owner just cut, and protects against nothing.
 minimumReleaseAgeExclude:
   - '@thomasfosterau/*'

@@ -1,29 +1,8 @@
 /**
- * The release workflow's publish step: every public workspace package whose
- * current version is not yet on npm is packed by pnpm and published by npm.
- *
- * Why this script rather than `changeset publish` or `pnpm publish -r`: it
- * was written under pnpm 10, whose publish path could not do npm trusted
- * publishing (OIDC). pnpm 11 — which this repo pins in `packageManager` — can:
- * effect-jsonapi 0.16.1 was published by `pnpm publish` through trusted
- * publishing. The script is kept because it works and matches
- * prosekit-utilities' release path. Replacing it with `changeset publish` is
- * a behaviour change for its own PR, and that PR must keep the tags and
- * GitHub releases this script reports (below).
- *
- * Why not bare `npm publish` in the package directory: npm does not
- * understand pnpm's `catalog:` and `workspace:*` specifiers and would ship
- * them verbatim. So `pnpm pack` rewrites the specifiers into the tarball and
- * `npm publish <tarball>` authenticates via OIDC. Nothing requests
- * provenance: an explicit request fails from a private repository, and npm
- * attaches it by itself only where it is allowed.
- *
- * `changesets/action` creates the git tags and GitHub releases, but only for
- * what this script reports: one `{"type":"git-tag",…}` line per published
- * package, appended to the NDJSON file named by `CHANGESETS_OUTPUT`.
- *
- * Idempotent: a version already on the registry is skipped, so a re-run after
- * a partial failure publishes only what is missing.
+ * Publishes every public workspace package whose version isn't on npm yet:
+ * `pnpm pack` (which rewrites `catalog:` / `workspace:*`), then `npm publish`
+ * of the tarball via OIDC. Reports each publish to changesets/action through
+ * `CHANGESETS_OUTPUT`, so it tags and releases it. Safe to re-run.
  */
 
 import { execFileSync } from 'node:child_process';

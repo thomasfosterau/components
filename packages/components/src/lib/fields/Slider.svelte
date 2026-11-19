@@ -28,7 +28,7 @@ A number, or a `[low, high]` range, picked from a bounded, stepped scale by drag
   Naming: a `<label for>` cannot name a `role="slider"` span, so the `id` goes
   on the first thumb (the second is `${id}-1`) and the name comes from
   `aria-labelledby={labelId}` — the visible label's id, which `FormField`
-  hands its control as `FieldControl.labelId` (#179). In range mode each
+  hands its control as `FieldControl.labelId`. In range mode each
   thumb is labelled by the label AND itself (`aria-labelledby="label thumb"`
   with `aria-label` = its `thumbLabels` entry), so the second thumb reads
   "Hours of sun Maximum". Outside a `FormField`, pass `label` instead; it

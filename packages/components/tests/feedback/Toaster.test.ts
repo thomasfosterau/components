@@ -6,7 +6,7 @@
  *
  * Auto-dismissal is driven by fake timers, not by a short real duration: the
  * dismiss timer starts inside the click, so a real duration races the
- * `userEvent` round trip and the first poll under suite load (#75). Only
+ * `userEvent` round trip and the first poll under suite load. Only
  * `setTimeout`/`clearTimeout` are faked — the pair `Toaster` uses — so
  * Playwright's clock keeps running underneath. The auto-dismiss checks are
  * synchronous (`flushSync` + `.elements()`), never `expect.element`: while fake

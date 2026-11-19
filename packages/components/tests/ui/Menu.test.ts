@@ -11,7 +11,7 @@ test('a Menu is a labelled navigation landmark around a list of links', async ()
   await expect.element(screen.getByRole('link', { name: 'Gardens' })).toBeInTheDocument();
 });
 
-test('a context member forwarded as `undefined` falls back to its default (#76)', async () => {
+test('a context member forwarded as `undefined` falls back to its default', async () => {
   // The fixture forwards its omitted `href` resolver as an explicit
   // `undefined`; the default resolver is the identity.
   const screen = await render(MenuNavFixture, {});

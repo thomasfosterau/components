@@ -1,6 +1,6 @@
 /**
  * The effect-document adapter: a candidate table of a document read
- * (`candidateTables`, effect-document#188) as the engine's
+ * (`candidateTables`) as the engine's
  * {@link SourceTable}, and the region a spec's `source.table` names.
  *
  * Only `@thomasfosterau/effect-document/schema` is imported: it needs no

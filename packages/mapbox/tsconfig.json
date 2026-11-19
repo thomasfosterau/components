@@ -1,6 +1,6 @@
 {
   // The repo-wide base, then SvelteKit 3's generated config on top of it
-  // (#55): where both set an option, Kit's value wins (`checkJs: true`,
+  //: where both set an option, Kit's value wins (`checkJs: true`,
   // `module: esnext`), and every base option Kit doesn't set (`strict`,
   // `exactOptionalPropertyTypes`, …) still applies. `$app/tsconfig` is
   // `node_modules/$app/tsconfig.json`, written by `svelte-kit sync`, so every

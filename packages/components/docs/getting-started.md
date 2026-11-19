@@ -43,7 +43,7 @@ Without the `@source` line the components render unstyled — Tailwind has no wa
 
 ### Bringing your own theme
 
-`theme.css` declares two daisyUI themes, `light` and `dark`, on deliberately neutral values (achromatic surfaces, one slate brand hue) — a starting point, not a brand. Override them by declaring your own `@plugin "daisyui/theme"` blocks after the import, or drop the import entirely and declare `light` / `dark` yourself. The components only ever reach for semantic names, so any pair of daisyUI themes with those two names works. If you use `@thomasfosterau/components/charts`, also replace the four `--color-chart-*` custom properties with your own measured set (see [Charts](./components-charts.md)).
+`theme.css` declares two daisyUI themes, `light` and `dark`, on deliberately neutral values (achromatic surfaces, one slate brand hue) — a starting point, not a brand. Override them by declaring your own `@plugin "daisyui/theme"` blocks after the import, or drop the import entirely and declare `light` / `dark` yourself. The components only ever reach for semantic names, so any pair of daisyUI themes with those two names works. If you use `@thomasfosterau/components/charts`, also replace the four `--color-chart-*` custom properties with your own measured set (see [Charts](charts.md)).
 
 ## App integration
 
@@ -94,7 +94,7 @@ Every member is optional in the object you pass — an omitted one falls back in
 <FormActions submitLabel={m.save()} pendingLabel={m.saving()} cancelLabel={m.cancel()} />
 ```
 
-**Translating `requiredLabel` once.** See [Fields and forms](./components-fields.md#translating-requiredlabel-once) for the wrapper pattern that applies the same idea to a default an app always translates.
+**Translating `requiredLabel` once.** See [Fields and forms](fields.md#translating-requiredlabel-once) for the wrapper pattern that applies the same idea to a default an app always translates.
 
 ## Entry points
 

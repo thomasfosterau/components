@@ -9,7 +9,7 @@
  *
  * Only ASCII digits are parsed. A locale whose formatter writes other digits
  * (Arabic-Indic, Devanagari) formats correctly but does not read its own
- * output back; widening the parser is a later decision (#145).
+ * output back; widening the parser is a later decision.
  *
  * Pure functions, no module-level state, so the file stays tree-shakeable.
  *

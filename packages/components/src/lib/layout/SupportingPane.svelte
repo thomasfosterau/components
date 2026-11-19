@@ -21,8 +21,7 @@ A main pane with a supporting panel (properties, comments, a legend): a column b
   - Narrow: `Drawer`'s modal-dialog contract, named by `title`; Escape closes
     it and focus returns to the toggle.
 
-  The `sheet` presentation (#190 `BottomSheet`) and a draggable divider (#176
-  `Splitter`) are follow-ups for when those primitives exist.
+  There is no `sheet` presentation or draggable divider yet.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';

@@ -62,7 +62,7 @@ describe('staticMapUrl', () => {
     expect(decodeURIComponent(url)).toContain('/static/[1,2,3,4]/640x360');
   });
 
-  it('reads options forwarded as `undefined` as absent (#76)', () => {
+  it('reads options forwarded as `undefined` as absent', () => {
     // A wrapper forwarding its own optional settings unconditionally. Under
     // `exactOptionalPropertyTypes` this only type-checks while
     // `StaticMapRequest` and `MapCamera` declare them `T | undefined`.

@@ -2,7 +2,7 @@
 
 A data import mapper: take a table a user has (a CSV, a worksheet, a table in a document) and turn it into records of your app's [Effect Schema](https://effect.website), with every row that does not fit reported field by field and cell by cell. The mapping is a plain, versioned JSON spec, so you can store it and offer it again as a preset.
 
-The `.` entry is the headless core: the target descriptor, the spec, the mapping engine and the adapter that reads [`@thomasfosterau/effect-document`](https://www.npmjs.com/package/@thomasfosterau/effect-document)'s documents. The `./svelte` entry is the UI: `ImportMapper`, which takes a user from a file to records in three steps (pick the file, match its columns, import), built on [`@thomasfosterau/components`](https://www.npmjs.com/package/@thomasfosterau/components). It handles CSV and TSV today; read options, workbooks and a review grid follow ([#139](https://github.com/thomasfosterau/components/issues/139)).
+The `.` entry is the headless core: the target descriptor, the spec, the mapping engine and the adapter that reads [`@thomasfosterau/effect-document`](https://www.npmjs.com/package/@thomasfosterau/effect-document)'s documents. The `./svelte` entry is the UI: `ImportMapper`, which takes a user from a file to records in three steps (pick the file, match its columns, import), built on [`@thomasfosterau/components`](https://www.npmjs.com/package/@thomasfosterau/components). It handles CSV and TSV today; read options, workbooks and a review grid follow.
 
 ## Install
 
@@ -104,7 +104,6 @@ The columns are matched to the fields from the headers (a field's key, title or 
 ## Docs
 
 - API reference: the TSDoc on each export, which your editor shows on hover and which ships in the published `.d.ts`.
-- Design and roadmap: [issue #139](https://github.com/thomasfosterau/components/issues/139).
 - Contributing: the [root README](https://github.com/thomasfosterau/components/blob/trunk/README.md) and [AGENTS.md](https://github.com/thomasfosterau/components/blob/trunk/packages/import/AGENTS.md).
 
 ## License

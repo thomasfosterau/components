@@ -5,7 +5,7 @@ One option of a `MenuRadioGroup` (`role="menuitemradio"`).
   MenuRadioItem — one option of a `MenuRadioGroup`. It renders the radio
   item part its enclosing `DropdownMenu` or `ContextMenu` lends it through
   context (`menu-parts/RadioItemPart.svelte`), so this file imports nothing
-  from bits-ui (#129).
+  from bits-ui.
 
   ARIA contract: `role="menuitemradio"` with `aria-checked`; the dot is
   `aria-hidden`. Outside a `DropdownMenu` / `ContextMenu` it renders nothing.

@@ -168,7 +168,7 @@ describe('chartNodeViewFactory', () => {
   });
 });
 
-describe('ChartNodeView data table (#304)', () => {
+describe('ChartNodeView data table', () => {
   it('appends the data as a visually hidden table after the SVG', () => {
     const view = viewFor(inlineSpec);
     const table = view.dom.querySelector('table[data-chart-table]');

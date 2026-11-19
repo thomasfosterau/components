@@ -1,136 +1,22 @@
 # AGENTS.md
 
-Guidance for any coding agent working in this repository; Claude Code reads it through [`.claude/CLAUDE.md`](.claude/CLAUDE.md), which adds only what is specific to Claude (its hooks and session constraints). What the packages are, for a consumer, is the [README](README.md); setup, commands and the branch / changeset rules are [CONTRIBUTING.md](CONTRIBUTING.md). This repo publishes two Svelte 5 component libraries, one framework-agnostic chart package and a data import mapper; the artifacts that matter are `packages/components/dist`, `packages/mapbox/dist`, `packages/charts/dist` and `packages/import/dist`, and everything below exists to keep them small, typed and accessible. The toolchain, workspace shape, catalog discipline and session hook are copied from the app repos so a component authored here compiles identically in the app that consumes it; the places the two deliberately differ are commented where they occur (the browser-mode test suite and its `playwright` provider, the absence of a stage/deploy graph).
+Read [README.md](README.md) and [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) first; they apply to agents too. Each package's own `AGENTS.md` covers its boundary and invariants.
 
-| Package | Directory | Boundary |
-| --- | --- | --- |
-| `@thomasfosterau/components` | `packages/components` | The core library. Peers: `svelte`; optional `@thomasfosterau/effect-forms-svelte`, reached only from `/entity-form`. Rules in [its AGENTS.md](packages/components/AGENTS.md). |
-| `@thomasfosterau/components-mapbox` | `packages/mapbox` | Maps and the plan editor. Required peer `mapbox-gl`; consumes the core through its published `/canvas` entry. Rules in [its AGENTS.md](packages/mapbox/AGENTS.md). |
-| `@thomasfosterau/charts` | `packages/charts` | The portable chart spec, its JSON Schema and geometry core, and the Svelte / ProseMirror / Vega-Lite interpreters (merged in from the former `thomasfosterau/charts` repo). Plain TypeScript built with `vp pack`, except the `/svelte` entry, which `svelte-package` ships as `.svelte` source; tested under Node, framework peers (`svelte` included) optional per entry; `effect` is a runtime dependency of its spec entry. Independent of the other two. Rules in [its AGENTS.md](packages/charts/AGENTS.md). |
-| `@thomasfosterau/components-import` | `packages/import` | The data import mapper (#139): an app's `Schema.Struct` target, the serialisable `ImportSpec` and the mapping engine. Its `.` entry is a headless core, plain TypeScript over Effect built with `vp pack` and tested under Node; it reads the candidate tables of `@thomasfosterau/effect-document`'s readers. Its `./svelte` entry is the `ImportMapper` UI, `svelte-package` output on `@thomasfosterau/components` (a `workspace:*` dependency, as in packages/mapbox), tested in Chromium. Required peers `effect`, `@thomasfosterau/effect-document` and `svelte`. Rules in [its AGENTS.md](packages/import/AGENTS.md). |
+## Process
 
-## Common pitfalls
+- You may open PRs in this repository; follow the workflow in docs/CONTRIBUTING.md. Out-of-scope work you spot becomes an issue, not a detour.
+- Use the GitHub MCP tools or `gh`, whichever is available. Write only to `thomasfosterau/components`.
+- If a gate can't run in your session (no matching Chromium, no network, no Swift toolchain), say so in the PR body rather than implying it ran. A run against a different Chromium revision is evidence, not the gate.
+- Never `git stash`: the stash is shared across worktrees. Use a WIP commit.
 
-- **Never edit a version in a `package.json`.** Every external version lives in [`pnpm-workspace.yaml`](pnpm-workspace.yaml) under `catalog:`, and the published peer ranges under `catalogs.peers`; package.json files carry only `catalog:`, `catalog:peers` or `workspace:*`. `catalogMode: strict` governs only the commands that write a specifier: `pnpm add` writes `catalog:` (creating the catalog entry if there is none), and `pnpm add` or `pnpm update <pkg>@<range>` fails with `ERR_PNPM_CATALOG_VERSION_MISMATCH` on a version outside the catalog's range; `pnpm install` accepts a literal hand-edited into a package.json, so review is what keeps literals out. After editing the catalog, run `pnpm install` and commit the regenerated `pnpm-lock.yaml` — a stale lockfile fails every CI job at once with `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH`.
-- **`dist/` is the product; `src/routes` does not exist.** Both packages are `svelte-package` libraries, not SvelteKit apps: no demo app, no adapter, no `app.html`. Nothing under either `src/lib/` may import `$app/*`, `$env/*` or anything else SvelteKit only resolves inside an app; an Oxlint `no-restricted-imports` override in the root `vite.config.ts` enforces it, since the `$app/types` the package tsconfigs take from `$app/tsconfig` declares `$app/*` and `svelte-check` no longer rejects such an import. SvelteKit is here to run `svelte-kit sync` and `svelte-package`, nothing more. Each package `tsconfig.json` extends the `node_modules/$app/tsconfig.json` that `sync` writes, so every task that reads one depends on `sync`.
-- **`"sideEffects": false` is a claim about `dist/`, and it is load-bearing.** Every emitted `.js` must be pure declarations: no bare imports, no top-level `await`, no top-level statements. A `<script module>` block may only declare. It is what lets a consumer's bundler drop the components they don't use.
-- **`@effect/tsgo`, `@typescript/native` and `vite-plus` move together.** The root `prepare` runs `effect-tsgo patch --typescript --oxlint`, which overwrites the native `tsc` and vite-plus's `oxlint` / `oxlint-tsgolint` with Effect-patched builds and hard-errors on any version trio its release does not list. Read the `@effect/tsgo` catalog comment before bumping any of the three. Dependabot's `toolchain` group brings `vite-plus`, `vitest`, `@vitest/*` and `@effect/tsgo` in one PR (the Effect lint plugin `@enfect/oxlint` ranges its oxlint and updates on its own; groups exist only for lockstep sets); the npm aliases it cannot bump (`vite`, `typescript`, `@typescript/native`) are by-hand edits in that PR, listed in `.github/dependabot.yml`'s header. Upgrade Vite+ with its migrator (`pnpm dlx --package=vite-plus@<v> vp migrate --no-interactive`), then drop the `minimumReleaseAgeExclude` entries it adds, so the 8-hour supply-chain wait (`minimumReleaseAge: 480`) still covers the toolchain.
-- **Accessibility regresses silently.** Type errors don't catch a lost accessible name, a broken focus order or a dropped `aria-*` relationship. That is the whole reason the suite drives a real browser.
+## Pitfalls
 
-## Conventions
+- In Effect code, use Effect v4's own modules rather than re-inventing them (docs/CONTRIBUTING.md § Effect). File an issue for non-idiomatic code you can't fix trivially.
 
-These are the Svelte packages' conventions; `packages/charts` follows the language-level ones (catalog, `T | undefined` optionals, `sideEffects`), and its one Svelte entry, `/svelte`, takes some of the component ones — its AGENTS.md says which.
+- Several catalog entries are npm aliases or exact lockstep pins (`vite`, `typescript`, `@typescript/native`, `vitest`, `@effect/tsgo`): read their comments in `pnpm-workspace.yaml` before moving any.
+- On a fresh checkout, `vp run -r sync` before `vp check`: the type-aware lint reads the tsconfig `svelte-kit sync` generates.
+- In a `.ts` browser test, `render(Component, props)` can't take a prop named `anchor`, `target`, `props`, `events`, `context` or `intro` (Svelte's mount options); nest those under `props:`.
 
-- **Svelte 5 runes and snippets only.** `$props`, `$state`, `$derived`, `$effect`, `{#snippet}` / `{@render}`. No `export let`, no slots, no stores in component code, no legacy event directives.
-- **Every component spreads the native attributes of the element it renders and merges `class`.**
+## Fallow
 
-  ```svelte
-  interface Props extends HTMLAttributes<HTMLSpanElement> {
-    children: Snippet<[]>;
-  }
-  let { children, class: className, ...rest }: Props = $props();
-  ```
-
-  ```svelte
-  <span {...rest} class={['sr-only', className]}>{@render children()}</span>
-  ```
-
-  Svelte 5's class arrays (`class={[…]}`) merge natively (clsx semantics, no dependency) — there is no `clsx` in this workspace, and a `.svelte` file never needs one. The caller's `class` goes **last**, so Tailwind's later-wins ordering lets them override anything. A component that swallows `id`, `aria-*` or `data-*` is a bug — a consumer cannot label, test or hook into it.
-
-- **Every string is a prop with an English default.** There is no message catalogue and the context carries no copy: `dismissLabel = 'Dismiss'`, `previousLabel = 'Previous'`. Accessible-name props end in `Label`. An i18n app passes its own messages at the call site.
-- **Links and locale go through the context.** `getComponentsContext()` supplies `href(path)`, `navigate(url)`, `isCurrent(href)` and `locale()`; a component never imports `$app/*` and never reads `window.location` itself. Every `Intl` formatter takes a `locales` prop and falls back to `locale()`.
-- **No Effect outside `/entity-form`.** Async callbacks are `(…, signal: AbortSignal) => Promise<T>`; optional values are `T | undefined`. Effect adapters live in the consuming apps. The one exception is the `@thomasfosterau/components/entity-form` entry: it renders `@thomasfosterau/effect-forms-svelte` definitions, so that library and `effect` are both optional peers reached only from that entry (see [§ Effect](#effect)).
-- **Ids are minted with `$props.id()`** and overridable by an `id` prop.
-- **Optional props are declared `T | undefined`, never bare `prop?: T`.** The workspace compiles with `exactOptionalPropertyTypes`, under which `prop?: T` rejects an explicitly forwarded `undefined`, so `<Button {tone}>` from a caller whose own `tone` is optional would not compile. Parenthesise function types: `onSelect?: (() => void) | undefined`. The same holds for every optional property of an exported `.ts` type: `readonly year?: number | undefined`. There are two exceptions. A type that describes a JSON document, whose keys are present or absent and never `undefined` (packages/charts' spec and Vega-Lite types; see its AGENTS.md). And Effect code's own types, where an options-bag member is `readonly x?: T` and an Option-shaped member is `x?: Option.Option<T>`, neither with `| undefined` ([§ Effect](#effect)).
-- **Document every component and prop for the hover.** Open each component with a one-sentence `<!-- @component … -->` comment (svelte2tsx copies only a comment starting with `@component` into the `.d.ts`; a plain `<!-- … -->` header stays maintainer-only). Give every prop a `/** … */` line, with `@defaultValue` wherever the destructuring sets one.
-- **`.svelte` files are formatted by hand** — oxfmt skips them, `vp staged` only lints them and the PostToolUse format hook ignores them: two-space indent, single quotes, semicolons.
-- **Tests import from `vite-plus/test`** (`vite-plus/test/browser`, `vite-plus/test/browser-playwright`), never `vitest` or `@vitest/*`; Oxlint's `vite-plus/prefer-vite-plus-imports` enforces it.
-- **In a `.ts` test, `render(Component, props)` cannot take a prop named `anchor`, `target`, `props`, `events`, `context` or `intro`** — those are Svelte's mount options; nest such props under `props:`.
-- **daisyUI classes come from a literal lookup table, never a template string.** Tailwind 4 extracts classes by scanning source text, so ``class={`btn-${variant}`}`` emits nothing at all:
-
-  ```ts
-  const variantClasses: Record<Variant, string> = {
-    primary: 'btn-primary',
-    ghost: 'btn-ghost',
-  };
-  ```
-
-  Same rule for sizes, colours and states. A `Record<K, string>` of complete class names is the only form that survives the scan, and it is also the form `sortTailwindcss` can order.
-
-- **Semantic tokens only.** `bg-base-200`, `text-error`, `btn-primary` — never `bg-green-700`, a hex or an `oklch()` inside a component. The vocabulary is [`packages/components/src/lib/theme.css`](packages/components/src/lib/theme.css); two vocabularies for one palette is how a design system drifts.
-- **bits-ui owns interaction.** Anything with focus management, keyboard semantics, a popover, or an ARIA relationship between elements is built on a bits-ui primitive rather than hand-rolled. Hand-rolling is the exception, and it needs a reason in the component's header comment.
-- **ARIA is part of the contract, not decoration.** A component's accessible name, role and state are its public API as much as its props are, and they are pinned by a test.
-- **Every component ships with a story and a browser test.** One `*.stories.svelte` / `*.stories.ts` per component under `src/stories/<family>/` and one `tests/<family>/<Component>.test.ts`, both mirroring `src/lib/<family>/` (in `packages/mapbox`, which is one family, the `<family>/` level is dropped) — not beside the component, because `svelte-package` copies every `src/lib/` file into `dist/` and stories must not ship. Snippet-taking components use Svelte CSF (`defineMeta` + `<Story>`), prop-only ones plain CSF.
-- **Families, entry points, and when a family becomes a package.** Core families (`ui`, `feedback`, `layout`, `fields`, `forms`, `data`, `infobox`, `formatting`, `links`, `media`, `hotkeys`, `search`) are re-exported from `@thomasfosterau/components`' root barrel; `citations`, `canvas`, `charts`, `tips` and `seo` are separate `exports` entries (`@thomasfosterau/components/<family>`), as is `entity-form` (the `forms` family's `EntityForm`, kept out of the barrel because of its optional peer) so a consumer that never uses them never loads them. `hotkeys` is also its own entry (`/hotkeys`) while staying in the barrel, so a consumer can load `HotkeyHelpDialog` lazily. A new family gets a barrel, an `exports` entry if heavy, and a README row and, when it needs more than a doc comment, a `docs/` guide.
-
-  **A component whose behaviour needs a specific third-party dependency lives in its own package adjacent to `packages/components`, so the core stays free of it** — the dependency becomes that package's required peer, and installing the package is the decision to take it on. `packages/mapbox` is the worked example: `@thomasfosterau/components-mapbox`, `mapbox-gl` required. An "optional peer" of the core library is the shape this rule replaces; nothing in this workspace could check it. `canvas`, `charts`, `citations` and `tips` need no such dependency and stay where they are.
-
-- **Prefer vertical slices per component** over horizontal sweeps: component → barrel export → story → test → README row (families only), finished, before starting the next.
-
-## Commands
-
-Invoke everything through `vp` — `vp run <script>`, `vp exec <bin>` (instead of `npx`). The sanctioned non-`vp` invocations: `pnpm install` (`pnpm install --frozen-lockfile` in CI), `pnpm changeset`, `pnpm audit`, the release path (`pnpm run release`: `pnpm pack` + `npm publish`), and `pnpm exec playwright install` (in CI, and in a session whose image lacks the pinned Chromium revision). The commands, and what each one checks, are in [CONTRIBUTING.md § Commands](CONTRIBUTING.md#commands).
-
-## Verification
-
-Before you report work as done, run the gates below in order and quote each command with its final pass/fail. `vp run ci` (the `ci` task in the root `vite.config.ts`) runs them all, fail-fast, and it is the only command `.github/workflows/ci.yml` runs, once per Node line (`lts`, `latest`); run the gates one by one when you need each verdict. If a gate can't run here, say which and why in the PR body; never imply it ran.
-
-1. `vp check` (on a fresh checkout, `vp run -r sync` first: the type-aware lint reads the Svelte packages' tsconfigs, which extend the `$app/tsconfig` that `svelte-kit sync` writes, and CI runs the same step before it)
-2. `vp run check`
-3. `vp run -r test:unit`
-4. `vp run -r build`
-5. `vp run --filter ./packages/components storybook:build`
-6. `pnpm audit --audit-level high`
-
-None needs a credential; `pnpm audit` needs the npm registry. `test:unit` and `storybook:build` need the exact Chromium revision the pinned `playwright` expects (see that entry's comment in `pnpm-workspace.yaml`). CI installs its own; a session image's pre-installed browser is not kept in step with the pin. If the suite reports a missing executable, run `pnpm exec playwright install chromium` once and re-run the gate; if that can't run (a session whose network policy blocks `cdn.playwright.dev`), report the browser gates as not run rather than as passing — a run against a different Chromium revision is evidence, not the gate. A human confirms rendering in Storybook (the `storybook` dev server); in a session, `storybook:build` is the check. `packages/charts/swift/ChartSpecKit` is outside these gates: [`.github/workflows/chartspeckit.yml`](.github/workflows/chartspeckit.yml) runs `swift test` on macOS when it or the schema changes, and no session has a Swift toolchain.
-
-## Pull requests
-
-Branch naming, rebasing, changesets and publishing are in [CONTRIBUTING.md § Branches, pull requests and changesets](CONTRIBUTING.md#branches-pull-requests-and-changesets); they bind agents too. What is agent-specific:
-
-- **Standing PR approvals** (these override any default "don't open a PR unless asked"): once a branch has pushed a commit, open a PR against `trunk` if none exists; watch it to merge or close, investigating CI failures and review comments as they arrive and rebasing onto `origin/trunk` promptly when it goes conflicting (`mergeable: CONFLICTING`); keep the PR body current as the implementation diverges.
-- **GitHub scope.** GitHub writes go to `thomasfosterau/components` only; pass `-R thomasfosterau/components` whenever the cwd might be another checkout — `gh` resolves the repo from the cwd's git remote, so a write from a third-party clone silently files upstream. Writing anywhere else (upstream projects, the owner's app repos) needs the owner's explicit approval for that action in the current session. Use the `gh` CLI for GitHub operations, even when GitHub MCP tools are available.
-
-## Work tracker
-
-Issues in `thomasfosterau/components` are the backlog: when you find work you can't do now, file an issue rather than leaving a TODO. The issue is the spec — read its comments (`gh issue view <n> --comments -R thomasfosterau/components`); later comments override the body. Record decisions and findings as issue comments. Stop-and-report is a valid outcome: on a blocker outside the issue's scope, comment the evidence on the issue and stop. Scope cut mid-PR becomes a linked issue before merge.
-
-## Effect
-
-In the Svelte packages, only `forms/EntityForm.svelte` and `forms/entity-form.ts` touch Effect (see [packages/components/AGENTS.md](packages/components/AGENTS.md#boundary)). `packages/charts` uses Effect Schema inside `src/spec` only, never in a published type ([its AGENTS.md](packages/charts/AGENTS.md#boundary)). `packages/import` is the exception by design: `effect` is its required peer, and its headless core takes and returns Effect values ([its AGENTS.md](packages/import/AGENTS.md#boundary)). The version is the `effect` pin in `pnpm-workspace.yaml`. What a consumer sees is a range, never that pin: `@thomasfosterau/charts` depends on `effect ^4.0.0` (`catalogs.published`). Raise it only when a dependency of the package requires it, naming the dependency in the catalog comment; the package's own code is written to run on 4.0.0. `fallow-rules.json` fails the audit on an `effect` import anywhere else in those packages, and on the form library outside the `/entity-form` files; it bans `svelte` and the other packages from `packages/import/src` (outside the `./svelte` entry's `src/svelte`) instead, and `@thomasfosterau/effect-document` (its other required peer) from every other package.
-
-Those files, and only those, are linted with `@enfect/oxlint`'s `recommended` rules (anti-slop included) and `@effect/tsgo`'s preset, which runs through the type-aware lint; the list is `effectFiles` in the root `vite.config.ts`. A rule is turned off only for a file it cannot apply to, with the reason beside it: `EntityForm.svelte` keeps `prefer-option-over-null` off for its props (Svelte-idiomatic `T | undefined`) and the form library's own field-handle type, `parse.ts` is the `unknown`-in, `unknown`-out parse boundary, and packages/import's `src/svelte/session.ts`, where its UI runs the engine, keeps it off for the types its components take as props. Effect helper modules are namespace-imported under `effect/prefer-namespace-imports`' canonical aliases, which the config pins at `error`: `import * as Arr from 'effect/Array'`, likewise `P` (`Predicate`), `R` (`Record`), `Str` (`String`), `Eq` (`Equal`) and `Bool` (`Boolean`), while `Option`, `Schema` and the rest keep their module name; never a named import from `effect` or a submodule. Absence in Effect code is `Option` (`effect/prefer-option-over-null`, pinned at `error`): a function that may have no answer returns an `Option`, and a value that is genuinely present-or-absent data is an `Option`, never `T | null` or `T | undefined`. The owner's family-wide spellings: an options-bag member (a setting a caller may leave out) is `readonly x?: T`, an Option-shaped member is `x?: Option.Option<T>` (neither with `| undefined`), an optional parameter is a plain `x?: T`, and a schema for a wire shape keeps its native optional fields (`Schema.optional`), because the document on the wire has keys that are present or absent. Three places it cannot apply, each by design: a Svelte component's props stay `T | undefined` (`EntityForm.svelte`, and every component — a prop is not an Effect option bag, and forwarding an optional prop needs `undefined`); `packages/charts`' spec and Vega-Lite types describe a JSON document, whose keys are present or absent; and nothing Effect reaches a published type (`packages/charts`' `check-dist-types`), so a public signature keeps `T | undefined` even when its implementation uses `Option`. A breaking move to `Option` takes a `minor` changeset. A conditional spread of an empty object (`...(cond ? { a } : {})`) is written as explicit construction instead (`effect/no-conditional-empty-object-spread`, pinned at `error`). A test that runs Effect uses `@effect/vitest`'s `it.effect` and `layer`, so the Effect rules apply to tests too (`effect-run-in-body`, `strict-effect-provide`); none is scoped off for tests except `effecttsgo/unstable-api-usage`, which reports `@effect/vitest`'s `it` itself (the reason is beside it in the root `vite.config.ts`). `packages/import`'s suite is the one that runs Effect; it imports `it`, `describe` and `assert` from `@effect/vitest`, which wraps the same `vitest` singleton `vite-plus/test` re-exports. Fix a finding by changing the code, never with a disable comment. `packages/charts` type-checks under the Effect-patched native `tsc` with the `@effect/language-service` plugin (its `tsconfig.json`), so Effect diagnostics print in `vp run check`; warnings do not fail it.
-
-Never guess at an Effect API: read the installed package — `node_modules/effect/dist/*.d.ts`, `node_modules/effect/src`, and the `node_modules/effect/AGENTS.md` and `ai-docs/` the pinned version ships — and, for the form store, `@thomasfosterau/effect-forms-svelte`'s README and `.d.ts`.
-
-## Documentation surfaces
-
-One home per fact:
-
-- **`AGENTS.md`** (this file) — repo-wide rules for any coding agent: pitfalls, conventions, the gate list, the work tracker.
-- **Package `AGENTS.md`** — that package's boundary, invariants and terms. Its `CLAUDE.md` only imports it (`@AGENTS.md`).
-- **`.claude/CLAUDE.md`** — what is specific to Claude Code: its hooks and session constraints. It imports this file, CONTRIBUTING.md and the README rather than repeating them; there is no root `CLAUDE.md`.
-- **Package `README.md`** — short, and read on npm: what the package is, install, one minimal example, a table of entry points, and absolute links. It holds no API detail. The root `README.md` is the repo landing page.
-- **Component doc comments** — the API reference: the `@component` one-liner, the header's ARIA contract and a `/** */` (with `@defaultValue`) per prop.
-- **`docs/*.md`** — longer guides and concepts, linked from the READMEs.
-- **`CONTRIBUTING.md`** — setup, the hooks, the commands, and the branch / pull request / changeset rules. **`PUBLISHING.md`** — the release flow and its one-time owner setup. **`SECURITY.md`** — the reporting channel and the supply-chain posture.
-- **`.fallowrc.json` / `fallow-rules.json`** — the entry points and the import boundaries, each exemption commented where it is made.
-- **Issue comments** — decisions and findings, later comments overriding the body.
-- **`.claude/rules/`** — a Claude rule that must be visible when touching certain files (none exist yet). Formatter and lint config goes in `vite.config.ts` first.
-
-`docs/*.md` holds the longer guides (setup, decision guides such as which choice control, worked examples), named `docs/<package>-<topic>.md`. One home per fact: API detail (props, defaults, ARIA, keyboard) lives in the doc comments, how-tos in `docs/`, and a package README is only the short landing page.
-
-## Fallow local gate
-
-Before any `git commit` or `git push`, run `fallow audit --format json --quiet --explain --gate-marker agent --base origin/trunk` (in a Claude Code session a PreToolUse hook runs it and blocks on `fail`; see `.claude/CLAUDE.md`). If the verdict is `fail`, fix the reported findings before retrying. Treat JSON runtime errors like `{ "error": true, ... }` as non-blocking. Audit defaults to `gate=new-only`: only findings introduced by the current changeset affect the verdict. Refresh `coverage/coverage-final.json` with `vp run test:coverage` first, or every function scores as uncovered.
-
-## Fallow task map
-
-| When the agent is about to... | Run |
-| --- | --- |
-| delete an "unused" export or file | `fallow dead-code --trace <file>:<export>` |
-| delete an "unused" dependency | `fallow dead-code --trace-dependency <name>` |
-| commit or open a PR | `fallow audit --base origin/trunk` |
-| check which architecture rules apply to a file before changing it | `fallow guard <files>` |
-| check cycles, boundaries and the rule pack after editing | `fallow architecture` |
-| understand a finding | `fallow explain <issue-type>` |
+A PreToolUse hook runs `fallow audit` before `git commit` / `git push` and blocks on a `fail` verdict (only findings the change introduces count). Run `vp run test:coverage` first, or every function scores as uncovered. Fix the findings rather than working around the gate; `vp exec fallow explain <issue-type>` explains one.

@@ -21,7 +21,7 @@ afterEach(() => {
  * animation the browser may throttle or abandon when this page is not in
  * the foreground: `test:coverage` runs the components and mapbox browser
  * projects side by side, and a stalled scroll whose `scrollend` releases the
- * carousel leaves the index where the strip really is, the start (#418).
+ * carousel leaves the index where the strip really is, the start.
  * Call before `render`: the carousel reads the query when it mounts.
  */
 const scrollInstantly = (): void => {

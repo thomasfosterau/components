@@ -1,6 +1,6 @@
 /**
  * `ganttSpec` builds a valid spec 1.1 range-bar chart whose earliest task is
- * the top row, the same way in the core and in Vega-Lite (#305).
+ * the top row, the same way in the core and in Vega-Lite.
  */
 import { describe, expect, it } from 'vite-plus/test';
 import { computeContext } from '../../src/core/index.ts';

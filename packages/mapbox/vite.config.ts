@@ -62,8 +62,7 @@ export default defineConfig({
           output: [],
         },
       },
-      // Browser mode, so `test:unit` never needs `PLAYWRIGHT_BROWSERS_PATH`
-      // spelled out here: Playwright reads it from the environment.
+      // Playwright reads `PLAYWRIGHT_BROWSERS_PATH` from the environment.
       'test:unit': {
         command: 'vp test run tests',
         dependsOn: ['sync', { task: 'build', from: 'dependencies' }],
@@ -78,12 +77,8 @@ export default defineConfig({
 
   plugins: [svelte()],
 
-  // Every runtime dependency the browser suite reaches, pre-bundled BEFORE the
-  // first test file loads — left to discovery, Vite optimises them on first
-  // import and reloads the page, failing every test in flight at that moment.
-  // `mapbox-gl` is on the list because `DynamicMap` reaches it from a dynamic
-  // `import()` inside a mount effect, which is exactly the late discovery that
-  // triggers the reload.
+  // Pre-bundle every dependency the browser suite reaches, `mapbox-gl` included
+  // (`DynamicMap` imports it late): one Vite discovers mid-run reloads the page.
   optimizeDeps: {
     include: [
       '@testing-library/jest-dom/vitest',
@@ -99,9 +94,6 @@ export default defineConfig({
     // Registers the jest-dom matchers.
     setupFiles: ['./tests/setup.ts'],
     testTimeout: 30_000,
-    // A REAL browser, not a DOM shim — the same reason as the sibling's suite:
-    // focus order, keyboard handling and the accessibility tree are the
-    // contract, and no shim models them faithfully enough to be evidence.
     browser: {
       enabled: true,
       headless: true,

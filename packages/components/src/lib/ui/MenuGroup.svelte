@@ -6,7 +6,7 @@ A labelled group of menu items: a `role="group"` in a `DropdownMenu` or `Context
   "Share"). Inside a `DropdownMenu` or `ContextMenu` it renders the group
   part its menu lends it through context (`menu-parts/GroupPart.svelte`): a
   `role="group"` named by its heading, or by `aria-label` when
-  `showLabel={false}`. This file imports nothing from bits-ui (#129).
+  `showLabel={false}`. This file imports nothing from bits-ui.
 
   In a navigation `Menu` (or `Sidebar`) it is daisyUI's titled sub-list: an
   `<li>` holding the `menu-title` and a nested `<ul>` of the items, the list

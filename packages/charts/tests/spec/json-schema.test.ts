@@ -43,7 +43,7 @@ describe('JSON Schema artifact', () => {
     expect(emitted.$defs['ChartSpec']?.['additionalProperties']).toBe(false);
   });
 
-  describe('discriminated union emission (the handover §10 verification)', () => {
+  describe('discriminated union emission', () => {
     // Swift Codable / kotlinx.serialization codegen needs the data union to be
     // an unambiguous oneOf whose branches are distinguishable by required keys.
     it('data emits as a clean oneOf of $refs', () => {

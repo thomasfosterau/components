@@ -4,7 +4,7 @@
   component built on this library does. Under `exactOptionalPropertyTypes` an
   omitted prop arrives here as an explicit `undefined`, so this file only
   type-checks while `NumberFormat` declares each forwarded prop
-  `T | undefined` (#45). `vp run check` is the assertion; the browser test
+  `T | undefined`. `vp run check` is the assertion; the browser test
   that renders it pins that the forwarded `undefined` still falls back to
   `NumberFormat`'s own defaults.
 -->

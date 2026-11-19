@@ -25,7 +25,7 @@ const article: Citation = {
  * A consumer's own record, whose optional fields are themselves
  * `T | undefined`, mapped field-for-field into a `Citation`. Under
  * `exactOptionalPropertyTypes` this only type-checks while `Citation` declares
- * those fields `T | undefined` (#76); `vp run check` is that assertion.
+ * those fields `T | undefined`; `vp run check` is that assertion.
  */
 interface StoredReference {
   readonly id: string;

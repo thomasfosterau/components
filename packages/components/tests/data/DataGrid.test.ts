@@ -620,7 +620,7 @@ test('an editing grid keeps row selection, as a column of boxes the grid moves t
   expect(focusedText()).toBe('Basil');
 });
 
-// `virtual`: 5,000 rows of 40 px in a 400 px scroller (#427).
+// `virtual`: 5,000 rows of 40 px in a 400 px scroller.
 
 const frame = (): Promise<void> => new Promise((resolve) => requestAnimationFrame(() => resolve()));
 

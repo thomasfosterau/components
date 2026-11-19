@@ -7,7 +7,7 @@
 - **Shape**: an area (`polygon`, closed), a path (`line`, open) or a point (`marker`, a disc). All three sit at a `position` in canvas coordinates; an outline's `points` are relative to it, so moving a shape never rewrites its corners.
 - **Grip vs indicator**: `MapShapeView` draws a selected outline's vertices as filled grips when `editable` and as hollow rings otherwise. The affordance matches the capability, so a read-only plan never offers a handle that does nothing. An editable outline also gets hollow, dashed midpoint handles, from which a new vertex is dragged out.
 - **Committed edit**: `MapEditor` reports every pointer move (or held-arrow repeat) with `committed: false` and the release once with `committed: true`, carrying a `Transform` spanning the whole gesture. A page records history on `committed` alone, so one drag is one undo entry. History and shape creation stay with the page that owns the document.
-- **Geo frame**: how a stored GeoJSON geometry becomes canvas coordinates; see [mapbox-geojson.md](https://github.com/thomasfosterau/components/blob/trunk/docs/mapbox-geojson.md).
+- **Geo frame**: how a stored GeoJSON geometry becomes canvas coordinates; see [geojson.md](https://github.com/thomasfosterau/components/blob/trunk/packages/mapbox/docs/geojson.md).
 
 ## A page that owns the document
 

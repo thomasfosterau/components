@@ -6,7 +6,7 @@ An on/off entry of a `DropdownMenu` or `ContextMenu` (`role="menuitemcheckbox"`)
   renders the checkbox item part its enclosing `DropdownMenu` or
   `ContextMenu` lends it through context (`menu-parts/CheckboxItemPart.svelte`),
   so this file imports nothing from bits-ui and costs a navigation-only page
-  nothing (#129).
+  nothing.
 
   ARIA contract: `role="menuitemcheckbox"` with `aria-checked` from bits-ui;
   the check mark is `aria-hidden`. A checkbox item belongs to an application

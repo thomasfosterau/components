@@ -1,6 +1,6 @@
 # Capability matrix
 
-The package overview is the [charts README](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/README.md); the spec itself is described in [Chart spec](https://github.com/thomasfosterau/components/blob/trunk/docs/charts-spec.md).
+The package overview is the [charts README](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/README.md); the spec itself is described in [Chart spec](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/docs/spec.md).
 
 For every spec field and mark type, this records which interpreters honour it and how it degrades when unsupported. This is the artifact that keeps multiple interpreters honest and prevents the spec from drifting into web-only assumptions.
 
@@ -30,13 +30,13 @@ For every spec field and mark type, this records which interpreters honour it an
 | `area` | ✅ | ✅ `area` | 🔵 `AreaMark` | 🔵 | 🔵 | n/a — part of the portable intersection |
 | `tree` (spec 1.1) | ✅ tidy layout (`buildTreeGeometry`), plus a visually hidden nested list | ⛔ `VegaLiteEmitError` with reason `'unsupported-mark'` (Vega-Lite has no tree layout; use full Vega's `tree` transform or another interpreter) | 🟡 `TreeLayout` drawn on a SwiftUI `Canvas` outside Swift Charts, the hierarchy as accessibility children | 🟡 custom layout outside the charting library | 🔵 | Render the nested-list fallback (the hierarchy as text), never an empty plot |
 
-The v1 mark set is deliberately the intersection of the native charting vocabularies. `tree` is the one exception (owner decision on #256): no native charting library has it, so every interpreter lays it out itself from the same algorithm, and the matrix rule 2 below is met by the nested-list degradation. New marks (e.g. `rect`, `rule`, `arc`) require a minor `specVersion` bump (see [§ Spec versioning](https://github.com/thomasfosterau/components/blob/trunk/docs/charts-spec.md#spec-versioning)) and a row here **before** implementation.
+The v1 mark set is deliberately the intersection of the native charting vocabularies. `tree` is the one exception: no native charting library has it, so every interpreter lays it out itself from the same algorithm, and the matrix rule 2 below is met by the nested-list degradation. New marks (e.g. `rect`, `rule`, `arc`) require a minor `specVersion` bump (see [§ Spec versioning](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/docs/spec.md#spec-versioning)) and a row here **before** implementation.
 
 ### Text alternatives
 
 | Feature | TS core | Vega-Lite | Swift Charts | Compose | Media | Degradation when unsupported |
 | --- | --- | --- | --- | --- | --- | --- |
-| Data table (#304) | ✅ `buildDataTable` (in `resolveChart`'s `table`); the Svelte and ProseMirror interpreters render it visually hidden beside every chart, and visible in place of a newer `1.N` mark they do not know | ⛔ (Vega-Lite has its own `description` / ARIA; an unknown mark is rendered by a TS interpreter) | 🔵 the same model through `accessibilityChildren`, and as the fallback view | 🔵 | 🔵 | **Normative** for an unknown mark: render the table, never an empty plot |
+| Data table | ✅ `buildDataTable` (in `resolveChart`'s `table`); the Svelte and ProseMirror interpreters render it visually hidden beside every chart, and visible in place of a newer `1.N` mark they do not know | ⛔ (Vega-Lite has its own `description` / ARIA; an unknown mark is rendered by a TS interpreter) | 🔵 the same model through `accessibilityChildren`, and as the fallback view | 🔵 | 🔵 | **Normative** for an unknown mark: render the table, never an empty plot |
 
 ### Encoding channels
 
@@ -108,7 +108,7 @@ The TS core never resolves references itself: `computeContext` takes already-res
 | --- | --- | --- | --- | --- | --- | --- |
 | `specVersion` | ✅ `'1'` and `'1.1'` strictly; a newer `'1.N'` degraded | ✅ (the degraded spec) | 🔵 enforced by decoder (`.v1`, `.v1_1`); degrading a newer `1.N` not yet implemented | 🔵 | 🔵 | See the rule below |
 
-The rule itself (what a minor version may change, how a newer `1.N` document degrades, and what is implemented) is [Spec versioning](https://github.com/thomasfosterau/components/blob/trunk/docs/charts-spec.md#spec-versioning).
+The rule itself (what a minor version may change, how a newer `1.N` document degrades, and what is implemented) is [Spec versioning](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/docs/spec.md#spec-versioning).
 
 ### Rules for changing this matrix
 

@@ -18,7 +18,7 @@ The responsive app frame: a sidebar column with a navigation drawer below `lg`, 
   SvelteKit's `afterNavigate(() => (navOpen = false))`, as with
   `Navbar`'s `menuOpen`.
 
-  Adaptive mode (`destinations` given; #206) declares the app's
+  Adaptive mode (`destinations` given) declares the app's
   destinations once and renders them three ways, Compose's
   `NavigationSuiteScaffold`: below `breakpoints.medium` a `BottomNav` (only
   the destinations whose `compact` is not `false`), from `medium` up to

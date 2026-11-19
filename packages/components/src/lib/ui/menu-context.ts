@@ -10,7 +10,7 @@
  *
  * `DropdownMenu` and `ContextMenu` are the only components that import
  * bits-ui's menus, and they lend the item parts to their descendants through
- * context, so a navigation-only `Menu` never loads the menu runtime (#129).
+ * context, so a navigation-only `Menu` never loads the menu runtime.
  *
  * @module
  */

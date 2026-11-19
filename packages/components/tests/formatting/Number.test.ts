@@ -49,7 +49,7 @@ test('options wins over the individual style props when given', async () => {
 test('a wrapper forwarding its own unset optional props gets the defaults', async () => {
   // The fixture passes `style`, `maximumFractionDigits` and
   // `minimumFractionDigits` through as explicit `undefined`; that it compiles
-  // at all is the type-level half of this test (#45).
+  // at all is the type-level half of this test.
   const screen = await render(NumberForwarder, { value: 1234.5678, locales: 'en-AU' });
 
   const expected = new Intl.NumberFormat('en-AU').format(1234.5678);

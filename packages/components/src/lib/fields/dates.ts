@@ -6,8 +6,7 @@
  * calendar maths, so they are not re-exported from the root barrel or from
  * `fields`: the separate entry makes that cost visible at the import site,
  * lets an app `import()` them lazily on the one page that needs them, and
- * keeps any always-loaded component from pulling them in by accident (the
- * #129 failure mode). `DateInput`, the native control, stays in the barrel
+ * keeps any always-loaded component from pulling them in by accident. `DateInput`, the native control, stays in the barrel
  * and remains the default for a single date on a form.
  *
  * `parseDate`, `parseTime`, `Time` and the `DateValue` type are re-exported

@@ -3,7 +3,7 @@
  * cell values, whatever format they came from.
  *
  * It is the smallest shape both of `@thomasfosterau/effect-document`'s
- * candidate tables (#188) reduce to: `sourceTableFromRegion` (`region.ts`)
+ * candidate tables reduce to: `sourceTableFromRegion` (`region.ts`)
  * turns a `WorksheetRegion` or a `ProseTableRegion` into one, and
  * {@link sourceTableFromGrid} turns any grid a caller built itself. Both read
  * the header and the skipped rows the same way, here.

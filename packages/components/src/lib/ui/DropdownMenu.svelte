@@ -13,7 +13,7 @@ An application menu behind a trigger — a bits-ui dropdown of `MenuItem`s style
   It is a separate component from `Menu` (site navigation) so that bits-ui's
   dropdown runtime is reached only by an app that actually renders a
   dropdown: `Menu`, `MenuItem`, `MenuSeparator` and `Sidebar` import nothing
-  from bits-ui (#129). The children are the same `MenuItem` /
+  from bits-ui. The children are the same `MenuItem` /
   `MenuSeparator` a `Menu` takes; this component lends them its bits-ui item
   and separator parts through context (`menu-parts/menu-parts.ts`), and
   the same for `MenuCheckboxItem`, `MenuRadioGroup`, `MenuRadioItem` and

@@ -61,7 +61,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     the redo side, and the whole history is dropped once a row it names
     leaves `allRows`.
 
-  `virtual` (for a large import, #427): every row of the result is in the
+  `virtual` (for a large import): every row of the result is in the
   grid's matrix but only a window of them is in the DOM. The window is
   `VirtualList`'s — the same `VirtualWindow` and `windowParts` from
   `virtual.svelte.ts`, not a second implementation — drawn as `<tr>`s

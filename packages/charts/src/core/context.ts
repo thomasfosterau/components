@@ -60,7 +60,7 @@ export function computeContext(
   // Positional scales: x → [0, plot width]. A continuous y (quantitative,
   // temporal) → [plot height, 0], inverted so larger values sit higher on
   // screen; a categorical y (nominal, ordinal) → [0, plot height], so the
-  // first category is the top band, as in Vega-Lite and ChartSpecKit (#305).
+  // first category is the top band, as in Vega-Lite and ChartSpecKit.
   const xPositional = spec.encoding.x
     ? resolvePositionalScale(
         spec.encoding.x,

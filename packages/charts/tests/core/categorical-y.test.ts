@@ -1,5 +1,5 @@
 /**
- * A categorical y runs top-down (#305): the first category is the top band
+ * A categorical y runs top-down: the first category is the top band
  * or point, as Vega-Lite and ChartSpecKit draw it, so one spec reads the
  * same in every interpreter. A continuous y still runs bottom-up.
  */

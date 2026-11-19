@@ -6,14 +6,14 @@
  * Those children are written once for every kind of menu, but only the
  * bits-ui menus need bits-ui's `Item` / `Separator` / `CheckboxItem` / … — and
  * a static import of them would put the menu runtime (about 30 KB gzip) on
- * every page that renders a plain navigation list (#129). So the parts travel
+ * every page that renders a plain navigation list. So the parts travel
  * down as context, set by `DropdownMenu` and `ContextMenu`, the only modules
  * that import them. A child outside such a menu never sees them and never
  * loads them.
  *
  * bits-ui's dropdown and context menus share these components (both re-export
  * `bits/menu`'s `Item`, `Separator`, `CheckboxItem`, `RadioGroup`,
- * `RadioItem` and `Sub*`), so one set of parts serves both (#157).
+ * `RadioItem` and `Sub*`), so one set of parts serves both.
  *
  * Internal: not re-exported from the `ui` barrel.
  *

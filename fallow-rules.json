@@ -9,7 +9,7 @@
       "kind": "banned-import",
       "specifiers": ["$app", "$env", "$service-worker"],
       "files": ["packages/components/src/lib/**", "packages/mapbox/src/lib/**"],
-      "message": "SvelteKit resolves this only inside an app, and src/lib ships. Take it as a prop or from getComponentsContext() (AGENTS.md § Common pitfalls)."
+      "message": "SvelteKit resolves this only inside an app, and src/lib ships. Take it as a prop or from getComponentsContext()."
     },
     {
       "id": "no-effect-in-svelte-packages",
@@ -46,7 +46,7 @@
         "packages/components/src/lib/ui/MenuSub.svelte",
         "packages/components/src/lib/ui/menu-parts/menu-parts.ts"
       ],
-      "message": "Navigation-only menus must not reach bits-ui's menus (~30 KB gzip on every page, #129). The bits-ui parts live in ui/menu-parts/*.svelte, are imported only by ui/DropdownMenu.svelte and ui/ContextMenu.svelte (through menu-parts/parts.ts), and reach the Menu* children through context."
+      "message": "Navigation-only menus must not reach bits-ui's menus (~30 KB gzip on every page). The bits-ui parts live in ui/menu-parts/*.svelte, are imported only by ui/DropdownMenu.svelte and ui/ContextMenu.svelte (through menu-parts/parts.ts), and reach the Menu* children through context."
     },
     {
       "id": "context-menu-own-entry",
@@ -54,7 +54,7 @@
       "specifiers": ["./ContextMenu.svelte", "../ui/ContextMenu.svelte"],
       "files": ["packages/components/src/lib/**"],
       "exclude": ["packages/components/src/lib/ui/context-menu.ts"],
-      "message": "ContextMenu is reached only through its own @thomasfosterau/components/context-menu entry (ui/context-menu.ts), so the root barrel never loads it (#157)."
+      "message": "ContextMenu is reached only through its own @thomasfosterau/components/context-menu entry (ui/context-menu.ts), so the root barrel never loads it."
     },
     {
       "id": "effect-only-in-charts-spec",

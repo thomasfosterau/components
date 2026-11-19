@@ -18,7 +18,7 @@ The app shell’s navigation column: a brand mark, the primary links and an acco
   announce itself as an afterthought, and puts a second landmark around the
   `navigation` one, which a reader then has to step through twice.
 
-  Given `destinations` (#428), the links are built from the app's one list of
+  Given `destinations`, the links are built from the app's one list of
   `NavDestination`s, the same declaration `AppShell` and `NavigationRail`
   read, so an app without `AppShell` declares them once; `children` still
   work, and render after them.

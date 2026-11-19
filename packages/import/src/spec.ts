@@ -21,7 +21,7 @@ const Index = Schema.Int.check(Schema.isGreaterThanOrEqualTo(0));
  * Where a table is in its document: block indexes from the top, then
  * list-item, slide, shape and table-cell indexes, and parts such as
  * `"caption"` or `"body"`, as `candidateTables` in
- * `@thomasfosterau/effect-document` locates it (#188); `findRegion` finds the
+ * `@thomasfosterau/effect-document` locates it; `findRegion` finds the
  * table again.
  *
  * The type is upstream's `TableLocator`. This Schema is how a stored spec
