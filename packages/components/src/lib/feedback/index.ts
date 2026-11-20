@@ -24,6 +24,7 @@ export { default as BottomSheet } from './BottomSheet.svelte';
 export { default as Drawer } from './Drawer.svelte';
 export { default as LoadingBoundary } from './LoadingBoundary.svelte';
 export { default as Meter } from './Meter.svelte';
+export { default as NavigationProgress } from './NavigationProgress.svelte';
 export { default as ProgressBar } from './ProgressBar.svelte';
 export { default as PromptDialog } from './PromptDialog.svelte';
 export { default as RadialProgress } from './RadialProgress.svelte';
@@ -42,5 +43,6 @@ export type { TimelineDate, TimelineEntry } from './Timeline.svelte';
 
 export * from './consent.svelte.ts';
 export * from './dialogs.ts';
+export * from './navigation-progress.svelte.ts';
 export * from './sizes.ts';
 export * from './toaster.ts';

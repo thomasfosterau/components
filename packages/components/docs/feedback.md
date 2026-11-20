@@ -4,7 +4,7 @@ Each component's props, defaults, snippets and ARIA contract are in its doc comm
 
 Dialogs, toasts, progress — chrome around something that just happened, or is happening now. What these share is the live region and the announcement order, not the markup.
 
-`feedback` also exports `sizes.ts` (`DialogSize`, `ToastPosition`, `BarSize`, `StatsOrientation` and their class tables `dialogSize`, `toastPosition`, `barSize`, `statsOrientation`), `consent.svelte.ts` (`createConsent`, `setConsent`, `getConsent`, `cookieStorage`, `parseConsentChoice`, `ConsentApi`, `ConsentCategory`, `ConsentChoice`, `ConsentOptions`, `ConsentStorage`, `CategoryConsent`), `dialogs.ts` (`getDialogs`, `setDialogs`, `DialogsApi`, `ConfirmRequest`, `PromptRequest`, `AlertRequest`) and `toaster.ts` (`getToaster`, `setToaster`, `Toast`, `NewToast`, `ToastTone`, `ToastAction`, `ToastOutcome`, `ToasterApi`), plus the prop types below. `colourToken` on a `SegmentBar` segment or a `TimelineEntry` is a CSS custom-property name your theme declares — see `ui`'s `colourTokenStyle`.
+`feedback` also exports `sizes.ts` (`DialogSize`, `ToastPosition`, `BarSize`, `StatsOrientation` and their class tables `dialogSize`, `toastPosition`, `barSize`, `statsOrientation`), `consent.svelte.ts` (`createConsent`, `setConsent`, `getConsent`, `cookieStorage`, `parseConsentChoice`, `ConsentApi`, `ConsentCategory`, `ConsentChoice`, `ConsentOptions`, `ConsentStorage`, `CategoryConsent`), `dialogs.ts` (`getDialogs`, `setDialogs`, `DialogsApi`, `ConfirmRequest`, `PromptRequest`, `AlertRequest`), `navigation-progress.svelte.ts` (`createNavigationProgress`, `setNavigationProgress`, `getNavigationProgress`, `NavigationProgressApi`) and `toaster.ts` (`getToaster`, `setToaster`, `Toast`, `NewToast`, `ToastTone`, `ToastAction`, `ToastOutcome`, `ToasterApi`), plus the prop types below. `colourToken` on a `SegmentBar` segment or a `TimelineEntry` is a CSS custom-property name your theme declares — see `ui`'s `colourTokenStyle`.
 
 | Type | What it is |
 | --- | --- |
@@ -125,3 +125,29 @@ Accept and Reject are deliberately the same button: a prominent Accept beside a 
 <Meter label="Storage used" value={7.2} max={10} low={5} high={8} optimum={0} valueText="7.2 GB of 10 GB" showValue />
 <RadialProgress label="Soil moisture" kind="meter" value={0.34} max={1} />
 ```
+
+## Navigation progress
+
+`NavigationProgress` is the thin bar across the top of the viewport while a client-side navigation or a long request is in flight. It shows nothing for an operation shorter than `delay` (150 ms), trickles toward the end, completes when the last operation is done, and fades. `ProgressBar` is the in-flow, determinate counterpart.
+
+Create the store once in the root layout and wire SvelteKit's `navigating` to it. The library can't import `$app/*`, so that wiring stays in the app:
+
+```svelte
+<script lang="ts">
+  import { navigating } from '$app/state';
+  import { NavigationProgress, setNavigationProgress } from '@thomasfosterau/components';
+
+  const progress = setNavigationProgress();
+  $effect(() => {
+    if (navigating.to === null) return;
+    progress.start();
+    return () => progress.done();
+  });
+</script>
+
+<NavigationProgress />
+```
+
+Anything below can call `getNavigationProgress()` to show the bar for its own long request. `start()` calls are counted, so the bar completes only after a matching `done()` for each; `set(fraction)` and `increment(by)` report real progress, which the bar exposes as `aria-valuenow`. A trickle has no value, because it is not a real percentage.
+
+The bar announces little: a polite "Loading" only when a wait outlasts the delay by a second, and `loadedLabel` at the end of such a wait when you set one. SvelteKit already announces the new page's title after a navigation, so by default the bar says nothing more. Whether to set `aria-busy` on `<main>` while loading is the app's call.
