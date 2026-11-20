@@ -111,3 +111,34 @@ Without `AppShell`, `Sidebar` and `BottomNav` take the same list as `destination
 - **`elevateOnScroll`.** The bar's border and shadow appear only once content is under it (`data-scrolled` is set then). It is on by default for a stuck bar.
 - **Anchors land below a stuck bar.** A pinned or hide-on-scroll `Navbar` sets `--navbar-offset` (its height, or `0px` while hidden) and `scroll-padding-top: var(--navbar-offset)` on the scroller, and removes both when it unmounts.
 - **`PageHeader` `scrollBehavior="collapse"`.** When the large title scrolls up under the top (below a stuck `Navbar`), a compact bar with `collapsedTitle` fades in. It falls back to `title` when that is a string. The bar is `position: fixed`, so nothing below it moves. It is `aria-hidden`, so the heading stays the page's one `h1` at every scroll position. Under reduced motion it switches at halfway instead of fading.
+
+### DashboardGrid
+
+`DashboardGrid` lays out tiles (stat tiles, charts, lists, maps) on a column grid and lets the reader arrange them. Each tile is an `id`, a `title` and a `content` snippet; where it sits is a `TileLayout` (`x`, `y`, `w`, `h` in cells, and `hidden`) in the bindable `layout`, which the app persists per reader.
+
+```svelte
+<script lang="ts">
+  import { DashboardGrid, StatTile, type TileLayout } from '@thomasfosterau/components';
+
+  let layout = $state<TileLayout[]>(saved ?? defaults);
+</script>
+
+{#snippet rainfall()}<StatTile label="Rainfall" value="12 mm" />{/snippet}
+{#snippet tasks()}<TaskList … />{/snippet}
+
+<DashboardGrid
+  tiles={[
+    { id: 'rainfall', title: 'Rainfall', content: rainfall, sizes: ['sm', 'md'] },
+    { id: 'tasks', title: 'This week', content: tasks, sizes: ['md', 'lg', 'tall'] },
+  ]}
+  bind:layout
+  defaultLayout={defaults}
+  onLayoutChange={(next) => save(next)}
+/>
+```
+
+- **Edit mode.** "Edit dashboard" (a toggle button) shows each tile's Move handle and options menu, plus Add widget (removed tiles) and Reset layout (with `defaultLayout`, after a confirmation). Outside edit mode a tile has no controls.
+- **Moving.** The handle drags with a pointer, or picks up on Space, moves a cell per arrow key, and drops on Space (Escape cancels). The first tile a moved tile lands on takes its old cell when it fits there; anything else it covers is pushed down, and the grid then compacts upward. The menu moves a tile up, down, to the start or to the end in reading order.
+- **Sizes are presets**, not free resizing: `sm` 1×1, `md` 2×1, `lg` 2×2, `wide` 4×1 and `tall` 1×2 (columns × rows, `tileSizes`), clamped to the grid. A tile's `sizes` lists the ones its menu offers; the first is its size when the layout has no entry for it.
+- **Columns.** `columns` is a count per breakpoint, read from the grid's own width (`{ sm: 2, md: 4, lg: 6 }` by default, one column below `sm`), or a fixed number. The layout is stored at the widest count. A narrower grid repacks the tiles in reading order, and there the handle and menu reorder tiles rather than move them in two dimensions, so editing on a phone doesn't scramble the desktop layout.
+- **Reading order is DOM order.** Tiles render top to bottom, then start to end, after every change, so Tab order and a screen reader's order always match what is on screen. Each tile is a `section` named by its heading (`headingLevel`, `h2` by default), and every pick-up, move, drop, resize, removal and reset is announced in one polite live region (`announcements`).
