@@ -16,7 +16,7 @@
   });
 </script>
 
-<Story name="Onboarding checklist">
+<Story name="Onboarding checklist" asChild>
   <TaskList
     sections={[
       {
@@ -36,7 +36,7 @@
   />
 </Story>
 
-<Story name="Multi-section application">
+<Story name="Multi-section application" asChild>
   <TaskList
     summaryLabel={(done, total) => `You have completed ${done} of ${total} sections`}
     sections={[
@@ -63,7 +63,7 @@
   />
 </Story>
 
-<Story name="With errors">
+<Story name="With errors" asChild>
   <TaskList
     sections={[
       {
