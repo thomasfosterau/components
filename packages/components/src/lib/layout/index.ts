@@ -23,6 +23,7 @@ export { default as BottomNav } from './BottomNav.svelte';
 export { default as BottomNavItem } from './BottomNavItem.svelte';
 export { default as Breadcrumbs } from './Breadcrumbs.svelte';
 export { default as Cluster } from './Cluster.svelte';
+export { default as DashboardGrid } from './DashboardGrid.svelte';
 export { default as DetailLayout } from './DetailLayout.svelte';
 export { default as FilterBar } from './FilterBar.svelte';
 export { default as Fits } from './Fits.svelte';
@@ -45,5 +46,14 @@ export { default as Tabs } from './Tabs.svelte';
 export { default as VStack } from './VStack.svelte';
 
 export type { ExpandedAt, MediumAt, NavBreakpoints, NavDestination } from './nav-destination.ts';
+export {
+  defaultDashboardAnnouncements,
+  tileSizes,
+  type DashboardAnnouncements,
+  type DashboardColumns,
+  type DashboardTile,
+  type TileLayout,
+  type TileSize,
+} from './dashboard.ts';
 export * from './space.ts';
 export * from './types.ts';
