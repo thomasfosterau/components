@@ -52,7 +52,37 @@ export interface FieldOption {
   readonly value: string;
   readonly label: string;
   readonly disabled?: boolean | undefined;
+  /** A line under the label; the option's accessible description in the `cards` variant. */
+  readonly description?: string | undefined;
 }
+
+/** How a `RadioGroup` or `CheckboxGroup` lays out its options. */
+export type ChoiceVariant = 'list' | 'cards';
+
+/** Grid columns for the `cards` variant; numbers are the widest step of a responsive grid. */
+export type ChoiceColumns = 1 | 2 | 3 | 4 | 'auto';
+
+/** Where a choice card's radio or checkbox sits, or `'hidden'` (the check badge still shows). */
+export type ChoiceIndicator = 'start' | 'end' | 'hidden';
+
+/** What a choice card's `card` snippet is given besides its option. */
+export interface ChoiceCardState {
+  readonly checked: boolean;
+  readonly disabled: boolean;
+}
+
+/** Literal grid classes per `ChoiceColumns`; a lookup table so Tailwind's scanner sees every class. */
+export const choiceColumns: Record<ChoiceColumns, string> = {
+  1: 'grid-cols-1',
+  2: 'grid-cols-1 sm:grid-cols-2',
+  3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+  4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+  auto: 'grid-cols-[repeat(auto-fill,minmax(14rem,1fr))]',
+};
+
+/** The tile every choice card is drawn on; the checked state is a border, a ring and a badge, never colour alone. */
+export const choiceCardClass =
+  'card card-border bg-base-100 hover:border-base-content/30 flex cursor-pointer flex-row items-start gap-3 p-4 text-left';
 
 /**
  * What an options prop accepts: full options, or bare strings for the common

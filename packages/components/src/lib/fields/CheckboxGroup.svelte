@@ -18,15 +18,35 @@ Several checkboxes answering one question, inside one `Fieldset`.
   options, indented under it: ticked when every enabled option is, mixed
   when some are, clear when none are. Activating it while mixed or clear
   ticks every enabled option; while ticked, clears them. A disabled option is
-  never changed. It is named by `selectAllLabel`, described by the legend
+  never changed.
+
+  `variant="cards"` lays the options out as a grid of tiles. Each tile is a
+  `<label>` around a native checkbox, so the whole tile toggles it; the box
+  is named by the tile's title and described by its description, and a
+  ticked tile shows a border, a ring and a check badge, never colour alone.
+  With `indicator="hidden"` the box is visually hidden but still focused. It is named by `selectAllLabel`, described by the legend
   like the rest of the group, points `aria-controls` at the options, and has
   no `name`, so it is never submitted.
 -->
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import Checkbox from './Checkbox.svelte';
+  import ChoiceCardContent from './ChoiceCardContent.svelte';
   import Fieldset from './Fieldset.svelte';
-  import { toFieldOptions, type FieldOptionInput, type FieldSize } from './field-types.ts';
+  import {
+    checkboxSize,
+    choiceCardClass,
+    choiceColumns,
+    toFieldOptions,
+    type ChoiceCardState,
+    type ChoiceColumns,
+    type ChoiceIndicator,
+    type ChoiceVariant,
+    type FieldOption,
+    type FieldOptionInput,
+    type FieldSize,
+  } from './field-types.ts';
 
   interface Props extends Omit<HTMLAttributes<HTMLFieldSetElement>, 'children'> {
     /** The question the boxes answer. */
@@ -68,6 +88,23 @@ Several checkboxes answering one question, inside one `Fieldset`.
      * @defaultValue `'Select all'`
      */
     selectAllLabel?: string | undefined;
+    /**
+     * Rows of checkboxes and labels, or a grid of selectable cards.
+     * @defaultValue `'list'`
+     */
+    variant?: ChoiceVariant | undefined;
+    /**
+     * The `cards` grid's widest column count, or `'auto'` to fill by width.
+     * @defaultValue `3`
+     */
+    columns?: ChoiceColumns | undefined;
+    /**
+     * Where a card's checkbox sits; `'hidden'` keeps it focusable but unseen.
+     * @defaultValue `'end'`
+     */
+    indicator?: ChoiceIndicator | undefined;
+    /** A card's body in place of its title and description; nothing in it may be focusable. */
+    card?: Snippet<[FieldOption, ChoiceCardState]> | undefined;
   }
 
   let {
@@ -83,6 +120,10 @@ Several checkboxes answering one question, inside one `Fieldset`.
     size = 'md',
     selectAll = false,
     selectAllLabel = 'Select all',
+    variant = 'list',
+    columns = 3,
+    indicator = 'end',
+    card,
     ...rest
   }: Props = $props();
 
@@ -112,20 +153,67 @@ Several checkboxes answering one question, inside one `Fieldset`.
   };
 </script>
 
-{#snippet boxes()}
-  {#each entries as option, index (option.value)}
-    <Checkbox
+{#snippet cardBox(option: FieldOption, index: number)}
+  {@const titleId = `${optionId(index)}-title`}
+  {@const descriptionId = `${optionId(index)}-description`}
+  {@const checked = values.includes(option.value)}
+  {@const off = disabled || option.disabled === true}
+  {#snippet box()}
+    <input
       id={optionId(index)}
-      label={option.label}
+      type="checkbox"
       {name}
-      {size}
-      {invalid}
       value={option.value}
-      disabled={disabled || option.disabled === true}
-      checked={values.includes(option.value)}
+      {checked}
+      disabled={off}
+      aria-labelledby={titleId}
+      aria-describedby={option.description === undefined ? undefined : descriptionId}
+      aria-invalid={invalid ? 'true' : undefined}
+      class={['checkbox shrink-0', checkboxSize[size], invalid && 'checkbox-error', indicator === 'hidden' && 'sr-only']}
       onchange={(event) => toggle(option.value, event.currentTarget.checked)}
     />
-  {/each}
+  {/snippet}
+  <label
+    class={[
+      choiceCardClass,
+      'has-[:checked]:border-primary has-[:checked]:ring-primary has-[:focus-visible]:outline-primary has-[:checked]:ring-1 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2',
+      off && 'cursor-not-allowed opacity-50',
+    ]}
+  >
+    <ChoiceCardContent
+      {option}
+      state={{ checked, disabled: off }}
+      {titleId}
+      {descriptionId}
+      {card}
+      indicator={box}
+      indicatorAtEnd={indicator === 'end'}
+    />
+  </label>
+{/snippet}
+
+{#snippet boxes()}
+  {#if variant === 'cards'}
+    <div class={['grid gap-3', choiceColumns[columns]]}>
+      {#each entries as option, index (option.value)}
+        {@render cardBox(option, index)}
+      {/each}
+    </div>
+  {:else}
+    {#each entries as option, index (option.value)}
+      <Checkbox
+        id={optionId(index)}
+        label={option.label}
+        {name}
+        {size}
+        {invalid}
+        value={option.value}
+        disabled={disabled || option.disabled === true}
+        checked={values.includes(option.value)}
+        onchange={(event) => toggle(option.value, event.currentTarget.checked)}
+      />
+    {/each}
+  {/if}
 {/snippet}
 
 <Fieldset {...rest} {legend} {hint} {errors} {required} {requiredLabel}>

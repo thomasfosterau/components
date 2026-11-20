@@ -52,6 +52,16 @@ Which date control: `DateInput` (the native control, in the barrel) for a single
 
 Which multi-choice control: `CheckboxGroup` when every option fits on screen (about seven or fewer), `MultiSelect` for a longer list, `Select` for a single native choice.
 
+### Choice cards
+
+`RadioGroup` and `CheckboxGroup` take `variant="cards"` to lay their options out as a grid of selectable tiles, for a short list where each option needs a sentence: plans, bed types, delivery speeds. Give each option a `description`; it becomes the card's accessible description, and the title its name. `columns` (`1` to `4`, default `3`, or `'auto'`) sets the widest step of a responsive grid, and `indicator` puts the radio or checkbox at the `'start'` or `'end'` (default), or hides it (`'hidden'`; a checked card still shows a check badge, so the state is never colour alone).
+
+A radio card is a bits-ui radio button, so the group keeps its one tab stop and arrow keys; a checkbox card is a `<label>` around a native checkbox, so the whole tile toggles it and it posts like any other box. A `card` snippet (`(option, { checked, disabled })`) replaces the title and description, but nothing in it may be focusable: a card is already a control, and in development `RadioGroup` warns when one holds a link or button.
+
+```svelte
+<RadioGroup legend="Plan" name="plan" variant="cards" options={plans} bind:value={plan} />
+```
+
 Which colour control: `ColorSwatchGroup` (in the barrel) when the reader picks from a fixed palette, such as a tag's colour; `ColorPicker` from `@thomasfosterau/components/color-picker` when they may need a colour outside it. `ColorPicker` puts the palette and an HSV editor (a saturation and brightness square, hue and opacity strips, a hex field and, in Chromium, an eyedropper) in a popover. The editor writes `format` (`'hex'` by default; `'rgb'`, `'hsl'` or `'oklch'`), with an alpha term only when `alpha` is set; a picked swatch writes its own `value` unchanged. A swatch's name is its `label`, never its hex, and the trigger's description reads the current colour's name. Both read hex, `rgb()`, `hsl()` and `oklch()`; a colour outside sRGB is clipped for the editor.
 
 ```svelte
