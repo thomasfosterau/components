@@ -216,8 +216,8 @@ catalogs:
       specifier: ^0.2.0
       version: 0.2.0
     '@thomasfosterau/effect-forms-svelte':
-      specifier: ^0.4.1
-      version: 0.4.1
+      specifier: ^0.4.2
+      version: 0.4.2
     '@thomasfosterau/effect-parse':
       specifier: ^0.6.1
       version: 0.6.1
@@ -445,7 +445,7 @@ importers:
         version: 8.0.0(@testing-library/dom@10.4.2)(vitest@5.1.0)
       '@thomasfosterau/effect-forms-svelte':
         specifier: 'catalog:'
-        version: 0.4.1(@sveltejs/kit@3.4.0(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@thomasfosterau/effect-ext@0.2.0(@thomasfosterau/effect-parse@0.5.0(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)(svelte@5.58.0)
+        version: 0.4.2(@sveltejs/kit@3.4.0(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@thomasfosterau/effect-ext@0.2.0(@thomasfosterau/effect-parse@0.5.0(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)(svelte@5.58.0)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -1914,8 +1914,8 @@ packages:
       '@thomasfosterau/effect-parse':
         optional: true
 
-  '@thomasfosterau/effect-forms-svelte@0.4.1':
-    resolution: {integrity: sha512-YVQQ9zBgGuQ1ltBd8U1zb3A56t6z1vKpvSZlJ4XBXWvil5KatyLD9yY7BG5JbFoaAciA38X0A9LjXXJG6uxGWA==}
+  '@thomasfosterau/effect-forms-svelte@0.4.2':
+    resolution: {integrity: sha512-iuq2werNu446vRG6HO0VwyIBPxRbdacpeC7HpStAmKHQt96sGKKFGHcJufhRk3adGNcoKAd1LoWaL4PJRP491Q==}
     engines: {node: '>=22.18.0'}
     peerDependencies:
       '@sveltejs/kit': 3.4.0
@@ -1929,8 +1929,8 @@ packages:
       '@thomasfosterau/effect-jsonapi':
         optional: true
 
-  '@thomasfosterau/effect-forms@0.4.1':
-    resolution: {integrity: sha512-WIz4xWmAPU6vzlrvfTCtU8obBXD0MLzrD2SID5xVnXeTBb8ml5iG4RmEpPpnCMIAzfODftQg32IOffhEFUefWw==}
+  '@thomasfosterau/effect-forms@0.5.0':
+    resolution: {integrity: sha512-vj4Rs5nnJAWGkXkHr8MXjRZFcmQ7AsnJaJSv+f50OQfIZFie/FOzh6289Pki4MLwVHySD13sGHANCWeH0upV+Q==}
     engines: {node: '>=22.18.0'}
     peerDependencies:
       '@thomasfosterau/effect-ext': ^0.1.0 || ^0.2.0 || ^0.3.0
@@ -4483,16 +4483,16 @@ snapshots:
     optionalDependencies:
       '@thomasfosterau/effect-parse': 0.6.1(effect@4.1.4)
 
-  '@thomasfosterau/effect-forms-svelte@0.4.1(@sveltejs/kit@3.4.0(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@thomasfosterau/effect-ext@0.2.0(@thomasfosterau/effect-parse@0.5.0(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)(svelte@5.58.0)':
+  '@thomasfosterau/effect-forms-svelte@0.4.2(@sveltejs/kit@3.4.0(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@thomasfosterau/effect-ext@0.2.0(@thomasfosterau/effect-parse@0.5.0(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)(svelte@5.58.0)':
     dependencies:
       '@thomasfosterau/effect-ext': 0.2.0(@thomasfosterau/effect-parse@0.5.0(effect@4.1.4))(effect@4.1.4)
-      '@thomasfosterau/effect-forms': 0.4.1(@thomasfosterau/effect-ext@0.2.0(@thomasfosterau/effect-parse@0.5.0(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)
+      '@thomasfosterau/effect-forms': 0.5.0(@thomasfosterau/effect-ext@0.2.0(@thomasfosterau/effect-parse@0.5.0(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)
       effect: 4.1.4
       svelte: 5.58.0
     optionalDependencies:
       '@sveltejs/kit': 3.4.0(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0)
 
-  '@thomasfosterau/effect-forms@0.4.1(@thomasfosterau/effect-ext@0.2.0(@thomasfosterau/effect-parse@0.5.0(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)':
+  '@thomasfosterau/effect-forms@0.5.0(@thomasfosterau/effect-ext@0.2.0(@thomasfosterau/effect-parse@0.5.0(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)':
     dependencies:
       '@thomasfosterau/effect-ext': 0.2.0(@thomasfosterau/effect-parse@0.5.0(effect@4.1.4))(effect@4.1.4)
       effect: 4.1.4

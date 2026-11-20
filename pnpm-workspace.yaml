@@ -11,7 +11,7 @@ catalog:
   'mapbox-gl': ^3.35.1
   '@changesets/cli': ^3.0.3
   # Optional peer of `/entity-form`; a devDependency for its suite and story.
-  '@thomasfosterau/effect-forms-svelte': ^0.4.1
+  '@thomasfosterau/effect-forms-svelte': ^0.4.2
   effect: 4.1.4
   # Peers `effect` at its own exact version: moves with `effect`.
   '@effect/vitest': 4.1.4
@@ -75,7 +75,7 @@ catalog:
 catalogs:
   peers:
     svelte: ^5.40.0
-    '@thomasfosterau/effect-forms-svelte': ^0.4.1
+    '@thomasfosterau/effect-forms-svelte': ^0.4.2
     effect: ^4.0.0
     '@thomasfosterau/effect-document': ^0.2.0
     prosemirror-model: ^1.0.0
