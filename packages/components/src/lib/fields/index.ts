@@ -41,6 +41,7 @@ export { default as TagsInput } from './TagsInput.svelte';
 export { default as Textarea } from './Textarea.svelte';
 export { default as TextInput } from './TextInput.svelte';
 export { default as Toggle } from './Toggle.svelte';
+export { default as TransferList } from './TransferList.svelte';
 export {
   default as PushToggle,
   type PushDeclineReason,
