@@ -44,6 +44,7 @@ export { default as IconLabel } from './IconLabel.svelte';
 export { default as Indicator } from './Indicator.svelte';
 export { default as Link } from './Link.svelte';
 export { default as LinkButton } from './LinkButton.svelte';
+export { default as LinkPreview } from './LinkPreview.svelte';
 export { default as Menu } from './Menu.svelte';
 export {
   default as Overflow,
