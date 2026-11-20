@@ -14,8 +14,7 @@
   "scripts": {
     "prepare": "vp config && effect-tsgo patch --typescript --oxlint",
     "changeset": "changeset",
-    "version": "changeset version",
-    "release": "node scripts/publish.mjs"
+    "version": "changeset version"
   },
   "dependencies": {
     "@thomasfosterau/charts": "workspace:*",

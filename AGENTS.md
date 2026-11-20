@@ -8,6 +8,7 @@ Read [README.md](README.md) and [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) fir
 - Use the GitHub MCP tools or `gh`, whichever is available. Write only to `thomasfosterau/components`.
 - If a gate can't run in your session (no matching Chromium, no network, no Swift toolchain), say so in the PR body rather than implying it ran. A run against a different Chromium revision is evidence, not the gate.
 - Never `git stash`: the stash is shared across worktrees. Use a WIP commit.
+- Never publish by hand: the Release workflow runs `vp run release` (`vp pm publish -r`, then `changeset git-tag`); there is no publish script. `vp run release:dry-run` is safe to run.
 
 ## Pitfalls
 
@@ -19,4 +20,6 @@ Read [README.md](README.md) and [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) fir
 
 ## Fallow
 
-The pre-commit hook runs `vp run fallow:audit`, which runs the test suites for coverage first, so commits are slow; don't bypass it. Fix what it reports rather than working around it; `vp exec fallow explain <issue-type>` explains a finding.
+The pre-commit hook runs `vp run fallow:audit`, which runs the test suites for coverage first, so commits are slow; don't bypass it. Fix what it reports rather than working around it.
+
+The `fallow` agent skill is linked into `.claude/skills/` from the installed package after `vp install`.
