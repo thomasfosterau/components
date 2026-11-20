@@ -16,7 +16,7 @@
   });
 </script>
 
-<Story name="Levels">
+<Story name="Levels" asChild>
   <div>
     <Heading level={1}>Growing conditions</Heading>
     <Heading level={2}>Light &amp; aspect</Heading>
@@ -28,7 +28,7 @@
 </Story>
 
 <!-- The ids below are `growing-conditions` and `light-aspect`, slugged from the text itself. -->
-<Story name="With anchors">
+<Story name="With anchors" asChild>
   <div>
     <Heading level={2} anchor>Growing conditions</Heading>
     <p class="max-w-prose">Hover the heading to reveal its permalink.</p>
@@ -37,7 +37,7 @@
   </div>
 </Story>
 
-<Story name="A snippet heading needs an explicit id">
+<Story name="A snippet heading needs an explicit id" asChild>
   <Heading level={2} id="rosa-canina" anchor>
     {#snippet children()}<em>Rosa canina</em> in cultivation{/snippet}
   </Heading>

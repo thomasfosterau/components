@@ -16,23 +16,23 @@
   });
 </script>
 
-<Story name="Text">
+<Story name="Text" asChild>
   <div class="max-w-md"><Skeleton variant="text" /></div>
 </Story>
 
-<Story name="Text, two lines">
+<Story name="Text, two lines" asChild>
   <div class="max-w-md"><Skeleton variant="text" lines={2} label="Loading description" /></div>
 </Story>
 
-<Story name="Block">
+<Story name="Block" asChild>
   <div class="max-w-md"><Skeleton /></div>
 </Story>
 
-<Story name="Circle">
+<Story name="Circle" asChild>
   <Skeleton variant="circle" label="Loading avatar" />
 </Story>
 
-<Story name="A loading card">
+<Story name="A loading card" asChild>
   <div class="card card-border bg-base-100 max-w-md shadow-sm">
     <div class="card-body flex-row items-start gap-4">
       <Skeleton variant="circle" label="Loading author" />

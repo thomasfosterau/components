@@ -24,7 +24,7 @@
   const editions = ['First edition, 1925', 'Revised edition, 1931', 'Facsimile, 1998'];
 </script>
 
-<Story name="Header, aside and body">
+<Story name="Header, aside and body" asChild>
   <Main>
     <DetailLayout asideLabel="Key facts">
       {#snippet header()}
@@ -71,7 +71,7 @@
   </Main>
 </Story>
 
-<Story name="No aside">
+<Story name="No aside" asChild>
   <Main>
     <DetailLayout>
       {#snippet header()}<PageHeader title="About this project" />{/snippet}

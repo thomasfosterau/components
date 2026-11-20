@@ -22,7 +22,7 @@
   let height = $state<number | undefined>();
 </script>
 
-<Story name="Default">
+<Story name="Default" asChild>
   <div class="max-w-md">
     <FormField label="Photograph" hint="JPEG, PNG, WebP or AVIF.">
       {#snippet children(control)}
@@ -35,7 +35,7 @@
   </div>
 </Story>
 
-<Story name="With a size cap">
+<Story name="With a size cap" asChild>
   <div class="max-w-md">
     <FormField label="Photograph" errors={['Choose a photograph.']}>
       {#snippet children(control)}

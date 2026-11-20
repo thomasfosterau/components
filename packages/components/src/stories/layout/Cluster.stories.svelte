@@ -6,7 +6,7 @@
   const tags = ['Annual', 'Full sun', 'Frost tender', 'Climber', 'Edible', 'Pollinator friendly', 'Heirloom'];
 </script>
 
-<Story name="Wrapping tags">
+<Story name="Wrapping tags" asChild>
   <Cluster as="ul" class="max-w-xs">
     {#each tags as tag (tag)}<li class="badge badge-outline">{tag}</li>{/each}
   </Cluster>

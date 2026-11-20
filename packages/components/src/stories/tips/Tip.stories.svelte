@@ -39,19 +39,19 @@
   const { Story } = defineMeta({ title: 'Tips/Tip', component: Tip, tags: ['autodocs'] });
 </script>
 
-<Story name="Title and message">
+<Story name="Title and message" asChild>
   <Tip config={welcome} store={storyStore(welcome)} />
 </Story>
 
-<Story name="With actions">
+<Story name="With actions" asChild>
   <Tip config={withActions} store={storyStore(withActions)} />
 </Story>
 
-<Story name="Custom dismiss label">
+<Story name="Custom dismiss label" asChild>
   <Tip config={welcome} store={storyStore(welcome)} dismissLabel="Close this tip" />
 </Story>
 
-<Story name="A rule that does not hold">
+<Story name="A rule that does not hold" asChild>
   <div class="space-y-2">
     <p class="text-base-content/70 text-sm">Nothing renders below — that is the story.</p>
     <Tip config={ruledOut} store={storyStore(ruledOut)} />

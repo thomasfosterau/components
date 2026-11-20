@@ -30,11 +30,11 @@
   </Sidebar>
 {/snippet}
 
-<Story name="Wide">
+<Story name="Wide" asChild>
   <AppShell sidebar={nav}><main class="p-6"><h1 class="text-2xl font-semibold">Beds</h1></main></AppShell>
 </Story>
 
-<Story name="Narrow" parameters={{ viewport: { defaultViewport: 'mobile1' } }}>
+<Story name="Narrow" parameters={{ viewport: { defaultViewport: 'mobile1' } }} asChild>
   <AppShell sidebar={nav}><main class="p-6"><h1 class="text-2xl font-semibold">Beds</h1></main></AppShell>
 </Story>
 
@@ -56,19 +56,19 @@
   ];
 </script>
 
-<Story name="Adaptive">
+<Story name="Adaptive" asChild>
   <AppShell {destinations} {brand}>
     <main class="p-6"><h1 class="text-2xl font-semibold">Beds</h1></main>
   </AppShell>
 </Story>
 
-<Story name="Adaptive, tablet" parameters={{ viewport: { defaultViewport: 'tablet' } }}>
+<Story name="Adaptive, tablet" parameters={{ viewport: { defaultViewport: 'tablet' } }} asChild>
   <AppShell {destinations} {brand}>
     <main class="p-6"><h1 class="text-2xl font-semibold">Beds</h1></main>
   </AppShell>
 </Story>
 
-<Story name="Adaptive, phone" parameters={{ viewport: { defaultViewport: 'mobile1' } }}>
+<Story name="Adaptive, phone" parameters={{ viewport: { defaultViewport: 'mobile1' } }} asChild>
   <AppShell {destinations} {brand}>
     <main class="p-6"><h1 class="text-2xl font-semibold">Beds</h1></main>
   </AppShell>

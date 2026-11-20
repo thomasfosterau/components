@@ -17,19 +17,19 @@
   });
 </script>
 
-<Story name="Opened with ?">
+<Story name="Opened with ?" asChild>
   <HotkeyDemo>
     <HotkeyHelpDialog />
   </HotkeyDemo>
 </Story>
 
-<Story name="A non-admin viewer">
+<Story name="A non-admin viewer" asChild>
   <HotkeyDemo isAdmin={false}>
     <HotkeyHelpDialog />
   </HotkeyDemo>
 </Story>
 
-<Story name="Every string is a prop">
+<Story name="Every string is a prop" asChild>
   <HotkeyDemo>
     <HotkeyHelpDialog
       title="Raccourcis clavier"

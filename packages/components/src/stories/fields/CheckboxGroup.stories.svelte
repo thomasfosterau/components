@@ -34,7 +34,7 @@
   let chosen = $state(['full-sun']);
 </script>
 
-<Story name="Default">
+<Story name="Default" asChild>
   <div class="max-w-sm">
     <CheckboxGroup
       legend="Growing conditions"
@@ -47,7 +47,7 @@
   </div>
 </Story>
 
-<Story name="Required, with errors">
+<Story name="Required, with errors" asChild>
   <div class="max-w-sm">
     <CheckboxGroup
       legend="Growing conditions"
@@ -59,7 +59,7 @@
   </div>
 </Story>
 
-<Story name="With a select-all parent">
+<Story name="With a select-all parent" asChild>
   <!-- The parent is mixed while some are ticked, and never touches a disabled option. -->
   <div class="max-w-sm">
     <CheckboxGroup
@@ -72,10 +72,10 @@
   </div>
 </Story>
 
-<Story name="Cards">
+<Story name="Cards" asChild>
   <CheckboxGroup legend="Where do you grow?" name="beds" variant="cards" columns="auto" options={beds} values={['raised']} />
 </Story>
 
-<Story name="Cards, no checkbox">
+<Story name="Cards, no checkbox" asChild>
   <CheckboxGroup legend="Where do you grow?" variant="cards" columns={2} indicator="hidden" options={beds} values={['containers']} />
 </Story>

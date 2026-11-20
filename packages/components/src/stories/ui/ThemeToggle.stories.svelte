@@ -22,14 +22,14 @@
   that is the component’s contract, and the only thing a story can do about
   it is not share the key.
 -->
-<Story name="Default">
+<Story name="Default" asChild>
   <div class="flex items-center gap-4">
     <ThemeToggle lightTheme="light" darkTheme="dark" storageKey="storybook:theme-toggle-demo" />
     <p class="text-base-content/70 text-sm">Switches the whole preview between the two themes.</p>
   </div>
 </Story>
 
-<Story name="Custom label">
+<Story name="Custom label" asChild>
   <ThemeToggle
     lightTheme="light"
     darkTheme="dark"

@@ -5,14 +5,14 @@
   const { Story } = defineMeta({ title: 'Layout/HStack', component: HStack });
 </script>
 
-<Story name="Row, centred">
+<Story name="Row, centred" asChild>
   <HStack align="center" gap="sm">
     <span class="avatar avatar-placeholder"><span class="bg-neutral text-neutral-content w-8 rounded-full">AL</span></span>
     <span>Ada Lovelace</span>
   </HStack>
 </Story>
 
-<Story name="Responsive">
+<Story name="Responsive" asChild>
   <HStack responsive gap="md">
     <div class="card bg-base-200 p-4">Plan</div>
     <div class="card bg-base-200 p-4">Sow</div>

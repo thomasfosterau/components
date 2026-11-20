@@ -16,15 +16,15 @@
   });
 </script>
 
-<Story name="Count">
+<Story name="Count" asChild>
   <ResultCount shown={24} total={4310} locales="en-AU" />
 </Story>
 
-<Story name="The caller’s own sentence">
+<Story name="The caller’s own sentence" asChild>
   <ResultCount shown={24} total={310} label={(shown, total) => `${shown} of ${total} plants`} />
 </Story>
 
-<Story name="Nothing to qualify">
+<Story name="Nothing to qualify" asChild>
   <!-- Renders nothing: "Showing 0 of 0" beside an empty state is noise. -->
   <div class="border-base-300 border border-dashed p-4">
     <ResultCount shown={0} total={0} />

@@ -54,7 +54,7 @@
   };
 </script>
 
-<Story name="With a renderer">
+<Story name="With a renderer" asChild>
   <VectorCanvas {doc} tool="pan" width={640} height={360} {onviewportchange}>
     {#snippet element(shape: CanvasElement, selected: boolean)}
       <g transform="translate({shape.position.x},{shape.position.y})">
@@ -77,11 +77,11 @@
 
 <!-- No renderer: the fallback marker, which exists so an application that has
      forgotten to supply one SEES that it has. -->
-<Story name="Fallback markers">
+<Story name="Fallback markers" asChild>
   <VectorCanvas doc={base} width={640} height={360} />
 </Story>
 
-<Story name="No grid, not interactive">
+<Story name="No grid, not interactive" asChild>
   <VectorCanvas
     doc={{ ...base, grid: { ...base.grid, visible: false } }}
     width={640}

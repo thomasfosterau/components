@@ -23,7 +23,7 @@
   const garden: ErrorSummaryItem = { fieldId: 'summary-garden', message: 'Choose a garden' };
 </script>
 
-<Story name="Server-rendered errors">
+<Story name="Server-rendered errors" asChild>
   <form class="space-y-4">
     <ErrorSummary
       titlePrefix=""
@@ -39,7 +39,7 @@
   </form>
 </Story>
 
-<Story name="From a record">
+<Story name="From a record" asChild>
   <ErrorSummary
     titlePrefix=""
     autofocus={false}
@@ -48,11 +48,11 @@
   />
 </Story>
 
-<Story name="Client validation">
+<Story name="Client validation" asChild>
   <ErrorSummaryClientDemo />
 </Story>
 
-<Story name="Long form">
+<Story name="Long form" asChild>
   <form class="space-y-4">
     <ErrorSummary titlePrefix="" autofocus={false} errors={[bed, garden]} />
     <div class="bg-base-200 text-base-content/70 h-[80vh] rounded p-4 text-sm">

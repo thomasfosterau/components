@@ -61,7 +61,7 @@
   <Badge>{tag}</Badge>
 {/snippet}
 
-<Story name="Vertical list">
+<Story name="Vertical list" asChild>
   <SortableList
     bind:items={route}
     key={stopKey}
@@ -72,7 +72,7 @@
   />
 </Story>
 
-<Story name="Horizontal chips">
+<Story name="Horizontal chips" asChild>
   <!-- ← / → move a held chip (mirrored right-to-left); the menu says "Move
        back" / "Move forward" rather than up and down. -->
   <SortableList
@@ -85,7 +85,7 @@
   />
 </Story>
 
-<Story name="Async persist with rollback">
+<Story name="Async persist with rollback" asChild>
   <!-- `onReorder` returns a promise; every other one rejects, and the list
        puts the row back and announces that it could not be moved. -->
   <SortableList
@@ -99,7 +99,7 @@
   />
 </Story>
 
-<Story name="Move menu only">
+<Story name="Move menu only" asChild>
   <!-- No drag handle: the menu's commands need no mode, which suits switch
        and voice-control users ("Move up" is a speakable command). -->
   <SortableList

@@ -19,31 +19,31 @@
     'The dog rose is a variable climbing wild rose native to Europe, north-west Africa and western Asia. It is a deciduous shrub ranging in height from one to five metres, though it can sometimes scramble higher into the crowns of taller trees. Its stems are covered with small, sharp, hooked prickles, which aid it in climbing. The flowers are usually pale pink, but can vary between a deep pink and white.';
 </script>
 
-<Story name="Long">
+<Story name="Long" asChild>
   <div class="max-w-sm">
     <ExpandableText><p>{description}</p></ExpandableText>
   </div>
 </Story>
 
-<Story name="Short (no toggle)">
+<Story name="Short (no toggle)" asChild>
   <div class="max-w-sm">
     <ExpandableText><p>A short note fits on one line.</p></ExpandableText>
   </div>
 </Story>
 
-<Story name="Resizable frame">
+<Story name="Resizable frame" asChild>
   <div class="max-w-full resize-x overflow-auto border border-base-300 p-3" style="width: 20rem">
     <ExpandableText lines={2}><p>{description}</p></ExpandableText>
   </div>
 </Story>
 
-<Story name="Fade, one-way">
+<Story name="Fade, one-way" asChild>
   <div class="max-w-sm">
     <ExpandableText fade oneWay><p>{description}</p></ExpandableText>
   </div>
 </Story>
 
-<Story name="Lines 1 to 6">
+<Story name="Lines 1 to 6" asChild>
   <div class="grid max-w-sm gap-6">
     {#each [1, 2, 3, 4, 5, 6] as const as lines (lines)}
       <ExpandableText {lines}><p>{description}</p></ExpandableText>

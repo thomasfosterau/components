@@ -18,7 +18,7 @@
   const beds = ['North bed', 'Glasshouse', 'Herb spiral'];
 </script>
 
-<Story name="Cards, peeking below">
+<Story name="Cards, peeking below" asChild>
   <Stack items={beds} class="w-56">
     {#snippet item(name)}
       <div class="card card-border bg-base-100 p-4 shadow-sm">
@@ -29,7 +29,7 @@
   </Stack>
 </Story>
 
-<Story name="Three of twelve, peeking to the end">
+<Story name="Three of twelve, peeking to the end" asChild>
   <Stack items={beds} count={12} direction="end" class="w-56">
     {#snippet item(name)}
       <div class="card bg-primary text-primary-content p-4">{name}</div>

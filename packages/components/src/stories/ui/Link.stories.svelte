@@ -16,7 +16,7 @@
   });
 </script>
 
-<Story name="Variants">
+<Story name="Variants" asChild>
   <p class="text-base-content max-w-prose">
     A <Link href="/taxa/rosa">primary link</Link> carries the brand colour, a
     <Link href="/taxa/rosa" variant="muted">muted link</Link> inherits the surrounding text, and a
@@ -25,7 +25,7 @@
   </p>
 </Story>
 
-<Story name="External">
+<Story name="External" asChild>
   <p class="text-base-content max-w-prose">
     The record is mirrored at <Link href="https://example.org/records/42" external>example.org</Link
     >, which opens in a new tab.

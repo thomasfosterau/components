@@ -18,11 +18,11 @@
   });
 </script>
 
-<Story name="Title only">
+<Story name="Title only" asChild>
   <EmptyState title="No gardens yet" />
 </Story>
 
-<Story name="With copy and an action">
+<Story name="With copy and an action" asChild>
   <EmptyState
     title="No gardens yet"
     description="A garden is a place you grow things — a balcony, a bed, a whole block. Start with one and add the plants later."
@@ -34,7 +34,7 @@
   </EmptyState>
 </Story>
 
-<Story name="Inside a section (h3)">
+<Story name="Inside a section (h3)" asChild>
   <section>
     <h2 class="mb-4 text-xl font-bold">Recent observations</h2>
     <EmptyState

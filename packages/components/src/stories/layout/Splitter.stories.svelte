@@ -22,7 +22,7 @@
   <div class="bg-base-200 text-base-content/70 flex h-full items-center justify-center p-4">{text}</div>
 {/snippet}
 
-<Story name="Side by side">
+<Story name="Side by side" asChild>
   <div class="h-72">
     <Splitter
       class="h-full"
@@ -38,7 +38,7 @@
   <p class="mt-2 text-sm">Last committed: {committed === undefined ? 'nothing yet' : `${Math.round(committed)}%`}</p>
 </Story>
 
-<Story name="Stacked, collapsible">
+<Story name="Stacked, collapsible" asChild>
   <div class="h-96">
     <Splitter class="h-full" orientation="vertical" collapsible size={60} handleLabel="Resize the map">
       {#snippet start()}{@render pane('Map (press Enter on the handle to collapse it)')}{/snippet}
@@ -47,7 +47,7 @@
   </div>
 </Story>
 
-<Story name="Three panes, nested">
+<Story name="Three panes, nested" asChild>
   <div class="h-80">
     <Splitter class="h-full" size={25} minSize={15} maxSize={40} handleLabel="Resize the bed list">
       {#snippet start()}{@render pane('Beds')}{/snippet}

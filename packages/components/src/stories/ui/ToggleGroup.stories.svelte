@@ -17,7 +17,7 @@
   });
 </script>
 
-<Story name="View switcher">
+<Story name="View switcher" asChild>
   <ToggleGroup
     type="single"
     label="View"
@@ -31,7 +31,7 @@
   />
 </Story>
 
-<Story name="Icon-only with tooltips">
+<Story name="Icon-only with tooltips" asChild>
   <ToggleGroup
     type="single"
     label="View"
@@ -45,7 +45,7 @@
   />
 </Story>
 
-<Story name="Formatting bar (multiple)">
+<Story name="Formatting bar (multiple)" asChild>
   <ToggleGroup
     type="multiple"
     label="Formatting"
@@ -59,7 +59,7 @@
   />
 </Story>
 
-<Story name="Filter: deselectable, check marks, a disabled item">
+<Story name="Filter: deselectable, check marks, a disabled item" asChild>
   <ToggleGroup
     type="multiple"
     label="Show"
@@ -72,7 +72,7 @@
   />
 </Story>
 
-<Story name="Block and vertical">
+<Story name="Block and vertical" asChild>
   <div class="flex max-w-md flex-col gap-6">
     <ToggleGroup
       type="single"

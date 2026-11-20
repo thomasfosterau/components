@@ -26,27 +26,27 @@
   </ul>
 {/snippet}
 
-<Story name="Ready">
+<Story name="Ready" asChild>
   <LoadingBoundary state="ready">{@render beds()}</LoadingBoundary>
 </Story>
 
-<Story name="First read">
+<Story name="First read" asChild>
   <LoadingBoundary state="loading" loadingLabel="Loading beds…">{@render beds()}</LoadingBoundary>
 </Story>
 
-<Story name="Refreshing — children stay">
+<Story name="Refreshing — children stay" asChild>
   <LoadingBoundary state="refreshing" loadingLabel="Refreshing beds…">
     {@render beds()}
   </LoadingBoundary>
 </Story>
 
-<Story name="Failed (page)">
+<Story name="Failed (page)" asChild>
   <LoadingBoundary state="error" errorLabel="The beds didn’t load. Try again.">
     {@render beds()}
   </LoadingBoundary>
 </Story>
 
-<Story name="Failed (section)">
+<Story name="Failed (section)" asChild>
   <Card title="Recent observations">
     <LoadingBoundary state="error" tone="section" errorLabel="Observations didn’t load.">
       {@render beds()}
@@ -54,7 +54,7 @@
   </Card>
 </Story>
 
-<Story name="A custom loading snippet">
+<Story name="A custom loading snippet" asChild>
   <LoadingBoundary state="loading">
     {#snippet loading()}
       <Skeleton variant="text" lines={3} label="Loading beds" />

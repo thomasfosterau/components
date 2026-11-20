@@ -32,23 +32,23 @@
   </AccordionItem>
 {/snippet}
 
-<Story name="Single">
+<Story name="Single" asChild>
   <div class="max-w-lg"><Accordion type="single">{@render seasons()}</Accordion></div>
 </Story>
 
-<Story name="Required">
+<Story name="Required" asChild>
   <div class="max-w-lg">
     <Accordion type="single" value="spring" required>{@render seasons()}</Accordion>
   </div>
 </Story>
 
-<Story name="Multiple">
+<Story name="Multiple" asChild>
   <div class="max-w-lg">
     <Accordion type="multiple" value={['spring', 'autumn']}>{@render seasons()}</Accordion>
   </div>
 </Story>
 
-<Story name="Plus variant, separate">
+<Story name="Plus variant, separate" asChild>
   <div class="flex max-w-lg flex-col gap-2">
     <Accordion type="single" variant="plus" joined={false} class="flex flex-col gap-2">
       {@render seasons()}

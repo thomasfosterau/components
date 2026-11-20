@@ -19,7 +19,7 @@
   const paragraphs = Array.from({ length: 24 }, (_, index) => index + 1);
 </script>
 
-<Story name="Inline, at the end of a long account">
+<Story name="Inline, at the end of a long account" asChild>
   <Main class="max-w-prose space-y-4">
     <h1 class="text-3xl font-semibold">Rosa canina</h1>
     <a class="link" href="#habitat">Habitat</a>
@@ -33,7 +33,7 @@
   </Main>
 </Story>
 
-<Story name="Floating, stacked above a floating action button">
+<Story name="Floating, stacked above a floating action button" asChild>
   <Main class="max-w-prose space-y-4" style="--back-to-top-offset: 4.5rem;">
     <h1 class="text-3xl font-semibold">Bed 4</h1>
     {#each paragraphs as paragraph (paragraph)}

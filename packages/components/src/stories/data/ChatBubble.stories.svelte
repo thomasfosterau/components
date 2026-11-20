@@ -25,7 +25,7 @@
   </div>
 {/snippet}
 
-<Story name="Two-party thread">
+<Story name="Two-party thread" asChild>
   <MessageThread label="Comments on Bed 4" class="max-w-md">
     <ChatBubble author="Ada Lovelace" sentAt={now - 26 * 60_000} relative>
       {#snippet avatar()}{@render initials('AL')}{/snippet}
@@ -43,7 +43,7 @@
   </MessageThread>
 </Story>
 
-<Story name="Grouped burst">
+<Story name="Grouped burst" asChild>
   <MessageThread label="A burst from one author" class="max-w-md">
     {#each ['The tomatoes need staking.', 'Before the wind on Thursday.', 'Use the soft ties, not wire.'] as text, i (text)}
       <ChatBubble author="Ada Lovelace" sentAt={now - 5 * 60_000} relative grouped={i > 0}>
@@ -55,7 +55,7 @@
   </MessageThread>
 </Story>
 
-<Story name="Tones, absolute time">
+<Story name="Tones, absolute time" asChild>
   <MessageThread label="Tones" class="max-w-md">
     {#each ['neutral', 'secondary', 'accent', 'info', 'success', 'warning', 'error'] as const as tone (tone)}
       <ChatBubble author="Garden coordinator" sentAt="2026-10-14T09:30:00Z" locales="en-AU" {tone}>{tone}</ChatBubble>

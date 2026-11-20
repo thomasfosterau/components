@@ -17,7 +17,7 @@
   });
 </script>
 
-<Story name="Default">
+<Story name="Default" asChild>
   <div class="max-w-xs">
     <FormField label="Sown on">
       {#snippet children(control)}
@@ -27,7 +27,7 @@
   </div>
 </Story>
 
-<Story name="Bounded">
+<Story name="Bounded" asChild>
   <div class="max-w-xs">
     <FormField label="Observed on" hint="Between the first record and today.">
       {#snippet children(control)}
@@ -37,7 +37,7 @@
   </div>
 </Story>
 
-<Story name="Invalid">
+<Story name="Invalid" asChild>
   <div class="max-w-xs">
     <FormField label="Sown on" errors={['That is in the future.']}>
       {#snippet children(control)}

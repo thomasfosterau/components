@@ -17,7 +17,7 @@
   });
 </script>
 
-<Story name="Filters sheet (end)">
+<Story name="Filters sheet (end)" asChild>
   <Drawer title="Filters" description="Narrow the plant list.">
     {#snippet trigger({ props })}<Button {...props}>Filters</Button>{/snippet}
     <div class="space-y-4">
@@ -32,7 +32,7 @@
   </Drawer>
 </Story>
 
-<Story name="Action sheet (bottom)">
+<Story name="Action sheet (bottom)" asChild>
   <Drawer title="Bed 4" side="bottom" size="sm">
     {#snippet trigger({ props })}<Button {...props}>Actions</Button>{/snippet}
     <div class="flex flex-col gap-2">

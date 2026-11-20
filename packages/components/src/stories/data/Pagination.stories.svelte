@@ -26,11 +26,11 @@
   let offset = $state(40);
 </script>
 
-<Story name="Window">
+<Story name="Window" asChild>
   <Pagination {offset} limit={20} total={151} {href} showRange locales="en-AU" />
 </Story>
 
-<Story name="Grouped page numbers">
+<Story name="Grouped page numbers" asChild>
   <!-- Page numbers are bare by default; `formatPage` groups the visible digits. -->
   <Pagination
     offset={999 * 20}
@@ -41,19 +41,19 @@
   />
 </Story>
 
-<Story name="First page">
+<Story name="First page" asChild>
   <Pagination offset={0} limit={20} total={151} {href} showRange locales="en-AU" />
 </Story>
 
-<Story name="Last page">
+<Story name="Last page" asChild>
   <Pagination offset={140} limit={20} total={151} {href} showRange locales="en-AU" />
 </Story>
 
-<Story name="Wider window">
+<Story name="Wider window" asChild>
   <Pagination offset={200} limit={20} total={1000} {href} siblings={3} />
 </Story>
 
-<Story name="Previous / next only">
+<Story name="Previous / next only" asChild>
   <Pagination
     offset={40}
     limit={20}
@@ -64,7 +64,7 @@
   />
 </Story>
 
-<Story name="Without chevrons, omitting unavailable arms">
+<Story name="Without chevrons, omitting unavailable arms" asChild>
   <Pagination
     offset={0}
     limit={20}
@@ -76,13 +76,13 @@
   />
 </Story>
 
-<Story name="No total, only whether there is more">
+<Story name="No total, only whether there is more" asChild>
   <!-- A search with no corpus total: Next follows `hasMore`, and nothing
        that would need the total is drawn. -->
   <Pagination offset={20} limit={20} hasMore {href} />
 </Story>
 
-<Story name="Callback, not links">
+<Story name="Callback, not links" asChild>
   <!-- No `href`, so the controls are buttons: for a pager over state the URL
        does not carry. -->
   <div class="space-y-3">
@@ -99,12 +99,12 @@
   </div>
 </Story>
 
-<Story name="Single page, range only">
+<Story name="Single page, range only" asChild>
   <!-- Nothing to navigate, so no nav is drawn — but the count is still true. -->
   <Pagination offset={0} limit={20} total={12} {href} showRange />
 </Story>
 
-<Story name="Another language">
+<Story name="Another language" asChild>
   <Pagination
     offset={40}
     limit={20}

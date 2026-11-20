@@ -5,10 +5,10 @@
   const { Story } = defineMeta({ title: 'Citations/ISSNLink', component: ISSNLink, tags: ['autodocs'] });
 </script>
 
-<Story name="Default">
+<Story name="Default" asChild>
   <ISSNLink issn="1030-1887" />
 </Story>
 
-<Story name="With Schema.org itemprop">
+<Story name="With Schema.org itemprop" asChild>
   <ISSNLink issn="1030-1887" itemprop="issn" />
 </Story>

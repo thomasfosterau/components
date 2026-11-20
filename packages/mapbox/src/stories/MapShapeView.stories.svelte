@@ -69,7 +69,7 @@
   });
 </script>
 
-<Story name="An area, a path and a point">
+<Story name="An area, a path and a point" asChild>
   <svg viewBox="0 0 340 180" class="bg-base-100 h-auto w-full max-w-lg">
     <MapShapeView shape={area} />
     <MapShapeView shape={path} />
@@ -80,7 +80,7 @@
 <!-- Selected in a surface that cannot reshape it — a plan on a detail page.
      The rings are indicators, not grips: a handle that looks draggable and is
      not is worse than no handle. -->
-<Story name="Selected, read-only">
+<Story name="Selected, read-only" asChild>
   <svg viewBox="0 0 340 160" class="bg-base-100 h-auto w-full max-w-lg">
     <MapShapeView shape={area} selected />
     <MapShapeView shape={point} selected />
@@ -90,14 +90,14 @@
 <!-- Selected in an editor. The same rule, read the other way: these vertices
      CAN be dragged, so they are filled grips, and each edge offers a dashed
      midpoint a new vertex is dragged out of. -->
-<Story name="Selected, editable">
+<Story name="Selected, editable" asChild>
   <svg viewBox="0 0 340 180" class="bg-base-100 h-auto w-full max-w-lg">
     <MapShapeView shape={area} selected editable />
     <MapShapeView shape={path} selected editable />
   </svg>
 </Story>
 
-<Story name="Rotated">
+<Story name="Rotated" asChild>
   <svg viewBox="0 0 340 200" class="bg-base-100 h-auto w-full max-w-lg">
     <MapShapeView shape={{ ...area, rotation: 20 }} />
   </svg>

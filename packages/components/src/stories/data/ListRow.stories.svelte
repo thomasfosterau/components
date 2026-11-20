@@ -16,13 +16,13 @@
   });
 </script>
 
-<Story name="Link row">
+<Story name="Link row" asChild>
   <ListRow headline="Units" supporting="How distances read." href="#units" class="max-w-md">
     {#snippet trailing()}<span class="text-base-content/70">Metric</span>{/snippet}
   </ListRow>
 </Story>
 
-<Story name="Control row">
+<Story name="Control row" asChild>
   <ListRow headline="Email digests" supporting="A summary every Monday." class="max-w-md">
     {#snippet trailing({ labelledBy, describedBy })}
       <input
@@ -36,6 +36,6 @@
   </ListRow>
 </Story>
 
-<Story name="Destructive button row">
+<Story name="Destructive button row" asChild>
   <ListRow headline="Delete account" tone="error" onclick={() => {}} class="max-w-md" />
 </Story>

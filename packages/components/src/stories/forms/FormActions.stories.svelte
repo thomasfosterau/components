@@ -17,19 +17,19 @@
   });
 </script>
 
-<Story name="Submit and cancel">
+<Story name="Submit and cancel" asChild>
   <FormActions submitLabel="Create garden" cancelHref="/gardens" />
 </Story>
 
-<Story name="Pending">
+<Story name="Pending" asChild>
   <FormActions submitLabel="Create garden" pendingLabel="Creating…" pending cancelHref="/gardens" />
 </Story>
 
-<Story name="Submit alone">
+<Story name="Submit alone" asChild>
   <FormActions submitLabel="Save notes" />
 </Story>
 
-<Story name="With an extra control">
+<Story name="With an extra control" asChild>
   <FormActions submitLabel="Publish" cancelHref="/gardens">
     <Button variant="ghost">Save as a draft</Button>
   </FormActions>

@@ -16,7 +16,7 @@
   });
 </script>
 
-<Story name="Variants">
+<Story name="Variants" asChild>
   <div class="flex max-w-lg flex-col gap-3">
     <Disclosure title="Arrow — the default">
       <p>The marker rotates as the section opens.</p>
@@ -30,7 +30,7 @@
   </div>
 </Story>
 
-<Story name="Open">
+<Story name="Open" asChild>
   <div class="max-w-lg">
     <Disclosure title="Add an anatomy record" open>
       <p>
@@ -41,7 +41,7 @@
   </div>
 </Story>
 
-<Story name="A snippet summary">
+<Story name="A snippet summary" asChild>
   <div class="max-w-lg">
     <Disclosure>
       {#snippet title()}

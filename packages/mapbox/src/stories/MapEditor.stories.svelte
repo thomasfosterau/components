@@ -140,7 +140,7 @@
   };
 </script>
 
-<Story name="Select and drag">
+<Story name="Select and drag" asChild>
   <div class="space-y-2">
     <p class="text-base-content/70 text-sm">
       Click an area to select it, drag to move it. Positions snap to the 20-unit grid.
@@ -161,7 +161,7 @@
   </div>
 </Story>
 
-<Story name="Reshape, draw and undo">
+<Story name="Reshape, draw and undo" asChild>
   <div class="space-y-2">
     <div class="flex flex-wrap items-center gap-2">
       <div class="join" role="group" aria-label="Tool">
@@ -232,6 +232,6 @@
   </div>
 </Story>
 
-<Story name="Panning">
+<Story name="Panning" asChild>
   <MapEditor doc={base} tool="pan" width={640} height={360} label="Site plan, pan tool" />
 </Story>

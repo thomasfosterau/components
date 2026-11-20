@@ -17,6 +17,6 @@
   });
 </script>
 
-<Story name="Editor with a leave guard">
+<Story name="Editor with a leave guard" asChild>
   <LeaveGuardDemo />
 </Story>

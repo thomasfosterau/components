@@ -23,7 +23,7 @@
   </dl>
 {/snippet}
 
-<Story name="Inspector over a canvas">
+<Story name="Inspector over a canvas" asChild>
   <SupportingPane title="Properties" toggleLabel="Properties" supporting={properties}>
     <div class="bg-base-200 text-base-content/60 flex h-80 items-center justify-center rounded-box">
       Plan canvas

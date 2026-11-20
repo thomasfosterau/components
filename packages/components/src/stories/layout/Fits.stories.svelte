@@ -27,7 +27,7 @@
   <button type="button" class="btn">More</button>
 {/snippet}
 
-<Story name="Row, column, menu">
+<Story name="Row, column, menu" asChild>
   <div class="resize-x overflow-auto border p-2" style="width: 40rem">
     <Fits breakpoints={['36rem', '20rem']} layouts={[row, column, menu]} />
   </div>

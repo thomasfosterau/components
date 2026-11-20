@@ -27,7 +27,7 @@
   };
 </script>
 
-<Story name="Tones">
+<Story name="Tones" asChild>
   <div class="flex flex-wrap gap-4">
     <SplitButton tone="primary" menuLabel="More save options" onclick={save} loading={saving}>
       Save
@@ -55,7 +55,7 @@
   </div>
 </Story>
 
-<Story name="Link main action">
+<Story name="Link main action" asChild>
   <SplitButton href="/beds/new" tone="primary" menuLabel="More ways to add a bed">
     New bed
     {#snippet menu()}
@@ -65,7 +65,7 @@
   </SplitButton>
 </Story>
 
-<Story name="Primary disabled">
+<Story name="Primary disabled" asChild>
   <SplitButton tone="primary" primaryDisabled menuLabel="More save options">
     Save
     {#snippet menu()}
@@ -75,7 +75,7 @@
   </SplitButton>
 </Story>
 
-<Story name="Opens upward">
+<Story name="Opens upward" asChild>
   <div class="pt-40">
     <SplitButton placement="top-start" menuLabel="More merge options">
       Merge

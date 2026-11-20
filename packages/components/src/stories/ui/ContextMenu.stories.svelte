@@ -25,7 +25,7 @@
   const plants = ['Rosa canina', 'Solanum lycopersicum', 'Lavandula angustifolia'];
 </script>
 
-<Story name="Plant list">
+<Story name="Plant list" asChild>
   <ul class="bg-base-100 rounded-box divide-base-300 max-w-sm divide-y border">
     {#each plants as plant (plant)}
       <ContextMenu label={`Actions for ${plant}`}>
@@ -62,7 +62,7 @@
   </ul>
 </Story>
 
-<Story name="Disabled (the browser's menu shows)">
+<Story name="Disabled (the browser's menu shows)" asChild>
   <ContextMenu label="Actions" disabled>
     {#snippet trigger({ props })}
       <div {...props} class="bg-base-200 rounded-box max-w-sm p-6">Right-click here</div>

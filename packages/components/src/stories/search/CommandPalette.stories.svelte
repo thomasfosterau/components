@@ -18,27 +18,27 @@
   });
 </script>
 
-<Story name="From the hotkey registry (press Cmd+K or Ctrl+K)">
+<Story name="From the hotkey registry (press Cmd+K or Ctrl+K)" asChild>
   <HotkeyDemo>
     <CommandPalette />
   </HotkeyDemo>
 </Story>
 
-<Story name="A non-admin viewer sees fewer rows">
+<Story name="A non-admin viewer sees fewer rows" asChild>
   <HotkeyDemo isAdmin={false}>
     <CommandPalette />
   </HotkeyDemo>
 </Story>
 
-<Story name="No registry: static rows and an async search">
+<Story name="No registry: static rows and an async search" asChild>
   <PaletteDemo />
 </Story>
 
-<Story name="No registry, no search: bits-ui does the filtering">
+<Story name="No registry, no search: bits-ui does the filtering" asChild>
   <PaletteDemo withSearch={false} />
 </Story>
 
-<Story name="Every string is a prop">
+<Story name="Every string is a prop" asChild>
   <HotkeyDemo>
     <CommandPalette
       label="Palette de commandes"

@@ -23,11 +23,11 @@
   ];
 </script>
 
-<Story name="Filter by status">
+<Story name="Filter by status" asChild>
   <FilterBar options={status} label="Filter by status" />
 </Story>
 
-<Story name="Two rows, two axes">
+<Story name="Two rows, two axes" asChild>
   <div class="space-y-2">
     <FilterBar options={status} label="Filter by status" />
     <FilterBar

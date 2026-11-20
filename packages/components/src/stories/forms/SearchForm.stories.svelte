@@ -16,13 +16,13 @@
   });
 </script>
 
-<Story name="Default">
+<Story name="Default" asChild>
   <div class="max-w-xl">
     <SearchForm action="/search" />
   </div>
 </Story>
 
-<Story name="Named and pre-filled">
+<Story name="Named and pre-filled" asChild>
   <div class="max-w-xl">
     <SearchForm
       action="/taxa"

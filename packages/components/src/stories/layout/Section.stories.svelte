@@ -22,7 +22,7 @@
   const observations = ['14 September — two seedlings', '2 September — sown', '30 August — soil turned'];
 </script>
 
-<Story name="Rows, a count and an action">
+<Story name="Rows, a count and an action" asChild>
   <Section title="Observations" count={1284} description="The most recent three of 1,284.">
     {#snippet actions()}<Link href="/observations">See all</Link>{/snippet}
     <ul class="divide-base-300 divide-y">
@@ -33,13 +33,13 @@
   </Section>
 </Story>
 
-<Story name="Empty, with the default message">
+<Story name="Empty, with the default message" asChild>
   <Section title="Chemistry" empty>
     <p>Never rendered — `empty` is set.</p>
   </Section>
 </Story>
 
-<Story name="Empty, with an EmptyState">
+<Story name="Empty, with an EmptyState" asChild>
   <Section title="Gardens" empty>
     {#snippet emptyState()}
       <EmptyState
@@ -57,7 +57,7 @@
   </Section>
 </Story>
 
-<Story name="Nested, as an h3">
+<Story name="Nested, as an h3" asChild>
   <section class="space-y-6">
     <h2 class="text-2xl font-semibold">Anatomy</h2>
     <Section title="Tissues" headingLevel={3} count={4}>

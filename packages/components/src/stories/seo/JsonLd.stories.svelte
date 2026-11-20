@@ -20,7 +20,7 @@
   const closingTag = '<' + '/script>';
 </script>
 
-<Story name="An article">
+<Story name="An article" asChild>
   <HeadInspector>
     <JsonLd
       data={{

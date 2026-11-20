@@ -17,18 +17,18 @@
   });
 </script>
 
-<Story name="Text">
+<Story name="Text" asChild>
   <ToggleButton>Show frost dates</ToggleButton>
 </Story>
 
-<Story name="Pressed icon (Favourite)">
+<Story name="Pressed icon (Favourite)" asChild>
   <ToggleButton iconOnly label="Favourite" tone="warning" tooltip>
     {#snippet icon()}<Star class="size-4" aria-hidden="true" />{/snippet}
     {#snippet pressedIcon()}<Star class="size-4 fill-current" aria-hidden="true" />{/snippet}
   </ToggleButton>
 </Story>
 
-<Story name="Mute, outline">
+<Story name="Mute, outline" asChild>
   <ToggleButton variant="outline" tone="error">
     {#snippet icon()}<VolumeX class="size-4" aria-hidden="true" />{/snippet}
     Mute

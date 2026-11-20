@@ -27,11 +27,11 @@
   ];
 </script>
 
-<Story name="Title only">
+<Story name="Title only" asChild>
   <PageHeader title="Gardens" />
 </Story>
 
-<Story name="Every region">
+<Story name="Every region" asChild>
   <PageHeader title="Tomato ‘Black Krim’" subtitle="Solanum lycopersicum · sown 14 September">
     {#snippet eyebrow()}<Breadcrumbs items={crumbs} />{/snippet}
     {#snippet icon()}
@@ -49,7 +49,7 @@
   </PageHeader>
 </Story>
 
-<Story name="A snippet title, and content under the block">
+<Story name="A snippet title, and content under the block" asChild>
   <PageHeader>
     {#snippet title()}
       <span class="flex flex-wrap items-center gap-3">
@@ -63,7 +63,7 @@
   </PageHeader>
 </Story>
 
-<Story name="As an h2, inside a panel">
+<Story name="As an h2, inside a panel" asChild>
   <section class="bg-base-200 rounded-box p-6">
     <PageHeader title="Watering schedule" headingLevel={2} subtitle="Runs between 5am and 6am." />
   </section>

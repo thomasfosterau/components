@@ -20,7 +20,7 @@
   const loaded = Date.now();
 </script>
 
-<Story name="Locales and styles">
+<Story name="Locales and styles" asChild>
   <ul class="space-y-1">
     {#each [['en', 'long'], ['en', 'short'], ['en', 'narrow'], ['en', 'digital'], ['de', 'long'], ['fr', 'short'], ['ja', 'short']] as const as [locale, style] (`${locale}-${style}`)}
       <li><code class="me-2">{locale} {style}</code><Duration value={{ hours: 2, minutes: 30 }} locales={locale} {style} /></li>
@@ -28,10 +28,10 @@
   </ul>
 </Story>
 
-<Story name="Countdown, digits">
+<Story name="Countdown, digits" asChild>
   <Countdown until={loaded + 2 * 24 * 60 * 60_000 + 4 * 60 * 60_000} label="Seed swap opens in" />
 </Story>
 
-<Story name="Countdown, text, to zero">
+<Story name="Countdown, text, to zero" asChild>
   <Countdown until={loaded + 12_000} label="Watering ends in" display="text" largestUnit="minutes" />
 </Story>

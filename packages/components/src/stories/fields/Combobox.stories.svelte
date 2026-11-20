@@ -60,7 +60,7 @@
   let picked = $state<string | undefined>();
 </script>
 
-<Story name="Static list">
+<Story name="Static list" asChild>
   <div class="max-w-sm">
     <Combobox
       label="Taxon"
@@ -76,7 +76,7 @@
   </div>
 </Story>
 
-<Story name="Pick or create">
+<Story name="Pick or create" asChild>
   <div class="max-w-sm">
     <Combobox
       label="Taxon"
@@ -93,7 +93,7 @@
   </div>
 </Story>
 
-<Story name="Asynchronous search">
+<Story name="Asynchronous search" asChild>
   <div class="max-w-sm">
     <Combobox
       label="Taxon"
@@ -110,7 +110,7 @@
   </div>
 </Story>
 
-<Story name="Custom rows, empty state and footer">
+<Story name="Custom rows, empty state and footer" asChild>
   <div class="max-w-sm">
     <Combobox
       label="Taxon"
@@ -137,7 +137,7 @@
   </div>
 </Story>
 
-<Story name="Invalid, with an error">
+<Story name="Invalid, with an error" asChild>
   <div class="max-w-sm">
     <Combobox
       label="Taxon"
@@ -152,7 +152,7 @@
   </div>
 </Story>
 
-<Story name="Search box (posts the typed query)">
+<Story name="Search box (posts the typed query)" asChild>
   <form
     method="GET"
     action="#search"

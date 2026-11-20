@@ -23,7 +23,7 @@
   There is nothing to look at: the story exists to show the shape of the call
   site. Inspect the DOM to see the two hidden inputs inside the form.
 -->
-<Story name="Inside a form">
+<Story name="Inside a form" asChild>
   <form class="max-w-sm" action="/gardens/42/plants" method="post">
     <HiddenField name="gardenId" value="42" />
     <HiddenField name="redirectTo" value="/gardens/42" />

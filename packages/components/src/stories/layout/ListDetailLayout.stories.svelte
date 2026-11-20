@@ -43,19 +43,19 @@
   <p class="text-base-content/60 p-4">Choose a bed to see it here.</p>
 {/snippet}
 
-<Story name="Nothing selected">
+<Story name="Nothing selected" asChild>
   <div class="border-base-300 h-96 border">
     <ListDetailLayout {list} {detail} {placeholder} showDetail={false} backHref="#" />
   </div>
 </Story>
 
-<Story name="An item selected">
+<Story name="An item selected" asChild>
   <div class="border-base-300 h-96 border">
     <ListDetailLayout {list} {detail} {placeholder} showDetail backHref="#" focusTarget="bed-4" />
   </div>
 </Story>
 
-<Story name="Resizable list">
+<Story name="Resizable list" asChild>
   <div class="border-base-300 h-96 border">
     <ListDetailLayout
       {list}

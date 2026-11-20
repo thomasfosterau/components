@@ -17,7 +17,7 @@
   });
 </script>
 
-<Story name="A group of checkboxes">
+<Story name="A group of checkboxes" asChild>
   <Fieldset legend="Taxon flags" hint="Four independent facts about the name.">
     <Checkbox label="Formally published" checked />
     <Checkbox label="Placement certain" />
@@ -26,7 +26,7 @@
   </Fieldset>
 </Story>
 
-<Story name="Required, with errors">
+<Story name="Required, with errors" asChild>
   <Fieldset
     legend="Growing conditions"
     required

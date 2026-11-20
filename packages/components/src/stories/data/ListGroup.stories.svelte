@@ -30,7 +30,7 @@
   let theme = $state('system');
 </script>
 
-<Story name="Settings page">
+<Story name="Settings page" asChild>
   <div class="flex max-w-md flex-col gap-6">
     <ListGroup title="Notifications" description="How we reach you." footer="Changes save at once.">
       <ListRow headline="Email digests" supporting="A summary every Monday.">
@@ -65,7 +65,7 @@
   </div>
 </Story>
 
-<Story name="Contacts with avatars">
+<Story name="Contacts with avatars" asChild>
   <ListGroup title="Contacts" class="max-w-md">
     {#each contacts as contact (contact.name)}
       <ListRow headline={contact.name} supporting={contact.role} href="#contact">
@@ -75,7 +75,7 @@
   </ListGroup>
 </Story>
 
-<Story name="Expander row (pattern)">
+<Story name="Expander row (pattern)" asChild>
   <!-- An expander row is a control row whose children hold a Disclosure;
        there is no separate component. -->
   <ListGroup title="Advanced" class="max-w-md">
@@ -87,7 +87,7 @@
   </ListGroup>
 </Story>
 
-<Story name="Plain variant">
+<Story name="Plain variant" asChild>
   <ListGroup title="Recent" variant="plain" class="max-w-md">
     <ListRow headline="Back bed" overline="Garden" supporting="Nine beds" href="#back" />
     <ListRow headline="Front bed" overline="Garden" supporting="Four beds" href="#front" />

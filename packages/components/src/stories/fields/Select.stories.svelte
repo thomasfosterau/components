@@ -24,7 +24,7 @@
   ];
 </script>
 
-<Story name="With a placeholder">
+<Story name="With a placeholder" asChild>
   <div class="max-w-sm">
     <FormField label="Rank" hint="Cultivars are added from the taxon page.">
       {#snippet children(control)}
@@ -34,7 +34,7 @@
   </div>
 </Story>
 
-<Story name="Clearable placeholder">
+<Story name="Clearable placeholder" asChild>
   <!-- An optional field: the placeholder stays selectable, so a chosen value
        can be cleared back to '' on edit. -->
   <div class="max-w-sm">
@@ -46,7 +46,7 @@
   </div>
 </Story>
 
-<Story name="Bare strings">
+<Story name="Bare strings" asChild>
   <div class="max-w-sm">
     <FormField label="Bed">
       {#snippet children(control)}
@@ -56,7 +56,7 @@
   </div>
 </Story>
 
-<Story name="Invalid">
+<Story name="Invalid" asChild>
   <div class="max-w-sm">
     <FormField label="Rank" errors={['Choose a rank.']}>
       {#snippet children(control)}

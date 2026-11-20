@@ -17,19 +17,19 @@
   });
 </script>
 
-<Story name="Input">
+<Story name="Input" asChild>
   <Rating label="How well did it grow?" value={3} />
 </Story>
 
-<Story name="Half steps">
+<Story name="Half steps" asChild>
   <Rating label="How well did it grow?" value={3.5} allowHalf />
 </Story>
 
-<Story name="Read-only display">
+<Story name="Read-only display" asChild>
   <Rating readonly value={4.5} size="sm" />
 </Story>
 
-<Story name="Custom glyph">
+<Story name="Custom glyph" asChild>
   <Rating label="Hardiness" value={2} max={3} tone="success">
     {#snippet item({ state })}
       <span class={['text-lg leading-none', state === 'inactive' ? 'opacity-20' : 'text-success']}>●</span>
@@ -37,7 +37,7 @@
   </Rating>
 </Story>
 
-<Story name="Tones">
+<Story name="Tones" asChild>
   <div class="flex flex-col gap-2">
     <Rating label="Warning" value={4} />
     <Rating label="Primary" value={4} tone="primary" />
@@ -45,11 +45,11 @@
   </div>
 </Story>
 
-<Story name="Invalid">
+<Story name="Invalid" asChild>
   <Rating label="How well did it grow?" invalid />
 </Story>
 
-<Story name="Inside FormField">
+<Story name="Inside FormField" asChild>
   <!-- `{...control}` alone names it: the root is `aria-labelledby` the FormField's `labelId`. -->
   <FormField label="How well did it grow?" hint="Five is a bumper crop." errors={['Rate it before saving.']}>
     {#snippet children(control)}

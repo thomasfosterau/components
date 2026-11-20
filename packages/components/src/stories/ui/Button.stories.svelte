@@ -17,7 +17,7 @@
   });
 </script>
 
-<Story name="Tones">
+<Story name="Tones" asChild>
   <div class="flex flex-wrap gap-2">
     <Button>Neutral</Button>
     <Button tone="primary">Primary</Button>
@@ -30,7 +30,7 @@
   </div>
 </Story>
 
-<Story name="Variants">
+<Story name="Variants" asChild>
   <div class="flex flex-wrap gap-2">
     <Button tone="primary" variant="solid">Solid</Button>
     <Button tone="primary" variant="outline">Outline</Button>
@@ -41,7 +41,7 @@
   </div>
 </Story>
 
-<Story name="Sizes">
+<Story name="Sizes" asChild>
   <div class="flex flex-wrap items-center gap-2">
     <Button tone="primary" size="xs">Extra small</Button>
     <Button tone="primary" size="sm">Small</Button>
@@ -51,21 +51,21 @@
   </div>
 </Story>
 
-<Story name="Loading and disabled">
+<Story name="Loading and disabled" asChild>
   <div class="flex flex-wrap gap-2">
     <Button tone="primary" loading>Saving changes</Button>
     <Button tone="primary" disabled>Unavailable</Button>
   </div>
 </Story>
 
-<Story name="With an icon">
+<Story name="With an icon" asChild>
   <Button tone="primary">
     {#snippet icon()}<Plus class="size-4" aria-hidden="true" />{/snippet}
     Add a plant
   </Button>
 </Story>
 
-<Story name="Block">
+<Story name="Block" asChild>
   <div class="max-w-sm">
     <Button tone="primary" block>Continue to checkout</Button>
   </div>

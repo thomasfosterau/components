@@ -25,13 +25,13 @@
   };
 </script>
 
-<Story name="Date picker">
+<Story name="Date picker" asChild>
   <FormField label="Sown on" hint="Type it, or choose it on the calendar.">
     {#snippet children(control)}<DatePicker {...control} locales="en-AU" name="sown" />{/snippet}
   </FormField>
 </Story>
 
-<Story name="Unavailable days">
+<Story name="Unavailable days" asChild>
   <FormField label="Delivery day">
     {#snippet children(control)}
       <DatePicker {...control} locales="en-AU" value={parseDate('2026-10-14')} isDateUnavailable={weekend} />
@@ -39,7 +39,7 @@
   </FormField>
 </Story>
 
-<Story name="Date range picker">
+<Story name="Date range picker" asChild>
   <FormField label="Season">
     {#snippet children(control)}
       <DateRangePicker {...control} locales="en-AU" minDays={3} numberOfMonths={2} startName="from" endName="to" />

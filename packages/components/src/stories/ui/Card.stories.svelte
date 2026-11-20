@@ -17,7 +17,7 @@
   });
 </script>
 
-<Story name="Bare">
+<Story name="Bare" asChild>
   <Card>
     <p>
       The 56 hand-written copies looked exactly like this: a bordered box on `base-100` with a
@@ -26,7 +26,7 @@
   </Card>
 </Story>
 
-<Story name="With a title and actions">
+<Story name="With a title and actions" asChild>
   <Card title="Tomato ‘Black Krim’">
     <p>Sown 14 September, transplanted 12 October. Two of six seedlings survived the frost.</p>
     {#snippet actions()}
@@ -36,7 +36,7 @@
   </Card>
 </Story>
 
-<Story name="Variants">
+<Story name="Variants" asChild>
   <div class="grid gap-4 sm:grid-cols-3">
     <Card title="Border" headingLevel={3}><p>The default.</p></Card>
     <Card title="Dash" headingLevel={3} variant="dash"><p>A provisional surface.</p></Card>
@@ -44,14 +44,14 @@
   </div>
 </Story>
 
-<Story name="Sizes">
+<Story name="Sizes" asChild>
   <div class="grid gap-4 sm:grid-cols-2">
     <Card title="Extra small" headingLevel={3} size="xs"><p>Tight padding and type.</p></Card>
     <Card title="Large" headingLevel={3} size="lg"><p>Generous padding and type.</p></Card>
   </div>
 </Story>
 
-<Story name="Unpadded, with a figure">
+<Story name="Unpadded, with a figure" asChild>
   <div class="max-w-sm">
     <Card title="Bed 3, in June" padded={false} bodyClass="p-4">
       {#snippet figure()}
@@ -64,7 +64,7 @@
   </div>
 </Story>
 
-<Story name="As a form, without a shadow">
+<Story name="As a form, without a shadow" asChild>
   <div class="max-w-sm">
     <Card as="form" method="post" title="Rename garden" shadow={false} aria-label="Rename garden">
       <label class="floating-label">
@@ -78,7 +78,7 @@
   </div>
 </Story>
 
-<Story name="As list items and a description list">
+<Story name="As list items and a description list" asChild>
   <div class="grid gap-4 sm:grid-cols-2">
     <ul class="space-y-2">
       <Card as="li" shadow={false} size="sm"><p>Bed 1 — brassicas</p></Card>

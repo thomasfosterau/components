@@ -32,7 +32,7 @@
 {#snippet pen()}<Pencil class="size-4" aria-hidden="true" />{/snippet}
 {#snippet pan()}<Hand class="size-4" aria-hidden="true" />{/snippet}
 
-<Story name="Formatting toolbar">
+<Story name="Formatting toolbar" asChild>
   <Toolbar label="Formatting">
     <ToolbarButton iconOnly icon={undo}>Undo</ToolbarButton>
     <ToolbarSeparator />
@@ -60,7 +60,7 @@
   </Toolbar>
 </Story>
 
-<Story name="Vertical canvas palette">
+<Story name="Vertical canvas palette" asChild>
   <Toolbar label="Tools" orientation="vertical">
     <ToolbarToggleGroup
       type="single"
@@ -77,7 +77,7 @@
   </Toolbar>
 </Story>
 
-<Story name="ButtonGroup on a form">
+<Story name="ButtonGroup on a form" asChild>
   <ButtonGroup label="Save options">
     <Button class="join-item" tone="primary">Save</Button>
     <Button class="join-item">Save as…</Button>

@@ -17,7 +17,7 @@
   });
 </script>
 
-<Story name="Numeric (inside FormField)">
+<Story name="Numeric (inside FormField)" asChild>
   <FormField label="Sign-in code" hint="We emailed you a six-digit code.">
     {#snippet children(control)}
       <PinInput {...control} name="code" />
@@ -25,7 +25,7 @@
   </FormField>
 </Story>
 
-<Story name="Alphanumeric">
+<Story name="Alphanumeric" asChild>
   <FormField label="Invite code">
     {#snippet children(control)}
       <PinInput {...control} charset="alphanumeric" length={8} size="sm" />
@@ -33,7 +33,7 @@
   </FormField>
 </Story>
 
-<Story name="Masked PIN">
+<Story name="Masked PIN" asChild>
   <FormField label="PIN">
     {#snippet children(control)}
       <PinInput {...control} length={4} masked value="12" size="lg" />
@@ -41,7 +41,7 @@
   </FormField>
 </Story>
 
-<Story name="Invalid">
+<Story name="Invalid" asChild>
   <FormField label="Sign-in code" errors={['That code has expired. Request a new one.']}>
     {#snippet children(control)}
       <PinInput {...control} value="123456" />
@@ -49,7 +49,7 @@
   </FormField>
 </Story>
 
-<Story name="Paste">
+<Story name="Paste" asChild>
   <FormField label="Sign-in code" hint="Paste “123 456” from the email; spaces and hyphens are dropped.">
     {#snippet children(control)}
       <PinInput {...control} />

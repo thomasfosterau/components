@@ -16,7 +16,7 @@
   });
 </script>
 
-<Story name="Tones">
+<Story name="Tones" asChild>
   <div class="flex flex-wrap gap-2">
     <LinkButton href="/gardens">All gardens</LinkButton>
     <LinkButton href="/gardens/new" tone="primary">Start a garden</LinkButton>
@@ -24,11 +24,11 @@
   </div>
 </Story>
 
-<Story name="Disabled">
+<Story name="Disabled" asChild>
   <LinkButton href="/gardens/new" tone="primary" disabled>Start a garden</LinkButton>
 </Story>
 
-<Story name="External">
+<Story name="External" asChild>
   <LinkButton href="https://example.org/handbook" tone="primary" variant="outline" external>
     Read the handbook
   </LinkButton>

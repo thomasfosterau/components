@@ -19,7 +19,7 @@
   });
 </script>
 
-<Story name="Grid">
+<Story name="Grid" asChild>
   <DescriptionList>
     <DescriptionRow label="Family" value="Rosaceae" />
     <DescriptionRow label="Sown" value="14 September 2026" />
@@ -28,7 +28,7 @@
   </DescriptionList>
 </Story>
 
-<Story name="Card, with markup values">
+<Story name="Card, with markup values" asChild>
   <DescriptionList variant="card">
     <DescriptionRow label="Captured">
       <DateTime value="2026-06-02T09:14:00Z" dateStyle="long" locales="en-AU" />
@@ -41,7 +41,7 @@
   </DescriptionList>
 </Story>
 
-<Story name="Mono, for identifiers">
+<Story name="Mono, for identifiers" asChild>
   <DescriptionList variant="card" mono>
     <DescriptionRow label="Formula" value="C8H10N4O2" />
     <DescriptionRow label="InChIKey" value="RYYVLZVUVIJVGH-UHFFFAOYSA-N" />
@@ -49,7 +49,7 @@
   </DescriptionList>
 </Story>
 
-<Story name="Divided">
+<Story name="Divided" asChild>
   <DescriptionList variant="divided">
     <DescriptionRow label="Owner" value="Ada Lovelace" />
     <DescriptionRow label="Visibility" value="Private" />
@@ -57,7 +57,7 @@
   </DescriptionList>
 </Story>
 
-<Story name="Inline">
+<Story name="Inline" asChild>
   <DescriptionList variant="inline">
     <DescriptionRow label="Beds" value={9} />
     <DescriptionRow label="Plants" value={214} />
@@ -65,7 +65,7 @@
   </DescriptionList>
 </Story>
 
-<Story name="Bare, in the caller's own grid">
+<Story name="Bare, in the caller's own grid" asChild>
   <!-- `bare` adds no layout: the caller's class lays the <dl> out, and each row's
        <dt>/<dd> sits directly in it beside the caller's own pairs. -->
   <DescriptionList variant="bare" class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
@@ -78,7 +78,7 @@
   </DescriptionList>
 </Story>
 
-<Story name="Showing the absences">
+<Story name="Showing the absences" asChild>
   <!-- A specimen record whose blank fields are what the reader came to check. -->
   <DescriptionList variant="divided" showEmpty emptyLabel="not recorded">
     <DescriptionRow label="Collector" value="J. Banks" />

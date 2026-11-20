@@ -50,7 +50,7 @@
   <LinkListItem href={garden.href} title={garden.title} subtitle={garden.subtitle} />
 {/snippet}
 
-<Story name="Compact">
+<Story name="Compact" asChild>
   <ItemList items={gardens} getKey={(garden) => garden.id}>
     {#snippet item(garden)}
       <LinkListItem href={garden.href} title={garden.title} badges={garden.badges} />
@@ -58,7 +58,7 @@
   </ItemList>
 </Story>
 
-<Story name="Stacked">
+<Story name="Stacked" asChild>
   <ItemList items={gardens} variant="stacked" getKey={(garden) => garden.id}>
     {#snippet item(garden)}
       <LinkListItem
@@ -71,7 +71,7 @@
   </ItemList>
 </Story>
 
-<Story name="Grid">
+<Story name="Grid" asChild>
   <ItemList items={gardens} variant="grid" getKey={(garden) => garden.id}>
     {#snippet item(garden)}
       <LinkListItem href={garden.href} title={garden.title} subtitle={garden.subtitle} />
@@ -79,7 +79,7 @@
   </ItemList>
 </Story>
 
-<Story name="Cards, with meta">
+<Story name="Cards, with meta" asChild>
   <ItemList items={gardens} variant="cards" getKey={(garden) => garden.id}>
     {#snippet item(garden)}
       <LinkListItem
@@ -97,7 +97,7 @@
   </ItemList>
 </Story>
 
-<Story name="Feed">
+<Story name="Feed" asChild>
   <!-- Turn on the a11y panel: the container is a feed, each entry an article
        that states its position in the whole stream. -->
   <ItemList
@@ -119,7 +119,7 @@
   </ItemList>
 </Story>
 
-<Story name="Lazy render">
+<Story name="Lazy render" asChild>
   <!-- Every row is in the DOM (find-in-page reaches plot 300); the browser
        skips laying out and painting the ones off screen. -->
   <ItemList
@@ -132,7 +132,7 @@
   />
 </Story>
 
-<Story name="Empty">
+<Story name="Empty" asChild>
   <ItemList
     items={[]}
     getKey={(garden: LinkListItemData) => garden.id}

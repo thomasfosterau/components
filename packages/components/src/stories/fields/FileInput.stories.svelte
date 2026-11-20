@@ -21,7 +21,7 @@
   let chosen = $state<File | undefined>();
 </script>
 
-<Story name="Default">
+<Story name="Default" asChild>
   <div class="max-w-md">
     <FormField label="Attachment" hint="PDF or plain text.">
       {#snippet children(control)}
@@ -34,7 +34,7 @@
   </div>
 </Story>
 
-<Story name="With a size cap">
+<Story name="With a size cap" asChild>
   <div class="max-w-md">
     <FormField label="Attachment" hint="Up to 1 kB, so anything real will be refused.">
       {#snippet children(control)}

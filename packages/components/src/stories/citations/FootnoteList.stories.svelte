@@ -16,7 +16,7 @@
   });
 </script>
 
-<Story name="Two notes, one with a custom symbol">
+<Story name="Two notes, one with a custom symbol" asChild>
   <BibliographyProvider {footnotes}>
     {#snippet children()}
       <FootnoteList />
@@ -24,7 +24,7 @@
   </BibliographyProvider>
 </Story>
 
-<Story name="Custom title and heading level">
+<Story name="Custom title and heading level" asChild>
   <BibliographyProvider {footnotes}>
     {#snippet children()}
       <FootnoteList title="Endnotes" headingLevel={3} />

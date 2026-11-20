@@ -35,7 +35,7 @@
   </ul>
 {/snippet}
 
-<Story name="Modal with detents">
+<Story name="Modal with detents" asChild>
   <Button onclick={() => (modalOpen = true)}>Show results</Button>
   <BottomSheet
     bind:open={modalOpen}
@@ -48,7 +48,7 @@
   </BottomSheet>
 </Story>
 
-<Story name="Non-modal over a map">
+<Story name="Non-modal over a map" asChild>
   <div class="bg-base-200 text-base-content/60 flex h-[80dvh] items-start justify-center pt-8">
     <Button onclick={() => (mapOpen = true)}>Map (still usable): show results</Button>
   </div>
@@ -64,7 +64,7 @@
   </BottomSheet>
 </Story>
 
-<Story name="Modal only when pulled up">
+<Story name="Modal only when pulled up" asChild>
   <div class="bg-base-200 text-base-content/60 flex h-[80dvh] items-start justify-center pt-8">
     <Button onclick={() => (peekOpen = true)}>Map (usable at Peek): show results</Button>
   </div>
@@ -79,7 +79,7 @@
   </BottomSheet>
 </Story>
 
-<Story name="Fit to content">
+<Story name="Fit to content" asChild>
   <Button onclick={() => (fitOpen = true)}>Bed 4 actions</Button>
   <BottomSheet bind:open={fitOpen} title="Bed 4" detents={['content']}>
     <p>Two metres by 1.2, loam, last watered on Tuesday.</p>
@@ -90,7 +90,7 @@
   </BottomSheet>
 </Story>
 
-<Story name="Not dismissible by drag">
+<Story name="Not dismissible by drag" asChild>
   <Button onclick={() => (pinnedOpen = true)}>Show the sheet</Button>
   <BottomSheet bind:open={pinnedOpen} title="Planting plan" dismissible={false} detents={[0.4, 0.92]}>
     <p>Dragging below the lowest detent snaps back; the close button still closes it.</p>

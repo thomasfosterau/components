@@ -17,13 +17,13 @@
   });
 </script>
 
-<Story name="Single">
+<Story name="Single" asChild>
   <div class="max-w-sm">
     <Slider label="Sowing depth" min={0} max={10} value={2} formatValue={(v) => `${v} cm`} />
   </div>
 </Story>
 
-<Story name="Range">
+<Story name="Range" asChild>
   <div class="max-w-sm">
     <Slider
       type="multiple"
@@ -37,23 +37,23 @@
   </div>
 </Story>
 
-<Story name="Ticks">
+<Story name="Ticks" asChild>
   <div class="max-w-sm">
     <Slider label="Minimum hours of sun" min={0} max={8} value={4} ticks formatValue={(v) => `${v} h`} />
   </div>
 </Story>
 
-<Story name="Vertical">
+<Story name="Vertical" asChild>
   <Slider label="Water level" orientation="vertical" value={60} tone="info" formatValue={(v) => `${v}%`} />
 </Story>
 
-<Story name="Invalid">
+<Story name="Invalid" asChild>
   <div class="max-w-sm">
     <Slider label="Spacing" min={0} max={100} value={90} invalid />
   </div>
 </Story>
 
-<Story name="Inside FormField">
+<Story name="Inside FormField" asChild>
   <!-- `{...control}` alone names it: every thumb is `aria-labelledby` the FormField's `labelId`. -->
   <div class="max-w-sm">
     <FormField label="Hours of sun" hint="Full sun is six hours or more." errors={['Most roses need at least four hours.']}>

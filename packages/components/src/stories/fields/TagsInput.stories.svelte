@@ -24,7 +24,7 @@
   };
 </script>
 
-<Story name="Plain">
+<Story name="Plain" asChild>
   <div class="max-w-md">
     <FormField label="Tags" hint="Press Enter or comma after each.">
       {#snippet children(control)}
@@ -34,7 +34,7 @@
   </div>
 </Story>
 
-<Story name="With suggestions">
+<Story name="With suggestions" asChild>
   <div class="max-w-md">
     <FormField label="Traits">
       {#snippet children(control)}
@@ -44,7 +44,7 @@
   </div>
 </Story>
 
-<Story name="Async">
+<Story name="Async" asChild>
   <div class="max-w-md">
     <FormField label="Traits" hint="Suggestions arrive after a short delay.">
       {#snippet children(control)}
@@ -54,7 +54,7 @@
   </div>
 </Story>
 
-<Story name="Max">
+<Story name="Max" asChild>
   <div class="max-w-md">
     <FormField label="Up to three tags">
       {#snippet children(control)}
@@ -64,7 +64,7 @@
   </div>
 </Story>
 
-<Story name="Invalid">
+<Story name="Invalid" asChild>
   <div class="max-w-md">
     <FormField label="Tags" errors={['Add at least one tag.']} required>
       {#snippet children(control)}

@@ -38,16 +38,16 @@
   });
 </script>
 
-<Story name="Word diff">
+<Story name="Word diff" asChild>
   <DiffText segments={wordDiff} />
 </Story>
 
-<Story name="Character diff">
+<Story name="Character diff" asChild>
   <!-- No separator: the runs are parts of one word. -->
   <DiffText segments={characterDiff} separator="" />
 </Story>
 
-<Story name="Announced">
+<Story name="Announced" asChild>
   <!-- Opt-in, because a forty-segment diff with a prefix on every run is
        unreadable. Inspect the accessibility tree to see the added words. -->
   <DiffText segments={wordDiff} insertLabel="inserted:" deleteLabel="deleted:" />

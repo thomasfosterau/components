@@ -17,7 +17,7 @@
   });
 </script>
 
-<Story name="Default">
+<Story name="Default" asChild>
   <div class="max-w-lg">
     <FormField label="Notes" hint="Anything a later reader would want to know.">
       {#snippet children(control)}
@@ -30,7 +30,7 @@
   </div>
 </Story>
 
-<Story name="Taller, and invalid">
+<Story name="Taller, and invalid" asChild>
   <div class="max-w-lg">
     <FormField label="Description" errors={['Keep this under 500 characters.']}>
       {#snippet children(control)}
@@ -40,7 +40,7 @@
   </div>
 </Story>
 
-<Story name="Auto-grow">
+<Story name="Auto-grow" asChild>
   <div class="max-w-lg">
     <FormField label="Observation" hint="Grows from 2 to 6 lines, then scrolls.">
       {#snippet children(control)}
@@ -50,7 +50,7 @@
   </div>
 </Story>
 
-<Story name="Character counter">
+<Story name="Character counter" asChild>
   <div class="max-w-lg">
     <FormField label="Summary">
       {#snippet children(control)}

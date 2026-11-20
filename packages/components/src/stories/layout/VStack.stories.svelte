@@ -5,7 +5,7 @@
   const { Story } = defineMeta({ title: 'Layout/VStack', component: VStack });
 </script>
 
-<Story name="Gap scale">
+<Story name="Gap scale" asChild>
   <div class="flex gap-8">
     {#each ['xs', 'sm', 'md', 'lg', 'xl'] as const as gap (gap)}
       <VStack {gap}>
@@ -15,7 +15,7 @@
   </div>
 </Story>
 
-<Story name="List with dividers">
+<Story name="List with dividers" asChild>
   <VStack as="ul" divider gap="sm" class="max-w-xs">
     <li>North bed</li>
     <li>Glasshouse</li>

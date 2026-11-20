@@ -21,7 +21,7 @@
   let submitted = $state('');
 </script>
 
-<Story name="With text">
+<Story name="With text" asChild>
   <div class="max-w-sm">
     <SearchInput
       label="Search taxa"
@@ -33,19 +33,19 @@
   </div>
 </Story>
 
-<Story name="Empty">
+<Story name="Empty" asChild>
   <div class="max-w-sm">
     <SearchInput label="Search taxa" value="" placeholder="Search taxa" />
   </div>
 </Story>
 
-<Story name="Pending">
+<Story name="Pending" asChild>
   <div class="max-w-sm">
     <SearchInput label="Search taxa" value="rosa can" pending />
   </div>
 </Story>
 
-<Story name="Sizes">
+<Story name="Sizes" asChild>
   <div class="flex max-w-sm flex-col gap-3">
     <SearchInput size="xs" label="Extra small" value="rosa" />
     <SearchInput size="sm" label="Small" value="rosa" />

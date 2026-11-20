@@ -16,13 +16,13 @@
   });
 </script>
 
-<Story name="Untrusted (the default)">
+<Story name="Untrusted (the default)" asChild>
   <p class="text-base-content">
     Homepage: <ExternalLink href="https://example.com/~member">example.com/~member</ExternalLink>
   </p>
 </Story>
 
-<Story name="Trusted resolver">
+<Story name="Trusted resolver" asChild>
   <p class="text-base-content">
     ORCID:
     <ExternalLink href="https://orcid.org/0000-0002-1825-0097" untrusted={false}>
@@ -31,7 +31,7 @@
   </p>
 </Story>
 
-<Story name="Without the icon">
+<Story name="Without the icon" asChild>
   <p class="text-base-content">
     Source: <ExternalLink href="https://example.org/paper" showIcon={false}>the paper</ExternalLink>
   </p>

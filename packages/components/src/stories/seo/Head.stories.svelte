@@ -19,7 +19,7 @@
   const canonicalHref = (path: string): string => new URL(path, 'https://example.org').href;
 </script>
 
-<Story name="A page">
+<Story name="A page" asChild>
   <HeadInspector>
     <Head
       title="About"
@@ -33,7 +33,7 @@
   </HeadInspector>
 </Story>
 
-<Story name="An article with a share card">
+<Story name="An article with a share card" asChild>
   <HeadInspector>
     <Head
       title="Pruning dog roses"
@@ -51,7 +51,7 @@
   </HeadInspector>
 </Story>
 
-<Story name="Not indexed">
+<Story name="Not indexed" asChild>
   <HeadInspector>
     <Head title="Settings" siteName="Example" robots={{ index: false, follow: false }} />
   </HeadInspector>

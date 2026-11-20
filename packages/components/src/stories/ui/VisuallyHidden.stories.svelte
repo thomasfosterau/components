@@ -22,21 +22,21 @@
   differs is what the accessibility tree carries.
 -->
 
-<Story name="Rating">
+<Story name="Rating" asChild>
   <p class="text-base-content">
     <span aria-hidden="true">★★★☆☆</span>
     <VisuallyHidden>3 out of 5 stars</VisuallyHidden>
   </p>
 </Story>
 
-<Story name="Icon button name">
+<Story name="Icon button name" asChild>
   <button class="btn btn-square btn-primary" type="button">
     <span aria-hidden="true">×</span>
     <VisuallyHidden>Dismiss notification</VisuallyHidden>
   </button>
 </Story>
 
-<Story name="Skip link (revealed on focus)">
+<Story name="Skip link (revealed on focus)" asChild>
   <a href="#main" class="btn btn-sm focus:not-sr-only">
     <VisuallyHidden class="focus:not-sr-only">Skip to main content</VisuallyHidden>
   </a>
