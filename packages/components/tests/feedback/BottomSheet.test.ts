@@ -143,6 +143,28 @@ test('the same drag snaps a non-dismissible sheet back to its lowest detent', as
   expect(height()).toBeCloseTo(before, 0);
 });
 
+test('a release with no move between rests where the pointer let go', async () => {
+  const screen = await render(BottomSheetFixture, { modal: false });
+  const grabber = handle().element();
+  const box = grabber.getBoundingClientRect();
+  const at = (y: number) => ({
+    pointerId: 1,
+    button: 0,
+    bubbles: true,
+    clientX: box.left + 10,
+    clientY: y,
+  });
+
+  // A synthetic pointer is not one the browser will capture.
+  grabber.setPointerCapture = () => {};
+  // A slow release (no flick) 400px above the press, with no pointermove dispatched.
+  grabber.dispatchEvent(new PointerEvent('pointerdown', { ...at(box.top + 10), isPrimary: true }));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  grabber.dispatchEvent(new PointerEvent('pointerup', at(box.top + 10 - 400)));
+
+  await expect.element(screen.getByTestId('detent')).toHaveTextContent('1');
+});
+
 test('dragging the grabber up rests the sheet at the next detent up', async () => {
   const screen = await render(BottomSheetFixture, { modal: false });
 
