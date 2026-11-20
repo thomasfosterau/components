@@ -227,30 +227,26 @@ Two lists side by side, the available options and the chosen ones, with buttons 
     announcement = reorderedLabel(pickedSet.size, direction);
   };
 
+  /** Move the highlighted options out of the list with this id, if it is one of ours. */
+  const moveFrom = (listId: string | undefined): boolean => {
+    if (listId === availableId) add(toAdd);
+    else if (listId === selectedId) remove(toRemove);
+    else return false;
+    return true;
+  };
+
+  const reorderKeys: Record<string, 'up' | 'down'> = { ArrowUp: 'up', ArrowDown: 'down' };
+
   const onkeydown = (event: KeyboardEvent): void => {
-    if (!(event.target instanceof HTMLElement)) return;
-    const inAvailable = event.target.id === availableId;
-    const inSelected = event.target.id === selectedId;
-    if (!inAvailable && !inSelected) return;
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      if (inAvailable) add(toAdd);
-      else remove(toRemove);
-    } else if (
-      inSelected &&
-      event.altKey &&
-      (event.key === 'ArrowUp' || event.key === 'ArrowDown')
-    ) {
-      shift(event.key === 'ArrowUp' ? 'up' : 'down');
-    }
+    const target = event.target instanceof HTMLElement ? event.target.id : undefined;
+    const direction = reorderKeys[event.key];
+    if (event.key === 'Enter' && moveFrom(target)) event.preventDefault();
+    else if (event.altKey && direction !== undefined && target === selectedId) shift(direction);
   };
 
   const ondblclick = (event: MouseEvent): void => {
-    if (!(event.target instanceof Element)) return;
-    const list = event.target.closest('[role="listbox"]');
-    if (event.target.closest('[role="option"]') === null || list === null) return;
-    if (list.id === availableId) add(toAdd);
-    else if (list.id === selectedId) remove(toRemove);
+    const hit = event.target instanceof Element ? event.target.closest('[role="option"]') : null;
+    moveFrom(hit?.closest('[role="listbox"]')?.id);
   };
 
   /** What both panes share. */
@@ -297,7 +293,11 @@ Two lists side by side, the available options and the chosen ones, with buttons 
     required={false}
     {...pane}
   />
-  <div role="group" aria-label={transferLabel} class="flex justify-center gap-1 self-center sm:flex-col">
+  <div
+    role="group"
+    aria-label={transferLabel}
+    class="flex justify-center gap-1 self-center sm:flex-col"
+  >
     {#each transfers as transfer (transfer.label)}
       <IconButtonCore
         label={transfer.label}
@@ -306,7 +306,10 @@ Two lists side by side, the available options and the chosen ones, with buttons 
         disabled={disabled || transfer.moves.length === 0}
         onclick={transfer.run}
       >
-        {#snippet icon()}<transfer.Icon class="size-4 rotate-90 sm:rotate-0 sm:rtl:rotate-180" />{/snippet}
+        {#snippet icon()}
+          <!-- Stacked panes put the lists above and below, so the arrows turn. -->
+          <transfer.Icon class="size-4 rotate-90 sm:rotate-0 sm:rtl:rotate-180" />
+        {/snippet}
       </IconButtonCore>
     {/each}
   </div>
