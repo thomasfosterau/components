@@ -24,6 +24,7 @@ export { default as DataGrid } from './DataGrid.svelte';
 export { default as DescriptionList } from './DescriptionList.svelte';
 export { default as DescriptionRow } from './DescriptionRow.svelte';
 export { default as DiffText } from './DiffText.svelte';
+export { default as DiffView } from './DiffView.svelte';
 export { default as ItemList } from './ItemList.svelte';
 export { default as LinkListItem } from './LinkListItem.svelte';
 export { default as ListGroup } from './ListGroup.svelte';
@@ -43,6 +44,7 @@ export { default as VirtualList } from './VirtualList.svelte';
 
 export * from './description-context.ts';
 export * from './diff.ts';
+export * from './line-diff.ts';
 export * from './list-item.ts';
 export type { ListGroupStyle, ListGroupVariant } from './list-group.ts';
 export * from './pagination.ts';
