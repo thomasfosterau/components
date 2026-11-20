@@ -124,7 +124,7 @@ export default defineConfig({
     ],
     options: {
       typeAware: true,
-      // tsgolint can't read `.svelte`, so it reports false errors on every
+      // tsrs can't read `.svelte`, so it reports false errors on every
       // `.svelte` import; svelte-check and `tsc` are the type gate.
       typeCheck: false,
     },

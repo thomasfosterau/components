@@ -54,16 +54,17 @@ catalog:
   # TS6 under the `typescript` name, for svelte-check (which needs the JS API).
   typescript: 'npm:@typescript/typescript6@6.0.2'
   # vite-plus pins oxlint, oxfmt and vitest exactly: `vitest`, `@vitest/*` and
-  # the `vite` alias follow it.
-  vite-plus: 1.6.0
-  vite: npm:@voidzero-dev/vite-plus-core@1.6.0
+  # the `vite` alias follow what it depends on (the alias no longer shares the
+  # vite-plus version).
+  vite-plus: 1.7.0
+  vite: npm:@voidzero-dev/vite-plus-core@8.3.8000
   vitest: 5.1.0
   '@vitest/coverage-istanbul': 5.1.0
   # `effect-tsgo patch` (the root `prepare`) supports only the TypeScript,
-  # oxlint and tsgolint versions in its `components` table
+  # oxlint and tsrs versions in its `components` table
   # (node_modules/@effect/tsgo/dist/effect-tsgo.cjs); check it before bumping
   # this, `@typescript/native` or `vite-plus`.
-  '@effect/tsgo': 0.69.0
+  '@effect/tsgo': 0.73.2
   # TS7, Effect-patched by `prepare`; type-checks packages/charts and packages/import.
   '@typescript/native': npm:typescript@7.0.2
   '@enfect/oxlint': 0.10.0
@@ -115,12 +116,10 @@ skills:
 # Storybook's peer ranges lag the toolchain; the overrides above force one copy.
 peerDependencyRules:
   allowAny:
-    - vite
     - vite-plus
     - vitest
     - '@sveltejs/kit'
   allowedVersions:
-    vite: '*'
     vite-plus: '*'
     vitest: '*'
     '@sveltejs/kit': '*'
