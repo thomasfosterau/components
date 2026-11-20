@@ -75,11 +75,13 @@ export { default as ToolbarLink } from './ToolbarLink.svelte';
 export { default as ToolbarSeparator } from './ToolbarSeparator.svelte';
 export { default as ToolbarToggleGroup } from './ToolbarToggleGroup.svelte';
 export { default as Tooltip } from './Tooltip.svelte';
+export { default as Truncate } from './Truncate.svelte';
 export { default as VisuallyHidden } from './VisuallyHidden.svelte';
 
 export * from './colour-token.ts';
 export * from './menu-context.ts';
 export * from './slug.ts';
+export * from './truncate.ts';
 export { initialsOf } from './avatar.ts';
 export * from './tones.ts';
 export type { ToggleGroupItem } from './toggle-classes.ts';

@@ -25,6 +25,13 @@ Buttons, badges and surfaces — the family every other family builds on: `Alert
 **A context menu is never the only route to an action.** It is invisible until summoned: keyboard users can open it with Shift+F10 or the Menu key on the focused region, but touch screen-reader users and many keyboard users never discover it. Put every action in a `ContextMenu` somewhere visible as well — a row's "More" `DropdownMenu`, a toolbar. The menu children (`MenuItem`, `MenuSeparator`, `MenuCheckboxItem`, `MenuRadioGroup` / `MenuRadioItem`, `MenuSub`) import nothing from bits-ui: `DropdownMenu` and `ContextMenu` lend them their bits-ui parts through context, so a page that only renders a navigation `Menu` never loads the menu runtime.
 
 - **`slug.ts`** — `slugify`, used by `Heading`.
+- **`truncate.ts`** — `truncateText(text, width, measure, position, keepEnd?)`, the measured start and middle cuts `Truncate` makes, with `defaultKeepEnd` (the last path segment or a short extension) and `canvasMeasure(element)`.
+
+**`Truncate` or `ExpandableText`.** `Truncate` is one line that may not fit: a file name, a path, a branch, a table cell. It cuts at the `end` (CSS), the `start` or the `middle` (measured, keeping the extension or last path segment: "IMG_2024…_0412.jpg"), and keeps the full text as the content screen readers read and what a copy puts on the clipboard, with a tooltip on hover (or on focus of an enclosing link) only while it is cut. `ExpandableText` is prose that runs to several lines, behind a "Show more" toggle.
+
+```svelte
+<Truncate text={file.name} position="middle" mono />
+```
 
 ```svelte
 <script lang="ts">
