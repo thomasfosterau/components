@@ -32,5 +32,6 @@ Tailwind and theme setup are in the [getting-started guide](packages/components/
 
 ## More
 
+- [Storybook](https://thomasfosterau.github.io/components/): every component's stories, built from `trunk`
 - [Contributing](docs/CONTRIBUTING.md), [publishing](docs/PUBLISHING.md), [security](docs/SECURITY.md)
 - [MIT licence](LICENSE.md)
