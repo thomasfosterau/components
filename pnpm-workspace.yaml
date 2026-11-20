@@ -65,7 +65,7 @@ catalog:
   # TS7, Effect-patched by `prepare`; type-checks packages/charts and packages/import.
   '@typescript/native': npm:typescript@7.0.2
   '@enfect/oxlint': 0.10.0
-  fallow: 3.43.1
+  fallow: 3.44.0
   vitest-browser-svelte: ^3.1.0
 
 # Ranges promised to consumers, written into the packed manifests by `pnpm pack`.
