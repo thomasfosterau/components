@@ -63,6 +63,8 @@ Which colour control: `ColorSwatchGroup` (in the barrel) when the reader picks f
 
 The native `<input type="color">` remains an option where none of that is needed: it is sRGB `#rrggbb` only, with no alpha or presets, and its picker differs by browser and OS.
 
+`Combobox` takes `onCreate(query, signal)` for a pick-or-create field (a person, a parent record): a query that matches no option's label exactly ends the list with "Create ‘query’" (`createLabel`), and choosing it selects the item the promise resolves to. While it runs the input is `aria-busy` and a polite status says `creatingLabel`; a rejection shows `createErrorLabel` and keeps the old selection; typing again aborts it.
+
 `Combobox` posts the selected id under `name` (a hidden input) by default. `postedValue="query"` makes it a search box instead: `name` goes on the visible input, so a plain `<form method="GET">` posts the typed text with JavaScript on or off, and Enter submits that form unless the reader moved to a suggestion with the arrow keys (clicking a suggestion still commits it, and `onSelect` receives it). `hideLabel` keeps `label` as the accessible name but renders it `sr-only`; `portal={false}` renders the listbox inside the component rather than in `<body>`, still floating.
 
 ```svelte

@@ -59,6 +59,14 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
   auto-highlight of the first candidate does not count, so typing a query and
   pressing Enter searches for that query instead of opening the first
   suggestion. Clicking an option still commits it.
+
+  **Creating.** With `onCreate`, a query that matches no option's label
+  exactly ends the list with a "Create ‘query’" option. Choosing it calls
+  `onCreate(query, signal)` and selects the item it resolves to, which is
+  kept so its label and id stay known even though no search returned it.
+  While it runs the input is `aria-busy` and a polite status says
+  `creatingLabel`; a rejection shows `createErrorLabel` as an alert and
+  leaves the selection as it was. Typing again, or unmounting, aborts it.
 -->
 <script lang="ts" generics="T">
   import { Combobox } from 'bits-ui';
@@ -165,7 +173,27 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
     portal?: boolean | undefined;
     /** Replace a row's contents. */
     item?: Snippet<[T]> | undefined;
-    /** Rendered after the rows — a "create this" row, a "see all" link. */
+    /**
+     * Create an item from the typed query; the item it resolves to is selected.
+     * `signal` aborts when the reader types again or the field unmounts.
+     */
+    onCreate?: ((query: string, signal: AbortSignal) => Promise<T>) | undefined;
+    /**
+     * The create option's text.
+     * @defaultValue `` (query) => `Create “${query}”` ``
+     */
+    createLabel?: ((query: string) => string) | undefined;
+    /**
+     * Announced while `onCreate` runs.
+     * @defaultValue `'Creating…'`
+     */
+    creatingLabel?: string | undefined;
+    /**
+     * Shown when `onCreate` rejects.
+     * @defaultValue `'Couldn’t create it.'`
+     */
+    createErrorLabel?: string | undefined;
+    /** Rendered after the rows — a "see all" link, a hint. */
     footer?: Snippet<[{ query: string; pending: boolean }]> | undefined;
     /** Replaces `emptyLabel` when a settled search returned nothing. */
     empty?: Snippet<[{ query: string }]> | undefined;
@@ -203,8 +231,15 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
     item,
     footer,
     empty,
+    onCreate,
+    createLabel = (text) => `Create “${text}”`,
+    creatingLabel = 'Creating…',
+    createErrorLabel = 'Couldn’t create it.',
     ...rest
   }: Props = $props();
+
+  /** The create option's value: not an id any caller's `getId` returns. */
+  const CREATE_VALUE = '\u0000create';
 
   const uid = $props.id();
   const inputId = $derived(idProp ?? uid);
@@ -225,18 +260,32 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
   /** The reader moved the cursor with the keyboard since they last typed. */
   let navigated = false;
 
+  /** Items `onCreate` returned: no search may have listed them. */
+  let created = $state<readonly T[]>([]);
+  let creating = $state(false);
+  let createFailed = $state(false);
+  let createController: AbortController | undefined;
+
   /** Static mode filters locally; async mode shows whatever last settled. */
   const visible = $derived.by(() => {
     if (onSearch !== undefined) return results;
-    const all = items ?? [];
+    const all = [...(items ?? []), ...created];
     const needle = query.trim().toLowerCase();
     if (needle === '') return all;
     return all.filter((entry) => getLabel(entry).toLowerCase().includes(needle));
   });
 
+  const trimmedQuery = $derived(query.trim());
+  const canCreate = $derived(
+    onCreate !== undefined &&
+      !creating &&
+      trimmedQuery !== '' &&
+      !visible.some((entry) => getLabel(entry).toLowerCase() === trimmedQuery.toLowerCase()),
+  );
+
   const selectedLabel = $derived.by(() => {
-    if (value === undefined || items === undefined) return undefined;
-    const match = items.find((entry) => getId(entry) === value);
+    if (value === undefined) return undefined;
+    const match = [...(items ?? []), ...created].find((entry) => getId(entry) === value);
     return match === undefined ? undefined : getLabel(match);
   });
 
@@ -245,13 +294,55 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
 
   const postsQuery = $derived(postedValue === 'query');
 
-  const visibleError = $derived(errorMessage ?? searchError);
+  const visibleError = $derived(
+    errorMessage ?? (createFailed ? createErrorLabel : undefined) ?? searchError,
+  );
 
-  $effect(() => () => searcher.dispose());
+  $effect(() => () => {
+    searcher.dispose();
+    createController?.abort();
+  });
+
+  let input = $state<HTMLInputElement | null>(null);
+
+  const create = async (text: string): Promise<void> => {
+    if (onCreate === undefined) return;
+    createController?.abort();
+    const controller = new AbortController();
+    createController = controller;
+    creating = true;
+    createFailed = false;
+    try {
+      const entry = await onCreate(text, controller.signal);
+      if (controller.signal.aborted) return;
+      created = [...created, entry];
+      value = getId(entry);
+      query = getLabel(entry);
+      if (input !== null) input.value = query;
+      onSelect?.(entry);
+    } catch {
+      if (!controller.signal.aborted) createFailed = true;
+    } finally {
+      if (createController === controller) creating = false;
+    }
+  };
+
+  const choose = (next: string): void => {
+    if (next === CREATE_VALUE) {
+      void create(trimmedQuery);
+      return;
+    }
+    value = next === '' ? undefined : next;
+    if (next === '' || onSelect === undefined) return;
+    const chosen = visible.find((entry) => getId(entry) === next);
+    if (chosen !== undefined) onSelect(chosen);
+  };
 
   const typed = (event: Event & { currentTarget: HTMLInputElement }): void => {
     query = event.currentTarget.value;
     navigated = false;
+    createController?.abort();
+    createFailed = false;
     onQueryChange?.(query);
     if (onSearch === undefined) {
       open = true;
@@ -285,23 +376,32 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
   };
 </script>
 
+{#snippet createOption()}
+  <Combobox.Item
+    value={CREATE_VALUE}
+    label={createLabel(trimmedQuery)}
+    onHighlight={() => (highlighted = CREATE_VALUE)}
+    onUnhighlight={() => {
+      if (highlighted === CREATE_VALUE) highlighted = undefined;
+    }}
+    class="rounded-field data-highlighted:bg-base-200 flex cursor-pointer items-center gap-3 px-3 py-2"
+  >
+    {createLabel(trimmedQuery)}
+  </Combobox.Item>
+{/snippet}
+
 <div {...rest} class={['fieldset w-full', className]}>
   <label class={['label', hideLabel && 'sr-only']} for={inputId}>{label}</label>
 
   <Combobox.Root
     type="single"
     bind:open
-    value={value ?? ''}
-    onValueChange={(next) => {
-      value = next === '' ? undefined : next;
-      if (next === '' || onSelect === undefined) return;
-      const chosen = visible.find((entry) => getId(entry) === next);
-      if (chosen !== undefined) onSelect(chosen);
-    }}
+    bind:value={() => value ?? '', choose}
     {disabled}
     {required}
   >
     <Combobox.Input
+      bind:ref={input}
       id={inputId}
       {...initialText === undefined ? {} : { defaultValue: initialText }}
       {...postsQuery && name !== undefined ? { name } : {}}
@@ -309,6 +409,7 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
       autocomplete="off"
       aria-describedby={describedBy === '' ? undefined : describedBy}
       aria-invalid={invalid ? 'true' : undefined}
+      aria-busy={creating ? 'true' : undefined}
       oninput={typed}
       onkeydown={keydown}
       class={['input w-full', inputSize[size], invalid && 'input-error', inputClass]}
@@ -343,7 +444,11 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
             </Combobox.Item>
           {/each}
 
-          {#if visible.length === 0}
+          {#if canCreate}
+            {@render createOption()}
+          {/if}
+
+          {#if visible.length === 0 && !canCreate}
             {#if pending}
               <p class="fieldset-label px-3 py-2">{pendingLabel}</p>
             {:else if empty}
@@ -370,6 +475,8 @@ A single-select typeahead over a static list or an asynchronous search, on bits-
   {#if name !== undefined && !postsQuery}
     <input type="hidden" {name} value={value ?? ''} />
   {/if}
+
+  <p class="sr-only" role="status">{creating ? creatingLabel : ''}</p>
 
   {#if visibleError !== undefined}
     <p class="text-error pt-1 text-sm" role="alert">{visibleError}</p>

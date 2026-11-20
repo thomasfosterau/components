@@ -25,6 +25,8 @@
     hideLabel?: boolean | undefined;
     portal?: boolean | undefined;
     testId?: string | undefined;
+    onCreate?: ((query: string, signal: AbortSignal) => Promise<Taxon>) | undefined;
+    createErrorLabel?: string | undefined;
   }
 
   let {
@@ -44,6 +46,8 @@
     hideLabel,
     portal,
     testId,
+    onCreate,
+    createErrorLabel,
   }: Props = $props();
 </script>
 
@@ -70,6 +74,8 @@
     {debounceMs}
     {emptyLabel}
     {pendingLabel}
+    {onCreate}
+    {createErrorLabel}
     bind:value
     getId={(taxon) => taxon.id}
     getLabel={(taxon) => taxon.name}

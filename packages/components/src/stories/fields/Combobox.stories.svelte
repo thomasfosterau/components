@@ -48,6 +48,12 @@
 </script>
 
 <script lang="ts">
+  let createdValue = $state<string | undefined>();
+  /** Stands in for a POST that creates the record: 600 ms. */
+  const createTaxon = (name: string): Promise<Taxon> =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve({ id: name.toLowerCase().replace(/\s+/g, '-'), name, rank: 'new' }), 600);
+    });
   let staticValue = $state<string | undefined>('rosa-canina');
   let asyncValue = $state<string | undefined>();
   let searchQuery = $state('rosa');
@@ -67,6 +73,23 @@
       bind:value={staticValue}
     />
     <p class="text-base-content/70 mt-3 text-sm">Selected: {staticValue ?? 'nothing'}</p>
+  </div>
+</Story>
+
+<Story name="Pick or create">
+  <div class="max-w-sm">
+    <Combobox
+      label="Taxon"
+      placeholder="Type a name, or a new one"
+      items={TAXA}
+      getId={taxonId}
+      getLabel={taxonLabel}
+      getBadge={taxonBadge}
+      name="taxonId"
+      onCreate={createTaxon}
+      bind:value={createdValue}
+    />
+    <p class="text-base-content/70 mt-3 text-sm">Selected: {createdValue ?? 'nothing'}</p>
   </div>
 </Story>
 
