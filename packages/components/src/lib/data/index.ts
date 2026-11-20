@@ -31,6 +31,7 @@ export { default as ListRow } from './ListRow.svelte';
 export { default as MessageThread } from './MessageThread.svelte';
 export { default as Pagination } from './Pagination.svelte';
 export { default as PaginationFooter } from './PaginationFooter.svelte';
+export { default as PullToRefresh } from './PullToRefresh.svelte';
 export { default as ResultCount } from './ResultCount.svelte';
 export { default as SortableList } from './SortableList.svelte';
 export { default as Table } from './Table.svelte';
