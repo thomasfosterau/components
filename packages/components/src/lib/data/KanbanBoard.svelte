@@ -220,19 +220,29 @@ A board of columns holding cards that move within and between columns by draggin
     );
   };
 
+  /** Where a card from `from` lands when aimed at `to` in `on`: clamped, or `undefined` if it would not move. */
+  const fit = (on: readonly BoardColumn<C>[], from: BoardPlace, to: BoardPlace): BoardPlace | undefined => {
+    const across = to.column !== from.column;
+    const room = lengthOf(on, to.column) - (across ? 0 : 1);
+    const index = Math.min(Math.max(to.index, 0), room);
+    return across || index !== from.index ? { column: to.column, index } : undefined;
+  };
+
+  const shiftMessage = (id: string, across: boolean, place: BoardPlace, on: readonly BoardColumn<C>[]): string => {
+    const total = lengthOf(on, place.column);
+    return across
+      ? say.movedTo(nameOf(id), titleOf(on, place.column), place.index + 1, total)
+      : say.movedWithin(nameOf(id), place.index + 1, total);
+  };
+
   const shiftTo = (to: BoardPlace): void => {
     if (!held || !draft) return;
     const from = locate(draft, key, held.id);
     if (!from || !draft[to.column] || !mayEnter(draft, from, to.column)) return;
-    const across = to.column !== from.column;
-    const room = lengthOf(draft, to.column) - (across ? 0 : 1);
-    const index = Math.min(Math.max(to.index, 0), room);
-    if (!across && index === from.index) return;
-    draft = moveCard(draft, from, { column: to.column, index });
-    const total = lengthOf(draft, to.column);
-    message = across
-      ? say.movedTo(nameOf(held.id), titleOf(draft, to.column), index + 1, total)
-      : say.movedWithin(nameOf(held.id), index + 1, total);
+    const place = fit(draft, from, to);
+    if (!place) return;
+    draft = moveCard(draft, from, place);
+    message = shiftMessage(held.id, place.column !== from.column, place, draft);
     if (held.via === 'keyboard') void refocus(handles, held.id);
   };
 
@@ -268,12 +278,11 @@ A board of columns holding cards that move within and between columns by draggin
   const menuMove = (id: string, to: BoardPlace): void => {
     const from = locate(columns, key, id);
     if (!from || held || !mayEnter(columns, from, to.column)) return;
-    const across = to.column !== from.column;
-    const index = Math.min(Math.max(to.index, 0), lengthOf(columns, to.column) - (across ? 0 : 1));
-    if (!across && index === from.index) return;
+    const place = fit(columns, from, to);
+    if (!place) return;
     const name = nameOf(id);
-    commit(id, from, { column: to.column, index }, () =>
-      say.movedTo(name, titleOf(columns, to.column), index + 1, lengthOf(columns, to.column)),
+    commit(id, from, place, () =>
+      say.movedTo(name, titleOf(columns, place.column), place.index + 1, lengthOf(columns, place.column)),
     );
     void refocus(triggers, id);
   };
