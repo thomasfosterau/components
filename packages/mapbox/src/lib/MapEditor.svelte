@@ -119,10 +119,6 @@ A plan-drawing surface for areas, paths and points on a snapping grid: select, d
   formatted with `locales`; this package cannot reach the core's
   `getComponentsContext()` (it consumes only `/canvas`), so there is no
   context fallback, and an absent `locales` means the runtime's default.
-
-  The keyboard path was first built in the owner's app
-  (thomasfosterau/gardeneria#1188, thomasfosterau/gardeneria#1540) and
-  upstreamed here (#135).
 -->
 <script lang="ts">
   import {

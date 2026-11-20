@@ -169,7 +169,7 @@ describe('tree mark (spec 1.1)', () => {
   });
 });
 
-describe('newer 1.N specs (#304)', () => {
+describe('newer 1.N specs', () => {
   it('emits a degraded spec from its known subset', () => {
     const future = parseSpec({
       ...lineSpec,

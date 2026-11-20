@@ -1,38 +1,20 @@
 /**
- * Root workspace config. Owns the repo-wide format/lint/staged passes (read
- * statically by `vp fmt` / `vp lint` / `vp staged`) and the one aggregate
- * task — `check`, the type-check gate over every package.
- *
- * The Svelte plugin, the browser test suite and the `svelte-package` build
- * live in each package's `vite.config.ts` (Storybook in packages/components
- * only): this file deliberately compiles nothing, so adding a package never
- * means editing it.
+ * Workspace-wide format, lint and staged checks, and the aggregate `ci`,
+ * `check` and `test:coverage` tasks. Each package's own vite.config.ts
+ * builds and tests it.
  */
 
 import { recommended as effectTsgoRecommended } from '@effect/tsgo/oxlint-presets';
 import effect from '@enfect/oxlint';
 import { defineConfig } from 'vite-plus';
 
-/**
- * The files that import Effect, and the only ones the Effect lint presets
- * apply to (AGENTS.md § Effect). Everywhere else in this workspace Effect is
- * out of bounds — `.fallowrc.json`'s boundaries keep it that way — so the
- * presets' idioms (Option over `null`, `Arr.match` over `.length`, services
- * over globals) would be rules about a style the rest of the code is
- * deliberately not written in: plain TypeScript and Svelte with `T |
- * undefined` optionals and `AbortSignal` callbacks.
- */
+/** The files that use Effect; the Effect lint presets apply to these. Add a file when it starts using Effect. */
 const effectFiles = [
   // packages/charts: Effect Schema parses the spec and emits its JSON Schema.
   'packages/charts/src/spec/parse.ts',
   'packages/charts/src/spec/internal/**',
-  // packages/import: the headless core is Effect code throughout (Schema
-  // decodes the rows, Stream carries them), and so is its suite, which runs
-  // under `@effect/vitest`. So is the `./svelte` entry's `session.ts`, which
-  // runs the core for the UI. The entry's components and their browser suite
-  // are not: they are the UI side of the `(…, signal) => Promise<T>` boundary
-  // (packages/import/AGENTS.md § Boundary), Svelte code whose props are
-  // `T | undefined`, which awaits `session.ts`'s promises in `try` / `catch`.
+  // packages/import: the core, its `@effect/vitest` suite, and the UI's
+  // `session.ts`, which runs the core. The UI components stay plain Svelte.
   'packages/import/src/*.ts',
   'packages/import/src/svelte/*.ts',
   'packages/import/tests/*.ts',
@@ -45,14 +27,8 @@ const effectFiles = [
 ];
 
 export default defineConfig({
-  // Staged-file checks run by `vp staged` (pre-commit). Routed by type: oxfmt
-  // cannot format `.svelte`, so Svelte goes through lint alone while the
-  // oxfmt-supported types get format (with fixes) then lint. Lint runs WITHOUT
-  // `--fix`: with type-aware lint on, `--fix` would apply type-aware autofixes
-  // (even of `warn` rules such as `no-unnecessary-type-assertion`) to staged
-  // files at commit time, so the commit would differ from the tree the gates
-  // ran on. `--no-error-on-unmatched-pattern` lets a commit of only
-  // `.md` / `.json` / `.css` pass the lint step, which selects no file there.
+  // oxfmt can't format `.svelte`, so those are only linted. Lint runs without
+  // `--fix` so a commit never differs from the tree the gates checked.
   staged: {
     '*.{js,ts,css,json,md}': [
       'vp check --fix --no-lint',
@@ -63,49 +39,44 @@ export default defineConfig({
 
   run: {
     tasks: {
-      // The whole CI pipeline, in AGENTS.md § Verification order, so a local
-      // `vp run ci` and the CI workflow are the same thing: ci.yml runs only
-      // this after checkout, setup-vp and the frozen install. Fail-fast: the
-      // first red gate stops the run. Chromium first, at the revision the
-      // pinned `playwright` expects (a no-op when it is already there), for
-      // `test:unit` and `storybook:build`; then `sync`, which the type-aware
-      // lint and the Svelte type gate read.
+      // What ci.yml runs. `sync` first: the type-aware lint and svelte-check
+      // read it. The browser suites install Chromium through `browser:install`.
       ci: {
         command:
-          'playwright install chromium && vp run -r sync && vp check && vp run check && vp run -r test:unit && vp run -r build && vp run --filter ./packages/components storybook:build && pnpm audit --audit-level high',
+          'vp run -r sync && vp check && vp run check && vp run -r test:unit && vp run -r build && vp run --filter ./packages/components storybook:build && pnpm audit --audit-level high',
         cache: false,
       },
-      // The type-check gate, as one task: every package's `check` pipeline
-      // (`svelte-kit sync` + svelte-check; `tsc` in packages/charts). A pure graph node — the root
-      // depends on every package purely so this edge reaches them.
+      // The Chromium the pinned `playwright` expects, for the browser suites,
+      // which depend on this task; a no-op when it is already installed.
+      // Skipped when `PLAYWRIGHT_CHROMIUM_EXECUTABLE` names a preinstalled
+      // Chromium (an agent session's /opt/pw-browsers/chromium), and the
+      // system libraries too only where `PLAYWRIGHT_INSTALL_DEPS` is set (the
+      // devcontainer).
+      'browser:install': {
+        command:
+          'bash -c \'[ -n "${PLAYWRIGHT_CHROMIUM_EXECUTABLE:-}" ] || playwright install ${PLAYWRIGHT_INSTALL_DEPS:+--with-deps} chromium\'',
+        cache: false,
+      },
+      // Fallow's change-set audit, run by the pre-commit hook; it reads the coverage map.
+      'fallow:audit': {
+        command: 'vp exec fallow audit --base origin/trunk --quiet',
+        dependsOn: ['test:coverage'],
+        cache: false,
+      },
+      // Every package's `check`, reached through the root's workspace dependencies.
       check: {
         command: "echo 'check: all type gates green'",
         dependsOn: [{ from: 'dependencies', task: 'check' }],
         cache: false,
       },
-      // Every package's suite in ONE vitest process (the `test.projects`
-      // below), under one Istanbul coverage map, `coverage/coverage-final.json`,
-      // which `fallow audit` reads for exact per-function CRAP scores
-      // (`health.coverage` in .fallowrc.json). Without it fallow estimates
-      // every function as uncovered, and any function with cyclomatic
-      // complexity >= 5 fails the audit on its own. Not a CI gate: the gate is
-      // `vp run -r test:unit`; run this before `fallow audit` (the PreToolUse
-      // fallow gate runs the audit but never refreshes the map).
-      //
-      // Each package's own `test:unit` gets its `sync` / sibling `build` edges
-      // from its own task; this one process gets them named here: both Svelte
-      // packages' `svelte-kit sync`, and packages/components' `build`, whose
-      // `dist/` the packages/mapbox suite imports through `exports`.
-      //
-      // `--maxWorkers=1` runs one test file at a time across every project.
-      // Instrumented, the three browser projects at full parallelism peaked
-      // at ~3.1 GB of Chromium RSS and crashed it on a loaded 15 GB machine;
-      // one at a time peaks at ~1.7 GB, below a plain `test:unit` of
-      // packages/components alone (~1.9 GB), for ~50 s -> ~90 s of wall time
-      // on 4 cores. `--maxWorkers=2` was not enough.
+      // Every suite in one run with one Istanbul map, which `fallow audit`
+      // reads. Not a CI gate. The Svelte suites need `sync`, and mapbox's
+      // imports packages/components' `dist/`. `--maxWorkers=1` runs one file
+      // at a time: the browser projects in parallel exhaust Chromium's memory.
       'test:coverage': {
         command: 'vp test run --coverage --maxWorkers=1',
         dependsOn: [
+          'browser:install',
           '@thomasfosterau/components#sync',
           '@thomasfosterau/components#build',
           '@thomasfosterau/components-mapbox#sync',
@@ -115,8 +86,6 @@ export default defineConfig({
     },
   },
 
-  // Oxlint, type-aware through oxlint-tsgolint (bundled with vite-plus, and
-  // patched by `effect-tsgo patch --oxlint` so the `effecttsgo/*` rules run).
   lint: {
     ignorePatterns: [
       '**/dist/**',
@@ -128,23 +97,11 @@ export default defineConfig({
     ],
     options: {
       typeAware: true,
-      // OFF, measured: tsgolint reads `.ts` files only, so every `.svelte`
-      // import resolves to the ambient `*.svelte` module declaration. With it
-      // on, the Svelte packages report 18 TS2614 (named `<script module>`
-      // exports it cannot see) and 21 TS7006 (callback props typed through
-      // those imports); the patched TS7 `tsc` reports the same 39 on
-      // packages/components. svelte-check, which reads `.svelte` through
-      // svelte2tsx, and packages/charts' patched `tsc` are already the type
-      // gate (`vp run check`), so `typeCheck` would only duplicate them with
-      // false errors. The type-aware RULES above still run on every `.ts`.
+      // tsgolint can't read `.svelte`, so it reports false errors on every
+      // `.svelte` import; svelte-check and `tsc` are the type gate.
       typeCheck: false,
     },
-    // `vite-plus/oxlint-plugin`: `prefer-vite-plus-imports` keeps tests on
-    // `vite-plus/test` rather than `vitest` (one toolchain, one import path).
-    // `@enfect/oxlint` is registered here but enables nothing globally; its
-    // rules are switched on for `effectFiles` only, below.
-    // Oxlint's `correctness`, `suspicious` and `perf` categories, over its
-    // TypeScript, unicorn, oxc, import, promise, Vitest and JSDoc plugins.
+    // `@enfect/oxlint` enables nothing globally; see `effectFiles` below.
     plugins: ['typescript', 'unicorn', 'oxc', 'import', 'promise', 'vitest', 'jsdoc'],
     categories: { correctness: 'error', suspicious: 'error', perf: 'error' },
     jsPlugins: [
@@ -153,8 +110,6 @@ export default defineConfig({
     ],
     rules: {
       'vite-plus/prefer-vite-plus-imports': 'error',
-      // TSDoc's `@defaultValue` (every defaulted prop, AGENTS.md
-      // § Conventions) and the `@module` file headers.
       'jsdoc/check-tag-names': ['error', { definedTags: ['defaultValue', 'module'] }],
       // Vitest's `expect(value, message)` takes the failure message second.
       'vitest/valid-expect': ['error', { maxArgs: 2 }],
@@ -168,28 +123,13 @@ export default defineConfig({
         'error',
         { allow: ['**/*.css', '@testing-library/jest-dom/vitest'] },
       ],
-      // Every flagged function is an exhaustive `switch` over a union, which
-      // the compiler already proves returns on every path
-      // (`noImplicitReturns` would flag a missing case); the rule cannot see
-      // exhaustiveness, so it can only report false positives here.
+      // It can't see that an exhaustive `switch` over a union returns on every path.
       'typescript/consistent-return': 'off',
-      // `Snippet<[]>` spells out "a snippet that takes no arguments", the
-      // form AGENTS.md § Conventions documents for every `children` prop; the
-      // rule would rewrite it to a bare `Snippet`.
+      // `Snippet<[]>` is the house spelling for a snippet with no arguments.
       'typescript/no-unnecessary-type-arguments': 'off',
-      // `SpecValidationError`'s constructor narrows `Error`'s optional
-      // `message` to a required one: a signature change, not a redundant
-      // constructor, which is the only shape this rule reports here.
-      'no-useless-constructor': 'off',
     },
-    // Nothing that ships may import a module SvelteKit only resolves inside an
-    // app (AGENTS.md § Common pitfalls). The package tsconfigs extend
-    // `$app/tsconfig`, whose `$app/types` declares `$app/*` ambiently, so
-    // `svelte-check` no longer rejects such an import; this rule does (#55).
     overrides: [
-      // The tests drive a UI step by step, so an `await` in a loop is the
-      // point (each press must land before the next), and the `mapbox-gl`
-      // doubles are `vi.mock` classes whose only job is to exist or throw.
+      // UI tests await each step in turn; the `mapbox-gl` doubles are empty classes.
       {
         files: ['packages/*/tests/**'],
         rules: {
@@ -197,15 +137,8 @@ export default defineConfig({
           'typescript/no-extraneous-class': 'off',
         },
       },
-      // The Svelte packages' browser suites register
-      // `@testing-library/jest-dom/vitest` (tests/setup.ts), whose matcher
-      // types return `void` and shadow the `Promise<void>` that Vitest browser
-      // mode's `expect.element(...)` declares for the same names, so tsgolint
-      // reads every awaited assertion as awaiting a non-promise (1,177 sites
-      // when type-aware lint was turned on). The `await` is required: the
-      // assertion retries. Dropping jest-dom is not a type-only change,
-      // because its runtime matchers differ too (its `toHaveTextContent`
-      // matches a substring or RegExp, Vitest 5's compares the whole text).
+      // jest-dom's matcher types return `void`, shadowing the `Promise` that
+      // browser mode's retrying `expect.element` returns; the `await` is needed.
       {
         files: ['packages/components/tests/**', 'packages/mapbox/tests/**'],
         rules: { 'typescript/await-thenable': 'off' },
@@ -216,23 +149,19 @@ export default defineConfig({
         files: ['**/seo/JsonLd.svelte', '**/seo/JsonLd.stories.svelte'],
         rules: { 'no-useless-concat': 'off' },
       },
-      // A chord carries at most three modifiers, so an array's `includes`
-      // beats hashing a `Set` on every keystroke (the comment at the site).
+      // At most three modifiers: `includes` beats hashing a `Set` per keystroke.
       {
         files: ['packages/components/src/lib/hotkeys/match.ts'],
         rules: { 'unicorn/prefer-set-has': 'off' },
       },
+      // Shipped code can't import what SvelteKit only resolves inside an app.
       {
         files: ['packages/*/src/lib/**'],
         rules: {
           'no-restricted-imports': [
             'error',
             {
-              // Exact package names, which fallow's rule pack cannot ban
-              // without also banning their subpaths: packages/mapbox reaches
-              // the core only through `/canvas` (the other subpaths are
-              // banned in fallow-rules.json), and no package imports itself
-              // or @thomasfosterau/charts by name.
+              // Bare names only; fallow-rules.json bans the subpaths.
               paths: [
                 {
                   name: '@thomasfosterau/components',
@@ -255,87 +184,47 @@ export default defineConfig({
           ],
         },
       },
-      // The Effect presets, scoped to the files that import Effect (see
-      // `effectFiles` above). `effect.configs.recommended` is
-      // `@enfect/oxlint`'s rule set (anti-slop included), all `error`.
-      // `effectTsgoRecommended` is the Effect Language Service's rule set,
-      // run by the Effect-patched oxlint and tsgolint (`effect-tsgo patch
-      // --oxlint`, the root `prepare`) now that type-aware linting is on; the
-      // same diagnostics also reach packages/charts through the patched `tsc`
-      // (its tsconfig's `@effect/language-service` plugin).
+      // The Effect presets, for `effectFiles` only.
       {
         files: effectFiles,
         plugins: effectTsgoRecommended.plugins,
         rules: {
           ...effectTsgoRecommended.rules,
           ...effect.configs.recommended.rules,
-          // The owner's family-wide decision (2026-11-11): Effect helper
-          // modules are namespace-imported under the rule's canonical alias
-          // (`Arr`, `P`, `R`, `Str`, `Eq`, `Bool`; `Option`, `Schema` keep
-          // their names), never by named import. `recommended` already sets
-          // it to `error`; it is pinned here so a preset change cannot drop it.
+          // Pinned so a preset change can't drop them.
           'effect/prefer-namespace-imports': 'error',
-          // The owner's family-wide decision (2026-11-11): in Effect code an
-          // optional value is `Option`, never `T | null` / `T | undefined`.
-          // Pinned for the same reason as the rule above. The one file it
-          // cannot apply to is turned off below with the reason (the
-          // `EntityForm` component's props), and `packages/charts`' spec
-          // types describe a JSON document, whose keys are present or absent.
           'effect/prefer-option-over-null': 'error',
-          // The owner's family-wide decision (2026-11-12): a conditional
-          // spread of an empty object (`...(cond ? { a } : {})`) is spelled
-          // as explicit construction instead.
           'effect/no-conditional-empty-object-spread': 'error',
         },
       },
-      // The `/entity-form` renderer: `effect` is an optional peer of this
-      // package (#312), so every Effect rule applies to it except
-      // `prefer-option-over-null`, at 18 sites that are not this file's to
-      // change: 17 are the component's props, which stay `T | undefined`
-      // because a Svelte prop is not an Effect option bag (the owner's
-      // Option-everywhere decision, #405) and `Option<T>`
-      // props would make every caller import `effect`; 1 is the store's data
-      // type, the form library's all-string input record
-      // (`Command.FormInputRecord`, where a field the submission left out is
-      // `undefined`), which a focus reads and writes as it is.
+      // Svelte props stay `T | undefined` (an `Option` prop would make every
+      // caller import `effect`), as does the form library's input record.
       {
         files: ['packages/components/src/lib/forms/EntityForm.svelte'],
         rules: {
           'effect/prefer-option-over-null': 'off',
         },
       },
-      // A module augmentation must restate Effect's own names: the
-      // `Annotations` interface lives in the `Annotations` namespace of
-      // `effect/Schema`, so the inner name shadows the outer by construction.
+      // A module augmentation of `effect/Schema` must restate its names.
       {
         files: ['packages/import/src/annotations.ts'],
         rules: { 'no-shadow': 'off' },
       },
-      // The Effect rules apply to packages/import's suite (AGENTS.md § Effect),
-      // which runs under `@effect/vitest`'s `it.effect` as that section
-      // requires. `@effect/vitest` marks `it` itself unstable, so every test
-      // would report it: the rule has nothing to say about a suite that must
-      // use that API.
+      // `@effect/vitest` marks `it` itself unstable.
       {
         files: ['packages/import/tests/*.ts'],
         plugins: effectTsgoRecommended.plugins,
         rules: { 'effecttsgo/unstable-api-usage': 'off' },
       },
-      // `SourceCell` is the plain value of one source cell, `undefined` for a
-      // gap, as effect-document's worksheet rows write it (`null` in JSON).
-      // It is the type a non-Effect adapter or the UI's grid builds, one per
-      // cell of a whole workbook, so an `Option` per cell would allocate a
-      // wrapper for every cell and make every adapter import `effect`.
+      // `SourceCell` is a plain per-cell value: an `Option` per cell of a whole
+      // workbook would allocate a wrapper each and force adapters onto `effect`.
       {
         files: ['packages/import/src/table.ts'],
         rules: { 'effect/prefer-option-over-null': 'off' },
       },
-      // `session.ts` is where the UI meets the engine. Its exported types are
-      // the `./svelte` components' prop and callback types (`FieldChoice`'s
-      // `column`, `mapTable`'s `onProgress`), which stay `T | undefined` as
-      // every component's props do (AGENTS.md § Effect). And it is the edge
-      // that runs each Effect, once per user action, as a promise the
-      // components await with an `AbortSignal`: running it is its job.
+      // `session.ts` is where the UI meets the engine: its types are the
+      // components' props (so `T | undefined`), and running each Effect as a
+      // promise is its job.
       {
         files: ['packages/import/src/svelte/session.ts'],
         rules: {
@@ -343,25 +232,22 @@ export default defineConfig({
           'effect/effect-run-in-body': 'off',
         },
       },
-      // `parseSpec` / `validateSpec` take arbitrary JSON and `encodeSpec`
-      // returns it: they ARE the parse boundary these two rules ask callers
-      // to go through, and `unknown` in their published signatures is the
-      // contract (the package keeps every Effect type out of its `.d.ts`, so
-      // there is no schema-typed input to accept instead).
+      // `parseSpec` / `validateSpec` / `encodeSpec` are the JSON parse boundary,
+      // and no Effect type may reach the published signatures.
       {
         files: ['packages/charts/src/spec/parse.ts'],
         rules: {
           'effect/no-unknown-parameters': 'off',
           'effect/no-unknown-returns': 'off',
+          // `SpecValidationError`'s constructor narrows `message` to required.
+          'no-useless-constructor': 'off',
         },
       },
     ],
   },
 
-  // The root vitest run behind `test:coverage`: each package's own
-  // vite.config.ts is one project (browser mode for the Svelte packages, Node
-  // for packages/charts and packages/import), plus packages/import's browser
-  // suite for its `./svelte` entry, so one run covers them all.
+  // The `test:coverage` run: each package's config is one project, plus
+  // packages/import's browser suite for `./svelte`.
   test: {
     projects: ['packages/*/vite.config.ts', 'packages/import/vite.svelte.config.ts'],
     coverage: {
@@ -377,17 +263,8 @@ export default defineConfig({
     },
   },
 
-  // Oxfmt — formatter of record for the workspace. `.svelte` files are outside
-  // its remit and are kept in the same style by hand. `sortTailwindcss` is on
-  // because this is a Tailwind library: class order is a diff-noise source
-  // otherwise, and a literal lookup table (see AGENTS.md) is exactly the shape
-  // it can sort.
-  // `packages/charts/schema/` is generated: its formatting is owned by that
-  // package's `emit-schema` task, and a test compares it to the emitter's
-  // output, so the formatter must not touch it. `CHANGELOG.md` is written by
-  // `changeset version` on the release bot's branch, where no format step
-  // runs: its indented blank lines would otherwise turn trunk red the moment
-  // the Version Packages PR merges.
+  // The schema is generated (a test compares it); CHANGELOG.md is written by
+  // the release bot, where no format step runs.
   fmt: {
     ignorePatterns: [
       '**/CHANGELOG.md',

@@ -9,7 +9,7 @@ Four rules hold across every component:
 - **daisyUI semantic classes, never raw colour.** `bg-base-200`, `text-error`, `btn-primary` — never a hex, an `oklch()` or `bg-green-700`.
 - **bits-ui owns interaction.** Anything with focus management, keyboard semantics, a popover or an ARIA relationship between elements is built on a bits-ui primitive. Native elements are used where they already give the semantics (`<details>`, `<progress>`, `<time>`, `<data>`, `<dl>`).
 - **Every user-facing string is a prop with an English default.** There is no message catalogue — `dismissLabel = 'Dismiss'`, `previousLabel = 'Previous'`. Accessible-name props end in `Label`. An i18n app passes its own messages at the call site.
-- **No Effect outside `/entity-form`.** Async callbacks are `(…, signal: AbortSignal) => Promise<T>`; optional values are `T | undefined`. Effect adapters stay in the consuming app.
+- **No Effect required outside `/entity-form`.** Async callbacks are `(…, signal: AbortSignal) => Promise<T>`; optional values are `T | undefined`. Effect adapters stay in the consuming app.
 
 Every component spreads the native attributes of the element it renders and merges the caller's `class` last, so nothing here ever swallows an `id`, an `aria-*` attribute or a `data-*` hook.
 
@@ -43,7 +43,7 @@ Without the `@source` line the components render unstyled — Tailwind has no wa
 
 ### Bringing your own theme
 
-`theme.css` declares two daisyUI themes, `light` and `dark`, on deliberately neutral values (achromatic surfaces, one slate brand hue) — a starting point, not a brand. Override them by declaring your own `@plugin "daisyui/theme"` blocks after the import, or drop the import entirely and declare `light` / `dark` yourself. The components only ever reach for semantic names, so any pair of daisyUI themes with those two names works. If you use `@thomasfosterau/components/charts`, also replace the four `--color-chart-*` custom properties with your own measured set (see [Charts](./components-charts.md)).
+`theme.css` declares two daisyUI themes, `light` and `dark`, on deliberately neutral values (achromatic surfaces, one slate brand hue) — a starting point, not a brand. Override them by declaring your own `@plugin "daisyui/theme"` blocks after the import, or drop the import entirely and declare `light` / `dark` yourself. The components only ever reach for semantic names, so any pair of daisyUI themes with those two names works. If you use `@thomasfosterau/components/charts`, also replace the four `--color-chart-*` custom properties with your own measured set (see [Charts](charts.md)).
 
 ## App integration
 
@@ -94,7 +94,7 @@ Every member is optional in the object you pass — an omitted one falls back in
 <FormActions submitLabel={m.save()} pendingLabel={m.saving()} cancelLabel={m.cancel()} />
 ```
 
-**Translating `requiredLabel` once.** See [Fields and forms](./components-fields.md#translating-requiredlabel-once) for the wrapper pattern that applies the same idea to a default an app always translates.
+**Translating `requiredLabel` once.** See [Fields and forms](fields.md#translating-requiredlabel-once) for the wrapper pattern that applies the same idea to a default an app always translates.
 
 ## Entry points
 

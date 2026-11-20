@@ -167,7 +167,7 @@ describe('tree mark (spec 1.1) in SSR', () => {
   });
 });
 
-describe('data table (#304) in SSR', () => {
+describe('data table in SSR', () => {
   it('renders the data as a visually hidden table beside the named SVG', () => {
     const html = ssr({ spec: lineSpec });
     expect(html).toContain('role="img"');

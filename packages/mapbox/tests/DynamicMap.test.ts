@@ -81,7 +81,7 @@ test('names the map region and its hint from props, before the peer’s absence 
 test('a wrapper forwarding its own unset optional props gets the defaults', async () => {
   // The fixture passes `height`, `label`, `panHintLabel` and
   // `unavailableLabel` through as explicit `undefined`; that it compiles at
-  // all is the type-level half of this test (#45).
+  // all is the type-level half of this test.
   const screen = await render(DynamicMapForwarder, props);
 
   await expect.element(screen.getByText('Map unavailable')).toBeInTheDocument();

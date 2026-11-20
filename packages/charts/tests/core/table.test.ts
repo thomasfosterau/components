@@ -1,5 +1,5 @@
 /**
- * The data-table text alternative (#304): headers from the channel fields,
+ * The data-table text alternative: headers from the channel fields,
  * cells formatted by declared type, a range as "start to end", and a tree's
  * rows with their parents.
  */

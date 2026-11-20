@@ -1,10 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
-  // Every published entry (each package.json `exports` target, by source
-  // path), plus everything a tool loads by convention: stories (Storybook),
-  // tests and their setup files (Vitest), the Storybook config, the charts
-  // scripts (`build` / `emit-schema`), the release script and the
-  // Vite / Svelte configs.
+  // Published entries fallow can't infer, plus files tools load by convention.
   "entry": [
     "packages/components/src/lib/index.ts",
     "packages/components/src/lib/citations/index.ts",
@@ -17,13 +13,6 @@
     "packages/components/src/lib/forms/entity-form.ts",
     "packages/components/src/lib/ui/context-menu.ts",
     "packages/mapbox/src/lib/index.ts",
-    "packages/charts/src/spec/index.ts",
-    "packages/charts/src/core/index.ts",
-    "packages/charts/src/prosemirror/index.ts",
-    "packages/charts/src/svelte/index.ts",
-    "packages/charts/src/vega/index.ts",
-    "packages/import/src/index.ts",
-    "packages/import/src/svelte/index.ts",
     "packages/*/src/stories/**/*.stories.{ts,svelte}",
     "packages/*/tests/**/*.test.ts",
     "packages/*/tests/setup.ts",
@@ -34,28 +23,13 @@
     "packages/import/vite.svelte.config.ts",
     "**/svelte.config.js"
   ],
-  "ignorePatterns": [
-    "**/dist/**",
-    "**/.svelte-kit/**",
-    "**/storybook-static/**",
-    "**/coverage/**",
-    "packages/charts/swift/**"
-  ],
+  "ignorePatterns": ["**/dist/**", "**/.svelte-kit/**", "**/storybook-static/**", "**/coverage/**"],
   "ignoreDependencies": [
-    // The root's `workspace:*` dependencies on the four packages exist for
-    // the task graph, not for an import: they are the edges the root `check`
-    // task's `{ from: 'dependencies' }` follows into every package.
-    "@thomasfosterau/charts",
+    // The root depends on the packages only so `check` reaches them.
     "@thomasfosterau/components",
     "@thomasfosterau/components-import",
     "@thomasfosterau/components-mapbox",
-    // Used for their bins only: `tsc` (packages/charts `check`, TS7) and
-    // `svelte-package` (the Svelte packages' `build`).
-    "@typescript/native",
-    "@sveltejs/package",
-    // Not a package: the name packages/charts' and packages/import's
-    // tsconfig.json give the `@effect/language-service` compiler plugin,
-    // which the Effect-patched native `tsc` (`@effect/tsgo`) serves itself.
+    // A tsconfig plugin name, served by the Effect-patched `tsc`.
     "@effect/language-service"
   ],
   "rulePacks": ["fallow-rules.json"],
@@ -96,39 +70,21 @@
       { "from": "mapbox", "allow": [] },
       { "from": "charts-spec", "allow": [] },
       { "from": "charts-core", "allow": ["charts-spec"] },
-      // Reaches spec and core by the package's own name, never by relative
-      // path: svelte-package copies src/svelte alone into dist/svelte
-      // (packages/charts/tsconfig.svelte.json). fallow resolves that name to
-      // the sources through the workspace link, so the zone allows the edge
-      // it cannot tell apart from a relative one, as `import-svelte` does
-      // below; fallow-rules.json's `charts-svelte-by-package-name` bans the
-      // relative form.
+      // svelte-package ships src/svelte alone, so it reaches spec and core by
+      // package name, which fallow resolves to source through the workspace
+      // link; fallow-rules.json bans the relative form.
       { "from": "charts-svelte", "allow": ["charts-spec", "charts-core"] },
       { "from": "charts-prosemirror", "allow": ["charts-spec", "charts-core"] },
       { "from": "charts-vega", "allow": ["charts-spec", "charts-core"] },
-      // The headless core reaches no other package by relative path; the
-      // package-name and Svelte bans are fallow-rules.json's
-      // `import-core-independent`. It is the one place outside
-      // packages/charts/src/spec and the /entity-form files that imports
-      // `effect`: that pack bans `effect` per package (each rule names its
-      // files), and leaves packages/import out on purpose, since `effect` is
-      // its required peer (packages/import/AGENTS.md § Boundary). The same holds
-      // for `@thomasfosterau/effect-document`, its other required peer, which
-      // `effect-document-only-in-import` bans from every other package.
+      // No relative imports into other packages; fallow-rules.json bans the rest.
       { "from": "import", "allow": [] },
-      // The UI reaches the core by the package's own name, never by relative
-      // path: svelte-package copies src/svelte alone into dist/svelte
-      // (packages/import/tsconfig.svelte.json). fallow resolves that name to
-      // the core's source through the workspace link, so the zone has to
-      // allow the edge it cannot tell apart from a relative one, as
-      // `charts-svelte` does above.
+      // svelte-package ships src/svelte alone, so the UI reaches the core by
+      // package name, which fallow resolves to source through the workspace link.
       { "from": "import-svelte", "allow": ["import"] }
     ]
   },
   "duplicates": {
-    // A deliberate copy of packages/components/tests/canvas/pointer.ts: test
-    // helpers are not published, so there is nothing to import it from
-    // (packages/mapbox/AGENTS.md § Invariants).
+    // A deliberate copy of packages/components/tests/canvas/pointer.ts.
     "ignore": ["packages/mapbox/tests/pointer.ts"]
   },
   "health": {

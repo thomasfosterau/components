@@ -146,7 +146,7 @@ describe('createTipStore', () => {
     expect(storage.entries.has('tips:welcome')).toBe(true);
   });
 
-  test('falls back to the defaults when options and config are forwarded as `undefined` (#76)', () => {
+  test('falls back to the defaults when options and config are forwarded as `undefined`', () => {
     // An app wrapping the store forwards its own optional settings
     // unconditionally; under `exactOptionalPropertyTypes` this only
     // type-checks while `TipStoreOptions` and `TipConfig` declare them

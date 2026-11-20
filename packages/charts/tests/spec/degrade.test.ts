@@ -1,5 +1,5 @@
 /**
- * Minor-version degradation (#304): a newer `1.N` document is read as the
+ * Minor-version degradation: a newer `1.N` document is read as the
  * newest version this interpreter knows, its unknown keys ignored and
  * reported, and an unknown mark carried as `unsupported`; `'1'` and `'1.1'`
  * stay strict, and another major is rejected.

@@ -1,16 +1,8 @@
 {
-  // The repo-wide base, then SvelteKit 3's generated config on top of it
-  // (#55): where both set an option, Kit's value wins (`checkJs: true`,
-  // `module: esnext`), and every base option Kit doesn't set (`strict`,
-  // `exactOptionalPropertyTypes`, …) still applies. `$app/tsconfig` is
-  // `node_modules/$app/tsconfig.json`, written by `svelte-kit sync`, so every
-  // task that reads this file depends on `sync`.
+  // Kit's generated config (written by `svelte-kit sync`) wins where both set an option.
   "extends": ["../../tsconfig.base.json", "$app/tsconfig"],
   "compilerOptions": {
-    // `$app/types` is Kit's (`svelte-kit sync` warns when `types` drops it).
-    // `vite/client` for the ambient module declarations that let a component
-    // import an asset by URL or a stylesheet for its side effect; those are
-    // Vite's, not Node's.
+    // Kit warns if `$app/types` is dropped; `vite/client` types asset imports.
     "types": ["$app/types", "node", "vite/client"]
   },
   "include": ["src", "tests", ".storybook"]

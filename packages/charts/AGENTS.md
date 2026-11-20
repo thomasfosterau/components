@@ -1,48 +1,25 @@
 # @thomasfosterau/charts
 
-The portable chart package: a durable chart spec (and its JSON Schema), a pure geometry core, and the interpreters of that spec (Svelte, ProseMirror, Vega-Lite). It was merged in from the former `thomasfosterau/charts` repo, where each layer was its own npm package; here each is a subpath entry of one package. Repo-wide rules are in the root [AGENTS.md](../../AGENTS.md); the entry points are in [README.md](README.md); the architecture and spec are in [docs/charts-spec.md](../../docs/charts-spec.md), the API reference is the TSDoc on each export and the capability matrix in [docs/charts-capability-matrix.md](../../docs/charts-capability-matrix.md).
+A durable chart spec and its JSON Schema, a pure geometry core, and interpreters of the spec (Svelte, ProseMirror, Vega-Lite), each a subpath entry. Design notes: [docs/spec.md](docs/spec.md) and the [capability matrix](docs/capability-matrix.md).
 
-## Where it differs from the Svelte packages
+## How it differs from the Svelte packages
 
-Everything here is plain TypeScript except the `/svelte` entry (`src/svelte`), so most of AGENTS.md's component conventions apply only there, and only in part: runes and snippets, attribute spreading with `class` merged, `T | undefined` props with a `/** … */` line each, `@component` headers, hand-formatted `.svelte`. What that entry does not take, and why: daisyUI tables and semantic tokens (it draws in the core palette and the same greys as the ProseMirror renderer, because a spec must look the same in every interpreter and none of the others has a theme), stories and browser tests (§ Testing; its ARIA surface, `role="img"` named by the title or a caller's `aria-label`, is pinned by the SSR suite), bits-ui (it has no interaction). What the whole package keeps: catalog-only versions, `exactOptionalPropertyTypes`-safe `T | undefined` optionals (except on the JSON-document types, `spec/types.ts` and `vega/types.ts`, whose keys are present or absent: their schemas use `Schema.optionalKey`, and widening them would make the emitted JSON Schema admit `null`), `"sideEffects": false`, changesets, the five gates. What it changes, and why:
-
-- **Built with `vp pack` (tsdown), then `svelte-package` for `/svelte` alone.** `vp pack` writes one `.mjs` + `.d.mts` per entry in `dist/`, shared chunks between them, and empties `dist/` first, so it runs first. `svelte-package -i src/svelte -o dist/svelte` then copies the Svelte entry as `.svelte` source with `.d.ts` declarations, for the consumer's compiler to build: a compiled component would pin this package's Svelte version into the consumer's bundle. `svelte.config.js` is there for `svelte-package`, `svelte-check` and the test compile; there is no `svelte-kit sync`, since nothing extends `$app/tsconfig`.
-- **`check` is `tsc`, twice, then `svelte-check`** (see [vite.config.ts](vite.config.ts)): `tsconfig.json` over everything but `src/svelte` and `tests/svelte`, then `tsconfig.pure.json` over `src/spec` and `src/core` with no DOM lib and no ambient types, then `svelte-check` over the Svelte entry and its suite with `tsconfig.svelte.json` (`tsc` cannot read `.svelte`). That `tsc` is TypeScript 7 (`@typescript/native`), Effect-patched by the root `prepare`, and `tsconfig.json` loads the `@effect/language-service` plugin, so Effect diagnostics on `src/spec` print here; `svelte-check`, here as in the Svelte packages, drives the TS6 alias. `vp pack`'s declaration bundler uses the TS6 JS API.
-- **Tests run under Node, not browser mode** — see § Testing.
-- **Framework peers are optional, per entry.** `svelte`, `prosemirror-model` and `prosemirror-view` are each imported only by their own entry and declared optional in `peerDependenciesMeta`. AGENTS.md's "a dependency gets its own package" rule is about the core component library; this package already _is_ the separate package, and splitting it back into one package per interpreter is what the merge undid.
-- **No Storybook.** The one Storybook in `packages/components` is the design system's review surface; `Chart` from `/svelte` is a spec interpreter, like the ProseMirror one, and has no stories. Rendering is checked by the SSR suite.
+- Plain TypeScript, built with `vp pack`; then `svelte-package` copies `src/svelte` alone into `dist/svelte` as `.svelte` source for the consumer to compile.
+- `check` is TS7 `tsc` over `tsconfig.json`, again over `tsconfig.pure.json` (`src/spec` and `src/core` with no DOM or Node types), then `svelte-check` over the Svelte entry.
+- Tests run under Node (parsing, geometry, Vega-Lite output, SSR strings); a suite that mounts into a DOM opts into happy-dom per file. No Storybook.
+- Framework peers (`svelte`, `prosemirror-*`) are optional, each imported only by its own entry.
+- The JSON-document types (`spec/types.ts`, `vega/types.ts`) use present-or-absent keys (`Schema.optionalKey`), not `| undefined`, so the JSON Schema never admits `null`.
 
 ## Boundary
 
-- **Layers depend downward only.** `spec` imports nothing in the package; `core` imports `spec`; every interpreter imports `spec` and/or `core`, never another interpreter. All by relative path (`../spec/index.ts`), never by the package's own name, with one exception: `src/svelte` imports `@thomasfosterau/charts` and `@thomasfosterau/charts/core` by name, because `svelte-package` copies that directory alone into `dist/svelte`, where a relative `../core/index.ts` would point at nothing. `tsconfig.svelte.json`'s `paths` and the `resolve.alias` in `vite.config.ts` map those names to the sources for `check` and the suite; in a consumer they resolve to the published `dist/`. `.fallowrc.json`'s `charts-*` zones enforce the relative imports (`charts-svelte` allows none).
-- **`spec` and `core` are DOM-free and Node-free.** `tsconfig.pure.json` enforces it at `check`.
-- **Effect stays inside `src/spec`.** It is a runtime dependency of the spec entry only (Effect Schema does the parsing and emits the JSON Schema), and it never reaches a published type: `scripts/check-dist-types.ts` fails `build` if any declaration under `dist/` (`.d.mts`, and `/svelte`'s `.d.ts`) mentions `effect`, and `fallow-rules.json` fails the audit on an `effect` import outside `src/spec`. `parse.ts` and `internal/` are linted with the Effect rules (AGENTS.md § Effect); `result.ts`, the published `validateSpec` result types (`T | undefined` optionals, not JSON-document types), imports no Effect and is not: each `internal/` schema exports a `typeof X.Type` alias, which is what `tests/spec/type-parity.test.ts` holds equal to the public mirror in `types.ts`. It is developed on the workspace `effect` pin and published as `effect ^4.0.0` (`catalogs.published` in `pnpm-workspace.yaml`): the code must run on 4.0.0, and the range rises only when a dependency requires it, named in the catalog comment. Before changing Effect code, read `node_modules/effect/dist/Schema.d.ts` rather than guessing at the API.
-- **Nothing here imports `@thomasfosterau/components`**, and nothing there imports this (`fallow-rules.json`). The Svelte `Chart` in `@thomasfosterau/components/charts` is a separate, series-based component; this package's `/svelte` `Chart` reads the spec.
-- **The `Chart` interpreters share `resolveChart`** (`src/core/resolve.ts`): validation, the missing-rows check and the error messages live there once, and the Svelte `Chart` adds only how it draws.
+- Layers depend downward only: `spec` ← `core` ← interpreters, by relative import, never one interpreter to another. The exception: `src/svelte` imports the package by name, because it is copied into `dist/svelte` on its own.
+- `spec` and `core` are DOM-free and Node-free (`tsconfig.pure.json`).
+- Effect never reaches a published type: `scripts/check-dist-types.ts` fails `build` otherwise. It is published as `effect ^4.0.0`, so the code must run on 4.0.0.
+- Nothing here imports `@thomasfosterau/components`, or the reverse.
+- The interpreters share `resolveChart` (`src/core/resolve.ts`) for validation and error messages.
 
 ## Invariants
 
-- **`schema/chart-spec.v1.json` is generated, committed and published** (`./schema.json` export). `tests/spec/json-schema.test.ts` fails when it disagrees with the Effect source; regenerate with `vp run --filter ./packages/charts emit-schema`. The formatter ignores it (root `vite.config.ts`).
-- **For the versions it knows (`'1'`, `'1.1'`), the JSON Schema closes objects exactly where `parseSpec` rejects unknown keys.** Both pass `onExcessProperty: 'error'` (`src/spec/parse.ts`'s strict decode, `src/spec/internal/json-schema.ts`); change them together. A newer `1.N` document is degraded by the parser alone (`onExcessProperty: 'ignore'`, a separate decode in `parse.ts`): the schema stays strict and its `specVersion` enum lists only the known versions (owner decision on #304), so the degrading path must never reach `buildJsonSchema`, and changing it must leave the `emit-schema` output byte-identical.
-- **A new spec field or mark gets a capability-matrix row** ([capability matrix](../../docs/charts-capability-matrix.md)) in the same change, and a matching change to `swift/ChartSpecKit`.
-
-## Testing
-
-`vp test run tests` under Node. `tests/<layer>/` mirrors `src/<layer>/`. Tests import from `vite-plus/test`.
-
-- **Why not browser mode.** These suites are parsing, geometry, Vega-Lite compilation and SSR string output (the Svelte entry's included, through `svelte/server`), and the schema test reads the committed artifact from disk with `node:fs` — none of it is focus order or the accessibility tree, which is what the Svelte packages need a real browser for.
-- **Suites that mount into a DOM opt in per file** with `// @vitest-environment happy-dom` (the ProseMirror NodeView). The Svelte entry has no client suite: the suite compiles `.svelte` for the server, and Svelte's `mount` exists only in its browser build, which would need a second Vitest project resolving `browser` conditions. It has no client-only logic to test there: it is one `$derived` over `resolveChart`, which the core suite covers, and markup the SSR suite renders.
-- **`swift/ChartSpecKit` is tested by its own workflow**, [`.github/workflows/chartspeckit.yml`](../../.github/workflows/chartspeckit.yml) (`swift test` on macOS). No session image has a Swift toolchain, so say so rather than claim it ran.
-
-## Commands
-
-From the workspace root (the repo-wide gates are in the root [AGENTS.md](../../AGENTS.md)):
-
-```sh
-vp run --filter ./packages/charts test:unit    # Vitest under Node (happy-dom where a suite mounts)
-vp run --filter ./packages/charts check        # tsc, plus the DOM-free re-check of spec + core
-vp run --filter ./packages/charts build        # vp pack -> dist/, then the Effect-leak check
-vp run --filter ./packages/charts emit-schema  # regenerate schema/chart-spec.v1.json
-```
-
-The Swift package is tested by its own workflow (`swift test` in `swift/ChartSpecKit`, on macOS).
+- `schema/chart-spec.v1.json` is generated, committed and published; regenerate it with `vp run --filter ./packages/charts emit-schema`. A test fails when it drifts.
+- For known versions the JSON Schema closes objects exactly where `parseSpec` rejects unknown keys; change both together. A newer `1.N` document is degraded by the parser alone, and must leave the emitted schema byte-identical.
+- A new spec field or mark gets a capability-matrix row.

@@ -39,7 +39,7 @@ An always-visible list of options to choose one or several from, as a form field
   all while nothing is selected).
 
   Large lists: every option is in the DOM, so keep `options` to a few
-  hundred; a virtualised listbox is #209's.
+  hundred.
 -->
 <script lang="ts">
   import { Check } from '@lucide/svelte';

@@ -31,7 +31,7 @@ Every primitive accepts it by spread — `<TextInput {...control} bind:value />`
 
 ## Translating `requiredLabel` once
 
-(Issue #419.) `FormField`, `Fieldset`, `CheckboxGroup` and `RadioGroup` each take `requiredLabel = '(required)'`, the screen-reader text after a required field's label. Like every other string, it is a prop. The components context carries no copy, by design (#353). An i18n app wraps the frame once and imports the wrapper everywhere, rather than threading the prop through every call site:
+`FormField`, `Fieldset`, `CheckboxGroup` and `RadioGroup` each take `requiredLabel = '(required)'`, the screen-reader text after a required field's label. Like every other string, it is a prop. The components context carries no copy, by design. An i18n app wraps the frame once and imports the wrapper everywhere, rather than threading the prop through every call site:
 
 ```svelte
 <!-- src/lib/components/AppFormField.svelte, in the app -->

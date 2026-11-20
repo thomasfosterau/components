@@ -1,22 +1,36 @@
-# @thomasfosterau/components
+# components
 
-Accessible Svelte 5 components built on Tailwind CSS 4, daisyUI 5 and bits-ui, with a Mapbox companion package, a portable chart spec and a data import mapper. I use them in my own apps (mostly private repositories) and publish them here to share them and keep them in sync across projects.
+Accessible Svelte 5 components on Tailwind CSS 4, daisyUI 5 and bits-ui, plus a Mapbox companion, a portable chart spec and a data import mapper. Extracted from Thomas Foster's own apps and published to keep them in sync.
 
-**Disclaimer:** these components (and therefore this repository) were extracted from several private repositories using Claude Code. I wrote most of the components myself, though they aren't particularly original; Claude generalised the API in many cases.
+> [!CAUTION]
+> Experimental and pre-1.0: the API may change in any release. Largely written with Claude Code.
 
-| Package | npm | What it is |
-| --- | --- | --- |
-| [`@thomasfosterau/components`](https://github.com/thomasfosterau/components/blob/trunk/packages/components/README.md) | [![npm](https://img.shields.io/npm/v/@thomasfosterau/components)](https://www.npmjs.com/package/@thomasfosterau/components) | Accessible Svelte 5 UI primitives: daisyUI classes for styling, bits-ui for interaction, every string a prop. |
-| [`@thomasfosterau/components-mapbox`](https://github.com/thomasfosterau/components/blob/trunk/packages/mapbox/README.md) | [![npm](https://img.shields.io/npm/v/@thomasfosterau/components-mapbox)](https://www.npmjs.com/package/@thomasfosterau/components-mapbox) | Mapbox GL maps and a plan editor for the components. `mapbox-gl` is a required peer. |
-| [`@thomasfosterau/charts`](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/README.md) | [![npm](https://img.shields.io/npm/v/@thomasfosterau/charts)](https://www.npmjs.com/package/@thomasfosterau/charts) | A portable, renderer-agnostic chart spec and its JSON Schema, with Svelte, ProseMirror and Vega-Lite interpreters. |
-| [`@thomasfosterau/components-import`](https://github.com/thomasfosterau/components/blob/trunk/packages/import/README.md) | [![npm](https://img.shields.io/npm/v/@thomasfosterau/components-import)](https://www.npmjs.com/package/@thomasfosterau/components-import) | A data import mapper: map a user's table onto an app's Effect Schema with a serialisable mapping spec, headless or through its Svelte `ImportMapper`. `effect` and `@thomasfosterau/effect-document` are required peers. |
+## Packages
 
-The guides are in [`docs/`](https://github.com/thomasfosterau/components/blob/trunk/docs).
+| Package | What it is |
+| --- | --- |
+| [`@thomasfosterau/components`](packages/components/README.md) | Accessible UI primitives: daisyUI for styling, bits-ui for interaction, every string a prop. |
+| [`@thomasfosterau/components-mapbox`](packages/mapbox/README.md) | Mapbox GL maps and a plan editor. `mapbox-gl` is a required peer. |
+| [`@thomasfosterau/charts`](packages/charts/README.md) | A renderer-agnostic chart spec, its JSON Schema, and Svelte, ProseMirror and Vega-Lite interpreters. |
+| [`@thomasfosterau/components-import`](packages/import/README.md) | Maps a user's table onto an app's Effect Schema, headless or through a Svelte `ImportMapper`. |
 
-## Contributing
+## Usage
 
-The toolchain is [Vite+](https://viteplus.dev) on Node and pnpm. Setup, hooks and the individual checks are in [CONTRIBUTING.md](./CONTRIBUTING.md); the conventions and the gate list every change passes are in [AGENTS.md](./AGENTS.md). Releases are Changesets with npm trusted publishing: see [PUBLISHING.md](./PUBLISHING.md). Report vulnerabilities as [SECURITY.md](./SECURITY.md) describes.
+```sh
+pnpm add @thomasfosterau/components
+```
 
-## License
+```svelte
+<script lang="ts">
+  import { Button } from '@thomasfosterau/components';
+</script>
 
-MIT © Thomas Foster
+<Button onclick={() => alert('Hi')}>Say hi</Button>
+```
+
+Tailwind and theme setup are in the [getting-started guide](packages/components/docs/getting-started.md); each package README links its guides.
+
+## More
+
+- [Contributing](docs/CONTRIBUTING.md), [publishing](docs/PUBLISHING.md), [security](docs/SECURITY.md)
+- [MIT licence](LICENSE.md)

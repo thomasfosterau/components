@@ -1,5 +1,5 @@
 /**
- * `AppShell` adaptive mode, rendered to a string on the server (#428): all
+ * `AppShell` adaptive mode, rendered to a string on the server: all
  * three tiers are in the markup with the classes that hide two of them at any
  * width, and nothing on the way asks `matchMedia` which one to show. Runs
  * under Node (the `ssr` project in `vite.config.ts`), because browser mode

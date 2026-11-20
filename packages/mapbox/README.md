@@ -10,7 +10,7 @@ It is a separate package so that an application that renders no map never instal
 pnpm add @thomasfosterau/components-mapbox @thomasfosterau/components mapbox-gl
 ```
 
-`mapbox-gl` (`^3.33.0`) is a required peer. Its stylesheet is imported by `DynamicMap` itself; you do not import it. Add this package's `dist/` to Tailwind's `@source` beside the core library's. Peers and the CSS are in the [setup guide](https://github.com/thomasfosterau/components/blob/trunk/docs/mapbox-setup.md).
+`mapbox-gl` (`^3.33.0`) is a required peer. Its stylesheet is imported by `DynamicMap` itself; you do not import it. Add this package's `dist/` to Tailwind's `@source` beside the core library's. Peers and the CSS are in the [setup guide](https://github.com/thomasfosterau/components/blob/trunk/packages/mapbox/docs/setup.md).
 
 ## Example
 
@@ -49,9 +49,9 @@ Everything comes from the package root. Props, snippets and ARIA are in each com
 
 ## Guides
 
-- [Setup and peers](https://github.com/thomasfosterau/components/blob/trunk/docs/mapbox-setup.md)
-- [The plan editor](https://github.com/thomasfosterau/components/blob/trunk/docs/mapbox-plan-editor.md)
-- [The GeoJSON seam](https://github.com/thomasfosterau/components/blob/trunk/docs/mapbox-geojson.md)
+- [Setup and peers](https://github.com/thomasfosterau/components/blob/trunk/packages/mapbox/docs/setup.md)
+- [The plan editor](https://github.com/thomasfosterau/components/blob/trunk/packages/mapbox/docs/plan-editor.md)
+- [The GeoJSON seam](https://github.com/thomasfosterau/components/blob/trunk/packages/mapbox/docs/geojson.md)
 
 ## License
 

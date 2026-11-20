@@ -97,7 +97,7 @@
     readonly age: number;
   }
 
-  // An import with problems the reader fixes in place before anything is saved (#139).
+  // An import with problems the reader fixes in place before anything is saved.
   const imported: readonly Contact[] = [
     { line: '2', name: 'Ada Lovelace', email: 'ada@example.org', age: 36 },
     { line: '3', name: '', email: 'grace@example', age: 85 },
@@ -139,7 +139,7 @@
   const familyNames = ['Lovelace', 'Hopper', 'Turing', 'Johnson', 'Dijkstra', 'Liskov', 'Knuth', 'Allen'];
 
   // A 5,000-row import generated here (no network), with a problem every
-  // 750 lines so the error summary has distant rows to reach (#427).
+  // 750 lines so the error summary has distant rows to reach.
   const pick = (list: readonly string[], index: number): string => list[index % list.length] ?? '';
 
   const largeImport: readonly Contact[] = Array.from({ length: 5000 }, (_, index) => {

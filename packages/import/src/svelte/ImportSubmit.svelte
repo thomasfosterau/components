@@ -12,7 +12,7 @@ The import's last step: map every row of the table, report the rows that do not 
   signal aborts when the step goes away.
 
   There is no editing here yet: the review grid (inline fixes, excluding rows
-  one by one) is a later slice of #139, so `edits` is always empty.
+  one by one) comes later, so `edits` is always empty.
 
   ARIA contract: progress and the outcome go through a polite `role="status"`
   region, a failure through an `Alert`'s `role="alert"`. Issues are a list

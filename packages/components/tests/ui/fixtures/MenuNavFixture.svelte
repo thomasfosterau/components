@@ -3,7 +3,7 @@
      unconditionally, the way an app wiring its own optional resolver does: an
      omitted one arrives as an explicit `undefined`, so this file only
      type-checks while `setComponentsContext` accepts `T | undefined` per
-     member (#76), and the Menu test pins that it falls back to the default. -->
+     member, and the Menu test pins that it falls back to the default. -->
 <script lang="ts">
   import { untrack } from 'svelte';
   import { setComponentsContext } from '../../../src/lib/context.svelte.ts';

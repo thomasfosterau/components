@@ -1,6 +1,6 @@
 # @thomasfosterau/charts
 
-A portable, renderer-agnostic charting system built around a durable chart specification: the spec and its JSON Schema, a pure TypeScript geometry core, and interpreters for Svelte, ProseMirror and Vega-Lite, plus a Swift package, [`ChartSpecKit`](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/swift/ChartSpecKit), that decodes the same JSON.
+A portable, renderer-agnostic charting system built around a durable chart specification: the spec and its JSON Schema, a pure TypeScript geometry core, and interpreters for Svelte, ProseMirror and Vega-Lite.
 
 It is unrelated to `Chart` from [`@thomasfosterau/components/charts`](https://github.com/thomasfosterau/components/blob/trunk/packages/components/README.md), which takes its own series props rather than this spec.
 
@@ -52,9 +52,9 @@ In Svelte, `<Chart {spec} />` from `@thomasfosterau/charts/svelte` renders the s
 
 ## Docs
 
-- [Chart spec](https://github.com/thomasfosterau/components/blob/trunk/docs/charts-spec.md): architecture, invariants, example specs (line, Gantt, taxonomy) and the versioning rule.
+- [Chart spec](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/docs/spec.md): architecture, invariants, example specs (line, Gantt, taxonomy) and the versioning rule.
 - API reference: the TSDoc on each export, which your editor shows on hover and which ships in the published `.d.ts`. Per-entry usage examples are in the chart spec guide.
-- [Capability matrix](https://github.com/thomasfosterau/components/blob/trunk/docs/charts-capability-matrix.md): which interpreters honour which spec fields, and how each degrades.
+- [Capability matrix](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/docs/capability-matrix.md): which interpreters honour which spec fields, and how each degrades.
 - Contributing: the [root README](https://github.com/thomasfosterau/components/blob/trunk/README.md) and [AGENTS.md](https://github.com/thomasfosterau/components/blob/trunk/packages/charts/AGENTS.md).
 
 ## License

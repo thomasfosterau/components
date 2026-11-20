@@ -1,34 +1,31 @@
 name: Release
 
-# Changesets release flow, split so that only publishing waits for approval.
-# On every push to `trunk`:
-#
-# - `select` (read-only) asks changesets/action/select-mode what the repo state
-#   calls for: `version` while unreleased changesets exist, `publish` once none
-#   remain and some package version is not on npm yet (`changeset
-#   publish-plan`), else `none`.
-# - `version` opens/updates the "chore: version packages" PR. It holds a
-#   write-scoped token but no `id-token`, so it cannot publish, and runs outside
-#   the `release` environment, so it needs no approval.
-# - `publish` is the only job in the protected `release` environment and the
-#   only one with `id-token: write`: it publishes to npm via OIDC trusted
-#   publishing and tags the release, after the owner approves it (once per
-#   release). See PUBLISHING.md.
-#
-# changesets/action's README recommends its sub-actions over the combined
-# action for trusted publishing, "to tighten publish permissions"; they need
-# Changesets CLI v3. The version and publish sub-actions push through the
-# GitHub API, so no checkout keeps git credentials.
+# Changesets, split so only publishing holds `id-token: write` and waits for the
+# protected `release` environment. See docs/PUBLISHING.md.
 
 on:
   push:
     branches: [trunk]
 
-# Nothing by default; the job grants exactly what it uses.
 permissions: {}
 
 jobs:
-  # Same setup as `publish` (see the comments there), minus the build.
+  verify-lockfile:
+    name: Verify actions.lock
+    if: github.repository == 'thomasfosterau/components' && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - run: gh extension install github/gh-actions-lock --pin v0.4.1
+      - run: gh actions-lock --verify
+
   select:
     name: Select mode
     if: github.repository == 'thomasfosterau/components' && github.actor != 'dependabot[bot]'
@@ -39,26 +36,23 @@ jobs:
     outputs:
       mode: ${{ steps.mode.outputs.mode }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-      # Vite+ provides Node.js and the pnpm that package.json's `packageManager`
-      # names; the install stays the explicit `--ignore-scripts` step below.
-      - name: Setup Vite+
-        uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+      - uses: voidzero-dev/setup-vp@v1.22.0
         with:
-          node-version: 'lts'
+          version-file: pnpm-workspace.yaml
+          node-version: lts
           cache: true
-          run-install: false
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --ignore-scripts
+          run-install: |
+            - args: ['--frozen-lockfile', '--ignore-scripts']
       - name: Select mode
         id: mode
-        uses: changesets/action/select-mode@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+        uses: changesets/action/select-mode@v2.1.2
 
   version:
     name: Version packages
-    needs: select
+    needs: [verify-lockfile, select]
     if: needs.select.outputs.mode == 'version'
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -69,23 +63,20 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
-      # Vite+ provides Node.js and the pnpm that package.json's `packageManager`
-      # names; the install stays the explicit `--ignore-scripts` step below.
-      - name: Setup Vite+
-        uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+      - uses: voidzero-dev/setup-vp@v1.22.0
         with:
-          node-version: 'lts'
-          cache: true
-          run-install: false
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --ignore-scripts
+          version-file: pnpm-workspace.yaml
+          node-version: lts
+          cache: false
+          run-install: |
+            - args: ['--frozen-lockfile', '--ignore-scripts']
       - name: Create or update the version PR
         id: version
-        uses: changesets/action/version@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+        uses: changesets/action/version@v2.1.2
         with:
           script: pnpm changeset version
           commit-message: 'chore: version packages'
@@ -100,70 +91,33 @@ jobs:
 
   publish:
     name: Publish to npm
-    # A fork that copies this workflow must not try to publish, and a push
-    # made by Dependabot never reaches the job that holds `id-token: write`.
-    # That guard is on `select` now: this job needs it, so it is skipped with it.
-    needs: select
+    needs: [verify-lockfile, select]
     if: needs.select.outputs.mode == 'publish'
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # One publish at a time; never cancel one that has started.
     concurrency:
       group: release-publish-${{ github.ref }}
       cancel-in-progress: false
-    # A protected environment (deployment branches: `trunk` only), named by the
-    # trusted publisher on npmjs.com — a workflow run from any other ref cannot
-    # mint a publish credential even if it copies this file.
     environment: release
     permissions:
-      # Commit the version bump, push tags, create GitHub releases.
-      contents: write # push the release tags and create the GitHub releases
-      # Open / update the "chore: version packages" pull request.
-      # npm Trusted Publishing (OIDC).
+      contents: write
       id-token: write
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 0
-
-      # Vite+ provides Node.js and the pnpm that package.json's `packageManager`
-      # names; the install stays the explicit `--ignore-scripts` step below.
-      #
-      # No `registry-url`: that writes an `.npmrc` whose `_authToken` reads
-      # `NODE_AUTH_TOKEN`, and a configured token — even an empty placeholder
-      # — is what npm tries instead of OIDC.
-      #
-      # The job publishes with the npm this Node bundles; there is no npm
-      # upgrade step (#84). Trusted Publishing needs npm >= 11.5.1, which
-      # every Node release since 24.5.0 bundles, so the Node is pinned to the
-      # latest LTS rather than left to `engines`, whose range admits Node 22
-      # (npm 10).
-      - name: Setup Vite+
-        uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+      # No `registry-url`: its `.npmrc` token would be tried instead of OIDC.
+      # `pnpm publish` does trusted publishing and provenance itself; no npm.
+      - uses: voidzero-dev/setup-vp@v1.22.0
         with:
-          node-version: 'lts'
-          cache: true
-          run-install: false
-
-      # `--ignore-scripts`, unlike CI's setup action: no install script runs in
-      # the job that holds `id-token: write`. Nothing on the build path needs
-      # one: the root `prepare` installs the Vite+ git hooks and applies the
-      # `effect-tsgo` patch, which only the type and lint gates use.
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --ignore-scripts
-
-      # The publish path runs `vp run -r build` first (the root `release`
-      # script) — `files` is `["dist"]`, so a stale or missing build would
-      # publish an empty package rather than fail.
-      #
-      # `pnpm run`, not `vp run`, for the script itself: `vp run` does not
-      # forward the ambient `ACTIONS_ID_TOKEN_REQUEST_URL` / `_TOKEN` that npm
-      # needs for OIDC, and npm then falls back to token auth and fails with
-      # ENEEDAUTH.
-      - uses: changesets/action/publish@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+          version-file: pnpm-workspace.yaml
+          node-version: lts
+          cache: false
+          run-install: |
+            - args: ['--frozen-lockfile', '--ignore-scripts']
+      - run: vp run -r build
+      # `pnpm run`, not `vp run`: `vp run` does not forward the OIDC request env pnpm needs.
+      - uses: changesets/action/publish@v2.1.2
         with:
           script: pnpm run release
-        # No `env:` block on purpose: don't force provenance (NPM_CONFIG_PROVENANCE).
-        # npm attaches it itself when allowed, and an explicit request fails
-        # from a private repository.

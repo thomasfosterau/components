@@ -65,7 +65,7 @@ describe('applying a transform', () => {
     expect(ids(deleted)).toEqual(['b']);
   });
 
-  it('reads a transform member forwarded as `undefined` as absent (#76)', () => {
+  it('reads a transform member forwarded as `undefined` as absent', () => {
     // A caller building a transform from its own optional fields forwards them
     // unconditionally; under `exactOptionalPropertyTypes` this only
     // type-checks while `Transform` declares them `T | undefined`.

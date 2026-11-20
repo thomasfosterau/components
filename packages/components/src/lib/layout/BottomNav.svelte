@@ -11,10 +11,10 @@ The mobile primary navigation: three to five destinations in a bar at the bottom
   opacity, so only one "Primary" navigation landmark is ever in the tree.
 
   No bits-ui and no `ui/Menu`: the contract is a landmark, links and
-  `aria-current`, which needs no primitive, and `Menu`'s dropdown runtime is
-  exactly the always-loaded cost #129 removed.
+  `aria-current`, which needs no primitive, and `Menu`'s dropdown runtime would
+  load on every page.
 
-  Given `destinations` (#428), the items are built from the app's one list of
+  Given `destinations`, the items are built from the app's one list of
   `NavDestination`s (all but `compact: false`), the same declaration
   `AppShell` and `NavigationRail` read; `children` still work, and render
   after them.

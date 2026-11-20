@@ -10,7 +10,7 @@ A rule between groups of `MenuItem`s.
   separator part that menu lends it through context: bits-ui's own separator
   (which also marks it non-focusable for the menu's arrow-key navigation),
   wrapped in a `role="none"` `<li>` so the presentational list item stays out
-  of the accessibility tree. This file imports nothing from bits-ui (#129).
+  of the accessibility tree. This file imports nothing from bits-ui.
 
   Outside a menu, use `Divider`: it is the free-standing rule, and this one
   must stay an `<li>` inside the menu's list.

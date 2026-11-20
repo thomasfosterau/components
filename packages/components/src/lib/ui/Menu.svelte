@@ -11,7 +11,7 @@ A labelled navigation list: a `<nav>` landmark around a daisyUI `menu` of `MenuI
   An application menu behind a trigger is `DropdownMenu`, which takes the
   same `MenuItem`s. The two are separate components so this one imports
   nothing from bits-ui: a page that only navigates (`Sidebar` included) never
-  loads the dropdown runtime (#129).
+  loads the dropdown runtime.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';

@@ -17,7 +17,7 @@ One entry of a `Menu` (a navigation link), or of a `DropdownMenu` or `ContextMen
   caller's own `<a>` or `<button>` — carrying bits-ui's `role="menuitem"`, its
   focus management and its selection handling — rather than a `<div>`
   pretending to be one. This file imports nothing from bits-ui, so a
-  navigation-only page never loads the dropdown runtime (#129). An item with
+  navigation-only page never loads the dropdown runtime. An item with
   an `href` is a link and must stay a link (middle-click, "open in new tab");
   an item without one is a button.
 

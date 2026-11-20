@@ -16,7 +16,7 @@ A score out of N as stars: an input on bits-ui's `RatingGroup` that binds a numb
   accessible name, `aria-describedby` and `aria-invalid`.
 
   Naming: a `<label for>` cannot name a `div`, so inside a `FormField` the
-  root takes `aria-labelledby={labelId}` (`FieldControl.labelId`, #179) and
+  root takes `aria-labelledby={labelId}` (`FieldControl.labelId`) and
   `FormField` forwards a label click to it. Outside one, `label` becomes the
   root's `aria-label`.
 

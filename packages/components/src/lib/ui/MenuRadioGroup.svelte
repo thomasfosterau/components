@@ -5,7 +5,7 @@ A set of mutually exclusive `MenuRadioItem`s in a `DropdownMenu` or `ContextMenu
   MenuRadioGroup — one choice from a few, made in a menu ("Sort by: name,
   date, size"). It renders the radio group part its enclosing `DropdownMenu`
   or `ContextMenu` lends it through context (`menu-parts/RadioGroupPart.svelte`),
-  so this file imports nothing from bits-ui (#129).
+  so this file imports nothing from bits-ui.
 
   ARIA contract: a `role="group"` named by its visible `label` heading, around
   `role="menuitemradio"` items, exactly one `aria-checked`. Outside a

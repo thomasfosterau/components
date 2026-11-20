@@ -5,7 +5,7 @@ A submenu of a `DropdownMenu` or `ContextMenu`: an item that opens a further men
   MenuSub — an item that opens a further menu ("Move to ▸"). It renders the
   submenu part its enclosing `DropdownMenu` or `ContextMenu` lends it through
   context (`menu-parts/SubPart.svelte`), so this file imports nothing from
-  bits-ui (#129). The children are the same `MenuItem`s, separators and
+  bits-ui. The children are the same `MenuItem`s, separators and
   checkbox / radio items the parent menu takes.
 
   ARIA contract: the opener is a `role="menuitem"` with
