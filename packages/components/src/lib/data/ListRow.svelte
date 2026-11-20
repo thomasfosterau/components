@@ -8,6 +8,7 @@ One row of a list: leading content, a headline with an overline and supporting t
   it. Inside a `ListGroup` the row renders its own `<li>`.
 -->
 <script lang="ts">
+  import { DEV } from 'esm-env';
   import { ChevronRight } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
   import type { Attachment } from 'svelte/attachments';
@@ -148,9 +149,10 @@ One row of a list: leading content, a headline with an overline and supporting t
   };
 
   $effect(() => {
-    if (!interactive || trailingBox?.querySelector(FOCUSABLE) == null) return;
+    if (!DEV || !interactive || trailingBox?.querySelector(FOCUSABLE) == null) return;
     // A caller's markup bug that breaks the row for keyboard and screen
-    // reader users: it has to reach the console the developer is looking at.
+    // reader users: it has to reach the console the developer is looking at,
+    // and only in development.
     console.warn(
       '[ListRow] A link or button row holds a focusable element in `trailing`. ' +
         'Interactive elements cannot nest: drop `href`/`onclick` to make a control row.',

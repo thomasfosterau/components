@@ -251,6 +251,9 @@ catalogs:
     daisyui:
       specifier: ^5.8.1
       version: 5.8.1
+    esm-env:
+      specifier: ^1.2.2
+      version: 1.2.2
     fallow:
       specifier: 3.44.0
       version: 3.44.0
@@ -418,6 +421,9 @@ importers:
       bits-ui:
         specifier: 'catalog:'
         version: 2.21.0(@internationalized/date@3.12.4)(@sveltejs/kit@3.4.0(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(svelte@5.58.0)
+      esm-env:
+        specifier: 'catalog:'
+        version: 1.2.2
     devDependencies:
       '@storybook/addon-a11y':
         specifier: 'catalog:'
