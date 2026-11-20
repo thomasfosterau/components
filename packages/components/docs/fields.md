@@ -114,6 +114,24 @@ The native `<input type="color">` remains an option where none of that is needed
 </form>
 ```
 
+### Structured numbers: `MaskedInput`
+
+Prefer a plain `TextInput` with a hint ("For example, 0412 345 678") and validation over a mask: people type and paste numbers in every format, and a mask that fights them is worse than none. Where formatting as you type does help, such as card numbers and phone numbers read back to the person, `MaskedInput` does it without the usual traps:
+
+- A pattern's `9` takes a digit, `a` a letter and `*` either; anything else is a literal, shown only once a character follows it. There are no placeholder underscores for a screen reader to read out.
+- The caret stays after the same characters through an edit mid-string, and Backspace or Delete beside a separator removes the digit beyond it.
+- Paste is stripped to the raw characters, so `0412-345-678` and `+61 412 345 678` both work. A letter typed into a digits mask is dropped and announced once (`rejectedLabel`).
+- `value` is the raw text and is what `name` posts (`submitFormatted` posts `formatted` instead). `formatOn="blur"` leaves the field free while it has focus and formats on blur, which is the right mode for anything people commonly paste.
+- `maskPresets` holds `auMobile`, `auPostcode`, `card` (Amex 4-6-5, others 4-4-4-4) and `isoDate`, each with its `inputmode` and `autocomplete`. `cardBrand` and `luhnValid` check a card number. For international phone numbers, format with libphonenumber in the app rather than a fixed pattern.
+
+```svelte
+<FormField label="Mobile" hint="For example, 0412 345 678">
+  {#snippet children(control)}
+    <MaskedInput {...control} mask={maskPresets.auMobile} name="mobile" bind:value={mobile} />
+  {/snippet}
+</FormField>
+```
+
 `fields` also exports `field-types.ts` (`FieldControl`, `FieldsetControl`, `FieldSize`, `FieldOption`, `FieldOptionInput`, `toFieldOptions`) and the daisyUI size tables (`inputSize`, `textareaSize`, `selectSize`, `checkboxSize`, `toggleSize`, `fileInputSize`, `rangeSize`, `pinCellSize`, `inputButtonSize`, each a `Record<FieldSize, string>`), and from `PushToggle` the `PushEnableResult` type (`{ _tag: 'enabled' | PushDeclineReason }`) and `PushDeclineReason` (`'unsupported' | 'unavailable' | 'denied'` — why `enable` did not subscribe, each with its own message prop).
 
 ```svelte
