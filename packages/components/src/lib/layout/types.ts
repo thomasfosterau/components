@@ -34,6 +34,24 @@ export interface TabItem {
   readonly disabled?: boolean | undefined;
 }
 
+/** A link in a {@link NavigationMenu} panel. */
+export interface NavigationLink {
+  readonly label: string;
+  /** An app path, resolved through the components context. */
+  readonly href: string;
+  /** A line under the label in the panel. */
+  readonly description?: string | undefined;
+}
+
+/** A top-level entry of a {@link NavigationMenu}: a link, or a panel of links. */
+export interface NavigationSection {
+  readonly label: string;
+  /** A top-level link, with no panel. */
+  readonly href?: string | undefined;
+  /** A panel of links; takes precedence over `href`. */
+  readonly links?: readonly NavigationLink[] | undefined;
+}
+
 /** One option of a {@link FilterBar}. */
 export interface FilterOption {
   /** Stable key for the keyed `{#each}`. */

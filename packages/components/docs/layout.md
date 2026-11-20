@@ -182,3 +182,17 @@ The links are plain `#id` hrefs, so they work without scripts. With scripts, a c
 ```
 
 The section being read is marked `aria-current="location"`, with a border and a heavier weight, from an `IntersectionObserver`. It is never announced, because a live region would speak on every scroll. Under a sticky header, set `offset` to its height: targets get a matching `scroll-margin-top`, and the spy ignores the band the header covers. Below `collapseBelow` (default `'lg'`) the list folds into a closed `Disclosure`; `false` keeps it open at every width.
+
+## Site navigation with panels
+
+`NavigationMenu` is for a site with more destinations than fit in a flat row: top-level entries that are links, or that open a panel of links ("Plants" opening Trees, Shrubs, Bulbs). It is the APG disclosure navigation pattern on bits-ui's `NavigationMenu`, not an application menu: its links stay links and Tab walks every one, where a `DropdownMenu` would turn them into menu items a screen reader announces as actions. Render it in `Navbar`'s `center` snippet, and the same `sections` with `orientation="vertical"` (a `Disclosure` per section) in its `menu` snippet:
+
+```svelte
+<Navbar label="Primary">
+  {#snippet start()}<a href="/" rel="home">Garden guide</a>{/snippet}
+  {#snippet center()}<NavigationMenu {sections} />{/snippet}
+  {#snippet menu()}<NavigationMenu {sections} orientation="vertical" />{/snippet}
+</Navbar>
+```
+
+Inside `Navbar`, omit `label`: the `Navbar` already names the `<nav>`. Links resolve through the components context, the current page's link is `aria-current="page"`, and the trigger of the section holding it is `aria-current="true"`. A `panel` snippet replaces a section's link list, for a featured card beside the links. It loads bits-ui's navigation-menu runtime (about 11 KB gzip with the component, measured from the Storybook chunk), so it sits on every page of an app that puts it in the root layout; that is the app's choice, and nothing else in the library imports it.
