@@ -4,7 +4,7 @@ Each component's props, defaults, snippets and ARIA contract are in its doc comm
 
 Dialogs, toasts, progress — chrome around something that just happened, or is happening now. What these share is the live region and the announcement order, not the markup.
 
-`feedback` also exports `sizes.ts` (`DialogSize`, `ToastPosition`, `BarSize`, `StatsOrientation` and their class tables `dialogSize`, `toastPosition`, `barSize`, `statsOrientation`) and `toaster.ts` (`getToaster`, `setToaster`, `Toast`, `NewToast`, `ToastTone`, `ToasterApi`), plus the prop types below. `colourToken` on a `SegmentBar` segment or a `TimelineEntry` is a CSS custom-property name your theme declares — see `ui`'s `colourTokenStyle`.
+`feedback` also exports `sizes.ts` (`DialogSize`, `ToastPosition`, `BarSize`, `StatsOrientation` and their class tables `dialogSize`, `toastPosition`, `barSize`, `statsOrientation`) and `toaster.ts` (`getToaster`, `setToaster`, `Toast`, `NewToast`, `ToastTone`, `ToastAction`, `ToastOutcome`, `ToasterApi`), plus the prop types below. `colourToken` on a `SegmentBar` segment or a `TimelineEntry` is a CSS custom-property name your theme declares — see `ui`'s `colourTokenStyle`.
 
 | Type | What it is |
 | --- | --- |
@@ -39,6 +39,13 @@ Dialogs, toasts, progress — chrome around something that just happened, or is 
   const toaster = getToaster();
   toaster.add({ title: 'Bed saved', tone: 'success' });
   toaster.add({ title: 'Could not save the bed', tone: 'error' }, 0); // 0 = sticky
+
+  // One action per toast; it lives the Toaster's actionDurationMs (10 s) and pauses on hover or focus.
+  async function deleteBed(bed: Bed) {
+    hideBed(bed);
+    const id = toaster.add({ title: 'Bed deleted', action: { label: 'Undo', onAction: () => showBed(bed) } });
+    if ((await toaster.result(id)) !== 'action') await purgeBed(bed); // 'dismissed' or 'timeout'
+  }
 
   // 'loading' only for a FIRST read; 'refreshing' while a re-fetch runs over content already on screen.
   const state = $derived(query.error ? 'error' : query.data === undefined ? 'loading' : query.pending ? 'refreshing' : 'ready');

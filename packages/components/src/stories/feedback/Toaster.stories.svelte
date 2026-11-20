@@ -3,6 +3,17 @@
   import Toaster from '../../lib/feedback/Toaster.svelte';
   import ToastTrigger from './ToastTrigger.svelte';
 
+  const wait = (ms: number, signal: AbortSignal) =>
+    new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(resolve, ms);
+      signal.addEventListener('abort', () => {
+        clearTimeout(timer);
+        reject(signal.reason);
+      });
+    });
+
+  let attempts = 0;
+
   const { Story } = defineMeta({
     title: 'Feedback/Toaster',
     component: Toaster,
@@ -52,6 +63,36 @@
         title="Import running"
         description="This one stays until it is dismissed."
         tone="info"
+      />
+    </div>
+  </Toaster>
+</Story>
+
+<Story name="Deleted · Undo">
+  <Toaster>
+    <div class="flex flex-wrap gap-2 p-4">
+      <ToastTrigger
+        buttonLabel="Delete a bed"
+        title="Bed deleted"
+        action={{ label: 'Undo', onAction: () => {} }}
+      />
+      <ToastTrigger
+        buttonLabel="Delete, with a slow undo"
+        title="Bed deleted"
+        description="Undo takes a second to restore it."
+        action={{ label: 'Undo', onAction: (signal) => wait(1_000, signal) }}
+      />
+      <ToastTrigger
+        buttonLabel="Delete, with an undo that fails once"
+        title="Bed deleted"
+        action={{
+          label: 'Undo',
+          onAction: async (signal) => {
+            await wait(600, signal);
+            attempts += 1;
+            if (attempts % 2 === 1) throw new Error('The bed could not be restored. Try again.');
+          },
+        }}
       />
     </div>
   </Toaster>

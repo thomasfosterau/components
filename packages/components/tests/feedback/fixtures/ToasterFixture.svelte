@@ -10,12 +10,26 @@
     regionLabel?: string | undefined;
     dismissLabel?: string | undefined;
     durationMs?: number | undefined;
+    actionDurationMs?: number | undefined;
+    actionHint?: ((label: string) => string) | undefined;
+    formatActionError?: ((error: unknown) => string) | undefined;
     toastDurationMs?: number | undefined;
+    onAction?: ((signal: AbortSignal) => void | Promise<void>) | undefined;
   }
 
-  let { position, regionLabel, dismissLabel, durationMs, toastDurationMs }: Props = $props();
+  let {
+    position,
+    regionLabel,
+    dismissLabel,
+    durationMs,
+    actionDurationMs,
+    actionHint,
+    formatActionError,
+    toastDurationMs,
+    onAction,
+  }: Props = $props();
 </script>
 
-<Toaster {position} {regionLabel} {dismissLabel} {durationMs}>
-  <ToasterPusher durationMs={toastDurationMs} />
+<Toaster {position} {regionLabel} {dismissLabel} {durationMs} {actionDurationMs} {actionHint} {formatActionError}>
+  <ToasterPusher durationMs={toastDurationMs} {onAction} />
 </Toaster>
