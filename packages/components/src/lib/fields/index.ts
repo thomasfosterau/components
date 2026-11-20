@@ -55,6 +55,7 @@ export {
   type PushEnableResult,
 } from './PushToggle.svelte';
 export { default as VideoInput } from './VideoInput.svelte';
+export { default as WheelPicker } from './WheelPicker.svelte';
 
 export * from './field-types.ts';
 export type { FileRejection } from './file-validation.ts';
@@ -71,3 +72,5 @@ export { compass8, compass16, type AngleZero } from './angle.ts';
 
 export { signatureToPng, type SignatureValue } from './signature.ts';
 export type { ImageCropOptions } from './ImageInput.svelte';
+
+export type { WheelColumnDef, WheelOption, WheelValue } from './wheel.ts';
