@@ -56,6 +56,10 @@ test('without Intl.DurationFormat the fallback is still localised', () => {
   expect(formatDuration({ hours: 2, minutes: 30, seconds: 5 }, 'en', 'digital')).toBe('2:30:05');
 });
 
+test('a zero duration reads as zero seconds rather than throwing', () => {
+  expect(formatDuration({}, 'en', 'long')).toBe('0 seconds');
+});
+
 test('durationFromMilliseconds splits and drops the zero fields', () => {
   expect(durationFromMilliseconds(9_309_000)).toEqual({ hours: 2, minutes: 35, seconds: 9 });
   expect(durationFromMilliseconds(90_061_500)).toEqual({
