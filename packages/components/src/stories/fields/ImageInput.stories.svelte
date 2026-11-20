@@ -2,6 +2,7 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import FormField from '../../lib/fields/FormField.svelte';
   import ImageInput from '../../lib/fields/ImageInput.svelte';
+  import type { CropArea } from '../../lib/fields/crop.ts';
 
   const { Story } = defineMeta({
     title: 'Fields/ImageInput',
@@ -20,6 +21,8 @@
 <script lang="ts">
   let width = $state<number | undefined>();
   let height = $state<number | undefined>();
+  let avatarArea = $state<CropArea | undefined>();
+  let coverFile = $state<File | undefined>();
 </script>
 
 <Story name="Default" asChild>
@@ -31,6 +34,45 @@
     </FormField>
     <p class="text-base-content/70 mt-3 text-sm">
       Measured: {width !== undefined && height !== undefined ? `${width} × ${height}` : 'nothing yet'}
+    </p>
+  </div>
+</Story>
+
+<Story name="Crop to an avatar" asChild>
+  <div class="max-w-md">
+    <FormField label="Profile photo" hint="You can frame it after choosing.">
+      {#snippet children(control)}
+        <ImageInput
+          {...control}
+          name="avatar"
+          crop={{ aspect: 1, round: true }}
+          previewAlt="Your profile photo"
+          bind:area={avatarArea}
+        />
+      {/snippet}
+    </FormField>
+    <p class="text-base-content/70 mt-3 text-sm">
+      Crop: {avatarArea
+        ? `${Math.round(avatarArea.width)} × ${Math.round(avatarArea.height)} at ${Math.round(avatarArea.x)}, ${Math.round(avatarArea.y)}`
+        : 'none yet'}
+    </p>
+  </div>
+</Story>
+
+<Story name="Crop in the browser" asChild>
+  <div class="max-w-md">
+    <FormField label="Cover image" hint="The cropped image replaces the one you chose.">
+      {#snippet children(control)}
+        <ImageInput
+          {...control}
+          name="cover"
+          crop={{ aspect: 16 / 9, straighten: true, output: 'blob', encode: { type: 'image/webp', maxSize: 1600 } }}
+          bind:file={coverFile}
+        />
+      {/snippet}
+    </FormField>
+    <p class="text-base-content/70 mt-3 text-sm">
+      File: {coverFile ? `${coverFile.name}, ${coverFile.type}, ${coverFile.size} bytes` : 'none yet'}
     </p>
   </div>
 </Story>

@@ -70,3 +70,4 @@ export { cardBrand, luhnValid, maskPresets, type Mask, type MaskPreset } from '.
 export { compass8, compass16, type AngleZero } from './angle.ts';
 
 export { signatureToPng, type SignatureValue } from './signature.ts';
+export type { ImageCropOptions } from './ImageInput.svelte';
