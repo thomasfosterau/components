@@ -36,6 +36,8 @@ export { default as ResultCount } from './ResultCount.svelte';
 export { default as KanbanBoard } from './KanbanBoard.svelte';
 export { default as JsonView } from './JsonView.svelte';
 export { default as SortableList } from './SortableList.svelte';
+export { default as SwipeActions } from './SwipeActions.svelte';
+export { default as SwipeGroup } from './SwipeGroup.svelte';
 export { default as Table } from './Table.svelte';
 export { default as TaskList } from './TaskList.svelte';
 export { default as TaskListItem } from './TaskListItem.svelte';
@@ -51,6 +53,7 @@ export * from './list-item.ts';
 export type { ListGroupStyle, ListGroupVariant } from './list-group.ts';
 export * from './pagination.ts';
 export { defaultSortableAnnouncements, move, type SortableAnnouncements } from './sortable.ts';
+export type { SwipeAction } from './swipe-actions.svelte.ts';
 export * from './table-types.ts';
 export {
   defaultTaskStatusLabels,
