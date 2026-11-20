@@ -47,12 +47,13 @@ Without the `@source` line the components render unstyled — Tailwind has no wa
 
 ## App integration
 
-Every component that needs to resolve a link, navigate, know the current page or format a locale-aware value reads from a small injected context instead of importing `$app/*` directly — that is what keeps the package usable outside SvelteKit (Storybook, a test, a plain Svelte app). Call `setComponentsContext` once, in your root layout:
+Every component that needs to resolve a link, navigate, know the current page, format a locale-aware value or enhance a POST form reads from a small injected context instead of importing `$app/*` directly — that is what keeps the package usable outside SvelteKit (Storybook, a test, a plain Svelte app). Call `setComponentsContext` once, in your root layout:
 
 ```svelte
 <!-- +layout.svelte -->
 <script lang="ts">
   import { setComponentsContext } from '@thomasfosterau/components';
+  import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import { getLocale, localizeHref } from '$lib/paraglide/runtime';
@@ -62,6 +63,7 @@ Every component that needs to resolve a link, navigate, know the current page or
     href: localizeHref,
     navigate: goto,
     isCurrent: (href) => page.url.pathname === href,
+    enhance: (form) => enhance(form).destroy,
   });
 </script>
 ```
@@ -72,8 +74,9 @@ Every component that needs to resolve a link, navigate, know the current page or
 | `href` | `(path: string) => string` | Resolving an app-relative path to the href actually rendered — base-path or locale-prefix logic lives here, once. |
 | `navigate` | `(url: string) => Promise<void> \| void` | Client-side navigation (`ConfirmDialog`'s `redirectTo`, `ConfirmButton`'s `redirectTo`, `CommandPalette`'s `href` rows). |
 | `isCurrent` | `(href: string) => boolean` | `aria-current="page"` decisions (`Breadcrumbs`, `Tabs` in `links` mode, `FilterBar`, `Sidebar`). |
+| `enhance` | `((form: HTMLFormElement) => void \| (() => void)) \| undefined` | Progressive enhancement for every form-mode POST (`ConfirmDialog` and `PromptDialog` with `form`) that is not given its own `form.enhance`. Its return value is the teardown. |
 
-Every member is optional in the object you pass — an omitted one falls back individually to `defaultComponentsContext` (identity `href`, `window.location.assign` for navigation, pathname equality for `isCurrent`, runtime-default locale), so every component works unwired in a story or a test. The object's type is exported as `ComponentsContext` (every member required; `setComponentsContext` takes the same members, each optional), and `getComponentsContext()` reads the merged result back for a component of your own.
+Every member is optional in the object you pass — an omitted one falls back individually to `defaultComponentsContext` (identity `href`, `window.location.assign` for navigation, pathname equality for `isCurrent`, runtime-default locale, no form enhancement), so every component works unwired in a story or a test. The object's type is exported as `ComponentsContext` (every member required; `setComponentsContext` takes the same members, each optional), and `getComponentsContext()` reads the merged result back for a component of your own.
 
 **A skip link first.** Put `SkipLink` before everything else in the root layout, so it is the first Tab stop on every page, and render the page content in `Main` (whose default `id` is the link's default target):
 

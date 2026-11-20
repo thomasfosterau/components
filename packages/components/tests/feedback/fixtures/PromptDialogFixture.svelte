@@ -1,6 +1,7 @@
 <!-- A PromptDialog opened from a trigger button, with the open state shown
      so a test can tell whether it closed. Form mode catches the submit. -->
 <script lang="ts">
+  import { setComponentsContext, type EnhanceForm } from '../../../src/lib/context.svelte.ts';
   import PromptDialog from '../../../src/lib/feedback/PromptDialog.svelte';
 
   interface Props {
@@ -12,10 +13,21 @@
     onConfirm?: ((value: string, signal: AbortSignal) => void | Promise<void>) | undefined;
     formMode?: boolean | undefined;
     onSubmitted?: ((data: FormData, form: HTMLFormElement) => void) | undefined;
+    contextEnhance?: EnhanceForm | undefined;
   }
 
-  let { value, validate, requireMatch, onConfirm, formMode = false, onSubmitted }: Props =
-    $props();
+  let {
+    value,
+    validate,
+    requireMatch,
+    onConfirm,
+    formMode = false,
+    onSubmitted,
+    contextEnhance,
+  }: Props = $props();
+
+  // svelte-ignore state_referenced_locally
+  setComponentsContext({ enhance: contextEnhance });
 
   let open = $state(false);
 </script>

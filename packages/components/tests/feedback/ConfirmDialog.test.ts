@@ -80,6 +80,46 @@ test('form mode renders a real POST form whose confirm button submits it', async
   expect(enhance.mock.calls[0]?.[0]).toBe(form);
 });
 
+test('form mode falls back to the context enhance, and its own enhance wins over it', async () => {
+  const contextEnhance = vi.fn<(form: HTMLFormElement) => void | (() => void)>();
+  const fallback = await render(ConfirmDialogFixture, {
+    form: { action: '?/delete' },
+    contextEnhance,
+  });
+  await userEvent.click(fallback.getByRole('button', { name: 'Delete garden' }));
+  const form = fallback
+    .getByRole('button', { name: 'Delete', exact: true })
+    .element()
+    .closest('form');
+  expect(contextEnhance).toHaveBeenCalledTimes(1);
+  expect(contextEnhance.mock.calls[0]?.[0]).toBe(form);
+  await fallback.unmount();
+
+  contextEnhance.mockClear();
+  const own = vi.fn<(form: HTMLFormElement) => void | (() => void)>();
+  const overridden = await render(ConfirmDialogFixture, {
+    form: { action: '?/delete', enhance: own },
+    contextEnhance,
+  });
+  await userEvent.click(overridden.getByRole('button', { name: 'Delete garden' }));
+  await expect
+    .element(overridden.getByRole('button', { name: 'Delete', exact: true }))
+    .toBeVisible();
+  expect(own).toHaveBeenCalledTimes(1);
+  expect(contextEnhance).not.toHaveBeenCalled();
+});
+
+test('callback mode never applies the context enhance', async () => {
+  const contextEnhance = vi.fn<(form: HTMLFormElement) => void | (() => void)>();
+  const screen = await render(ConfirmDialogFixture, {
+    onConfirm: () => Promise.resolve(undefined),
+    contextEnhance,
+  });
+  await userEvent.click(screen.getByRole('button', { name: 'Delete garden' }));
+  await expect.element(screen.getByRole('button', { name: 'Delete', exact: true })).toBeVisible();
+  expect(contextEnhance).not.toHaveBeenCalled();
+});
+
 test('the cancel button closes without confirming, in either mode', async () => {
   const onConfirm = vi.fn<() => Promise<unknown>>(() => Promise.resolve(undefined));
   const screen = await render(ConfirmDialogFixture, { onConfirm });

@@ -13,9 +13,10 @@ A destructive action behind a modal confirmation, run either as a callback (`onC
   **Form mode** (`form`) is the progressive-enhancement one: the confirm
   button is a real `type="submit"` inside a real `<form method="POST">`, so
   the action posts and the server redirects even with scripting off. The SvelteKit `enhance` action is passed IN by the
-  app (`enhance: (node) => enhance(node)`); importing `$app/forms` here would
-  tie this package to SvelteKit. It is applied as an attachment, so a caller
-  that omits it simply gets the unenhanced form.
+  app (`enhance: (node) => enhance(node)`), or once for every form through
+  the components context's `enhance`; importing `$app/forms` here would tie
+  this package to SvelteKit. It is applied as an attachment, so with neither
+  the form is a plain, unenhanced POST.
 
   Pass exactly one of the two. With neither, the confirm button does nothing
   — there is no action to take.
@@ -50,7 +51,8 @@ A destructive action behind a modal confirmation, run either as a callback (`onC
     readonly fields?: Readonly<Record<string, string>> | undefined;
     /**
      * The app's own `use:enhance`, applied to the `<form>` element. Returns
-     * its teardown, if it has one. Omit for a plain, unenhanced POST.
+     * its teardown, if it has one. Omitted, the components context's
+     * `enhance` applies; with neither, the form is a plain POST.
      */
     readonly enhance?: ((form: HTMLFormElement) => void | (() => void)) | undefined;
   }
@@ -156,8 +158,9 @@ A destructive action behind a modal confirmation, run either as a callback (`onC
     }
   };
 
-  /** The app's `enhance`, as an attachment so omitting it is a no-op. */
-  const enhanceForm = (node: HTMLFormElement): void | (() => void) => form?.enhance?.(node);
+  /** The caller's `enhance`, else the context's, as an attachment so having neither is a no-op. */
+  const enhanceForm = (node: HTMLFormElement): void | (() => void) =>
+    (form?.enhance ?? context.enhance)?.(node);
 </script>
 
 <Dialog bind:open {title} {description} {closeLabel} {size} class={className} {trigger} {finalFocus}>

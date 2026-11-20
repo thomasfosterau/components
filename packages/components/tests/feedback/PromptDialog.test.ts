@@ -123,3 +123,27 @@ test('form mode is a real POST of the field under its name', async () => {
   expect(form?.getAttribute('action')).toBe('/beds/4?/rename');
   expect(data?.get('name')).toBe('Bed 4');
 });
+
+test('form mode applies the context enhance; callback mode does not', async () => {
+  const contextEnhance = vi.fn<(form: HTMLFormElement) => void | (() => void)>();
+  const formScreen = await render(PromptDialogFixture, {
+    value: 'Bed 4',
+    formMode: true,
+    contextEnhance,
+  });
+  await openDialog(formScreen);
+  await expect.element(formScreen.getByRole('button', { name: 'Rename' })).toBeVisible();
+  expect(contextEnhance).toHaveBeenCalledTimes(1);
+  expect(contextEnhance.mock.calls[0]?.[0]).toBeInstanceOf(HTMLFormElement);
+  await formScreen.unmount();
+
+  contextEnhance.mockClear();
+  const callbackScreen = await render(PromptDialogFixture, {
+    value: 'Bed 4',
+    onConfirm: () => undefined,
+    contextEnhance,
+  });
+  await openDialog(callbackScreen);
+  await expect.element(callbackScreen.getByRole('button', { name: 'Rename' })).toBeVisible();
+  expect(contextEnhance).not.toHaveBeenCalled();
+});
