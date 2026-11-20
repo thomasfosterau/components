@@ -17,11 +17,11 @@
   });
 </script>
 
-<Story name="Title only">
+<Story name="Title only" asChild>
   <LinkListItem href="/gardens/1" title="Back bed" />
 </Story>
 
-<Story name="With a subtitle and badges">
+<Story name="With a subtitle and badges" asChild>
   <LinkListItem
     href="/gardens/1"
     title="Back bed"
@@ -30,7 +30,7 @@
   />
 </Story>
 
-<Story name="As a heading, with meta">
+<Story name="As a heading, with meta" asChild>
   <!-- `headingLevel` is opt-in: twenty `<h3>`s in a filter result is worse for
        heading navigation than none at all. -->
   <LinkListItem

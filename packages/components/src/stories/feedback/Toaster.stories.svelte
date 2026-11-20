@@ -28,7 +28,7 @@
   });
 </script>
 
-<Story name="Four tones">
+<Story name="Four tones" asChild>
   <Toaster>
     <div class="flex flex-wrap gap-2 p-4">
       <ToastTrigger buttonLabel="Saved" title="Bed saved" tone="success" />
@@ -55,7 +55,7 @@
   </Toaster>
 </Story>
 
-<Story name="Top left, sticky">
+<Story name="Top left, sticky" asChild>
   <Toaster position="top-start" durationMs={0} dismissLabel="Dismiss this notification">
     <div class="flex flex-wrap gap-2 p-4">
       <ToastTrigger
@@ -68,7 +68,7 @@
   </Toaster>
 </Story>
 
-<Story name="Deleted · Undo">
+<Story name="Deleted · Undo" asChild>
   <Toaster>
     <div class="flex flex-wrap gap-2 p-4">
       <ToastTrigger

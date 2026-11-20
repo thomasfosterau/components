@@ -34,7 +34,7 @@
   let plan = $state('grower');
 </script>
 
-<Story name="Vertical">
+<Story name="Vertical" asChild>
   <div class="max-w-sm">
     <RadioGroup
       legend="Who can see this garden"
@@ -47,7 +47,7 @@
   </div>
 </Story>
 
-<Story name="Horizontal">
+<Story name="Horizontal" asChild>
   <RadioGroup
     legend="Sort by"
     orientation="horizontal"
@@ -56,7 +56,7 @@
   />
 </Story>
 
-<Story name="Required, with errors">
+<Story name="Required, with errors" asChild>
   <div class="max-w-sm">
     <RadioGroup
       legend="Who can see this garden"
@@ -68,11 +68,11 @@
   </div>
 </Story>
 
-<Story name="Cards">
+<Story name="Cards" asChild>
   <RadioGroup legend="Plan" name="plan" variant="cards" options={plans} bind:value={plan} />
 </Story>
 
-<Story name="Cards, custom body">
+<Story name="Cards, custom body" asChild>
   <RadioGroup legend="Plan" variant="cards" columns={2} indicator="start" options={plans} value="free">
     {#snippet card(option, { checked })}
       <span class="font-semibold">{option.label}</span>

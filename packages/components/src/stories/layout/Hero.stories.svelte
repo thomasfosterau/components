@@ -29,11 +29,11 @@
   <LinkButton href="/tour" variant="outline">Take the tour</LinkButton>
 {/snippet}
 
-<Story name="Centred">
+<Story name="Centred" asChild>
   <Hero title="Grow more with less" description="Plan your beds by the season, and know what to sow next." actions={calls} />
 </Story>
 
-<Story name="With a figure">
+<Story name="With a figure" asChild>
   <Hero title="Grow more with less" description="Plan your beds by the season, and know what to sow next." actions={calls}>
     {#snippet figure()}
       <div class="bg-base-300 rounded-box flex aspect-video items-center justify-center">
@@ -43,7 +43,7 @@
   </Hero>
 </Story>
 
-<Story name="Background image">
+<Story name="Background image" asChild>
   <Hero
     title="Grow more with less"
     description="Plan your beds by the season, and know what to sow next."

@@ -22,7 +22,7 @@
   });
 </script>
 
-<Story name="Brand, links and account">
+<Story name="Brand, links and account" asChild>
   <Navbar>
     {#snippet start()}
       <a href="/" rel="home" class="text-primary text-xl font-bold">Blog</a>
@@ -53,7 +53,7 @@
   </Navbar>
 </Story>
 
-<Story name="With the responsive panel">
+<Story name="With the responsive panel" asChild>
   <Navbar menuLabel="Open the site menu">
     {#snippet start()}
       <a href="/" rel="home" class="text-primary text-xl font-bold">Blog</a>

@@ -16,30 +16,30 @@
   });
 </script>
 
-<Story name="A modifier chord">
+<Story name="A modifier chord" asChild>
   <HotkeyBadge trigger="$mod+k" />
 </Story>
 
-<Story name="A plain key">
+<Story name="A plain key" asChild>
   <HotkeyBadge trigger="e" />
 </Story>
 
-<Story name="A sequence">
+<Story name="A sequence" asChild>
   <HotkeyBadge trigger={['g', 'p']} />
 </Story>
 
-<Story name="Shift in the chord">
+<Story name="Shift in the chord" asChild>
   <HotkeyBadge trigger="$mod+shift+p" />
 </Story>
 
-<Story name="Every label is a prop">
+<Story name="Every label is a prop" asChild>
   <div class="flex flex-col gap-2">
     <HotkeyBadge trigger="$mod+k" commandLabel="Cmd" controlLabel="Strg" />
     <HotkeyBadge trigger={['g', 'p']} thenLabel="puis" />
   </div>
 </Story>
 
-<Story name="In a row, as the palette and the help overlay use it">
+<Story name="In a row, as the palette and the help overlay use it" asChild>
   <ul class="divide-base-300 border-base-300 w-80 divide-y rounded border">
     <li class="flex items-center justify-between gap-4 px-3 py-2">
       <span class="text-sm">Open the command palette</span>

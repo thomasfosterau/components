@@ -18,7 +18,7 @@
   });
 </script>
 
-<Story name="A dashboard row">
+<Story name="A dashboard row" asChild>
   <Stats>
     <StatTile label="Plants recorded" value={1284} delta={{ value: 46, label: 'this month' }} />
     <StatTile
@@ -31,7 +31,7 @@
   </Stats>
 </Story>
 
-<Story name="Vertical, with a figure">
+<Story name="Vertical, with a figure" asChild>
   <Stats orientation="vertical">
     <StatTile label="Seedlings" value={412} delta={{ value: 0, label: 'this week' }}>
       {#snippet figure()}
@@ -42,7 +42,7 @@
   </Stats>
 </Story>
 
-<Story name="A lone tile">
+<Story name="A lone tile" asChild>
   <Stats orientation="horizontal">
     <StatTile label="Swing" value="+4.1 pts" delta={{ value: 4.1, unit: 'points', label: 'swing' }} />
   </Stats>

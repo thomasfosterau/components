@@ -9,7 +9,7 @@
   });
 </script>
 
-<Story name="Sign-up">
+<Story name="Sign-up" asChild>
   <div class="max-w-sm">
     <FormField label="New password" hint="At least 12 characters." errors={['Too short.']} required>
       {#snippet children(control)}

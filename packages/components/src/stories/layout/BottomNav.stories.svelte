@@ -31,7 +31,7 @@
 {#snippet notifications()}<Bell class="size-5" />{/snippet}
 {#snippet account()}<User class="size-5" />{/snippet}
 
-<Story name="Four destinations">
+<Story name="Four destinations" asChild>
   <BottomNav fixed={false}>
     <BottomNavItem href="/gardens" label="Gardens" current icon={gardens} />
     <BottomNavItem href="/taxa" label="Taxa" icon={taxa} />
@@ -40,7 +40,7 @@
   </BottomNav>
 </Story>
 
-<Story name="Small">
+<Story name="Small" asChild>
   <BottomNav fixed={false} size="sm">
     <BottomNavItem href="/gardens" label="Gardens" current icon={gardens} />
     <BottomNavItem href="/taxa" label="Taxa" icon={taxa} />
@@ -48,6 +48,6 @@
   </BottomNav>
 </Story>
 
-<Story name="From destinations">
+<Story name="From destinations" asChild>
   <BottomNav fixed={false} {destinations} />
 </Story>

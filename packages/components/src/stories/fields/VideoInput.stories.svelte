@@ -31,7 +31,7 @@
   };
 </script>
 
-<Story name="Selection and progress">
+<Story name="Selection and progress" asChild>
   <div class="max-w-md">
     <FormField label="Video" hint="The bar appears once the caller reports progress.">
       {#snippet children(control)}
@@ -47,7 +47,7 @@
   </div>
 </Story>
 
-<Story name="With a size cap">
+<Story name="With a size cap" asChild>
   <div class="max-w-md">
     <FormField label="Video">
       {#snippet children(control)}

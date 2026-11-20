@@ -30,7 +30,7 @@
   };
 </script>
 
-<Story name="Basic">
+<Story name="Basic" asChild>
   <div class="max-w-sm">
     <FormField label="Growing conditions">
       {#snippet children(control)}
@@ -40,7 +40,7 @@
   </div>
 </Story>
 
-<Story name="Many options">
+<Story name="Many options" asChild>
   <div class="max-w-sm">
     <FormField label="Show beds" hint="Pick any number.">
       {#snippet children(control)}
@@ -50,7 +50,7 @@
   </div>
 </Story>
 
-<Story name="Custom option">
+<Story name="Custom option" asChild>
   <div class="max-w-sm">
     <FormField label="Propagation">
       {#snippet children(control)}
@@ -67,7 +67,7 @@
   </div>
 </Story>
 
-<Story name="Invalid">
+<Story name="Invalid" asChild>
   <div class="max-w-sm">
     <FormField label="Growing conditions" errors={['Pick at least one.']} required>
       {#snippet children(control)}

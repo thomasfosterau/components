@@ -21,7 +21,7 @@
 {#snippet pin()}<MapPin />{/snippet}
 {#snippet chevron()}<ChevronRight />{/snippet}
 
-<Story name="Styles">
+<Story name="Styles" asChild>
   <ul class="space-y-2">
     <li><IconLabel title="12 mm" icon={rain} /></li>
     <li><IconLabel title="Bed 4" icon={pin} labelStyle="title-only" /></li>
@@ -33,6 +33,6 @@
   </ul>
 </Story>
 
-<Story name="Trailing icon, at a larger size">
+<Story name="Trailing icon, at a larger size" asChild>
   <p class="text-2xl"><IconLabel title="Next bed" icon={chevron} trailingIcon /></p>
 </Story>

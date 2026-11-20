@@ -32,7 +32,7 @@
 
 <!-- Each story gets its own `BibliographyProvider`, so the numbering in one
      never leaks into the next. -->
-<Story name="Superscript, linked to the reference list">
+<Story name="Superscript, linked to the reference list" asChild>
   <BibliographyProvider>
     {#snippet children()}
       <article class="prose max-w-none">
@@ -47,7 +47,7 @@
   </BibliographyProvider>
 </Story>
 
-<Story name="Inline format">
+<Story name="Inline format" asChild>
   <BibliographyProvider>
     {#snippet children()}
       <p class="text-base-content">
@@ -57,7 +57,7 @@
   </BibliographyProvider>
 </Story>
 
-<Story name="No reference list on the page">
+<Story name="No reference list on the page" asChild>
   <BibliographyProvider>
     {#snippet children()}
       <p class="text-base-content">
@@ -67,7 +67,7 @@
   </BibliographyProvider>
 </Story>
 
-<Story name="Custom reference label">
+<Story name="Custom reference label" asChild>
   <BibliographyProvider>
     {#snippet children()}
       <p class="text-base-content">

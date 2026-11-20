@@ -33,7 +33,7 @@
   });
 </script>
 
-<Story name="Two sources">
+<Story name="Two sources" asChild>
   <BibliographyProvider citations={[revision, flora]}>
     {#snippet children()}
       <ReferenceList />
@@ -41,7 +41,7 @@
   </BibliographyProvider>
 </Story>
 
-<Story name="Custom title and heading level">
+<Story name="Custom title and heading level" asChild>
   <BibliographyProvider citations={[revision, flora]}>
     {#snippet children()}
       <ReferenceList title="Works cited" headingLevel={3} />
@@ -49,7 +49,7 @@
   </BibliographyProvider>
 </Story>
 
-<Story name="Heading suppressed">
+<Story name="Heading suppressed" asChild>
   <BibliographyProvider citations={[revision, flora]}>
     {#snippet children()}
       <ReferenceList showTitle={false} />
@@ -57,7 +57,7 @@
   </BibliographyProvider>
 </Story>
 
-<Story name="Nothing cited — renders nothing">
+<Story name="Nothing cited — renders nothing" asChild>
   <BibliographyProvider>
     {#snippet children()}
       <p class="text-base-content/70 text-sm">Nothing renders below — that is the story.</p>

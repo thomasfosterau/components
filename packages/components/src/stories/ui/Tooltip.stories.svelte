@@ -21,7 +21,7 @@
   });
 </script>
 
-<Story name="On a button">
+<Story name="On a button" asChild>
   <div class="p-10">
     <Tooltip text="Published gardens are visible to everyone.">
       {#snippet children({ props })}
@@ -35,7 +35,7 @@
   The icon button still carries its OWN accessible name; the tooltip only
   describes it.
 -->
-<Story name="On an icon button">
+<Story name="On an icon button" asChild>
   <div class="p-10">
     <Tooltip text="Watering is logged automatically." side="right">
       {#snippet children({ props })}
@@ -48,7 +48,7 @@
   </div>
 </Story>
 
-<Story name="Sides">
+<Story name="Sides" asChild>
   <div class="flex flex-wrap gap-6 p-16">
     {#each sides as side (side)}
       <Tooltip text={`Anchored ${side}`} {side}>

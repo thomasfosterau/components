@@ -103,11 +103,11 @@
   <Badge tone={tones[plant.status]} size="sm">{plant.status}</Badge>
 {/snippet}
 
-<Story name="Sortable">
+<Story name="Sortable" asChild>
   <Table rows={plants} {columns} {rowKey} bind:sort caption="Everything sown this season" />
 </Story>
 
-<Story name="Row headers">
+<Story name="Row headers" asChild>
   <!-- The plant column names each row, so a screen reader moving down
        "Seedlings" hears "Basil ‘Genovese’, 30" rather than a bare "30". -->
   <Table
@@ -118,7 +118,7 @@
   />
 </Story>
 
-<Story name="Row attributes and a hidden header">
+<Story name="Row attributes and a hidden header" asChild>
   <!-- `rowAttributes` bolds the selected row and gives each row an anchor id;
        `headerClass="sr-only"` keeps the edit column's header for screen
        readers over visible cells. -->
@@ -137,7 +137,7 @@
   />
 </Story>
 
-<Story name="Caption hidden">
+<Story name="Caption hidden" asChild>
   <section>
     <h2 class="mb-2 text-xl font-semibold">Everything sown this season</h2>
     <!-- The page heading already shows the name, so the caption is kept for
@@ -146,7 +146,7 @@
   </section>
 </Story>
 
-<Story name="Zebra, small, pinned">
+<Story name="Zebra, small, pinned" asChild>
   <div class="max-h-48">
     <Table
       rows={plants}
@@ -162,7 +162,7 @@
   </div>
 </Story>
 
-<Story name="Selectable rows">
+<Story name="Selectable rows" asChild>
   <div class="space-y-2">
     <Table
       rows={plants}
@@ -177,7 +177,7 @@
   </div>
 </Story>
 
-<Story name="With a footer">
+<Story name="With a footer" asChild>
   <Table rows={plants} columns={plainColumns} {rowKey} caption="Seedlings by plant">
     {#snippet foot()}
       <th scope="row">Total</th>
@@ -186,7 +186,7 @@
   </Table>
 </Story>
 
-<Story name="Empty">
+<Story name="Empty" asChild>
   <Table
     rows={[]}
     {columns}
@@ -196,7 +196,7 @@
   />
 </Story>
 
-<Story name="Bulk archive">
+<Story name="Bulk archive" asChild>
   <!-- A checkbox column, a tri-state select-all over the rows shown, and a
        toolbar of bulk actions that appears while anything is selected. -->
   <div class="space-y-2">
@@ -213,7 +213,7 @@
   </div>
 </Story>
 
-<Story name="Single select">
+<Story name="Single select" asChild>
   <div class="space-y-2">
     <Table
       rows={plants}
@@ -229,7 +229,7 @@
   </div>
 </Story>
 
-<Story name="Column visibility">
+<Story name="Column visibility" asChild>
   <!-- "Plant" names the row and cannot be hidden; "Status" opts out with
        `hideable: false`. Hiding removes the cells, not just their paint. -->
   <div class="space-y-2">

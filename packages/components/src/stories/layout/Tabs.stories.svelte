@@ -28,7 +28,7 @@
   let selected = $state('tcp');
 </script>
 
-<Story name="Panels">
+<Story name="Panels" asChild>
   <Tabs {items} label="Results views">
     {#snippet panel(item)}
       <p class="leading-7">The {item.label.toLowerCase()} for every booth in the division.</p>
@@ -36,7 +36,7 @@
   </Tabs>
 </Story>
 
-<Story name="Panels, bound">
+<Story name="Panels, bound" asChild>
   <div class="space-y-3">
     <Tabs {items} bind:value={selected} label="Results views">
       {#snippet panel(item)}<p class="leading-7">{item.label}</p>{/snippet}
@@ -45,7 +45,7 @@
   </div>
 </Story>
 
-<Story name="Variants and sizes">
+<Story name="Variants and sizes" asChild>
   <div class="space-y-6">
     <Tabs {items} variant="box" size="sm" label="Boxed" />
     <Tabs {items} variant="lift" label="Lifted" />
@@ -53,6 +53,6 @@
   </div>
 </Story>
 
-<Story name="Links">
+<Story name="Links" asChild>
   <Tabs {items} mode="links" value="tcp" label="Results views" />
 </Story>

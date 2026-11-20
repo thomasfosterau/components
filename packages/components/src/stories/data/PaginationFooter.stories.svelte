@@ -21,11 +21,11 @@
   const href = (offset: number): string => pageHref('/plants?q=rosa', { offset, limit: 20 });
 </script>
 
-<Story name="Footer">
+<Story name="Footer" asChild>
   <PaginationFooter shown={20} offset={40} limit={20} total={151} {href} locales="en-AU" />
 </Story>
 
-<Story name="Previous / next only">
+<Story name="Previous / next only" asChild>
   <PaginationFooter
     shown={20}
     offset={40}
@@ -37,12 +37,12 @@
   />
 </Story>
 
-<Story name="One page">
+<Story name="One page" asChild>
   <!-- Nothing to page, so only the count is drawn. -->
   <PaginationFooter shown={12} offset={0} limit={20} total={12} {href} />
 </Story>
 
-<Story name="Nothing found">
+<Story name="Nothing found" asChild>
   <!-- Both halves render nothing; the page's own empty state speaks instead. -->
   <div class="border-base-300 border border-dashed p-4">
     <PaginationFooter shown={0} offset={0} limit={20} total={0} {href} />

@@ -52,7 +52,7 @@
   const gated = memory();
 </script>
 
-<Story name="First visit">
+<Story name="First visit" asChild>
   <ConsentBanner consent={firstVisit} settingsHref="#cookies">
     <p>We’d like to set analytics cookies to understand how you use the garden planner.</p>
     <p>We also use cookies to keep you signed in.</p>
@@ -63,13 +63,13 @@
   </main>
 </Story>
 
-<Story name="Settings page">
+<Story name="Settings page" asChild>
   <div class="max-w-lg">
     <ConsentSettings consent={settings} />
   </div>
 </Story>
 
-<Story name="Gating an embed">
+<Story name="Gating an embed" asChild>
   <div class="flex max-w-lg flex-col gap-4">
     <ConsentSettings consent={gated} title="Video settings" />
     <Embed

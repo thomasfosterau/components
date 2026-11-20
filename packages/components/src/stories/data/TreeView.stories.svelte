@@ -108,7 +108,7 @@
   {/if}
 {/snippet}
 
-<Story name="Single selection">
+<Story name="Single selection" asChild>
   <TreeView
     nodes={taxa}
     label="Taxa"
@@ -119,7 +119,7 @@
   <p class="mt-4 text-sm">Selected: {[...singleSelected].join(', ') || 'nothing'}</p>
 </Story>
 
-<Story name="Multiple selection">
+<Story name="Multiple selection" asChild>
   <TreeView
     nodes={taxa}
     label="Taxa to compare"
@@ -130,11 +130,11 @@
   <p class="mt-4 text-sm">Selected: {[...multipleSelected].join(', ') || 'nothing'}</p>
 </Story>
 
-<Story name="Custom row">
+<Story name="Custom row" asChild>
   <TreeView nodes={taxa} label="Taxa" row={taxonRow} class="max-w-sm" />
 </Story>
 
-<Story name="Lazy children">
+<Story name="Lazy children" asChild>
   <TreeView
     nodes={lazyFamilies}
     label="Families"

@@ -16,11 +16,11 @@
   });
 </script>
 
-<Story name="One message">
+<Story name="One message" asChild>
   <FormErrors messages={['That garden name is already taken.']} />
 </Story>
 
-<Story name="Several messages">
+<Story name="Several messages" asChild>
   <div class="flex flex-col gap-3">
     <FormErrors
       messages={[
@@ -31,11 +31,11 @@
   </div>
 </Story>
 
-<Story name="A different tone">
+<Story name="A different tone" asChild>
   <FormErrors tone="warning" messages={['Saved, but two photographs could not be attached.']} />
 </Story>
 
-<Story name="Nothing to say">
+<Story name="Nothing to say" asChild>
   <div class="text-base-content/70 text-sm">
     <FormErrors messages={[]} />
     (nothing above this line)

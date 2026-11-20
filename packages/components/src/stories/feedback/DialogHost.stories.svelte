@@ -17,7 +17,7 @@
   });
 </script>
 
-<Story name="Keyboard delete and an async flow">
+<Story name="Keyboard delete and an async flow" asChild>
   <DialogHost>
     <DialogsDemo />
   </DialogHost>

@@ -22,11 +22,11 @@
   let notifications = $state(true);
 </script>
 
-<Story name="Plain">
+<Story name="Plain" asChild>
   <Toggle label="Email me a weekly summary" bind:checked={notifications} />
 </Story>
 
-<Story name="With a description">
+<Story name="With a description" asChild>
   <Toggle
     label="Notify this browser"
     description="Only this browser is registered — your other devices are asked separately."
@@ -34,7 +34,7 @@
   />
 </Story>
 
-<Story name="A change that is refused">
+<Story name="A change that is refused" asChild>
   <Toggle
     label="Notify this browser"
     description="This one always says no, after a moment’s thought — watch the switch come back."
@@ -46,6 +46,6 @@
   />
 </Story>
 
-<Story name="Disabled">
+<Story name="Disabled" asChild>
   <Toggle label="Email me a weekly summary" checked disabled />
 </Story>

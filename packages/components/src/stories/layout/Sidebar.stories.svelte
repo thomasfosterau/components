@@ -30,7 +30,7 @@
 {#snippet tags()}<Leaf class="size-5" />{/snippet}
 {#snippet authors()}<User class="size-5" />{/snippet}
 
-<Story name="Primary navigation">
+<Story name="Primary navigation" asChild>
   <div class="flex h-96">
     <Sidebar>
       {#snippet brand()}
@@ -55,7 +55,7 @@
   </div>
 </Story>
 
-<Story name="With a visible title">
+<Story name="With a visible title" asChild>
   <div class="flex h-96">
     <Sidebar title="Browse">
       <MenuItem href="/gardens">Gardens</MenuItem>
@@ -65,7 +65,7 @@
   </div>
 </Story>
 
-<Story name="From destinations">
+<Story name="From destinations" asChild>
   <div class="flex h-96">
     <Sidebar {destinations} title="Browse" />
   </div>

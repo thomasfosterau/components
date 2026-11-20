@@ -17,11 +17,11 @@
   });
 </script>
 
-<Story name="Create">
+<Story name="Create" asChild>
   <EntityForm definition={bedForm} mode="create" cancelHref="/beds" onsubmit={(event) => event.preventDefault()} />
 </Story>
 
-<Story name="Update">
+<Story name="Update" asChild>
   <EntityForm
     definition={bedForm}
     mode="update"
@@ -38,7 +38,7 @@
   />
 </Story>
 
-<Story name="With a server message">
+<Story name="With a server message" asChild>
   <EntityForm
     definition={bedForm}
     mode="create"

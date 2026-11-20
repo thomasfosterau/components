@@ -18,7 +18,7 @@
   });
 </script>
 
-<Story name="Label only">
+<Story name="Label only" asChild>
   <FormField label="Scientific name">
     {#snippet children(control)}
       <TextInput {...control} value="Rosa canina" />
@@ -26,7 +26,7 @@
   </FormField>
 </Story>
 
-<Story name="With a hint">
+<Story name="With a hint" asChild>
   <FormField label="Scientific name" hint="Genus and species, as published.">
     {#snippet children(control)}
       <TextInput {...control} value="Rosa canina" />
@@ -34,7 +34,7 @@
   </FormField>
 </Story>
 
-<Story name="Required">
+<Story name="Required" asChild>
   <FormField label="Scientific name" hint="Genus and species, as published." required>
     {#snippet children(control)}
       <TextInput {...control} value="" placeholder="Rosa canina" />
@@ -42,7 +42,7 @@
   </FormField>
 </Story>
 
-<Story name="One error">
+<Story name="One error" asChild>
   <FormField label="Scientific name" errors={['That name is already recorded.']}>
     {#snippet children(control)}
       <TextInput {...control} value="Rosa canina" />
@@ -50,7 +50,7 @@
   </FormField>
 </Story>
 
-<Story name="Several errors, with a hint">
+<Story name="Several errors, with a hint" asChild>
   <FormField
     label="Notes"
     hint="Anything a later reader would want to know."
@@ -62,7 +62,7 @@
   </FormField>
 </Story>
 
-<Story name="A control `<label for>` cannot name">
+<Story name="A control `<label for>` cannot name" asChild>
   <!-- A role-based control points `aria-labelledby` at `labelId`; a click on the label focuses it. -->
   <FormField label="Hours of sun" hint="Use the arrow keys once focused.">
     {#snippet children(control)}

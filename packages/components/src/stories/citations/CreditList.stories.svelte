@@ -23,27 +23,27 @@
   });
 </script>
 
-<Story name="Authors, no role label">
+<Story name="Authors, no role label" asChild>
   <CreditList credits={authors} role="author" />
 </Story>
 
-<Story name="A single editor — (ed)">
+<Story name="A single editor — (ed)" asChild>
   <CreditList credits={editors} role="editor" />
 </Story>
 
-<Story name="Two editors — (eds)">
+<Story name="Two editors — (eds)" asChild>
   <CreditList credits={[...editors, { name: 'Second, E.' }]} role="editor" />
 </Story>
 
-<Story name="Translators — trans. before the names">
+<Story name="Translators — trans. before the names" asChild>
   <CreditList credits={translators} role="translator" />
 </Story>
 
-<Story name="An unresolved credit renders as plain text">
+<Story name="An unresolved credit renders as plain text" asChild>
   <CreditList credits={unresolved} role="author" />
 </Story>
 
-<Story name="Custom role and label">
+<Story name="Custom role and label" asChild>
   <CreditList
     credits={[{ name: 'García, R.', itemtype: 'Person' }]}
     role="illustrator"
@@ -52,7 +52,7 @@
   />
 </Story>
 
-<Story name="Organizations, not people">
+<Story name="Organizations, not people" asChild>
   <CreditList
     credits={[{ name: 'Royal Botanic Gardens', itemtype: 'Organization', href: '/organisations/rbg' }]}
     role="author"

@@ -20,7 +20,7 @@
   const tones = ['neutral', 'primary', 'secondary', 'accent', 'info', 'success', 'warning', 'error'] as const;
 </script>
 
-<Story name="Horizontal">
+<Story name="Horizontal" asChild>
   <div class="max-w-md">
     <p>Sowing notes for the north bed.</p>
     <Divider />
@@ -28,7 +28,7 @@
   </div>
 </Story>
 
-<Story name="Vertical between two cards">
+<Story name="Vertical between two cards" asChild>
   <div class="flex max-w-2xl">
     <Card class="grow"><p class="p-4">Annuals</p></Card>
     <Divider orientation="vertical" />
@@ -36,7 +36,7 @@
   </div>
 </Story>
 
-<Story name="Labelled 'or'">
+<Story name="Labelled 'or'" asChild>
   <div class="flex max-w-xs flex-col">
     <Button tone="primary">Sign in with a passkey</Button>
     <Divider>or</Divider>
@@ -44,7 +44,7 @@
   </div>
 </Story>
 
-<Story name="Label alignment">
+<Story name="Label alignment" asChild>
   <div class="max-w-md">
     <Divider align="start">Start</Divider>
     <Divider>Centre</Divider>
@@ -52,7 +52,7 @@
   </div>
 </Story>
 
-<Story name="Tones">
+<Story name="Tones" asChild>
   <div class="max-w-md">
     {#each tones as tone (tone)}
       <Divider {tone}>{tone}</Divider>
@@ -60,7 +60,7 @@
   </div>
 </Story>
 
-<Story name="Decorative">
+<Story name="Decorative" asChild>
   <div class="max-w-md">
     <p>A flourish between two paragraphs of one section.</p>
     <Divider decorative />

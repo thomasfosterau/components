@@ -17,7 +17,7 @@
   });
 </script>
 
-<Story name="With a trigger and actions">
+<Story name="With a trigger and actions" asChild>
   <Dialog
     title="Move this plant?"
     description="It keeps its history — only the bed it is recorded in changes."
@@ -36,7 +36,7 @@
   </Dialog>
 </Story>
 
-<Story name="Large, no action row">
+<Story name="Large, no action row" asChild>
   <Dialog title="Watering schedule" size="lg" closeLabel="Close the schedule">
     {#snippet trigger({ props })}
       <Button {...props}>Show the schedule</Button>
@@ -49,7 +49,7 @@
   </Dialog>
 </Story>
 
-<Story name="Small">
+<Story name="Small" asChild>
   <Dialog title="Renamed" description="The bed is now called ‘Glasshouse’." size="sm">
     {#snippet trigger({ props })}
       <Button {...props} size="sm">What changed?</Button>

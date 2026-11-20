@@ -27,7 +27,7 @@
 {#snippet outline()}<Star class="size-5" />{/snippet}
 {#snippet filled()}<Star class="size-5 fill-current" />{/snippet}
 
-<Story name="Effects">
+<Story name="Effects" asChild>
   <div class="flex items-center gap-6">
     <Swap active={false} off={play} on={pause} />
     <Swap active effect="rotate" off={play} on={pause} />
@@ -35,7 +35,7 @@
   </div>
 </Story>
 
-<Story name="Inside the control that owns the state">
+<Story name="Inside the control that owns the state" asChild>
   <ToggleButton label="Play recording" iconOnly bind:pressed={playing}>
     {#snippet icon()}<Swap active={playing} effect="rotate" off={play} on={pause} />{/snippet}
   </ToggleButton>

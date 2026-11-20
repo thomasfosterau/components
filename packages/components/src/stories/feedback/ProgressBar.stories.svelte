@@ -16,7 +16,7 @@
   });
 </script>
 
-<Story name="With a value">
+<Story name="With a value" asChild>
   <div class="max-w-md space-y-4">
     <ProgressBar label="Seeds germinated" value={62} showValue />
     <ProgressBar label="Beds photographed" value={19} max={31} tone="secondary" showValue />
@@ -24,13 +24,13 @@
   </div>
 </Story>
 
-<Story name="Indeterminate">
+<Story name="Indeterminate" asChild>
   <div class="max-w-md">
     <ProgressBar label="Importing the seed list" />
   </div>
 </Story>
 
-<Story name="Every tone">
+<Story name="Every tone" asChild>
   <div class="max-w-md space-y-3">
     <ProgressBar label="Neutral" tone="neutral" value={40} />
     <ProgressBar label="Primary" tone="primary" value={45} />

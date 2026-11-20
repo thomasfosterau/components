@@ -48,10 +48,10 @@
   ];
 </script>
 
-<Story name="Labels always">
+<Story name="Labels always" asChild>
   <NavigationRail {destinations} header={compose} class="h-[32rem]" />
 </Story>
 
-<Story name="Labels on current only">
+<Story name="Labels on current only" asChild>
   <NavigationRail {destinations} labels="current" header={compose} class="h-[32rem]" />
 </Story>

@@ -17,19 +17,19 @@
   });
 </script>
 
-<Story name="Plain value">
+<Story name="Plain value" asChild>
   <dl class="border-base-300 bg-base-200 w-80 border">
     <InfoboxRow label="Family" value="Solanaceae" />
   </dl>
 </Story>
 
-<Story name="Numeric value">
+<Story name="Numeric value" asChild>
   <dl class="border-base-300 bg-base-200 w-80 border">
     <InfoboxRow label="Margin" value={0} />
   </dl>
 </Story>
 
-<Story name="Rich value">
+<Story name="Rich value" asChild>
   <dl class="border-base-300 bg-base-200 w-80 border">
     <InfoboxRow label="Status">
       <span class="badge badge-success badge-sm">Accepted</span>
@@ -37,13 +37,13 @@
   </dl>
 </Story>
 
-<Story name="Linked value">
+<Story name="Linked value" asChild>
   <dl class="border-base-300 bg-base-200 w-80 border">
     <InfoboxRow label="Parent" value="Solanaceae" href="/taxa/solanaceae" />
   </dl>
 </Story>
 
-<Story name="Empty, rendered as nothing">
+<Story name="Empty, rendered as nothing" asChild>
   <div class="w-80">
     <p class="text-base-content/60 mb-2 text-xs">
       Nothing below this line — an absent row renders no DOM at all.
@@ -56,7 +56,7 @@
 
 <!-- The em dash is the point: an absent row and an unrecorded fact are
      different things, and `showEmpty` is how a caller asks to show which. -->
-<Story name="Empty, shown as unrecorded">
+<Story name="Empty, shown as unrecorded" asChild>
   <dl class="border-base-300 bg-base-200 w-80 border">
     <InfoboxRow label="Frost tolerance" showEmpty />
   </dl>

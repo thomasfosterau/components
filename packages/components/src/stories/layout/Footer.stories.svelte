@@ -16,7 +16,7 @@
   });
 </script>
 
-<Story name="Columns">
+<Story name="Columns" asChild>
   <Footer>
     <nav>
       <h2 class="footer-title">Browse</h2>
@@ -32,7 +32,7 @@
   </Footer>
 </Story>
 
-<Story name="With an attribution block">
+<Story name="With an attribution block" asChild>
   <Footer>
     {#snippet aside()}
       <p class="max-w-xs text-sm leading-6">

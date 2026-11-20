@@ -43,7 +43,7 @@
   <Button {...props} tone="error" variant="soft">Delete plan…</Button>
 {/snippet}
 
-<Story name="Rename">
+<Story name="Rename" asChild>
   <PromptDialog
     title="Rename bed"
     label="Name"
@@ -55,7 +55,7 @@
   />
 </Story>
 
-<Story name="New item, with an async uniqueness check">
+<Story name="New item, with an async uniqueness check" asChild>
   <!-- "Herb spiral" and "Bed 4" are taken. -->
   <PromptDialog
     title="New collection"
@@ -68,7 +68,7 @@
   />
 </Story>
 
-<Story name="Type to confirm a delete">
+<Story name="Type to confirm a delete" asChild>
   <PromptDialog
     title="Delete the plan?"
     description="This removes the plan and every bed in it."

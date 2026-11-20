@@ -22,7 +22,7 @@
 {#snippet more()}<EllipsisVertical class="size-4" />{/snippet}
 {#snippet trash()}<Trash2 class="size-4" />{/snippet}
 
-<Story name="Labelled, with a tooltip">
+<Story name="Labelled, with a tooltip" asChild>
   <div class="flex gap-2 p-8">
     <IconButton label="Close" icon={close} />
     <IconButton label="Edit" icon={edit} />
@@ -30,7 +30,7 @@
   </div>
 </Story>
 
-<Story name="Tones, variants, shapes and sizes">
+<Story name="Tones, variants, shapes and sizes" asChild>
   <div class="flex flex-wrap items-center gap-2 p-8">
     <IconButton label="Delete" icon={trash} tone="error" variant="soft" />
     <IconButton label="Edit" icon={edit} tone="primary" variant="solid" shape="circle" />
@@ -39,7 +39,7 @@
   </div>
 </Story>
 
-<Story name="Disabled, still discoverable">
+<Story name="Disabled, still discoverable" asChild>
   <!-- `aria-disabled` rather than `disabled`, so the name is still reachable
        by focus and hover; activation is swallowed. -->
   <div class="p-8">
@@ -47,7 +47,7 @@
   </div>
 </Story>
 
-<Story name="As a link">
+<Story name="As a link" asChild>
   <div class="p-8">
     <IconButton label="Edit garden" icon={edit} href="/gardens/7/edit" />
   </div>

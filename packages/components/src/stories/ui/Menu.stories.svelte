@@ -19,7 +19,7 @@
   });
 </script>
 
-<Story name="Navigation">
+<Story name="Navigation" asChild>
   <div class="bg-base-100 max-w-xs rounded-box p-2">
     <Menu label="Primary">
       <MenuItem href="/gardens" current>

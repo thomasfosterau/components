@@ -25,7 +25,7 @@
   });
 </script>
 
-<Story name="Account menu">
+<Story name="Account menu" asChild>
   <div class="flex justify-end p-10">
     <DropdownMenu label="Account">
       {#snippet trigger({ props })}
@@ -51,7 +51,7 @@
   </div>
 </Story>
 
-<Story name="Choices and a submenu">
+<Story name="Choices and a submenu" asChild>
   <div class="flex justify-end p-10">
     <DropdownMenu label="View">
       {#snippet trigger({ props })}
@@ -80,7 +80,7 @@
   `aria-keyshortcuts`, hidden from the item's name) and a destructive item,
   whose verb still says what it does.
 -->
-<Story name="Groups, shortcuts and a destructive item">
+<Story name="Groups, shortcuts and a destructive item" asChild>
   <div class="p-10">
     <DropdownMenu label="Garden">
       {#snippet trigger({ props })}

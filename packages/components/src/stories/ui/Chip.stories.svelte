@@ -16,7 +16,7 @@
   });
 </script>
 
-<Story name="Legend">
+<Story name="Legend" asChild>
   <ul
     class="flex flex-wrap gap-4"
     style="--demo-ever: var(--color-success); --demo-decid: var(--color-warning)"
@@ -27,13 +27,13 @@
   </ul>
 </Story>
 
-<Story name="As a link">
+<Story name="As a link" asChild>
   <p style="--demo-ever: var(--color-success)">
     <Chip label="EVG" title="Evergreen" href="/traits/evergreen" colourToken="--demo-ever" />
   </p>
 </Story>
 
-<Story name="Small">
+<Story name="Small" asChild>
   <p style="--demo-ever: var(--color-success)">
     <Chip label="EVG" title="Evergreen" size="sm" colourToken="--demo-ever" />
   </p>

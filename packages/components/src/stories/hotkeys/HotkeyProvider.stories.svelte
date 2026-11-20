@@ -18,7 +18,7 @@
   });
 </script>
 
-<Story name="Keys, sequences, and the editable guard">
+<Story name="Keys, sequences, and the editable guard" asChild>
   <HotkeyDemo>
     <label class="floating-label w-72">
       <span>Type here — the hotkeys go quiet</span>

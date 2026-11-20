@@ -5,7 +5,7 @@
   const { Story } = defineMeta({ title: 'Layout/Grid', component: Grid });
 </script>
 
-<Story name="Cards by minimum width">
+<Story name="Cards by minimum width" asChild>
   <Grid as="ul" minItem="sm">
     {#each Array.from({ length: 7 }, (_, index) => index + 1) as bed (bed)}
       <li class="card card-border bg-base-100 p-4">Bed {bed}</li>

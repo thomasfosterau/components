@@ -17,7 +17,7 @@
   });
 </script>
 
-<Story name="Titled">
+<Story name="Titled" asChild>
   <div class="border-base-300 bg-base-200 w-80 border">
     <InfoboxSection title="Classification">
       <InfoboxRow label="Family" value="Solanaceae" />
@@ -26,7 +26,7 @@
   </div>
 </Story>
 
-<Story name="Untitled">
+<Story name="Untitled" asChild>
   <div class="border-base-300 bg-base-200 w-80 border">
     <InfoboxSection>
       <InfoboxRow label="Area" value="4.2 m²" />
@@ -35,7 +35,7 @@
   </div>
 </Story>
 
-<Story name="Mixed rows">
+<Story name="Mixed rows" asChild>
   <div class="border-base-300 bg-base-200 w-80 border">
     <InfoboxSection>
       <InfoboxRow label="Plain" value="A string value" />

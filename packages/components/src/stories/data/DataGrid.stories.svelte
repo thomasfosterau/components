@@ -204,11 +204,11 @@
   }
 </script>
 
-<Story name="Filter, sort and page">
+<Story name="Filter, sort and page" asChild>
   <DataGrid rows={devices} {columns} {rowKey} filterable pageSize={5} caption="Your devices" />
 </Story>
 
-<Story name="Unpaged">
+<Story name="Unpaged" asChild>
   <DataGrid
     rows={devices.slice(0, 6)}
     {columns}
@@ -220,7 +220,7 @@
   />
 </Story>
 
-<Story name="Starting sorted">
+<Story name="Starting sorted" asChild>
   <DataGrid
     rows={devices}
     {columns}
@@ -231,7 +231,7 @@
   />
 </Story>
 
-<Story name="Nothing matches">
+<Story name="Nothing matches" asChild>
   <DataGrid
     rows={[]}
     {columns}
@@ -242,7 +242,7 @@
   />
 </Story>
 
-<Story name="Selection and columns">
+<Story name="Selection and columns" asChild>
   <!-- Selections are keyed by row, so they survive the filter, a sort and a
        page change; select-all covers the page on screen, and once the
        page is selected the toolbar offers "Select all <n>" for the rest. -->
@@ -258,7 +258,7 @@
   />
 </Story>
 
-<Story name="Price list (cell editing)">
+<Story name="Price list (cell editing)" asChild>
   <!-- Each commit is saved on its own. The pretend server takes half a
        second (the cell is busy meanwhile) and refuses a price over 100: the
        cell rolls back and the reason is announced. Arrow to a cell and press
@@ -274,7 +274,7 @@
   />
 </Story>
 
-<Story name="Import review (batch editing with errors)">
+<Story name="Import review (batch editing with errors)" asChild>
   <!-- The rows arrive with problems; the summary counts them and each entry
        focuses its cell. Fixes collect as changes until Save. -->
   <div class="space-y-3">
@@ -293,7 +293,7 @@
   </div>
 </Story>
 
-<Story name="Undo and redo (batch editing)">
+<Story name="Undo and redo (batch editing)" asChild>
   <!-- Edit a few cells, then with a cell focused (not open) press Ctrl/⌘+Z
        to undo the last edit and Ctrl/⌘+Shift+Z or Ctrl+Y to redo it. Each
        undo rewrites `changes`, listed below, moves focus to the cell and is
@@ -318,7 +318,7 @@
   </div>
 </Story>
 
-<Story name="Large import (virtual, 5,000 rows)">
+<Story name="Large import (virtual, 5,000 rows)" asChild>
   <!-- `virtual` windows the rows instead of paging them: only the rows in
        view are in the DOM, yet every row states its place in all 5,001, the
        arrow and Page keys reach any row, and each summary entry scrolls its

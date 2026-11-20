@@ -28,7 +28,7 @@
   };
 </script>
 
-<Story name="Callback, succeeds">
+<Story name="Callback, succeeds" asChild>
   <ConfirmDialog
     title="Delete this garden?"
     description="Every bed, plant and photo in it goes too. This cannot be undone."
@@ -40,7 +40,7 @@
   </ConfirmDialog>
 </Story>
 
-<Story name="Callback, fails">
+<Story name="Callback, fails" asChild>
   <ConfirmDialog title="Delete this garden?" onConfirm={fail} confirmLabel="Delete it">
     {#snippet trigger({ props })}
       <Button {...props} tone="error" variant="outline">Delete garden</Button>
@@ -48,7 +48,7 @@
   </ConfirmDialog>
 </Story>
 
-<Story name="Form POST, works without JavaScript">
+<Story name="Form POST, works without JavaScript" asChild>
   <ConfirmDialog
     title="Delete this accession?"
     description="An accession record is hard-deleted: there is no version chain to restore it from."
@@ -62,7 +62,7 @@
   </ConfirmDialog>
 </Story>
 
-<Story name="A gentler tone">
+<Story name="A gentler tone" asChild>
   <ConfirmDialog
     title="Archive this bed?"
     description="It disappears from the garden’s listing. You can restore it later."

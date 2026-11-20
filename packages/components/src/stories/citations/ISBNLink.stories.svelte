@@ -5,10 +5,10 @@
   const { Story } = defineMeta({ title: 'Citations/ISBNLink', component: ISBNLink, tags: ['autodocs'] });
 </script>
 
-<Story name="Default">
+<Story name="Default" asChild>
   <ISBNLink isbn="9780868405048" />
 </Story>
 
-<Story name="With Schema.org itemprop">
+<Story name="With Schema.org itemprop" asChild>
   <ISBNLink isbn="9780868405048" itemprop="isbn" />
 </Story>

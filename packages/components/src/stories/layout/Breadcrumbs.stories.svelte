@@ -24,15 +24,15 @@
   ];
 </script>
 
-<Story name="A trail">
+<Story name="A trail" asChild>
   <Breadcrumbs {items} />
 </Story>
 
-<Story name="A custom landmark name">
+<Story name="A custom landmark name" asChild>
   <Breadcrumbs {items} label="You are here" />
 </Story>
 
-<Story name="Per-crumb markup">
+<Story name="Per-crumb markup" asChild>
   <Breadcrumbs {items}>
     {#snippet item(crumb, index)}
       <span class="flex items-center gap-1">
@@ -47,6 +47,6 @@
   </Breadcrumbs>
 </Story>
 
-<Story name="One level deep">
+<Story name="One level deep" asChild>
   <Breadcrumbs items={[{ label: 'Gardens', href: '/gardens' }, { label: 'Back bed' }]} />
 </Story>

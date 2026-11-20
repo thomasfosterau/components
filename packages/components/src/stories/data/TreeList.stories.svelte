@@ -18,7 +18,7 @@
   });
 </script>
 
-<Story name="Taxonomy">
+<Story name="Taxonomy" asChild>
   <TreeList title="Rosaceae">
     <TreeListItem>
       <TreeList title="Rosa">
@@ -35,7 +35,7 @@
   </TreeList>
 </Story>
 
-<Story name="Folded">
+<Story name="Folded" asChild>
   <TreeList title="Amaryllidaceae" open={false}>
     <TreeListItem>Allium sativum</TreeListItem>
     <TreeListItem>Allium cepa</TreeListItem>

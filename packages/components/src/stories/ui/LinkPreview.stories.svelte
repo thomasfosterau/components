@@ -39,7 +39,7 @@
     });
 </script>
 
-<Story name="Taxon with load">
+<Story name="Taxon with load" asChild>
   <p class="max-w-prose">
     The hedge is mostly
     <LinkPreview load={loadTaxon}>
@@ -56,7 +56,7 @@
   </p>
 </Story>
 
-<Story name="Static author card">
+<Story name="Static author card" asChild>
   <p>
     Written by
     <LinkPreview openDelay={300}>

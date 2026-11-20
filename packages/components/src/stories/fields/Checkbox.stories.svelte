@@ -16,7 +16,7 @@
   });
 </script>
 
-<Story name="States">
+<Story name="States" asChild>
   <div class="flex flex-col gap-1">
     <Checkbox label="Formally published" checked />
     <Checkbox label="Placement certain" />
@@ -25,7 +25,7 @@
   </div>
 </Story>
 
-<Story name="Sizes">
+<Story name="Sizes" asChild>
   <div class="flex flex-col gap-1">
     <Checkbox size="xs" label="Extra small" checked />
     <Checkbox size="sm" label="Small" checked />
@@ -34,7 +34,7 @@
   </div>
 </Story>
 
-<Story name="Mixed">
+<Story name="Mixed" asChild>
   <!-- `indeterminate` is the platform's mixed state, drawn as a dash; a click settles it to checked. -->
   <Checkbox label="Some beds watered" indeterminate />
 </Story>

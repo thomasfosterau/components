@@ -17,7 +17,7 @@
   });
 </script>
 
-<Story name="With a title">
+<Story name="With a title" asChild>
   <div class="p-10">
     <Popover title="Filter observations">
       {#snippet trigger({ props })}
@@ -37,7 +37,7 @@
   </div>
 </Story>
 
-<Story name="Untitled, aligned to the start">
+<Story name="Untitled, aligned to the start" asChild>
   <div class="p-10">
     <Popover align="start" side="bottom" closeLabel="Close this panel">
       {#snippet trigger({ props })}

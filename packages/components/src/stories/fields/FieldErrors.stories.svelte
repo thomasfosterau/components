@@ -16,11 +16,11 @@
   });
 </script>
 
-<Story name="One message">
+<Story name="One message" asChild>
   <FieldErrors errors={['That name is already recorded.']} />
 </Story>
 
-<Story name="Several messages">
+<Story name="Several messages" asChild>
   <FieldErrors
     errors={[
       'That name is already recorded.',
@@ -30,7 +30,7 @@
   />
 </Story>
 
-<Story name="Empty renders nothing">
+<Story name="Empty renders nothing" asChild>
   <div class="text-base-content/70 text-sm">
     <FieldErrors errors={[]} />
     (nothing above this line)

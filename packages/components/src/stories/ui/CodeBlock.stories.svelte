@@ -18,22 +18,22 @@
   const config = `import { defineConfig } from 'vite-plus';\n\nexport default defineConfig({\n  fmt: { singleQuote: true },\n});`;
 </script>
 
-<Story name="Shell">
+<Story name="Shell" asChild>
   <CodeBlock code={'pnpm add @thomasfosterau/components\npnpm exec playwright install'} prefix="$" />
 </Story>
 
-<Story name="Numbered, with a caption and a highlighted line">
+<Story name="Numbered, with a caption and a highlighted line" asChild>
   <CodeBlock code={config} language="ts" prefix="numbers" caption="vite.config.ts" highlightLines={[4]} />
 </Story>
 
-<Story name="Pre-highlighted markup">
+<Story name="Pre-highlighted markup" asChild>
   <!-- A highlighter's output goes in `children`; the copy button still copies `code`. -->
   <CodeBlock code={'const answer = 42;'} language="ts">
     <span class="text-info">const</span> answer = <span class="text-warning">42</span>;
   </CodeBlock>
 </Story>
 
-<Story name="Overflowing, so its scroller is a focusable region">
+<Story name="Overflowing, so its scroller is a focusable region" asChild>
   <div class="max-w-sm">
     <CodeBlock code={'curl -fsSL https://example.com/a/very/long/install/script/that/does/not/fit.sh | bash'} language="bash" />
   </div>

@@ -39,7 +39,7 @@
   const many = Array.from({ length: 120 }, (_, index) => `Plot ${String(index + 1).padStart(3, '0')}`);
 </script>
 
-<Story name="Single">
+<Story name="Single" asChild>
   <div class="max-w-sm">
     <FormField label="Bed type" hint="Arrow keys move and select; type to jump.">
       {#snippet children(control)}
@@ -49,7 +49,7 @@
   </div>
 </Story>
 
-<Story name="Multiple">
+<Story name="Multiple" asChild>
   <div class="max-w-sm">
     <FormField label="Crops to export" hint="Space toggles; Shift extends; Ctrl/⌘+A selects all.">
       {#snippet children(control)}
@@ -59,7 +59,7 @@
   </div>
 </Story>
 
-<Story name="Rich options">
+<Story name="Rich options" asChild>
   <div class="max-w-sm">
     <FormField label="Template">
       {#snippet children(control)}
@@ -74,7 +74,7 @@
   </div>
 </Story>
 
-<Story name="Toggle model, long list">
+<Story name="Toggle model, long list" asChild>
   <!-- Touch-first: a click toggles, no modifiers. 120 options in a 10-row box. -->
   <div class="max-w-sm">
     <FormField label="Plots">

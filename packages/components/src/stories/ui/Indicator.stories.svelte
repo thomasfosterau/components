@@ -26,7 +26,7 @@
 {#snippet unread()}<StatusDot tone="primary" label="Unread messages" />{/snippet}
 {#snippet fresh()}<Badge tone="primary" size="sm">New</Badge>{/snippet}
 
-<Story name="Count on an icon button">
+<Story name="Count on an icon button" asChild>
   <Indicator item={count}>
     <IconButton label="Notifications, 3 unread">
       {#snippet icon()}<Bell class="size-5" />{/snippet}
@@ -34,13 +34,13 @@
   </Indicator>
 </Story>
 
-<Story name="Unread dot on an avatar">
+<Story name="Unread dot on an avatar" asChild>
   <Indicator item={unread} placement="bottom-end">
     <Avatar name="Thomas Foster" />
   </Indicator>
 </Story>
 
-<Story name="New on a card">
+<Story name="New on a card" asChild>
   <Indicator item={fresh} placement="top-start">
     <Card title="Bed 4">Tomatoes and basil.</Card>
   </Indicator>

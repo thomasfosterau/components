@@ -16,7 +16,7 @@
   });
 </script>
 
-<Story name="Tones">
+<Story name="Tones" asChild>
   <div class="flex flex-col gap-3">
     <Alert live="off">Seedlings are watered automatically between 5am and 6am.</Alert>
     <Alert tone="success" live="off">Your garden was saved.</Alert>
@@ -25,13 +25,13 @@
   </div>
 </Story>
 
-<Story name="With a title">
+<Story name="With a title" asChild>
   <Alert tone="warning" title="Frost warning" live="off">
     Two of the beds you follow are below 2 °C tonight. Cover anything tender.
   </Alert>
 </Story>
 
-<Story name="Variants">
+<Story name="Variants" asChild>
   <div class="flex flex-col gap-3">
     <Alert tone="info" variant="solid" live="off">Solid</Alert>
     <Alert tone="info" variant="soft" live="off">Soft — the default</Alert>
@@ -40,7 +40,7 @@
   </div>
 </Story>
 
-<Story name="Dismissible">
+<Story name="Dismissible" asChild>
   <Alert tone="success" live="off" onDismiss={() => undefined} dismissLabel="Dismiss this notice">
     Your changes were published.
   </Alert>

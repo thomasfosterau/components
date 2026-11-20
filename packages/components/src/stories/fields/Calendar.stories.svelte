@@ -23,7 +23,7 @@
   const planted = new Set(['2026-10-02', '2026-10-15', '2026-10-28']);
 </script>
 
-<Story name="Single date">
+<Story name="Single date" asChild>
   <FormField label="Sown on" hint="Pick the day the seeds went in.">
     {#snippet children(control)}
       <Calendar {...control} value={parseDate('2026-10-15')} locales="en-AU" />
@@ -31,7 +31,7 @@
   </FormField>
 </Story>
 
-<Story name="Two months">
+<Story name="Two months" asChild>
   <FormField label="Sown on">
     {#snippet children(control)}
       <Calendar {...control} month={parseDate('2026-10-01')} numberOfMonths={2} locales="en-AU" />
@@ -39,7 +39,7 @@
   </FormField>
 </Story>
 
-<Story name="Unavailable days and decorations">
+<Story name="Unavailable days and decorations" asChild>
   <FormField label="Planting day" hint="Struck-through days have a frost forecast.">
     {#snippet children(control)}
       <Calendar {...control} month={parseDate('2026-10-01')} isDateUnavailable={isFrost} locales="en-AU">
@@ -53,7 +53,7 @@
   </FormField>
 </Story>
 
-<Story name="Range">
+<Story name="Range" asChild>
   <FormField label="Holiday" hint="At least three nights.">
     {#snippet children(control)}
       <RangeCalendar

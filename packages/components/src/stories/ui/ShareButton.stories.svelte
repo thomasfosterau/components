@@ -16,7 +16,7 @@
   });
 </script>
 
-<Story name="Default">
+<Story name="Default" asChild>
   <ShareButton
     title="Tomato ‘Black Krim’"
     text="Two of six seedlings survived the frost."
@@ -24,7 +24,7 @@
   />
 </Story>
 
-<Story name="Prominent">
+<Story name="Prominent" asChild>
   <ShareButton
     title="Tomato ‘Black Krim’"
     url="https://example.org/gardens/1"

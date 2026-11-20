@@ -36,7 +36,7 @@
   ];
 </script>
 
-<Story name="Composed, beside an article">
+<Story name="Composed, beside an article" asChild>
   <div class="prose max-w-none">
     <Infobox title="Solanum lycopersicum" subtitle="Tomato">
       <InfoboxSection title="Classification">
@@ -60,7 +60,7 @@
   </div>
 </Story>
 
-<Story name="Floated beside prose">
+<Story name="Floated beside prose" asChild>
   <div class="prose max-w-none">
     <Infobox title="Ocimum basilicum" subtitle="Basil" float>
       <InfoboxSection>
@@ -75,11 +75,11 @@
   </div>
 </Story>
 
-<Story name="From typed rows">
+<Story name="From typed rows" asChild>
   <Infobox title="Solanum lycopersicum" rows={taxonRows} />
 </Story>
 
-<Story name="As a section of the page (h2)">
+<Story name="As a section of the page (h2)" asChild>
   <!-- The box is a page section in its own right, so its title sits at the section level. -->
   <div class="max-w-sm">
     <h1 class="mb-4 text-2xl font-bold">Solanum lycopersicum</h1>
@@ -87,7 +87,7 @@
   </div>
 </Story>
 
-<Story name="With an identifying image">
+<Story name="With an identifying image" asChild>
   <Infobox
     title="Anthony Albanese"
     label="Portrait"
@@ -107,7 +107,7 @@
   />
 </Story>
 
-<Story name="Rows and children together">
+<Story name="Rows and children together" asChild>
   <Infobox
     title="Bed 3"
     rows={[{ kind: "fact", label: "Area", value: "4.2 m²" }]}
@@ -120,6 +120,6 @@
   </Infobox>
 </Story>
 
-<Story name="Untitled, falling back to label">
+<Story name="Untitled, falling back to label" asChild>
   <Infobox rows={[{ kind: "fact", label: "Area", value: "4.2 m²" }]} />
 </Story>

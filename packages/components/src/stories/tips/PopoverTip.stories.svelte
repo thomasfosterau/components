@@ -31,7 +31,7 @@
   });
 </script>
 
-<Story name="Above its trigger">
+<Story name="Above its trigger" asChild>
   <div class="flex justify-center py-24">
     <PopoverTip config={search} store={storyStore(search)} placement="top">
       <button type="button" class="btn btn-primary">Search</button>
@@ -39,7 +39,7 @@
   </div>
 </Story>
 
-<Story name="Beside its trigger">
+<Story name="Beside its trigger" asChild>
   <div class="flex justify-center py-24">
     <PopoverTip config={filters} store={storyStore(filters)} placement="right">
       <button type="button" class="btn">Filters</button>
@@ -48,7 +48,7 @@
 </Story>
 
 <!-- Two tips, one stack: Escape closes the one that appeared last, not both. -->
-<Story name="Two tips sharing a stack">
+<Story name="Two tips sharing a stack" asChild>
   {@const store = storyStore(search, filters)}
   {@const stack = createTipStack()}
   <div class="flex justify-around py-24">

@@ -16,7 +16,7 @@
   });
 </script>
 
-<Story name="Sensor list">
+<Story name="Sensor list" asChild>
   <ul class="flex flex-col gap-2">
     <li>Sensor 1 <StatusDot tone="success" label="Online" showLabel /></li>
     <li>Sensor 2 <StatusDot tone="warning" label="Battery low" showLabel /></li>
@@ -24,7 +24,7 @@
   </ul>
 </Story>
 
-<Story name="Sizes, label for screen readers only">
+<Story name="Sizes, label for screen readers only" asChild>
   <div class="flex items-center gap-3">
     <StatusDot size="xs" tone="info" label="Syncing" />
     <StatusDot size="sm" tone="info" label="Syncing" />

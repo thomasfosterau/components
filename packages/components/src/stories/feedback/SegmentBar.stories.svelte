@@ -16,7 +16,7 @@
   });
 </script>
 
-<Story name="A breakdown">
+<Story name="A breakdown" asChild>
   <div class="max-w-xl">
     <SegmentBar
       label="Storage"
@@ -30,7 +30,7 @@
   </div>
 </Story>
 
-<Story name="Two-sided, with a marker">
+<Story name="Two-sided, with a marker" asChild>
   <div class="max-w-xl">
     <SegmentBar
       label="Two-candidate preferred"
@@ -45,7 +45,7 @@
   </div>
 </Story>
 
-<Story name="Colour tokens, and a remainder">
+<Story name="Colour tokens, and a remainder" asChild>
   <div class="max-w-xl space-y-4">
     <!-- The app's theme declares `--rank-genus` and friends in both themes;
          the component only ever names them. -->

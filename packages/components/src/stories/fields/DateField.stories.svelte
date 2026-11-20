@@ -19,13 +19,13 @@
   });
 </script>
 
-<Story name="In a FormField">
+<Story name="In a FormField" asChild>
   <FormField label="Sown on" hint="As on the seed packet.">
     {#snippet children(control)}<DateField {...control} name="sown" locales="en-AU" />{/snippet}
   </FormField>
 </Story>
 
-<Story name="US order, with a value">
+<Story name="US order, with a value" asChild>
   <FormField label="Sown on">
     {#snippet children(control)}
       <DateField {...control} value={parseDate('2026-10-14')} locales="en-US" />
@@ -33,19 +33,19 @@
   </FormField>
 </Story>
 
-<Story name="In error">
+<Story name="In error" asChild>
   <FormField label="Sown on" errors={['Pick a day in spring.']}>
     {#snippet children(control)}<DateField {...control} locales="en-AU" />{/snippet}
   </FormField>
 </Story>
 
-<Story name="TimeField, 24-hour">
+<Story name="TimeField, 24-hour" asChild>
   <FormField label="Water at">
     {#snippet children(control)}<TimeField {...control} hourCycle={24} locales="en-AU" />{/snippet}
   </FormField>
 </Story>
 
-<Story name="TimeField, 12-hour">
+<Story name="TimeField, 12-hour" asChild>
   <FormField label="Water at">
     {#snippet children(control)}<TimeField {...control} hourCycle={12} locales="en-AU" />{/snippet}
   </FormField>

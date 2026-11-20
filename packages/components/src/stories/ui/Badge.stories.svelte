@@ -16,7 +16,7 @@
   });
 </script>
 
-<Story name="Tones">
+<Story name="Tones" asChild>
   <div class="flex flex-wrap gap-2">
     <Badge>Draft</Badge>
     <Badge tone="primary">Featured</Badge>
@@ -31,7 +31,7 @@
   `tone="none"` is daisyUI's bare badge: no colour class, so it draws in
   `base-content` and stays legible on a dark theme, outline included.
 -->
-<Story name="Toneless">
+<Story name="Toneless" asChild>
   <div class="flex flex-wrap gap-2">
     <Badge tone="none" variant="solid">Disabled</Badge>
     <Badge tone="none" variant="outline">12 reactions</Badge>
@@ -39,7 +39,7 @@
   </div>
 </Story>
 
-<Story name="Variants and sizes">
+<Story name="Variants and sizes" asChild>
   <div class="flex flex-wrap items-center gap-2">
     <Badge tone="primary" variant="solid">Solid</Badge>
     <Badge tone="primary" variant="outline">Outline</Badge>
@@ -56,7 +56,7 @@
   token falls back to the theme's neutral colour, which is what the third
   badge below shows.
 -->
-<Story name="Subject colour from a theme token">
+<Story name="Subject colour from a theme token" asChild>
   <div
     class="flex flex-wrap gap-2"
     style="--demo-sun: var(--color-warning); --demo-shade: var(--color-info)"

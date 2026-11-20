@@ -53,7 +53,7 @@
   </div>
 {/snippet}
 
-<Story name="Fixed rows, 10,000">
+<Story name="Fixed rows, 10,000" asChild>
   <!-- Open the a11y tree: ~30 rows in the DOM, each "n of 10000". -->
   <VirtualList
     items={taxa}
@@ -65,7 +65,7 @@
   />
 </Story>
 
-<Story name="Measured rows">
+<Story name="Measured rows" asChild>
   <VirtualList
     items={taxa}
     key={(taxon) => taxon.id}
@@ -77,7 +77,7 @@
   />
 </Story>
 
-<Story name="Window scroller">
+<Story name="Window scroller" asChild>
   <!-- The page scrolls; the list has no height of its own. -->
   <VirtualList
     items={taxa}
@@ -89,11 +89,11 @@
   />
 </Story>
 
-<Story name="Infinite load">
+<Story name="Infinite load" asChild>
   <InfiniteVirtualList total={500} />
 </Story>
 
-<Story name="Feed">
+<Story name="Feed" asChild>
   <!-- Focus a link, then Page Down / Page Up move between articles,
        scrolling the next one into existence when it is outside the window. -->
   <VirtualList

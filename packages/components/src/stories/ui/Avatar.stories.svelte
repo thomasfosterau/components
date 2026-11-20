@@ -23,7 +23,7 @@
 
 {#snippet sprout()}<Sprout class="size-1/2" />{/snippet}
 
-<Story name="Image, broken image and initials">
+<Story name="Image, broken image and initials" asChild>
   <div class="flex items-center gap-4">
     <Avatar src={PIXEL} name="Ada Lovelace" />
     <Avatar src="/missing-upload.png" name="Grace Hopper" />
@@ -32,7 +32,7 @@
   </div>
 </Story>
 
-<Story name="Sizes, shapes and presence">
+<Story name="Sizes, shapes and presence" asChild>
   <div class="flex items-center gap-4">
     <Avatar name="Ada Lovelace" size="xs" />
     <Avatar name="Ada Lovelace" size="sm" shape="rounded" />
@@ -41,7 +41,7 @@
   </div>
 </Story>
 
-<Story name="Mask shapes">
+<Story name="Mask shapes" asChild>
   <div class="flex items-center gap-4">
     <Avatar src={PIXEL} name="Ada Lovelace" size="lg" shape="squircle" />
     <Avatar src={PIXEL} name="Grace Hopper" size="lg" shape="hexagon" />
@@ -52,7 +52,7 @@
   </div>
 </Story>
 
-<Story name="Group with overflow">
+<Story name="Group with overflow" asChild>
   <AvatarGroup label="Bed 4 volunteers" overflow={3}>
     <Avatar name="Ada Lovelace" />
     <Avatar name="Grace Hopper" />

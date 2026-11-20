@@ -18,7 +18,7 @@
   });
 </script>
 
-<Story name="Field label">
+<Story name="Field label" asChild>
   <div class="max-w-sm">
     <FormField label="Hardiness zone" hint="A number from 1 to 13.">
       {#snippet help()}
@@ -37,7 +37,7 @@
   </div>
 </Story>
 
-<Story name="Table header">
+<Story name="Table header" asChild>
   <table class="table max-w-md">
     <thead>
       <tr>
@@ -57,7 +57,7 @@
   </table>
 </Story>
 
-<Story name="Stat tile">
+<Story name="Stat tile" asChild>
   <div class="stats card-border">
     <div class="stat">
       <div class="stat-title flex items-center gap-1">
@@ -71,7 +71,7 @@
   </div>
 </Story>
 
-<Story name="Help variant">
+<Story name="Help variant" asChild>
   <p class="flex items-center gap-1">
     Import a planting plan
     <ContextualHelp variant="help" title="Importing a plan">

@@ -6,7 +6,7 @@
   const { Story } = defineMeta({ title: 'Layout/Spacer', component: Spacer });
 </script>
 
-<Story name="Push to the end">
+<Story name="Push to the end" asChild>
   <HStack align="center" class="max-w-md">
     <button type="button" class="btn btn-ghost">Back</button>
     <Spacer />

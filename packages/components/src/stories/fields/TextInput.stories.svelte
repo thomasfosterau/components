@@ -18,7 +18,7 @@
   });
 </script>
 
-<Story name="Sizes">
+<Story name="Sizes" asChild>
   <div class="flex max-w-sm flex-col gap-3">
     <TextInput size="xs" value="Extra small" aria-label="Extra small" />
     <TextInput size="sm" value="Small" aria-label="Small" />
@@ -27,7 +27,7 @@
   </div>
 </Story>
 
-<Story name="Types">
+<Story name="Types" asChild>
   <div class="flex max-w-sm flex-col gap-3">
     <FormField label="Email">
       {#snippet children(control)}
@@ -47,7 +47,7 @@
   </div>
 </Story>
 
-<Story name="Invalid">
+<Story name="Invalid" asChild>
   <div class="max-w-sm">
     <FormField label="Scientific name" errors={['That name is already recorded.']}>
       {#snippet children(control)}
@@ -57,13 +57,13 @@
   </div>
 </Story>
 
-<Story name="Disabled">
+<Story name="Disabled" asChild>
   <div class="max-w-sm">
     <TextInput value="Rosa canina" disabled aria-label="Scientific name" />
   </div>
 </Story>
 
-<Story name="Prefix and suffix">
+<Story name="Prefix and suffix" asChild>
   <div class="flex max-w-sm flex-col gap-3">
     <FormField label="Website">
       {#snippet children(control)}
@@ -83,7 +83,7 @@
   </div>
 </Story>
 
-<Story name="Leading and trailing icons">
+<Story name="Leading and trailing icons" asChild>
   <div class="flex max-w-sm flex-col gap-3">
     <FormField label="Handle">
       {#snippet children(control)}
@@ -102,7 +102,7 @@
   </div>
 </Story>
 
-<Story name="Character counter">
+<Story name="Character counter" asChild>
   <div class="max-w-sm">
     <FormField label="Bed name" hint="Shown on the garden map.">
       {#snippet children(control)}

@@ -17,18 +17,18 @@
   });
 </script>
 
-<Story name="Settings form">
+<Story name="Settings form" asChild>
   <SaveBarDemo />
 </Story>
 
-<Story name="At the top">
+<Story name="At the top" asChild>
   <SaveBarDemo position="top" />
 </Story>
 
-<Story name="Saving">
+<Story name="Saving" asChild>
   <SaveBar dirty saving />
 </Story>
 
-<Story name="Clean">
+<Story name="Clean" asChild>
   <SaveBar dirty={false} />
 </Story>

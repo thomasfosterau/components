@@ -7,7 +7,7 @@
   const { Story } = defineMeta({ title: 'Citations/Footnote', component: Footnote, tags: ['autodocs'] });
 </script>
 
-<Story name="Numbered, with its list">
+<Story name="Numbered, with its list" asChild>
   <BibliographyProvider>
     {#snippet children()}
       <p class="text-base-content">
@@ -21,7 +21,7 @@
   </BibliographyProvider>
 </Story>
 
-<Story name="Custom symbol">
+<Story name="Custom symbol" asChild>
   <BibliographyProvider>
     {#snippet children()}
       <p class="text-base-content">
@@ -31,7 +31,7 @@
   </BibliographyProvider>
 </Story>
 
-<Story name="Custom accessible label">
+<Story name="Custom accessible label" asChild>
   <BibliographyProvider>
     {#snippet children()}
       <p class="text-base-content">

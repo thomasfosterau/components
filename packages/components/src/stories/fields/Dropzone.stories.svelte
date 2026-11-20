@@ -31,7 +31,7 @@
   ]);
 </script>
 
-<Story name="Images with previews">
+<Story name="Images with previews" asChild>
   <div class="max-w-lg">
     <FormField label="Photos" hint="PNG or JPEG, up to 5 MB each.">
       {#snippet children(control)}
@@ -41,7 +41,7 @@
   </div>
 </Story>
 
-<Story name="Documents">
+<Story name="Documents" asChild>
   <div class="max-w-lg">
     <FormField label="Reports">
       {#snippet children(control)}
@@ -51,7 +51,7 @@
   </div>
 </Story>
 
-<Story name="Limits">
+<Story name="Limits" asChild>
   <div class="max-w-lg">
     <FormField label="Up to two PDFs of 100 kB" hint="Drop three, or a large one, to see the rejections.">
       {#snippet children(control)}
@@ -61,7 +61,7 @@
   </div>
 </Story>
 
-<Story name="Caller-tracked progress">
+<Story name="Caller-tracked progress" asChild>
   <div class="max-w-lg">
     <FormField label="Uploads">
       {#snippet children(control)}

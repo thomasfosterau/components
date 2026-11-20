@@ -23,10 +23,10 @@
   };
 </script>
 
-<Story name="Contacts from a CSV">
+<Story name="Contacts from a CSV" asChild>
   <ImportMapper target={contactTarget} {formats} onSubmit={saveContacts} />
 </Story>
 
-<Story name="Rows with issues left out">
+<Story name="Rows with issues left out" asChild>
   <ImportMapper target={contactTarget} {formats} onSubmit={saveContacts} invalidRows="exclude" />
 </Story>

@@ -17,7 +17,7 @@
   });
 </script>
 
-<Story name="The main landmark">
+<Story name="The main landmark" asChild>
   <Main class="space-y-4">
     <h1 class="text-3xl font-semibold">Rosa canina</h1>
     <p class="max-w-prose leading-7">
@@ -27,7 +27,7 @@
   </Main>
 </Story>
 
-<Story name="Nested, as a named region">
+<Story name="Nested, as a named region" asChild>
   <main class="space-y-6">
     <h1 class="text-3xl font-semibold">Gardens</h1>
     <Main as="section" aria-label="Recently watered" class="space-y-2">
@@ -40,7 +40,7 @@
   </main>
 </Story>
 
-<Story name="With a skip link">
+<Story name="With a skip link" asChild>
   <div class="space-y-4">
     <p class="text-base-content/70">Press Tab: the skip link is the first stop, and Enter jumps into the content.</p>
     <SkipLink target="story-main" />

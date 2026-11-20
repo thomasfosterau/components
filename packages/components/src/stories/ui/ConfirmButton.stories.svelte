@@ -27,7 +27,7 @@
   };
 </script>
 
-<Story name="Succeeds">
+<Story name="Succeeds" asChild>
   <ConfirmButton
     action={succeed}
     idleLabel="Delete this garden"
@@ -35,11 +35,11 @@
   />
 </Story>
 
-<Story name="Fails">
+<Story name="Fails" asChild>
   <ConfirmButton action={fail} idleLabel="Delete this garden" />
 </Story>
 
-<Story name="Another tone">
+<Story name="Another tone" asChild>
   <ConfirmButton
     action={succeed}
     tone="warning"
@@ -57,7 +57,7 @@
   Form mode: the confirm step is a real POST form, so it works with scripts
   off. The wrapper here only stops the story's own page being submitted away.
 -->
-<Story name="Form mode, no JavaScript needed">
+<Story name="Form mode, no JavaScript needed" asChild>
   <div
     onsubmit={(event) => {
       event.preventDefault();

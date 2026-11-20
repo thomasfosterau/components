@@ -42,15 +42,15 @@
   ];
 </script>
 
-<Story name="A history">
+<Story name="A history" asChild>
   <Timeline items={beds} label="Beds this plant has grown in" />
 </Story>
 
-<Story name="Custom wording">
+<Story name="Custom wording" asChild>
   <Timeline items={beds} label="Beds" presentLabel="still growing" currentLabel="Currently:" />
 </Story>
 
-<Story name="A custom entry body">
+<Story name="A custom entry body" asChild>
   <Timeline items={beds} label="Beds">
     {#snippet item(entry)}
       <p class="font-semibold uppercase">{entry.label}</p>
