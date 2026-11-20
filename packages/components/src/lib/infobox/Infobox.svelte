@@ -17,6 +17,10 @@ The summary rail beside an entity page’s prose: an optional header and image a
   page layout and never float it. Off by default, since a grid-column aside
   is the more common shape here, and opt-in per page with `float`.
 
+  Empty: with no `title`, no `image`, no present row and no `children`,
+  nothing renders, so rows that all filter out leave no empty rail and no
+  unnamed-content landmark. A passed `children` counts as content.
+
   ARIA contract: `aria-label={title ?? label}` names the region — a real
   `title` is more specific than the generic default, so it wins.
   `data-testid="infobox"` is kept for e2e parity with the source apps.
@@ -80,49 +84,58 @@ The summary rail beside an entity page’s prose: an optional header and image a
     presentRows.filter((row): row is Extract<Row, { kind: 'image' }> => row.kind === 'image'),
   );
   const bodyRows = $derived(presentRows.filter((row) => row.kind !== 'image'));
+  const hasContent = $derived(
+    title !== undefined || image !== undefined || presentRows.length > 0 || children !== undefined,
+  );
 </script>
 
-<aside
-  {...rest}
-  data-testid="infobox"
-  aria-label={title ?? label}
-  class={[
-    'card card-border bg-base-100 shadow-sm',
-    float && 'float-right mb-4 ml-4 w-full sm:w-80',
-    className,
-  ]}
->
-  {#if title !== undefined}
-    <InfoboxHeader {title} {subtitle} {headingLevel} />
+{#snippet bodyRow(row: Row)}
+  {#if row.kind === 'fact'}
+    <InfoboxRow label={row.label} value={row.value} />
+  {:else if row.kind === 'link'}
+    <InfoboxRow label={row.label} value={row.text} href={row.href} external={row.external} />
+  {:else if row.kind === 'links'}
+    <InfoboxRow label={row.label}>
+      <ul class="flex flex-col gap-1">
+        {#each row.links ?? [] as link (link.href)}
+          <li><Link href={link.href}>{link.label}</Link></li>
+        {/each}
+      </ul>
+    </InfoboxRow>
+  {:else if row.kind === 'custom'}
+    <InfoboxRow label={row.label}>
+      {@render row.content()}
+    </InfoboxRow>
   {/if}
-  {#if image !== undefined}
-    <InfoboxImage {...image} />
-  {/if}
-  {#each imageRows as row (row.src)}
-    <InfoboxImage {...row} />
-  {/each}
-  {#if bodyRows.length > 0}
-    <InfoboxSection>
-      {#each bodyRows as row (row.label)}
-        {#if row.kind === 'fact'}
-          <InfoboxRow label={row.label} value={row.value} />
-        {:else if row.kind === 'link'}
-          <InfoboxRow label={row.label} value={row.text} href={row.href} external={row.external} />
-        {:else if row.kind === 'links'}
-          <InfoboxRow label={row.label}>
-            <ul class="flex flex-col gap-1">
-              {#each row.links ?? [] as link (link.href)}
-                <li><Link href={link.href}>{link.label}</Link></li>
-              {/each}
-            </ul>
-          </InfoboxRow>
-        {:else if row.kind === 'custom'}
-          <InfoboxRow label={row.label}>
-            {@render row.content()}
-          </InfoboxRow>
-        {/if}
-      {/each}
-    </InfoboxSection>
-  {/if}
-  {@render children?.()}
-</aside>
+{/snippet}
+
+{#if hasContent}
+  <aside
+    {...rest}
+    data-testid="infobox"
+    aria-label={title ?? label}
+    class={[
+      'card card-border bg-base-100 shadow-sm',
+      float && 'float-right mb-4 ml-4 w-full sm:w-80',
+      className,
+    ]}
+  >
+    {#if title !== undefined}
+      <InfoboxHeader {title} {subtitle} {headingLevel} />
+    {/if}
+    {#if image !== undefined}
+      <InfoboxImage {...image} />
+    {/if}
+    {#each imageRows as row (row.src)}
+      <InfoboxImage {...row} />
+    {/each}
+    {#if bodyRows.length > 0}
+      <InfoboxSection>
+        {#each bodyRows as row (row.label)}
+          {@render bodyRow(row)}
+        {/each}
+      </InfoboxSection>
+    {/if}
+    {@render children?.()}
+  </aside>
+{/if}

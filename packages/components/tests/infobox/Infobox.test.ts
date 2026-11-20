@@ -14,7 +14,10 @@ test('is a labelled complementary region, kept as data-testid="infobox" for e2e 
 });
 
 test('falls back to label for its accessible name when there is no title', async () => {
-  const screen = await render(Infobox, { label: 'Key facts' });
+  const screen = await render(Infobox, {
+    label: 'Key facts',
+    rows: [{ kind: 'fact', label: 'Family', value: 'Solanaceae' }],
+  });
 
   await expect
     .element(screen.getByRole('complementary', { name: 'Key facts' }))
@@ -123,6 +126,37 @@ test('is unfloated by default', async () => {
 test('float adds float-right rail classes', async () => {
   const screen = await render(Infobox, { title: 'Bed 3', float: true });
   await expect.element(screen.getByTestId('infobox')).toHaveClass('float-right');
+});
+
+test('renders nothing when no title, image, present row or children is left', async () => {
+  const screen = await render(Infobox, {
+    rows: [
+      { kind: 'fact', label: 'Frost tolerance', value: undefined },
+      { kind: 'links', label: 'Neighbours', links: [] },
+    ],
+  });
+
+  expect(screen.container.querySelector('aside')).toBeNull();
+  expect(screen.container.textContent?.trim()).toBe('');
+});
+
+test('one present row is enough to render the named region', async () => {
+  const screen = await render(Infobox, {
+    rows: [
+      { kind: 'fact', label: 'Family', value: 'Solanaceae' },
+      { kind: 'fact', label: 'Frost tolerance', value: undefined },
+    ],
+  });
+
+  await expect
+    .element(screen.getByRole('complementary', { name: 'Key facts' }))
+    .toBeInTheDocument();
+});
+
+test('renders children alone, with no title or rows', async () => {
+  const screen = await render(Infobox, { children: htmlSnippet('<p>Composed body</p>') });
+
+  await expect.element(screen.getByRole('complementary')).toBeInTheDocument();
 });
 
 test('renders children when given, with no rows at all', async () => {
