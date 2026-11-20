@@ -1,12 +1,6 @@
 /**
- * How a {@link ListRow} learns it is inside a {@link ListGroup}.
- *
- * A row inside a group is a list item: it renders its own `<li>` (the
- * group's `children` are rows, and the group cannot wrap each one) and takes
- * the group's padding. Outside a group it renders only its body, so it can
- * sit in `ItemList`'s `<li>` or `<article>` (which is how `LinkListItem`
- * uses it). The group passes its variant down as context so the two cannot
- * fall out of step.
+ * Tells a `ListRow` it is inside a `ListGroup`: it then renders its own
+ * `<li>` and takes the group's padding; outside one it renders only its body.
  *
  * @module
  */

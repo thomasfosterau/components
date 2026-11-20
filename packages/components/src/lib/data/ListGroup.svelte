@@ -2,17 +2,9 @@
 An inset, rounded, divided group of `ListRow`s with an optional heading, description and footer: a settings screen's section.
 -->
 <!--
-  ListGroup — the iOS Settings / libadwaita preferences group: a heading, a
-  line of explanation, a box of rows and a footnote.
-
-  ARIA contract:
-  - A `<section>` named by its heading (`aria-labelledby`), so a titled
-    group is a `region` landmark a reader can jump to; `description` is its
-    `aria-describedby`. Without a `title` it is a plain, unnamed section.
-  - The rows are a `<ul role="list">` of the `ListRow`s' own `<li>`s. The
-    explicit role restores the list semantics Safari drops from a list
-    styled `list-style: none`.
-  - `footer` is plain text after the list, not part of the list.
+  A `<section>` named by its heading (a `region` when titled) and described by
+  `description`. The explicit `role="list"` restores the list semantics
+  Safari drops under `list-style: none`.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';

@@ -17,19 +17,18 @@
   setComponentsContext({ isCurrent: (href) => href === current });
 
   let digests = $state(false);
+
+  const switchAttributes = (labelledBy: string, describedBy: string | undefined) => ({
+    role: 'switch' as const,
+    'aria-labelledby': labelledBy,
+    'aria-describedby': describedBy,
+  });
 </script>
 
 <ListGroup title="Notifications" description="How we reach you." footer="Changes save at once.">
   <ListRow headline="Email digests" supporting="A summary every Monday.">
     {#snippet trailing({ labelledBy, describedBy })}
-      <input
-        type="checkbox"
-        role="switch"
-        class="toggle"
-        bind:checked={digests}
-        aria-labelledby={labelledBy}
-        aria-describedby={describedBy}
-      />
+      <input type="checkbox" {...switchAttributes(labelledBy, describedBy)} bind:checked={digests} />
     {/snippet}
   </ListRow>
   <ListRow headline="Units" supporting="How distances read." href="/settings/units">

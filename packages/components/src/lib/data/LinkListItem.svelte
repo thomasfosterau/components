@@ -3,8 +3,7 @@ The row body most lists want: a linked title, a line of context under it, and sh
 -->
 <!--
   LinkListItem — the row body most lists want: a linked title, a line of
-  context under it, and short markers. A preset over `ListRow` (a control
-  row whose headline is the link), so there is one row implementation.
+  context under it, and short markers. Built on `ListRow`.
 
   It renders the body only, never the `<li>` or the `<article>` around it,
   because the container is `ItemList`'s decision (a list item in one mode, a

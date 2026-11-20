@@ -2,39 +2,10 @@
 One row of a list: leading content, a headline with an overline and supporting text, and trailing content (a value, a badge, a chevron or a control). The whole row can be a link or a button.
 -->
 <!--
-  ListRow — the general-purpose row (Compose's `ListItem`, libadwaita's
-  `AdwActionRow`): `leading`, then `overline` / `headline` / `supporting`,
-  then `trailing`. Inside a `ListGroup` it renders its own `<li>` and takes
-  the group's padding; outside one it renders only the row body, so it can
-  sit in `ItemList`'s item (`LinkListItem` is built on it).
-
-  ARIA contract, by kind of row:
-  - `href`: the row is one `<a>` (resolved through the components context,
-    `aria-current="page"` when the context says it is the current page).
-    Its name is the headline and the trailing content (`aria-labelledby`),
-    so "Units › Metric" reads "Units Metric"; `supporting` is its
-    description (`aria-describedby`). A chevron is drawn, `aria-hidden`.
-  - `onclick` (no `href`): the row is one `<button type="button">`, named
-    and described the same way. `tone="error"` colours a destructive row
-    ("Delete account"); the headline's verb carries the meaning, not the
-    colour.
-  - Neither: a control row. The row is not interactive itself; the
-    control in `trailing` is the one Tab stop, and the snippet receives
-    `labelledBy` (the headline's id) and `describedBy` (the supporting
-    text's id) so it names itself after the row:
-    `<input type="checkbox" role="switch" aria-labelledby={labelledBy} …>`.
-    A click anywhere on the row's text forwards to the control (a checkbox,
-    switch, radio or button is clicked; anything else is focused), so the
-    hit target is the whole row, as in SwiftUI and libadwaita.
-  - A link or button row never holds a second interactive element: its
-    `trailing` is decoration and value text, and badges in it need
-    `VisuallyHidden` text if their meaning is not in the name. A focusable
-    element in a link or button row's `trailing` logs a console warning.
-  - `disabled`: `aria-disabled="true"` on the link or button, which stays
-    focusable but does nothing, at reduced opacity.
-
-  An expander row (libadwaita's `AdwExpanderRow`) is a pattern, not a
-  component: a control row whose `children` holds a `Disclosure`.
+  A link or button row is one target named by its headline and trailing value
+  (`aria-labelledby`), described by `supporting`. A control row hands
+  `trailing` the ids to name its control, and forwards clicks on its text to
+  it. Inside a `ListGroup` the row renders its own `<li>`.
 -->
 <script lang="ts">
   import { ChevronRight } from '@lucide/svelte';
@@ -124,6 +95,32 @@ One row of a list: leading content, a headline with an overline and supporting t
 
   let trailingBox: HTMLElement | undefined = $state();
 
+  /** A link or button row's own attributes: what makes it one named, described target. */
+  const targetAttributes = $derived(
+    interactive
+      ? {
+          href: tag === 'a' ? resolved : undefined,
+          type: tag === 'button' ? 'button' : undefined,
+          'aria-current': current ? ('page' as const) : undefined,
+          'aria-disabled': disabled ? ('true' as const) : undefined,
+          'aria-labelledby': labelledBy,
+          'aria-describedby': describedBy,
+          onclick: activate,
+        }
+      : {},
+  );
+  const rowClass = $derived([
+    'flex items-center gap-3 text-start',
+    group !== undefined && padding[group().variant],
+    interactive && 'hover:bg-base-200 w-full focus-visible:outline-offset-[-2px]',
+    interactive && !disabled && 'cursor-pointer',
+    tone === 'error' && 'text-error',
+    disabled && 'cursor-not-allowed opacity-50',
+    className,
+  ]);
+  /** A control row passes clicks on its text to the trailing control. */
+  const forwards = $derived(!interactive && trailing !== undefined && !disabled);
+
   function activate(event: MouseEvent): void {
     if (disabled) {
       event.preventDefault();
@@ -169,30 +166,16 @@ One row of a list: leading content, a headline with an overline and supporting t
   <svelte:element
     this={tag}
     {...rest}
-    href={tag === 'a' ? resolved : undefined}
-    type={tag === 'button' ? 'button' : undefined}
-    aria-current={current ? 'page' : undefined}
-    aria-disabled={interactive && disabled ? 'true' : undefined}
-    aria-labelledby={interactive ? labelledBy : undefined}
-    aria-describedby={interactive ? describedBy : undefined}
-    onclick={interactive ? activate : undefined}
-    class={[
-      'flex items-center gap-3 text-start',
-      group !== undefined && padding[group().variant],
-      interactive && 'hover:bg-base-200 w-full focus-visible:outline-offset-[-2px]',
-      interactive && !disabled && 'cursor-pointer',
-      tone === 'error' && 'text-error',
-      disabled && 'cursor-not-allowed opacity-50',
-      className,
-    ]}
+    {...targetAttributes}
+    class={rowClass}
   >
     {#if leading}
       <svelte:element this={box} class="flex shrink-0 items-center">{@render leading()}</svelte:element>
     {/if}
     <svelte:element
       this={box}
-      class={['flex min-w-0 flex-1 flex-col gap-1', !interactive && trailing && !disabled && 'cursor-pointer']}
-      {@attach !interactive && trailing !== undefined && !disabled && forwardClicks}
+      class={['flex min-w-0 flex-1 flex-col gap-1', forwards && 'cursor-pointer']}
+      {@attach forwards && forwardClicks}
     >
       {#if overline !== undefined}
         <span class="text-base-content/60 text-xs uppercase">{overline}</span>
