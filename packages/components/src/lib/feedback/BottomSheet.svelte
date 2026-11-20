@@ -211,7 +211,9 @@ A panel that rises from the bottom edge and rests at one of several heights (det
   const onHandlePointerup = (event: PointerEvent): void => {
     if (drag?.pointerId !== event.pointerId) return;
     const { heights, samples } = drag;
-    const height = dragHeight ?? drag.startHeight;
+    // From the release point, not the last move: a quick drag can end before
+    // any pointermove is dispatched.
+    const height = Math.max(0, drag.startHeight + drag.startY - event.clientY);
     const first = samples[0];
     const elapsed = first === undefined ? 0 : event.timeStamp - first.t;
     const velocity = first === undefined || elapsed <= 0 ? 0 : (event.clientY - first.y) / elapsed;
