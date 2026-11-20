@@ -31,7 +31,7 @@
   </SupportingPane>
 </Story>
 
-<Story name="Sheet on a phone" parameters={{ viewport: { defaultViewport: 'mobile1' } }}>
+<Story name="Sheet on a phone" parameters={{ viewport: { defaultViewport: 'mobile1' } }} asChild>
   <SupportingPane
     title="Properties"
     toggleLabel="Properties"

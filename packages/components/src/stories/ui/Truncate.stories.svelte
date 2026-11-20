@@ -23,7 +23,7 @@
   });
 </script>
 
-<Story name="File names in a table">
+<Story name="File names in a table" asChild>
   <table class="table w-72 table-fixed">
     <thead><tr><th>File</th><th class="w-16">Size</th></tr></thead>
     <tbody>
@@ -37,7 +37,7 @@
   </table>
 </Story>
 
-<Story name="End, start and middle">
+<Story name="End, start and middle" asChild>
   <div class="w-56 space-y-2 p-4">
     <Truncate text="Solanum lycopersicum 'Black Krim' (heirloom)" />
     <Truncate text="feature/garden-beds-map-and-legend" position="start" mono />
@@ -45,7 +45,7 @@
   </div>
 </Story>
 
-<Story name="Branch name">
+<Story name="Branch name" asChild>
   <span class="badge badge-ghost max-w-48">
     <Truncate text="feature/import-mapper-csv-preview" position="middle" mono maxWidth="xs" />
   </span>

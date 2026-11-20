@@ -22,7 +22,7 @@
 
 <Story name="URL" args={{ value: 'https://example.org/p/1', downloadable: true }} />
 
-<Story name="Plant label for print">
+<Story name="Plant label for print" asChild>
   <div class="border-base-300 rounded-box inline-flex items-center gap-4 border p-4">
     <QRCode value="https://example.org/plants/black-krim" size={96} showValue />
     <div>
@@ -36,7 +36,7 @@
 
 <Story name="Expiring sign-in code" args={{ value: 'https://example.org/login/abc123', status: 'expired', onRefresh: () => undefined }} />
 
-<Story name="In the dark theme">
+<Story name="In the dark theme" asChild>
   <div data-theme="dark" class="bg-base-100 text-base-content p-6">
     <QRCode value="https://example.org/p/1" showValue />
   </div>

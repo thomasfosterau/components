@@ -44,14 +44,14 @@
   </article>
 {/snippet}
 
-<Story name="Docs page, sticky">
+<Story name="Docs page, sticky" asChild>
   <div class="flex items-start gap-8">
     {@render article('docs-article')}
     <TableOfContents container="#docs-article" sticky class="w-56 shrink-0" />
   </div>
 </Story>
 
-<Story name="Nested levels">
+<Story name="Nested levels" asChild>
   <TableOfContents
     collapseBelow={false}
     scrollSpy={false}
@@ -65,14 +65,14 @@
   />
 </Story>
 
-<Story name="Mobile, collapsed" parameters={{ viewport: { defaultViewport: 'mobile1' } }}>
+<Story name="Mobile, collapsed" parameters={{ viewport: { defaultViewport: 'mobile1' } }} asChild>
   <div class="flex flex-col gap-4">
     <TableOfContents container="#mobile-article" />
     {@render article('mobile-article')}
   </div>
 </Story>
 
-<Story name="Under a sticky Navbar">
+<Story name="Under a sticky Navbar" asChild>
   <div class="sticky top-0 z-10">
     <Navbar>
       {#snippet start()}
