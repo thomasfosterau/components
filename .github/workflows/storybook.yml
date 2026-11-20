@@ -1,0 +1,57 @@
+name: Storybook
+
+# Builds the Storybook and deploys it to GitHub Pages (Settings → Pages → Source: GitHub Actions).
+
+on:
+  push:
+    branches: [trunk]
+  workflow_dispatch:
+
+# One deploy at a time; a newer push waits rather than cancelling one mid-deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  build:
+    name: Build Storybook
+    if: github.repository == 'thomasfosterau/components'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      # Install scripts run: the root `prepare` applies the `effect-tsgo` patch `sync` needs.
+      - uses: voidzero-dev/setup-vp@v1.22.0
+        with:
+          version-file: pnpm-workspace.yaml
+          node-version: lts
+          cache: true
+          run-install: true
+
+      - run: vp run --filter ./packages/components storybook:build
+
+      - uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: packages/components/storybook-static
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5.0.1
