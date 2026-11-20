@@ -102,3 +102,9 @@ export const drawerHeight: Record<DrawerSize, string> = {
   lg: 'h-[75dvh]',
   full: 'h-dvh max-h-none rounded-none',
 };
+
+/**
+ * A height a `BottomSheet` rests at: a fraction of the viewport height
+ * (`0.5` is half the screen), or `'content'` to fit what it holds.
+ */
+export type SheetDetent = number | 'content';

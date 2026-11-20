@@ -33,6 +33,10 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
     actions?: Snippet<[{ close: () => void }]> | undefined;
     /** The element to focus on open, instead of bits-ui's first focusable one. */
     initialFocus?: (() => HTMLElement | null | undefined) | undefined;
+    /** Rendered first inside the panel, above the title row: `BottomSheet`'s grabber. */
+    grabber?: Snippet<[]> | undefined;
+    /** Extra attributes on the panel (`style`, `data-*`): `BottomSheet`'s live height. */
+    contentProps?: Record<string, unknown> | undefined;
     children: Snippet<[]>;
   }
 
@@ -47,6 +51,8 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
     trigger,
     actions,
     initialFocus,
+    grabber,
+    contentProps,
     children,
   }: Props = $props();
 
@@ -76,7 +82,8 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
     <!-- daisyUI's `modal-backdrop` is a child of an open `.modal`; this is
          the same scrim as an element bits-ui can animate and dismiss from. -->
     <Dialog.Overlay class="bg-base-300/60 fixed inset-0 z-40" />
-    <Dialog.Content class={contentClass} {onOpenAutoFocus}>
+    <Dialog.Content {...contentProps} class={contentClass} {onOpenAutoFocus}>
+      {@render grabber?.()}
       <div class={['flex items-start justify-between gap-4', sheet && 'px-4 pt-4']}>
         <Dialog.Title class={hideTitle ? 'sr-only' : 'text-lg font-semibold'}>{title}</Dialog.Title>
         <Dialog.Close>
@@ -92,7 +99,7 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
           {description}
         </Dialog.Description>
       {/if}
-      <div class={sheet ? 'min-h-0 flex-1 overflow-y-auto p-4' : 'py-4'}>{@render children()}</div>
+      <div data-dialog-body class={sheet ? 'min-h-0 flex-1 overflow-y-auto p-4' : 'py-4'}>{@render children()}</div>
       {#if actions}
         <div class={sheet ? 'border-base-300 flex justify-end gap-2 border-t p-4' : 'modal-action'}>
           {@render actions({ close })}
