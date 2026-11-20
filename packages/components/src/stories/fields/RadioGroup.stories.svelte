@@ -20,10 +20,18 @@
     { value: 'followers', label: 'Only people who follow me' },
     { value: 'private', label: 'Only me' },
   ];
+
+  const plans = [
+    { value: 'free', label: 'Free', description: 'One garden, ten plants, community support.' },
+    { value: 'grower', label: 'Grower', description: 'Unlimited gardens, harvest logs and reminders.' },
+    { value: 'market', label: 'Market', description: 'Everything in Grower, plus sales and stock tracking.' },
+    { value: 'co-op', label: 'Co-op', description: 'Shared gardens for groups.', disabled: true },
+  ];
 </script>
 
 <script lang="ts">
   let chosen = $state('followers');
+  let plan = $state('grower');
 </script>
 
 <Story name="Vertical">
@@ -58,4 +66,18 @@
       value=""
     />
   </div>
+</Story>
+
+<Story name="Cards">
+  <RadioGroup legend="Plan" name="plan" variant="cards" options={plans} bind:value={plan} />
+</Story>
+
+<Story name="Cards, custom body">
+  <RadioGroup legend="Plan" variant="cards" columns={2} indicator="start" options={plans} value="free">
+    {#snippet card(option, { checked })}
+      <span class="font-semibold">{option.label}</span>
+      <span class="text-base-content/70 text-sm">{option.description}</span>
+      {#if checked}<span class="text-primary text-xs font-semibold">Current choice</span>{/if}
+    {/snippet}
+  </RadioGroup>
 </Story>

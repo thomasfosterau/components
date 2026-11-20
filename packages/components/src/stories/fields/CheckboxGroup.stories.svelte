@@ -21,6 +21,13 @@
     { value: 'full-shade', label: 'Full shade' },
     { value: 'bog', label: 'Permanently wet', disabled: true },
   ];
+
+  const beds = [
+    { value: 'raised', label: 'Raised bed', description: 'Warms early and drains well.' },
+    { value: 'in-ground', label: 'In-ground bed', description: 'Holds moisture through summer.' },
+    { value: 'containers', label: 'Containers', description: 'Movable, for balconies and patios.' },
+    { value: 'greenhouse', label: 'Greenhouse', description: 'Frost-free growing all year.' },
+  ];
 </script>
 
 <script lang="ts">
@@ -63,4 +70,12 @@
       selectAllLabel="All conditions"
     />
   </div>
+</Story>
+
+<Story name="Cards">
+  <CheckboxGroup legend="Where do you grow?" name="beds" variant="cards" columns="auto" options={beds} values={['raised']} />
+</Story>
+
+<Story name="Cards, no checkbox">
+  <CheckboxGroup legend="Where do you grow?" variant="cards" columns={2} indicator="hidden" options={beds} values={['containers']} />
 </Story>
