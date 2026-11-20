@@ -33,6 +33,8 @@ export { default as MessageThread } from './MessageThread.svelte';
 export { default as Pagination } from './Pagination.svelte';
 export { default as PaginationFooter } from './PaginationFooter.svelte';
 export { default as PullToRefresh } from './PullToRefresh.svelte';
+
+export { default as PivotTable } from './PivotTable.svelte';
 export { default as ResultCount } from './ResultCount.svelte';
 export { default as KanbanBoard } from './KanbanBoard.svelte';
 export { default as JsonView } from './JsonView.svelte';
@@ -53,6 +55,23 @@ export * from './line-diff.ts';
 export * from './list-item.ts';
 export type { ListGroupStyle, ListGroupVariant } from './list-group.ts';
 export * from './pagination.ts';
+export {
+  dateKey,
+  pivot,
+  type PivotAggregate,
+  type PivotConfig,
+  type PivotDateGrouping,
+  type PivotGroup,
+  type PivotResult,
+  type PivotValue,
+} from './pivot.ts';
+export {
+  defaultPivotFieldsLabels,
+  pivotAggregates,
+  type PivotBuiltInAggregate,
+  type PivotField,
+  type PivotFieldsLabels,
+} from './pivot-fields.ts';
 export { defaultSortableAnnouncements, move, type SortableAnnouncements } from './sortable.ts';
 export type { SwipeAction } from './swipe-actions.svelte.ts';
 export * from './table-types.ts';

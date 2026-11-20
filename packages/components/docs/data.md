@@ -85,6 +85,21 @@ The tables, lists and pagers an index page and a detail page are built from. Two
 </DescriptionList>
 ```
 
+## Summarising records: `PivotTable`
+
+`PivotTable` cross-tabulates flat records: `config.rows` and `config.columns` name the dimensions on each axis, outermost first, and `config.values` the measures (`{ field, agg, label?, format? }`, where `agg` is `'sum'`, `'count'`, `'countDistinct'`, `'mean'`, `'median'`, `'min'`, `'max'` or your own function of a cell's values). `dateGrouping` buckets a date field by year, quarter, month, ISO week or day before grouping; `filters` keeps only the listed values of a field. Every subtotal and the totals come from one pass over the records, and the engine (`pivot`) is exported for a server or a test.
+
+It stays a plain `<table>`, never a grid, so a screen reader's table commands work. Each data cell lists in `headers` every header that names it, row groups outermost first, then the column groups and the measure, and so is read as "Bed 4, March, Sum of kg, 12.5" at any depth. A row group with children has a button with `aria-expanded`; collapsed, its subtotal stays on its row (`subtotals={false}` leaves open parents empty). `config` is bindable: unless `configurable={false}`, each field above the table is a menu button that moves it to the other axis or to values, reorders it, removes it, or changes a measure's aggregate, and each change reads out the new layout.
+
+```svelte
+<PivotTable
+  data={harvests}
+  bind:config
+  fields={[{ name: 'bed', label: 'Bed' }, { name: 'picked', label: 'Picked' }, { name: 'kg', label: 'kg', kind: 'measure' }]}
+  caption="Harvest by bed and month"
+/>
+```
+
 ## Grouping a burst of chat messages
 
 `ChatBubble` takes `grouped` for the second and later messages of a run from one author. The caller computes the run, so `MessageThread` stays a plain list of children:
