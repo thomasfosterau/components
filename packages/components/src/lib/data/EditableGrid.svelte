@@ -60,7 +60,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     commit; a commit whose save is rejected leaves it, a new commit empties
     the redo side, and the whole history is dropped once a row it names
     leaves `allRows`.
-  - Copy and paste (#425), in navigation mode: Ctrl/⌘+C copies the active
+  - Copy and paste, in navigation mode: Ctrl/⌘+C copies the active
     cell's text (`format`, a date's ISO form, else the value) through the
     `copy` event's `clipboardData`, unless the reader has selected text of
     their own. Ctrl/⌘+V into an editable cell reads the `paste` event's
@@ -71,7 +71,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     commits nothing and marks the cell in error with `pasteFailedLabel` or
     the messages, announced through the polite region. In edit mode both
     are the editor control's own.
-  - Range selection (#426): Shift+arrow keys (and Shift+Home/End/Page
+  - Range selection: Shift+arrow keys (and Shift+Home/End/Page
     keys) extend a block of body cells from the cell they started on; each
     cell in it carries `aria-selected="true"` and the grid
     `aria-multiselectable="true"`. Any other move, a click, Escape or
