@@ -49,11 +49,13 @@ test('arrow keys pan within the image, and the readout follows', async () => {
     .toHaveTextContent('Showing 67% of the width, towards the left');
 });
 
-test('plus zooms in about the centre and Home resets', async () => {
+test('plus and minus zoom about the centre and Home resets', async () => {
   const { screen, area } = await setup();
 
   focus(screen.getByRole('group', { name: 'Crop area' }));
   await userEvent.keyboard('+');
+  await expect.element(area).toHaveTextContent('236,36,727,727,0');
+  await userEvent.keyboard('+-');
   await expect.element(area).toHaveTextContent('236,36,727,727,0');
   await userEvent.keyboard('{Home}');
   await expect.element(area).toHaveTextContent('200,0,800,800,0');

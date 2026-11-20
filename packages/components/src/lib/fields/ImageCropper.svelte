@@ -227,25 +227,29 @@ Frames a chosen image: a fixed crop frame over an image the reader pans, zooms, 
     ArrowDown: { x: 0, y: 1 },
   };
 
+  /** Zoom keys and their factor; `=` and `_` are + and − without Shift. */
+  const ZOOM_KEYS: Readonly<Record<string, number>> = {
+    '+': ZOOM_STEP,
+    '=': ZOOM_STEP,
+    '-': 1 / ZOOM_STEP,
+    _: 1 / ZOOM_STEP,
+  };
+
+  /** Home: centred and fully zoomed out, keeping the turn. */
+  const recentre = (): void =>
+    update((f, v) => clampView(f, { ...initialView(f), rotation: v.rotation, straighten: v.straighten }));
+
   const keyChange = (event: KeyboardEvent): (() => void) | undefined => {
     const arrow = ARROWS[event.key];
     if (arrow) {
       const step = (event.shiftKey ? 50 : 10) * sourcePerPixel();
       return () => update((f, v) => panView(f, v, { x: arrow.x * step, y: arrow.y * step }));
     }
-    const zoom = view?.zoom ?? 1;
-    switch (event.key) {
-      case '+':
-      case '=':
-        return () => zoomTo(zoom * ZOOM_STEP);
-      case '-':
-      case '_':
-        return () => zoomTo(zoom / ZOOM_STEP);
-      case 'Home':
-        return () => update((f, v) => clampView(f, { ...initialView(f), rotation: v.rotation, straighten: v.straighten }));
-      default:
-        return undefined;
+    const factor = ZOOM_KEYS[event.key];
+    if (factor !== undefined) {
+      return () => zoomTo((view?.zoom ?? 1) * factor);
     }
+    return event.key === 'Home' ? recentre : undefined;
   };
 
   const onKeydown = (event: KeyboardEvent): void => {
