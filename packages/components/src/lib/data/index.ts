@@ -34,6 +34,8 @@ export { default as PaginationFooter } from './PaginationFooter.svelte';
 export { default as ResultCount } from './ResultCount.svelte';
 export { default as SortableList } from './SortableList.svelte';
 export { default as Table } from './Table.svelte';
+export { default as TaskList } from './TaskList.svelte';
+export { default as TaskListItem } from './TaskListItem.svelte';
 export { default as TreeList } from './TreeList.svelte';
 export { default as TreeListItem } from './TreeListItem.svelte';
 export { default as TreeView } from './TreeView.svelte';
@@ -46,6 +48,12 @@ export type { ListGroupStyle, ListGroupVariant } from './list-group.ts';
 export * from './pagination.ts';
 export { defaultSortableAnnouncements, move, type SortableAnnouncements } from './sortable.ts';
 export * from './table-types.ts';
+export {
+  defaultTaskStatusLabels,
+  type Task,
+  type TaskListSection,
+  type TaskStatus,
+} from './task-list.ts';
 export * from './tree-view.ts';
 export type {
   VirtualAlign,
