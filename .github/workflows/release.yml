@@ -108,7 +108,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       # No `registry-url`: its `.npmrc` token would be tried instead of OIDC.
-      # Node LTS bundles npm >= 11.5.1, which trusted publishing needs.
+      # `pnpm publish` does trusted publishing and provenance itself; no npm.
       - uses: voidzero-dev/setup-vp@v1.22.0
         with:
           version-file: pnpm-workspace.yaml
@@ -117,7 +117,7 @@ jobs:
           run-install: |
             - args: ['--frozen-lockfile', '--ignore-scripts']
       - run: vp run -r build
-      # `pnpm run`, not `vp run`: `vp run` does not forward the OIDC request env npm needs.
+      # `pnpm run`, not `vp run`: `vp run` does not forward the OIDC request env pnpm needs.
       - uses: changesets/action/publish@v2.1.2
         with:
           script: pnpm run release

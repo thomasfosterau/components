@@ -1,7 +1,7 @@
 /**
  * Publishes every public workspace package whose version isn't on npm yet:
- * `pnpm pack` (which rewrites `catalog:` / `workspace:*`), then `npm publish`
- * of the tarball via OIDC. Reports each publish to changesets/action through
+ * `pnpm pack` (which rewrites `catalog:` / `workspace:*`), then `pnpm publish`
+ * of the tarball via OIDC trusted publishing (pnpm attaches provenance itself). Reports each publish to changesets/action through
  * `CHANGESETS_OUTPUT`, so it tags and releases it. Safe to re-run.
  */
 
@@ -40,12 +40,14 @@ packages.sort((a, b) => siblingCount(a.manifest) - siblingCount(b.manifest));
 /** @param {string} name @param {string} version */
 const isPublished = (name, version) => {
   try {
-    execFileSync('npm', ['view', `${name}@${version}`, 'version'], { stdio: 'pipe' });
+    execFileSync('pnpm', ['view', `${name}@${version}`, 'version'], { stdio: 'pipe' });
     return true;
   } catch (error) {
     const stderr =
       typeof error === 'object' && error !== null && 'stderr' in error ? String(error.stderr) : '';
-    if (stderr.includes('E404')) return false;
+    // A missing version, or a package never published.
+    if (stderr.includes('ERR_PNPM_PACKAGE_NOT_FOUND') || stderr.includes('ERR_PNPM_FETCH_404'))
+      return false;
     throw error;
   }
 };
@@ -66,9 +68,11 @@ for (const { dir, manifest } of packages) {
   const tarball = readdirSync(packDir).find((file) => !before.has(file));
   if (tarball === undefined) throw new Error(`pnpm pack produced no tarball for ${name}`);
 
-  execFileSync('npm', ['publish', join(packDir, tarball), '--access', 'public'], {
-    stdio: 'inherit',
-  });
+  execFileSync(
+    'pnpm',
+    ['publish', join(packDir, tarball), '--access', 'public', '--no-git-checks'],
+    { stdio: 'inherit' },
+  );
   console.log(`publish  ${name}@${version}`);
   published += 1;
 

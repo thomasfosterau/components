@@ -6,7 +6,7 @@ These are UI, chart and data-import libraries that run in your app and hold no c
 
 ## Supply chain
 
-- Publishing uses npm trusted publishing from a protected environment, so there is no long-lived token, and npm attaches provenance.
+- Publishing uses `pnpm publish` with npm trusted publishing from a protected environment, so there is no long-lived token, and pnpm attaches provenance.
 - The publishing job installs with `--ignore-scripts`; elsewhere dependency build scripts run only if listed in `allowBuilds`.
 - Actions are pinned by `.github/workflows/actions.lock`; workflows default to `permissions: {}`.
-- pnpm waits 8 hours (`minimumReleaseAge`) before installing a new third-party release, and CI fails on a high-severity `pnpm audit` finding.
+- pnpm waits 24 hours (`minimumReleaseAge`) before installing a new third-party release, and CI fails on a high-severity `pnpm audit` finding.
