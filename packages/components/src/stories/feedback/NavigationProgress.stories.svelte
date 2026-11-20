@@ -38,7 +38,7 @@
   };
 </script>
 
-<Story name="Simulated navigation">
+<Story name="Simulated navigation" asChild>
   <NavigationProgress {progress} />
   <div class="flex flex-wrap gap-2">
     <Button onclick={() => navigate(100)}>Fast page (100 ms)</Button>
