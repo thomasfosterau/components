@@ -25,6 +25,10 @@ The label, hint and errors frame around one control, handing it the `FieldContro
   `<label>`, so the accessible name reads "Scientific name (required)" rather
   than "Scientific name star".
 
+  `help` renders beside the label but outside the `<label>` element: a button
+  inside a label is invalid, and would steal the label's click. Pass a
+  `ContextualHelp`.
+
   `errors` is a LIST. A field that fails several rules says so; collapsing
   them to the first message is a decision the call site should make, not one
   this frame makes for it.
@@ -62,6 +66,8 @@ The label, hint and errors frame around one control, handing it the `FieldContro
     requiredLabel?: string | undefined;
     /** The control; receives the `FieldControl` props to spread. */
     children: Snippet<[FieldControl]>;
+    /** Beside the label, outside it: a `ContextualHelp`. */
+    help?: Snippet<[]> | undefined;
   }
 
   let {
@@ -72,6 +78,7 @@ The label, hint and errors frame around one control, handing it the `FieldContro
     required = false,
     requiredLabel = '(required)',
     children,
+    help,
     class: className,
     ...rest
   }: Props = $props();
@@ -108,7 +115,7 @@ The label, hint and errors frame around one control, handing it the `FieldContro
   };
 </script>
 
-<div {...rest} class={['fieldset', className]}>
+{#snippet fieldLabel()}
   <!-- The click handler restores what `<label for>` does natively — a pointer
        shortcut to the control — for a control `for` cannot reach. Keyboard
        users reach the control itself with Tab, as with any label, so there is
@@ -121,6 +128,17 @@ The label, hint and errors frame around one control, handing it the `FieldContro
       <span class="sr-only">{requiredLabel}</span>
     {/if}
   </label>
+{/snippet}
+
+<div {...rest} class={['fieldset', className]}>
+  {#if help === undefined}
+    {@render fieldLabel()}
+  {:else}
+    <div class="flex items-center gap-1">
+      {@render fieldLabel()}
+      {@render help()}
+    </div>
+  {/if}
   {@render children(control)}
   {#if hint !== undefined}
     <p class="fieldset-label" id={hintId}>{hint}</p>
