@@ -325,11 +325,16 @@ A board of columns holding cards that move within and between columns by draggin
     return on[column] ? { ...to, column } : to;
   };
 
+  /** Where a key sends the held card, or `undefined` for a key the board does not use. */
+  const heldTarget = (on: readonly BoardColumn<C>[], id: string, keyName: string): BoardPlace | undefined => {
+    const at = locate(on, key, id);
+    const raw = at ? keyTarget(keyName, at) : undefined;
+    return at && raw ? pastFull(on, at, raw) : undefined;
+  };
+
   const onHandleKeydown = (event: KeyboardEvent, id: string): void => {
     if (held?.id !== id || held.via !== 'keyboard' || !draft) return;
-    const at = locate(draft, key, id);
-    const raw = at ? keyTarget(event.key, at) : undefined;
-    const target = at && raw ? pastFull(draft, at, raw) : raw;
+    const target = heldTarget(draft, id, event.key);
     if (event.key === 'Escape') cancel();
     else if (target) shiftTo(target);
     else return;
