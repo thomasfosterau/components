@@ -159,3 +159,48 @@
   --color-chart-3: oklch(66.6% 0.179 58.318); /* amber-600, inside both bands */
   --color-chart-4: oklch(54.6% 0.245 262.881); /* blue-600, inside both bands */
 }
+
+/* ── NavigationStack: the push and pop slides ─────────────────────────────────
+ * `NavigationStackState.onNavigate` sets `data-stack-direction` on the root for
+ * the length of a view transition; a `StackPage` is the `stack-page` group.
+ * Under reduced motion the browser's default cross-fade is left alone.
+ * ──────────────────────────────────────────────────────────────────────────── */
+@keyframes stack-in-from-end {
+  from {
+    transform: translateX(var(--stack-shift, 100%));
+  }
+}
+@keyframes stack-out-to-start {
+  to {
+    transform: translateX(calc(var(--stack-shift, 100%) * -0.3));
+    opacity: 0;
+  }
+}
+@keyframes stack-in-from-start {
+  from {
+    transform: translateX(calc(var(--stack-shift, 100%) * -0.3));
+    opacity: 0;
+  }
+}
+@keyframes stack-out-to-end {
+  to {
+    transform: translateX(var(--stack-shift, 100%));
+  }
+}
+:root:dir(rtl) {
+  --stack-shift: -100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-stack-direction='push']::view-transition-new(stack-page) {
+    animation: stack-in-from-end 250ms ease-out;
+  }
+  :root[data-stack-direction='push']::view-transition-old(stack-page) {
+    animation: stack-out-to-start 250ms ease-out;
+  }
+  :root[data-stack-direction='pop']::view-transition-new(stack-page) {
+    animation: stack-in-from-start 250ms ease-out;
+  }
+  :root[data-stack-direction='pop']::view-transition-old(stack-page) {
+    animation: stack-out-to-end 250ms ease-out;
+  }
+}
