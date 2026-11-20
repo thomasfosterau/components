@@ -22,6 +22,8 @@ Buttons, badges and surfaces — the family every other family builds on: `Alert
 
 **A default action with alternatives is a `SplitButton`.** "Save ▾" runs Save on the main part and offers "Save as draft" behind the chevron: two Tab stops in a `join`, with the alternatives as the same `MenuItem`s a `DropdownMenu` takes. Name the chevron for what it holds (`menuLabel="More save options"`), not "More". Like `DropdownMenu`, it loads bits-ui's menu runtime, so keep it off components every page renders.
 
+**A link's preview is supplementary.** `LinkPreview` shows a card while a link is hovered or keyboard-focused: a taxon's photo, an author's bio. The card takes no focus and never shows on touch, so the link's name and its destination must carry the meaning, and nothing interactive goes in the card; a "Follow" button there is unreachable by keyboard and belongs in a `Popover`. `Tooltip` is for a few words, `LinkPreview` for a card, `Popover` for anything you act on. `load` fetches the card's data the first time it opens.
+
 **A context menu is never the only route to an action.** It is invisible until summoned: keyboard users can open it with Shift+F10 or the Menu key on the focused region, but touch screen-reader users and many keyboard users never discover it. Put every action in a `ContextMenu` somewhere visible as well — a row's "More" `DropdownMenu`, a toolbar. The menu children (`MenuItem`, `MenuSeparator`, `MenuCheckboxItem`, `MenuRadioGroup` / `MenuRadioItem`, `MenuSub`) import nothing from bits-ui: `DropdownMenu` and `ContextMenu` lend them their bits-ui parts through context, so a page that only renders a navigation `Menu` never loads the menu runtime.
 
 - **`slug.ts`** — `slugify`, used by `Heading`.
