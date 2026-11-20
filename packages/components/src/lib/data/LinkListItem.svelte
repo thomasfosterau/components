@@ -3,7 +3,8 @@ The row body most lists want: a linked title, a line of context under it, and sh
 -->
 <!--
   LinkListItem — the row body most lists want: a linked title, a line of
-  context under it, and short markers.
+  context under it, and short markers. A preset over `ListRow` (a control
+  row whose headline is the link), so there is one row implementation.
 
   It renders the body only, never the `<li>` or the `<article>` around it,
   because the container is `ItemList`'s decision (a list item in one mode, a
@@ -19,10 +20,12 @@ The row body most lists want: a linked title, a line of context under it, and sh
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import type { Attachment } from 'svelte/attachments';
   import type { HTMLAttributes } from 'svelte/elements';
   import Badge from '../ui/Badge.svelte';
   import Link from '../ui/Link.svelte';
   import type { HeadingLevel } from '../ui/tones.ts';
+  import ListRow from './ListRow.svelte';
 
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
     /** Where the title links to; resolved through the components context. */
@@ -39,29 +42,34 @@ The row body most lists want: a linked title, a line of context under it, and sh
     meta?: Snippet<[]> | undefined;
   }
 
-  let {
-    href,
-    title,
-    subtitle,
-    badges,
-    headingLevel,
-    meta,
-    class: className,
-    ...rest
-  }: Props = $props();
+  let { href, title, subtitle, badges, headingLevel, meta, onclick, ...rest }: Props = $props();
+
+  /**
+   * A caller's `onclick` stays a plain listener on the row body. Passed as
+   * `ListRow`'s `onclick` it would turn the body into a button around the link.
+   */
+  // The row body is the `<div>` these attributes were typed for; `ListRow`
+  // types its body as any element because a link or button row is not one.
+  const rowAttributes = $derived(rest as Omit<HTMLAttributes<HTMLElement>, 'onclick'>);
+
+  const listen: Attachment<HTMLElement> = (node) => {
+    if (onclick == null) return;
+    const handler = onclick as unknown as (event: MouseEvent) => void;
+    node.addEventListener('click', handler);
+    return () => node.removeEventListener('click', handler);
+  };
 </script>
 
-<div {...rest} class={['flex flex-col gap-1', className]}>
-  {#if headingLevel === undefined}
-    <Link {href} variant="muted" class="font-medium">{title}</Link>
-  {:else}
-    <svelte:element this={`h${headingLevel}`} class="text-base font-medium">
+<ListRow {...rowAttributes} supporting={subtitle} {@attach listen}>
+  {#snippet headline()}
+    {#if headingLevel === undefined}
       <Link {href} variant="muted">{title}</Link>
-    </svelte:element>
-  {/if}
-  {#if subtitle !== undefined}
-    <p class="text-base-content/70 text-sm">{subtitle}</p>
-  {/if}
+    {:else}
+      <svelte:element this={`h${headingLevel}`} class="text-base">
+        <Link {href} variant="muted">{title}</Link>
+      </svelte:element>
+    {/if}
+  {/snippet}
   {#if meta}
     <div class="text-base-content/60 text-sm">{@render meta()}</div>
   {/if}
@@ -72,4 +80,4 @@ The row body most lists want: a linked title, a line of context under it, and sh
       {/each}
     </div>
   {/if}
-</div>
+</ListRow>

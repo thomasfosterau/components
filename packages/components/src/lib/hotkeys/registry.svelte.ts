@@ -66,8 +66,8 @@ function warnOnTriggerConflicts(
     );
     if (conflict) {
       // A dev-build diagnostic: it has to reach the browser console the
-      // developer is looking at, which is why this is the one `console` call
-      // in the package.
+      // developer is looking at, which is why this is one of the package's
+      // two `console` calls (`data/ListRow`'s markup warning is the other).
       console.warn(
         `[hotkeys] Trigger ${formatTrigger(trigger)} of "${entry.action.id}" ` +
           `shadows "${conflict.action.id}" (${conflict.scope}). ` +
