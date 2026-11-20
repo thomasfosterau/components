@@ -4,7 +4,7 @@ Each component's props, defaults, snippets and ARIA contract are in its doc comm
 
 Dialogs, toasts, progress — chrome around something that just happened, or is happening now. What these share is the live region and the announcement order, not the markup.
 
-`feedback` also exports `sizes.ts` (`DialogSize`, `ToastPosition`, `BarSize`, `StatsOrientation` and their class tables `dialogSize`, `toastPosition`, `barSize`, `statsOrientation`), `dialogs.ts` (`getDialogs`, `setDialogs`, `DialogsApi`, `ConfirmRequest`, `PromptRequest`, `AlertRequest`) and `toaster.ts` (`getToaster`, `setToaster`, `Toast`, `NewToast`, `ToastTone`, `ToastAction`, `ToastOutcome`, `ToasterApi`), plus the prop types below. `colourToken` on a `SegmentBar` segment or a `TimelineEntry` is a CSS custom-property name your theme declares — see `ui`'s `colourTokenStyle`.
+`feedback` also exports `sizes.ts` (`DialogSize`, `ToastPosition`, `BarSize`, `StatsOrientation` and their class tables `dialogSize`, `toastPosition`, `barSize`, `statsOrientation`), `consent.svelte.ts` (`createConsent`, `setConsent`, `getConsent`, `cookieStorage`, `parseConsentChoice`, `ConsentApi`, `ConsentCategory`, `ConsentChoice`, `ConsentOptions`, `ConsentStorage`, `CategoryConsent`), `dialogs.ts` (`getDialogs`, `setDialogs`, `DialogsApi`, `ConfirmRequest`, `PromptRequest`, `AlertRequest`) and `toaster.ts` (`getToaster`, `setToaster`, `Toast`, `NewToast`, `ToastTone`, `ToastAction`, `ToastOutcome`, `ToasterApi`), plus the prop types below. `colourToken` on a `SegmentBar` segment or a `TimelineEntry` is a CSS custom-property name your theme declares — see `ui`'s `colourTokenStyle`.
 
 | Type | What it is |
 | --- | --- |
@@ -71,3 +71,48 @@ Dialogs, toasts, progress — chrome around something that just happened, or is 
   <StatTile label="Plants recorded" value={1284} delta={{ value: 46, label: 'this month' }} />
 </Stats>
 ```
+
+## Consent
+
+`ConsentBanner` asks once whether the app may set optional cookies or load third-party content; `ConsentSettings` is the form on your cookie settings page where a reader changes or withdraws that choice. Both read a store you create once in the root layout and publish with `setConsent`. Storage is yours: pass `read` and `write`, or spread `cookieStorage(name)`.
+
+```svelte
+<script lang="ts">
+  import { ConsentBanner, cookieStorage, createConsent, setConsent } from '@thomasfosterau/components';
+
+  const consent = setConsent(
+    createConsent({
+      categories: [
+        { id: 'necessary', label: 'Strictly necessary cookies', required: true },
+        { id: 'analytics', label: 'Analytics cookies' },
+      ],
+      ...cookieStorage('consent'),
+    }),
+  );
+</script>
+
+<ConsentBanner settingsHref="/cookies" action="/cookies">
+  <p>We’d like to set analytics cookies to understand how you use the site.</p>
+</ConsentBanner>
+```
+
+`cookieStorage` reads `document.cookie` in the browser only. To render the right state on the server (no banner flash for someone who already chose), read the cookie in a server `load`, pass it through `parseConsentChoice`, and give that to `read`. With `action`, the banner is a `<form method="post">` posting `consent=accept|reject`, so it works before scripts load; `ConsentSettings` with `action` posts each enabled category as `consent`.
+
+**Gate loaders on `hasConsent`.** Nothing optional should run until the reader allows it. Start analytics in an effect, and hand an embed its category:
+
+```svelte
+<script lang="ts">
+  import { Embed, getConsent } from '@thomasfosterau/components';
+
+  const consent = getConsent();
+  $effect(() => {
+    if (consent.hasConsent('analytics')) startAnalytics();
+  });
+</script>
+
+<Embed provider="youtube" id={videoId} title="Planting garlic" consent={consent.category('video')} />
+```
+
+`hasConsent` is true for a `required` category and false for any other until the reader chooses. `category(id)` is live, so the embed loads as soon as consent is granted anywhere, and activating the embed grants it.
+
+Accept and Reject are deliberately the same button: a prominent Accept beside a buried Reject is the pattern regulators fine. The banner is a region in reading order, not a dialog, so it traps no focus and is not announced on every page.
