@@ -33,7 +33,9 @@ A read-only, collapsible tree of structured data: keys beside typed values, a fi
     filterJson,
     formatJsonPath,
     idsToDepth,
+    isCopyKey,
     jsonTree,
+    pathOfItem,
     toJson,
     type JsonEntry,
     type JsonKind,
@@ -214,13 +216,7 @@ A read-only, collapsible tree of structured data: keys beside typed values, a fi
   };
 
   const copyFocused: KeyboardEventHandler<HTMLUListElement> = (event) => {
-    if (!copyable || !(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== 'c') return;
-    if ((globalThis.getSelection?.()?.toString() ?? '') !== '') return;
-    const path =
-      event.target instanceof Element
-        ? event.target.querySelector('[data-json-path]')?.getAttribute('data-json-path')
-        : undefined;
-    const entry = path === undefined || path === null ? undefined : entries.get(path);
+    const entry = copyable && isCopyKey(event) ? entries.get(pathOfItem(event.target)) : undefined;
     if (entry === undefined) return;
     event.preventDefault();
     void copy(toJson(entry.value));

@@ -182,3 +182,15 @@ export const toJson = (value: unknown): string => {
     ) ?? 'null'
   );
 };
+
+/** Whether a keydown is Ctrl/⌘+C with no text selected: copy the focused node. */
+export const isCopyKey = (event: KeyboardEvent): boolean =>
+  (event.ctrlKey || event.metaKey) &&
+  event.key.toLowerCase() === 'c' &&
+  (globalThis.getSelection?.()?.toString() ?? '') === '';
+
+/** The JSONPath of the `JsonView` treeitem `target` is, read from its row. */
+export const pathOfItem = (target: EventTarget | null): string =>
+  (target instanceof Element
+    ? target.querySelector('[data-json-path]')?.getAttribute('data-json-path')
+    : undefined) ?? '';
