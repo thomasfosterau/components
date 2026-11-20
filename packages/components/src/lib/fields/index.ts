@@ -43,6 +43,7 @@ export { default as Textarea } from './Textarea.svelte';
 export { default as TextInput } from './TextInput.svelte';
 export { default as Toggle } from './Toggle.svelte';
 export { default as TransferList } from './TransferList.svelte';
+export { default as TreeSelect } from './TreeSelect.svelte';
 export {
   default as PushToggle,
   type PushDeclineReason,
@@ -53,3 +54,4 @@ export { default as VideoInput } from './VideoInput.svelte';
 export * from './field-types.ts';
 export type { FileRejection } from './file-validation.ts';
 export type { CascaderNode } from './cascader.ts';
+export type { TreeSelectStrategy } from './tree-select.ts';
