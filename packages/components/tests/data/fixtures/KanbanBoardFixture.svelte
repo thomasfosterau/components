@@ -13,9 +13,11 @@
       | ((cardId: string, toColumn: string, toIndex: number, signal: AbortSignal) => Promise<void>)
       | undefined;
     enforceLimits?: boolean | undefined;
+    /** The board's width: narrow enough and the columns become tabs. */
+    width?: string | undefined;
   }
 
-  let { onMove, enforceLimits = false }: Props = $props();
+  let { onMove, enforceLimits = false, width = '1000px' }: Props = $props();
 
   const crop = (name: string): Crop => ({ id: name.toLowerCase(), name });
 
@@ -28,6 +30,7 @@
   );
 </script>
 
+<div style:width>
 <KanbanBoard
   bind:columns
   key={(card) => card.id}
@@ -37,6 +40,7 @@
 >
   {#snippet card(item)}<span>{item.name}</span>{/snippet}
 </KanbanBoard>
+</div>
 <output data-testid="columns"
   >{columns.map((column) => `${column.id}: ${column.cards.map((c) => c.name).join(' ')}`).join(' | ')}</output
 >

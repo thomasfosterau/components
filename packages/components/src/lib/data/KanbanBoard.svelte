@@ -14,6 +14,10 @@ A board of columns holding cards that move within and between columns by draggin
   ←/→ to the next column (mirrored right-to-left) at the nearest position,
   Home/End to either end, Escape cancels. The "Move to" menu needs no mode.
   Every step is announced politely.
+
+  Narrower than `narrowWidth`, the columns become tabs (one column per tab,
+  named with its count), since only one column would fit. A card moved to
+  another column, by keyboard or menu, takes the view to that column's tab.
 -->
 <script lang="ts" generics="C">
   import { EllipsisVertical, GripVertical } from '@lucide/svelte';
@@ -27,6 +31,8 @@ A board of columns holding cards that move within and between columns by draggin
   import MenuRadioGroup from '../ui/MenuRadioGroup.svelte';
   import MenuRadioItem from '../ui/MenuRadioItem.svelte';
   import MenuSeparator from '../ui/MenuSeparator.svelte';
+  import Tabs from '../layout/Tabs.svelte';
+  import type { TabItem } from '../layout/types.ts';
   import VisuallyHidden from '../ui/VisuallyHidden.svelte';
   import {
     defaultBoardAnnouncements,
@@ -104,6 +110,21 @@ A board of columns holding cards that move within and between columns by draggin
      * @defaultValue `'Move to bottom'`
      */
     moveToBottomLabel?: string | undefined;
+    /**
+     * Show the columns as tabs when the board is narrower than `narrowWidth`.
+     * @defaultValue `true`
+     */
+    tabsOnNarrow?: boolean | undefined;
+    /**
+     * The board width, in CSS pixels, below which columns become tabs.
+     * @defaultValue `640`
+     */
+    narrowWidth?: number | undefined;
+    /**
+     * The tab strip's name, in tabs mode.
+     * @defaultValue `'Columns'`
+     */
+    tabsLabel?: string | undefined;
     /** Live-region messages; any one can be replaced. */
     announcements?: Partial<BoardAnnouncements> | undefined;
   }
@@ -127,6 +148,9 @@ A board of columns holding cards that move within and between columns by draggin
     columnGroupLabel = 'Column',
     moveToTopLabel = 'Move to top',
     moveToBottomLabel = 'Move to bottom',
+    tabsOnNarrow = true,
+    narrowWidth = 640,
+    tabsLabel = 'Columns',
     announcements,
     class: className,
     ...rest
@@ -146,6 +170,23 @@ A board of columns holding cards that move within and between columns by draggin
   const view = $derived(draft ?? columns);
 
   let board: HTMLElement | undefined = $state();
+  let boardWidth = $state(Number.POSITIVE_INFINITY);
+  const narrow = $derived(tabsOnNarrow && boardWidth < narrowWidth);
+  /** The column shown in tabs mode. */
+  let shown = $state('');
+  const tabItems = $derived(
+    view.map(
+      (column): TabItem => ({
+        value: column.id,
+        label: `${column.title}, ${cardsLabel(column.cards.length, column.limit)}`,
+      }),
+    ),
+  );
+  /** In tabs mode, bring a column's tab forward, so a card moved there stays in view. */
+  const showColumn = (on: readonly BoardColumn<C>[], column: number): void => {
+    const id = on[column]?.id;
+    if (narrow && id !== undefined) shown = id;
+  };
   const lists = new Map<string, HTMLElement>();
   const rows = new Map<string, HTMLElement>();
   const handles = new Map<string, HTMLElement>();
@@ -243,6 +284,7 @@ A board of columns holding cards that move within and between columns by draggin
     if (!place) return;
     draft = moveCard(draft, from, place);
     message = shiftMessage(held.id, place.column !== from.column, place, draft);
+    showColumn(draft, place.column);
     if (held.via === 'keyboard') void refocus(handles, held.id);
   };
 
@@ -272,6 +314,7 @@ A board of columns holding cards that move within and between columns by draggin
     if (!released) return;
     const { id, via, origin } = released;
     message = say.cancelled(nameOf(id), titleOf(columns, origin.column), origin.index + 1);
+    showColumn(columns, origin.column);
     if (via === 'keyboard') void refocus(handles, id);
   };
 
@@ -284,6 +327,7 @@ A board of columns holding cards that move within and between columns by draggin
     commit(id, from, place, () =>
       say.movedTo(name, titleOf(columns, place.column), place.index + 1, lengthOf(columns, place.column)),
     );
+    showColumn(columns, place.column);
     void refocus(triggers, id);
   };
 
@@ -517,47 +561,64 @@ A board of columns holding cards that move within and between columns by draggin
   </h2>
 {/snippet}
 
+{#snippet cardList(column: BoardColumn<C>, columnIndex: number)}
+  <ul
+    {@attach register(lists, column.id)}
+    role="list"
+    class="flex max-h-[70vh] min-h-16 flex-col gap-2 overflow-y-auto p-2"
+  >
+    {#each column.cards as item, index (key(item))}
+      {@const id = key(item)}
+      {@const dragging = held?.id === id}
+      <li
+        {@attach register(rows, id)}
+        animate:flip={{ duration: prefersReducedMotion.current ? 0 : 150 }}
+        class={[
+          'bg-base-100 rounded-box flex items-start gap-1 p-1 shadow-sm',
+          dragging && 'ring-primary relative z-10 shadow-lg ring-2',
+        ]}
+      >
+        {@render handleFor(item, id, dragging)}
+        <div class="min-w-0 flex-1 py-1">
+          {@render card(item, { columnId: column.id, index, dragging })}
+        </div>
+        {@render menuFor(item, id, column, columnIndex, index)}
+      </li>
+    {/each}
+  </ul>
+{/snippet}
+
+{#snippet tabPanel(tab: TabItem)}
+  {@const columnIndex = view.findIndex((column) => column.id === tab.value)}
+  {@const column = view[columnIndex]}
+  {#if column}
+    <div class="bg-base-200 rounded-box">{@render cardList(column, columnIndex)}</div>
+  {/if}
+{/snippet}
+
 <section
   {...rest}
   bind:this={board}
+  bind:clientWidth={boardWidth}
   aria-label={label}
-  class={['flex items-start gap-4 overflow-x-auto pb-2', held?.via === 'pointer' && 'select-none', className]}
-  style:display="flex"
-  style:overflow-x="auto"
+  class={[!narrow && 'flex items-start gap-4 overflow-x-auto pb-2', held?.via === 'pointer' && 'select-none', className]}
+  style:display={narrow ? undefined : 'flex'}
+  style:overflow-x={narrow ? undefined : 'auto'}
 >
-  {#each view as column, columnIndex (column.id)}
-    <section
-      aria-labelledby={headingId(columnIndex)}
-      class="bg-base-200 rounded-box flex w-72 shrink-0 flex-col"
-      style:flex-shrink="0"
-    >
-      {@render heading(column, columnIndex)}
-      <ul
-        {@attach register(lists, column.id)}
-        role="list"
-        class="flex max-h-[70vh] min-h-16 flex-col gap-2 overflow-y-auto p-2"
+  {#if narrow}
+    <Tabs items={tabItems} bind:value={shown} label={tabsLabel} panel={tabPanel} />
+  {:else}
+    {#each view as column, columnIndex (column.id)}
+      <section
+        aria-labelledby={headingId(columnIndex)}
+        class="bg-base-200 rounded-box flex w-72 shrink-0 flex-col"
+        style:flex-shrink="0"
       >
-        {#each column.cards as item, index (key(item))}
-          {@const id = key(item)}
-          {@const dragging = held?.id === id}
-          <li
-            {@attach register(rows, id)}
-            animate:flip={{ duration: prefersReducedMotion.current ? 0 : 150 }}
-            class={[
-              'bg-base-100 rounded-box flex items-start gap-1 p-1 shadow-sm',
-              dragging && 'ring-primary relative z-10 shadow-lg ring-2',
-            ]}
-          >
-            {@render handleFor(item, id, dragging)}
-            <div class="min-w-0 flex-1 py-1">
-              {@render card(item, { columnId: column.id, index, dragging })}
-            </div>
-            {@render menuFor(item, id, column, columnIndex, index)}
-          </li>
-        {/each}
-      </ul>
-    </section>
-  {/each}
+        {@render heading(column, columnIndex)}
+        {@render cardList(column, columnIndex)}
+      </section>
+    {/each}
+  {/if}
 </section>
 <VisuallyHidden id={instructionsId}>{instructionsLabel}</VisuallyHidden>
 <div aria-live="polite" aria-atomic="true" class="sr-only">{message}</div>

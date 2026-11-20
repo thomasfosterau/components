@@ -28,3 +28,9 @@
 <Story name="Slow persistence with rollback" asChild>
   <KanbanDemo slow />
 </Story>
+
+<Story name="Phone width as tabs" asChild>
+  <div class="w-[390px] max-w-full">
+    <KanbanDemo />
+  </div>
+</Story>

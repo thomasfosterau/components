@@ -1,4 +1,4 @@
-import { expect, test, vi } from 'vite-plus/test';
+import { describe, expect, test, vi } from 'vite-plus/test';
 import { page, userEvent } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import KanbanBoardFixture from './fixtures/KanbanBoardFixture.svelte';
@@ -139,4 +139,48 @@ test('dragging a handle moves the card between columns', async () => {
 
   expect(onMove).toHaveBeenCalledExactlyOnceWith('basil', 'sown', 1, expect.any(AbortSignal));
   await expect.poll(board).toBe('planned: Tomato Carrot | sown: Pea Basil | harvested: ');
+});
+
+describe('on a narrow board', () => {
+  test('columns render as tabs named with their counts', async () => {
+    const screen = await render(KanbanBoardFixture, { width: '390px' });
+    await expect
+      .element(screen.getByRole('tab', { name: 'Planned, 3 cards' }))
+      .toHaveAttribute('aria-selected', 'true');
+    await expect
+      .element(screen.getByRole('tab', { name: 'Sown, 1 of 1 cards' }))
+      .toBeInTheDocument();
+    await expect.element(screen.getByRole('tabpanel')).toBeInTheDocument();
+    await expect
+      .element(screen.getByRole('button', { name: 'Move Tomato', exact: true }))
+      .toBeVisible();
+  });
+
+  test('a held card moved sideways switches the tab and keeps focus on its handle', async () => {
+    const screen = await render(KanbanBoardFixture, { width: '390px' });
+    focus(screen.getByRole('button', { name: 'Move Tomato', exact: true }).element());
+    await userEvent.keyboard(' ');
+    await userEvent.keyboard('{ArrowRight}');
+
+    await expect
+      .element(screen.getByRole('tab', { name: /^Sown/ }))
+      .toHaveAttribute('aria-selected', 'true');
+    await expect
+      .element(screen.getByRole('button', { name: 'Move Tomato', exact: true }))
+      .toHaveFocus();
+    await userEvent.keyboard(' ');
+    await expect.poll(board).toBe('planned: Basil Carrot | sown: Tomato Pea | harvested: ');
+  });
+
+  test('"Move to" moves a card across tabs and follows it', async () => {
+    const screen = await render(KanbanBoardFixture, { width: '390px' });
+    await screen.getByRole('button', { name: 'Move Basil to…' }).click();
+    await screen.getByRole('menuitemradio', { name: 'Harvested' }).click();
+
+    await expect.poll(board).toBe('planned: Tomato Carrot | sown: Pea | harvested: Basil');
+    await expect
+      .element(screen.getByRole('tab', { name: /^Harvested/ }))
+      .toHaveAttribute('aria-selected', 'true');
+    await expect.element(screen.getByRole('button', { name: 'Move Basil to…' })).toHaveFocus();
+  });
 });
