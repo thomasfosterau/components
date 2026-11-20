@@ -119,6 +119,8 @@ export default defineConfig({
       '**/storybook-static/**',
       '**/coverage/**',
       'packages/charts/schema/**',
+      // Vendored (Nayuki's qrcodegen): kept as close to upstream as the build allows.
+      'packages/components/src/lib/media/qr/qrcodegen.ts',
     ],
     options: {
       typeAware: true,
@@ -297,6 +299,7 @@ export default defineConfig({
       '**/.svelte-kit/**',
       '**/storybook-static/**',
       'packages/charts/schema/**',
+      'packages/components/src/lib/media/qr/qrcodegen.ts',
     ],
     singleQuote: true,
     semi: true,

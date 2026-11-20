@@ -85,6 +85,11 @@
       "svelte": "./dist/calendar/index.js",
       "default": "./dist/calendar/index.js"
     },
+    "./qr": {
+      "types": "./dist/media/qr/index.d.ts",
+      "svelte": "./dist/media/qr/index.js",
+      "default": "./dist/media/qr/index.js"
+    },
     "./context-menu": {
       "types": "./dist/ui/context-menu.d.ts",
       "svelte": "./dist/ui/context-menu.js",
