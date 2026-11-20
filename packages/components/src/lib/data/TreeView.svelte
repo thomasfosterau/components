@@ -29,7 +29,8 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
   - Each node is an `<li role="treeitem">`, named by its row through
     `aria-labelledby` (not by its content, which holds its subtree), with
     `aria-level`, `aria-setsize` and `aria-posinset`; `aria-expanded` on parents only, never on a leaf;
-    `aria-selected` unless `selection="none"`; `aria-disabled` on a disabled
+    `aria-selected` unless `selection="none"`, or `aria-checked` instead in a
+    checkbox tree (`checked`); `aria-disabled` on a disabled
     node; `aria-busy` (and `loadingLabel` as its description) while its
     children load. A parent's children are an `<ul role="group">` inside it,
     rendered only while it is expanded.
@@ -137,6 +138,14 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
      * @defaultValue `(node) => \`Could not load ${node.label}\``
      */
     loadErrorLabel?: ((node: TreeNode<T>) => string) | undefined;
+    /**
+     * Makes this a checkbox tree: each node's `aria-checked` (`'mixed'` for a
+     * partly checked parent) replaces `aria-selected`, and Space or a click on
+     * a row calls `onCheck` instead of selecting. Pair with `selection="none"`.
+     */
+    checked?: ((node: TreeNode<T>) => boolean | 'mixed') | undefined;
+    /** A checkbox tree's node was toggled: Space, or a click on its row. */
+    onCheck?: ((node: TreeNode<T>) => void) | undefined;
     /** A node was activated: Enter, or a click on a leaf. */
     onActivate?: ((node: TreeNode<T>) => void) | undefined;
     /**
@@ -163,6 +172,8 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
     loadChildren,
     onLoadError,
     loadErrorLabel = (node) => `Could not load ${node.label}`,
+    checked,
+    onCheck,
     onActivate,
     loadingLabel = 'Loading',
     id = uid,
@@ -311,6 +322,12 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
     selected.add(node.id);
   }
 
+  /** Space or a click: checks in a checkbox tree, else selects. */
+  function toggleNode(node: TreeNode<T>): void {
+    if (checked === undefined) toggleSelected(node);
+    else if (node.disabled !== true) onCheck?.(node);
+  }
+
   function toggleSelected(node: TreeNode<T>): void {
     anchorId = node.id;
     if (selection === 'multiple' && node.disabled !== true && selected.has(node.id)) {
@@ -396,7 +413,7 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
   /** Enter, Space, `*` and typeahead. Whether one matched. */
   function actionKey(event: KeyboardEvent, index: number, node: TreeNode<T>): boolean {
     if (event.key === 'Enter') activate(node);
-    else if (event.key === ' ') toggleSelected(node);
+    else if (event.key === ' ') toggleNode(node);
     else if (event.key === '*') {
       for (const siblingId of siblingParentIds(visible, index)) expanded.add(siblingId);
     } else if (event.key.length === 1 && event.key.trim() !== '') typeahead(index, event.key);
@@ -445,17 +462,38 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
       toggleExpanded(node);
       return;
     }
+    // A checkbox tree's row click only checks; its chevron expands.
+    if (checked !== undefined) return toggleNode(node);
     if (selection === 'multiple') toggleSelected(node);
     else select(node);
     if (shape.isParent(node)) toggleExpanded(node);
     else activate(node);
   };
 
+  /** `aria-selected`, which a checkbox tree or `selection="none"` leaves out. */
+  function selectedState(isSelected: boolean, check: boolean | 'mixed' | undefined): boolean | undefined {
+    return selection === 'none' || check !== undefined ? undefined : isSelected;
+  }
+
   const rowClasses = {
     selected: 'bg-primary text-primary-content',
     idle: 'hover:bg-base-200',
   } as const;
 </script>
+
+{#snippet checkMark(check: boolean | 'mixed' | undefined)}
+  {#if check !== undefined}
+    <input
+      type="checkbox"
+      class="checkbox checkbox-sm"
+      tabindex="-1"
+      aria-hidden="true"
+      inert
+      checked={check === true}
+      indeterminate={check === 'mixed'}
+    />
+  {/if}
+{/snippet}
 
 {#snippet branch(list: readonly TreeNode<T>[], level: number)}
   {#each list as node, index (node.id)}
@@ -464,6 +502,7 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
     {@const isSelected = selected.has(node.id)}
     {@const isBusy = busy.has(node.id)}
     {@const children = shape.childrenOf(node)}
+    {@const check = checked?.(node)}
     <li
       role="treeitem"
       tabindex={node.id === tabStopId ? 0 : -1}
@@ -471,7 +510,8 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
       aria-setsize={list.length}
       aria-posinset={index + 1}
       aria-expanded={parent ? open : undefined}
-      aria-selected={selection === 'none' ? undefined : isSelected}
+      aria-selected={selectedState(isSelected, check)}
+      aria-checked={check}
       aria-disabled={node.disabled === true ? true : undefined}
       aria-busy={isBusy ? true : undefined}
       aria-labelledby={rowId(node)}
@@ -498,6 +538,7 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
         {:else}
           <span class="inline-block size-4 shrink-0" aria-hidden="true"></span>
         {/if}
+        {@render checkMark(check)}
         {#if row}
           {@render row(node, { expanded: open, selected: isSelected, level })}
         {:else}
@@ -521,7 +562,7 @@ An ARIA `tree` widget over a `nodes` array: one tab stop, arrow-key navigation, 
   {id}
   role="tree"
   aria-label={label}
-  aria-multiselectable={selection === 'multiple' ? true : undefined}
+  aria-multiselectable={selection === 'multiple' || checked !== undefined ? true : undefined}
   class={['flex flex-col', className]}
   {onkeydown}
   {onfocusin}

@@ -24,6 +24,7 @@ Every primitive accepts it by spread — `<TextInput {...control} bind:value />`
 | `CheckboxGroup` | several | all, one row and one tab stop each | about seven or fewer |
 | `Select` | one | behind the native popup | a known list of any length; no script, the platform picker |
 | `MultiSelect` | several | behind a popover, summarised in the trigger | a longer known list in a compact space |
+| `TreeSelect` | one or several | a searchable tree behind a popover | a hierarchy (garden → bed), with whole branches chosen at once |
 | `Combobox` | one | filtered as you type | a long or fetched list (`onSearch`) |
 | `Listbox` | one or several | a fixed-height inline list, one tab stop | 20 to a few hundred options to scan at once, with typeahead and range selection |
 | `Cascader` | one path through a hierarchy | one column per level, in a popover | taxonomy, location or category trees; children can load lazily (`loadChildren`) and `searchable` finds a node at any depth |
@@ -52,7 +53,9 @@ The wrapper passes `requiredLabel` before the spread, so a call site can still o
 
 Which date control: `DateInput` (the native control, in the barrel) for a single date on a form; `DateField` / `TimeField` from `@thomasfosterau/components/dates` when the design needs the same control on every browser, or a time with a fixed 12/24-hour clock; `DatePicker` when the reader benefits from seeing the month but the field should stay compact, `Calendar` when the month should always show; `DateRangePicker` / `RangeCalendar` for a span. Their values are `DateValue`s: `parseDate('2026-10-23')` in, `value.toString()` out.
 
-Which multi-choice control: `CheckboxGroup` when every option fits on screen (about seven or fewer), `MultiSelect` for a longer list, `Select` for a single native choice.
+Which multi-choice control: `CheckboxGroup` when every option fits on screen (about seven or fewer), `MultiSelect` for a longer list, `Select` for a single native choice, `TreeSelect` when the options are a hierarchy.
+
+**`TreeSelect`.** Takes `TreeView`'s `TreeNode`s (a node's `id` is its value) and opens a `TreeView` in a popover, with a filter box (`searchable`) that keeps matches and their ancestors and announces the count. Single choice binds `value`; Space selects, Enter or a click picks and closes, and `leavesOnly` makes parents expand-only (they render disabled). `multiple` binds `values` and makes the tree a checkbox tree (`aria-checked`, `'mixed'` for a partly checked parent): checking a node checks every enabled leaf under it. What a fully checked subtree reports is `strategy`: `'parent'` (the topmost node, default), `'leaf'` (its leaves) or `'all'` (both). The trigger is a select-only `combobox` with `aria-haspopup="tree"` that summarises the choice (`maxShown`); a separate Clear button empties it; `name` posts one hidden input per value. `TreeView` gains the same checkbox mode for its own use: `checked(node)` and `onCheck(node)`.
 
 ### Choice cards
 
