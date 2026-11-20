@@ -62,6 +62,7 @@ export { default as Popover } from './Popover.svelte';
 export { default as ShareButton } from './ShareButton.svelte';
 export { default as Skeleton } from './Skeleton.svelte';
 export { default as Spinner } from './Spinner.svelte';
+export { default as SplitButton } from './SplitButton.svelte';
 export { default as Stack } from './Stack.svelte';
 export { default as StatusDot } from './StatusDot.svelte';
 export { default as Swap } from './Swap.svelte';
