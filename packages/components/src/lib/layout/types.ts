@@ -97,6 +97,20 @@ export const listDetailGrid: Record<ExpandAt, string> = {
   xl: 'xl:grid xl:grid-cols-[var(--list-width)_1fr]',
 };
 
+/** A `resizable` `ListDetailLayout`'s three columns from the breakpoint up: list, handle, detail. */
+export const listDetailGridResizable: Record<ExpandAt, string> = {
+  md: 'md:grid md:grid-cols-[var(--list-width)_auto_1fr]',
+  lg: 'lg:grid lg:grid-cols-[var(--list-width)_auto_1fr]',
+  xl: 'xl:grid xl:grid-cols-[var(--list-width)_auto_1fr]',
+};
+
+/** A `ListDetailLayout`'s resize handle: only from the breakpoint up, where both panes show. */
+export const handleFromBreakpoint: Record<ExpandAt, string> = {
+  md: 'hidden md:block',
+  lg: 'hidden lg:block',
+  xl: 'hidden xl:block',
+};
+
 /** The list pane's border, from the breakpoint up, where it sits beside the detail. */
 export const listDivider: Record<ExpandAt, string> = {
   md: 'md:border-e md:border-base-300',

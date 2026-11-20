@@ -25,16 +25,26 @@ An adaptive list / detail layout: both panes side by side on wide screens, one a
     both panes are there. Which width applies is read with `matchMedia` on
     the client only, for that decision — the layout itself is CSS.
   - The selected list item's `aria-current="true"` is the app's to set.
+  - `resizable`: from `expandAt` up, the divider is `Splitter`'s handle
+    (`SplitterHandle`, the APG window splitter): a focusable `separator`
+    named by `handleLabel` that controls the list region, moved by the arrow
+    keys, Home / End or a drag. `listSize` is the list's width in percent
+    of the layout, bindable; until it is set the list keeps its `listWidth`
+    token, and the handle reports the share that token measures to. On
+    compact widths the handle is `display: none` with the hidden pane.
 -->
 <script lang="ts">
   import { ChevronLeft } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import LinkButton from '../ui/LinkButton.svelte';
+  import SplitterHandle from './SplitterHandle.svelte';
   import {
     compactOnly,
     expandQuery,
+    handleFromBreakpoint,
     listDetailGrid,
+    listDetailGridResizable,
     listDivider,
     listWidth as listWidths,
     paneFromBreakpoint,
@@ -79,6 +89,30 @@ An adaptive list / detail layout: both panes side by side on wide screens, one a
     listWidth?: 'sm' | 'md' | 'lg' | undefined;
     /** The id of the element to focus when compact navigation returns to the list. */
     focusTarget?: string | undefined;
+    /**
+     * Make the divider a draggable, keyboard-operable handle (from `expandAt` up).
+     * @defaultValue `false`
+     */
+    resizable?: boolean | undefined;
+    /** `resizable`: the list's width in percent of the layout; `undefined` keeps `listWidth`. Bindable. */
+    listSize?: number | undefined;
+    /**
+     * `resizable`: the narrowest the list goes, in percent.
+     * @defaultValue `15`
+     */
+    minListSize?: number | undefined;
+    /**
+     * `resizable`: the widest the list goes, in percent.
+     * @defaultValue `60`
+     */
+    maxListSize?: number | undefined;
+    /**
+     * `resizable`: the handle's accessible name.
+     * @defaultValue `'Resize list'`
+     */
+    handleLabel?: string | undefined;
+    /** `resizable`: called with the settled `listSize` after each key press or drag that changed it. */
+    onListResize?: ((size: number) => void) | undefined;
   }
 
   let {
@@ -93,12 +127,41 @@ An adaptive list / detail layout: both panes side by side on wide screens, one a
     expandAt = 'lg',
     listWidth = 'md',
     focusTarget,
+    resizable = false,
+    listSize = $bindable(undefined),
+    minListSize = 15,
+    maxListSize = 60,
+    handleLabel = 'Resize list',
+    onListResize,
     class: className,
     style,
     ...rest
   }: Props = $props();
 
+  const uid = $props.id();
+  const listId = `${uid}-list`;
+  let layout: HTMLDivElement | undefined = $state();
+  let listPane: HTMLElement | undefined = $state();
   let detailPane: HTMLElement | undefined = $state();
+  /** The share of the layout the `listWidth` token comes to, for the handle before `listSize` is set. */
+  let measured = $state(30);
+
+  $effect(() => {
+    if (!resizable || listSize !== undefined || layout === undefined || listPane === undefined) return;
+    const box = layout;
+    const pane = listPane;
+    const measure = (): void => {
+      if (box.clientWidth > 0) measured = (pane.offsetWidth / box.clientWidth) * 100;
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(box);
+    return () => observer.disconnect();
+  });
+
+  const listWidthValue = $derived(
+    resizable && listSize !== undefined ? `${listSize}%` : listWidths[listWidth],
+  );
   /** The `showDetail` last seen, so only a change (not the first render) moves focus. */
   let previous: boolean | undefined;
 
@@ -118,19 +181,41 @@ An adaptive list / detail layout: both panes side by side on wide screens, one a
 
 <div
   {...rest}
-  style={[`--list-width: ${listWidths[listWidth]}`, style].filter(Boolean).join('; ')}
-  class={['flex min-h-0 flex-col', listDetailGrid[expandAt], className]}
+  bind:this={layout}
+  style={[`--list-width: ${listWidthValue}`, style].filter(Boolean).join('; ')}
+  class={[
+    'flex min-h-0 flex-col',
+    resizable ? listDetailGridResizable[expandAt] : listDetailGrid[expandAt],
+    className,
+  ]}
 >
   <section
+    bind:this={listPane}
+    id={listId}
     aria-label={listLabel}
     class={[
       'min-h-0 flex-col overflow-y-auto',
       showDetail ? paneFromBreakpoint[expandAt] : 'flex',
-      listDivider[expandAt],
+      !resizable && listDivider[expandAt],
     ]}
   >
     {@render list()}
   </section>
+  {#if resizable}
+    <SplitterHandle
+      bind:value={() => listSize ?? measured, (next) => (listSize = next)}
+      min={minListSize}
+      max={maxListSize}
+      step={5}
+      collapsible={false}
+      orientation="horizontal"
+      label={handleLabel}
+      controls={listId}
+      container={() => layout}
+      onCommit={onListResize}
+      class={['w-1', handleFromBreakpoint[expandAt]]}
+    />
+  {/if}
   <section
     bind:this={detailPane}
     aria-label={detailLabel}
