@@ -1,5 +1,5 @@
 /**
- * forms — the pieces of a form that are not one control: the field-error summary, the whole-form error
+ * forms — the pieces of a form that are not one control: the auth-page card, the field-error summary, the whole-form error
  * list, the submit row, a hidden command field, and the site search form, plus
  * the unsaved-changes pair: `SaveBar` and the leave guard.
  *
@@ -10,6 +10,7 @@
  * @module
  */
 
+export { default as AuthCard } from './AuthCard.svelte';
 export { default as ErrorSummary } from './ErrorSummary.svelte';
 export { default as FormActions } from './FormActions.svelte';
 export { default as FormErrors } from './FormErrors.svelte';
