@@ -46,6 +46,7 @@ An always-visible list of options to choose one or several from, as a form field
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import { toFieldOptions, type FieldOption, type FieldSize } from './field-types.ts';
+  import { createTypeahead } from './typeahead.ts';
 
   /** A `Listbox` option: a `FieldOption`, optionally under a `group` heading. */
   interface ListboxOption extends FieldOption {
@@ -246,27 +247,15 @@ An always-visible list of options to choose one or several from, as a form field
     document.getElementById(optionId(index))?.scrollIntoView({ block: 'nearest' });
   };
 
-  let typed = '';
-  let typedAt = 0;
+  const typeAhead = createTypeahead();
 
   /** Typeahead: the next enabled option whose label starts with what was typed. */
   const typeahead = (key: string): void => {
-    const now = Date.now();
-    typed = now - typedAt > 500 ? key : typed + key;
-    typedAt = now;
-    const query = typed.toLowerCase();
-    const count = ordered.length;
-    // A repeated single letter cycles; a longer query re-checks from the current one.
-    const offset = typed.length === 1 ? 1 : 0;
-    for (let step = 0; step < count; step += 1) {
-      const index = (Math.max(active, 0) + offset + step) % count;
-      const entry = ordered[index];
-      if (entry !== undefined && enabled(index) && entry.label.toLowerCase().startsWith(query)) {
-        moveTo(index);
-        if (!multiple) selectOnly(index);
-        return;
-      }
-    }
+    const labels = ordered.map((entry) => entry.label);
+    const index = typeAhead(key, labels, enabled, active);
+    if (index === undefined) return;
+    moveTo(index);
+    if (!multiple) selectOnly(index);
   };
 
   const onkeydown = (event: KeyboardEvent): void => {
