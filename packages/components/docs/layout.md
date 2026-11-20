@@ -72,6 +72,9 @@ Without `AppShell`, `Sidebar` and `BottomNav` take the same list as `destination
 </Tabs>
 <!-- Navigation: separate routes — anchors and `aria-current`, never `role="tab"`. -->
 <Tabs items={views} mode="links" label="Results views" />
+<!-- Too many to fit: the rest go into a "More" menu; the current tab always stays. -->
+<Tabs items={sections} mode="links" label="Sections" overflow />
+<Breadcrumbs items={trail} overflow />
 
 <Sidebar title="Browse">
   {#snippet brand()}<a href="/" rel="home">Home</a>{/snippet}
