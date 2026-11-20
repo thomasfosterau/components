@@ -96,8 +96,15 @@ export default defineConfig({
       // from its own task; this one process gets them named here: both Svelte
       // packages' `svelte-kit sync`, and packages/components' `build`, whose
       // `dist/` the packages/mapbox suite imports through `exports`.
+      //
+      // `--maxWorkers=1` runs one test file at a time across every project.
+      // Instrumented, the three browser projects at full parallelism peaked
+      // at ~3.1 GB of Chromium RSS and crashed it on a loaded 15 GB machine;
+      // one at a time peaks at ~1.7 GB, below a plain `test:unit` of
+      // packages/components alone (~1.9 GB), for ~50 s -> ~90 s of wall time
+      // on 4 cores. `--maxWorkers=2` was not enough.
       'test:coverage': {
-        command: 'vp test run --coverage',
+        command: 'vp test run --coverage --maxWorkers=1',
         dependsOn: [
           '@thomasfosterau/components#sync',
           '@thomasfosterau/components#build',
