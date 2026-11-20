@@ -60,6 +60,9 @@ export interface ChoiceLabels<T> {
   readonly selectAllLabel: string;
   readonly selectColumnLabel: string;
   readonly selectedCountLabel: (count: number) => string;
+  readonly selectAllTotalLabel: (total: number) => string;
+  readonly allSelectedLabel: (total: number) => string;
+  readonly clearSelectionLabel: string;
   readonly columnMenuLabel: string;
 }
 
@@ -75,6 +78,9 @@ export function choiceLabels<T>(
     selectAllLabel: given.selectAllLabel ?? 'Select all on this page',
     selectColumnLabel: given.selectColumnLabel ?? 'Select',
     selectedCountLabel: given.selectedCountLabel ?? ((count) => `${count} selected`),
+    selectAllTotalLabel: given.selectAllTotalLabel ?? ((total) => `Select all ${total}`),
+    allSelectedLabel: given.allSelectedLabel ?? ((total) => `All ${total} selected`),
+    clearSelectionLabel: given.clearSelectionLabel ?? 'Clear selection',
     columnMenuLabel: given.columnMenuLabel ?? 'Columns',
   };
 }

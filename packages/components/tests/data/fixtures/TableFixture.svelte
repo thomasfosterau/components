@@ -51,6 +51,9 @@
     initialHidden?: readonly string[] | undefined;
     /** Mark the last column `defaultHidden`. */
     defaultHidden?: boolean;
+    selectAllTotal?: number | undefined;
+    /** Record an "all matching" flag, as a server-paged caller would. */
+    onSelectAllTotal?: (() => void) | undefined;
   }
 
   let {
@@ -81,6 +84,8 @@
     columnMenuLabel,
     initialHidden,
     defaultHidden = false,
+    selectAllTotal,
+    onSelectAllTotal,
   }: Props = $props();
 
   // Seeded once: the fixture owns the state from here, as a page would.
@@ -136,6 +141,8 @@
   {onSort}
   {onSelect}
   {rowAttributes}
+  {selectAllTotal}
+  {onSelectAllTotal}
   emptyState={withEmptyState ? emptyState : undefined}
   foot={withFoot ? foot : undefined}
   {selection}

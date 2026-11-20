@@ -21,7 +21,11 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
 
   Selection and hidden columns are `Table`'s, passed straight through.
   Selections are keyed by `rowKey`, so they survive a sort, a filter and a
-  page change; the select-all header covers the page on screen.
+  page change; the select-all header covers the page on screen. Once the
+  whole page is selected and the filter leaves more rows than the page, the
+  selection toolbar offers "Select all <n>" (`selectAllTotalLabel`), which
+  selects every filtered row on every page; the count then reads "All <n>
+  selected" (`allSelectedLabel`) beside a "Clear selection" button.
 
   Editing (`editing="cell" | "batch"`) swaps `Table` for `EditableGrid`, the
   same table as an APG Grid with one Tab stop and editable cells; its
@@ -311,6 +315,9 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
     selectColumnLabel,
     bulkActions,
     selectedCountLabel,
+    selectAllTotalLabel,
+    allSelectedLabel,
+    clearSelectionLabel,
     hiddenColumns = $bindable(undefined),
     columnMenu,
     columnMenuLabel,
@@ -383,6 +390,13 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
   });
 
   const total = $derived(sorted.length);
+
+  /** Select-all's second step: every row the filter leaves, on every page. */
+  function selectEveryRow(): void {
+    const next = new Set([...selected, ...sorted.map((row) => rowKey(row))]);
+    selected = next;
+    onSelectionChange?.(next);
+  }
   const pageCount = $derived(paged ? Math.max(1, Math.ceil(total / limit)) : 1);
   // A filter that shrinks the result out from under the current page would
   // otherwise leave the reader looking at an empty body with rows they cannot
@@ -449,6 +463,11 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
       {selectColumnLabel}
       {bulkActions}
       {selectedCountLabel}
+      {selectAllTotalLabel}
+      {allSelectedLabel}
+      {clearSelectionLabel}
+      selectAllTotal={total}
+      onSelectAllTotal={selectEveryRow}
       {columnMenu}
       {columnMenuLabel}
       bind:selected
@@ -499,6 +518,11 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
       {selectColumnLabel}
       {bulkActions}
       {selectedCountLabel}
+      {selectAllTotalLabel}
+      {allSelectedLabel}
+      {clearSelectionLabel}
+      selectAllTotal={total}
+      onSelectAllTotal={selectEveryRow}
       {columnMenu}
       {columnMenuLabel}
       bind:changes

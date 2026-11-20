@@ -34,7 +34,9 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
   `aria-selected`: the input's checked state IS the selection's semantics,
   each input is an ordinary Tab stop, Space toggles a checkbox and the arrow
   keys move a radio group, as natively. Select-all covers the rows in hand
-  (the current page) and never touches a selected key that is not on it. A
+  (the current page) and never touches a selected key that is not on it;
+  with `selectAllTotal` and `onSelectAllTotal` the toolbar offers a second,
+  explicit step to select all of them (see `TableToolbar`'s header). A
   selected row also takes `bg-base-200`, never colour alone. Activation and
   selection never share a gesture: the selection cell stops its clicks and
   keys from reaching an activatable row's handler, and activating a row
@@ -98,6 +100,19 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
     pinRows?: boolean | undefined;
     /** Which column is sorted, and which way. Bindable; `undefined` is unsorted. */
     sort?: SortState | undefined;
+    /**
+     * How many rows there are past this page (a paged caller's total). With
+     * `onSelectAllTotal`, once every row on the page is selected the
+     * selection toolbar offers "Select all <n>" as a second step.
+     */
+    selectAllTotal?: number | undefined;
+    /**
+     * The second select-all step: select every one of `selectAllTotal` rows.
+     * A caller that holds them all adds their keys to `selected`; a
+     * server-paged one resolves them itself or records an "all matching"
+     * flag.
+     */
+    onSelectAllTotal?: (() => void) | undefined;
     /** Called with the next state when a sortable header is activated. */
     onSort?: ((sort: SortState | undefined) => void) | undefined;
     /** Makes every row activatable by pointer and keyboard. */
@@ -148,6 +163,11 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
     selectColumnLabel,
     bulkActions,
     selectedCountLabel,
+    selectAllTotalLabel,
+    allSelectedLabel,
+    clearSelectionLabel,
+    selectAllTotal,
+    onSelectAllTotal,
     hiddenColumns = $bindable(undefined),
     columnMenu = false,
     columnMenuLabel,
@@ -162,7 +182,7 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
   const shownColumns = $derived(view.shown);
   const labels = $derived(
     choiceLabels(
-      { selectRowLabel, selectAllLabel, selectColumnLabel, selectedCountLabel, columnMenuLabel },
+      { selectRowLabel, selectAllLabel, selectColumnLabel, selectedCountLabel, selectAllTotalLabel, allSelectedLabel, clearSelectionLabel, columnMenuLabel },
       columns,
     ),
   );
@@ -324,6 +344,13 @@ A daisyUI `table` from column definitions and rows, with optional sortable heade
     }}
     {bulkActions}
     selectedCountLabel={labels.selectedCountLabel}
+    pageSelected={selection === 'multiple' && pageState === 'all'}
+    pageSize={pageKeys.length}
+    total={selectAllTotal}
+    {onSelectAllTotal}
+    selectAllTotalLabel={labels.selectAllTotalLabel}
+    allSelectedLabel={labels.allSelectedLabel}
+    clearSelectionLabel={labels.clearSelectionLabel}
     columnChoices={view.choices}
     columnMenuLabel={labels.columnMenuLabel}
     onColumnToggle={toggleColumn}

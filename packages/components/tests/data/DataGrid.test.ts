@@ -1014,3 +1014,18 @@ test('one value pasted over a selected block fills every cell', async () => {
   await userEvent.keyboard('{Control>}z{/Control}');
   await expect.poll(changeList).toBe('');
 });
+
+test('select-all’s second step selects every filtered row on every page', async () => {
+  const screen = await render(DataGridFixture, { selection: 'multiple', pageSize: 2 });
+
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Select all on this page' }));
+  await expect.element(screen.getByRole('status').first()).toHaveTextContent('2 selected');
+  await userEvent.click(screen.getByRole('button', { name: 'Select all 3' }));
+
+  expect(selectedKeys()).toBe('basil,garlic,tomato');
+  await expect.element(screen.getByText('All 3 selected')).toBeInTheDocument();
+
+  // A later change ends "all": the count is a count again.
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Select Basil' }));
+  await expect.element(screen.getByText('2 selected')).toBeInTheDocument();
+});
