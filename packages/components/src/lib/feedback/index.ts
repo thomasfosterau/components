@@ -17,6 +17,7 @@
 
 export { default as ConfirmDialog } from './ConfirmDialog.svelte';
 export { default as Dialog } from './Dialog.svelte';
+export { default as DialogHost } from './DialogHost.svelte';
 export { default as BottomSheet } from './BottomSheet.svelte';
 export { default as Drawer } from './Drawer.svelte';
 export { default as LoadingBoundary } from './LoadingBoundary.svelte';
@@ -35,5 +36,6 @@ export type { StatDelta } from './StatTile.svelte';
 export type { StepItem, StepState } from './Steps.svelte';
 export type { TimelineDate, TimelineEntry } from './Timeline.svelte';
 
+export * from './dialogs.ts';
 export * from './sizes.ts';
 export * from './toaster.ts';

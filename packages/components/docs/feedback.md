@@ -4,7 +4,7 @@ Each component's props, defaults, snippets and ARIA contract are in its doc comm
 
 Dialogs, toasts, progress — chrome around something that just happened, or is happening now. What these share is the live region and the announcement order, not the markup.
 
-`feedback` also exports `sizes.ts` (`DialogSize`, `ToastPosition`, `BarSize`, `StatsOrientation` and their class tables `dialogSize`, `toastPosition`, `barSize`, `statsOrientation`) and `toaster.ts` (`getToaster`, `setToaster`, `Toast`, `NewToast`, `ToastTone`, `ToastAction`, `ToastOutcome`, `ToasterApi`), plus the prop types below. `colourToken` on a `SegmentBar` segment or a `TimelineEntry` is a CSS custom-property name your theme declares — see `ui`'s `colourTokenStyle`.
+`feedback` also exports `sizes.ts` (`DialogSize`, `ToastPosition`, `BarSize`, `StatsOrientation` and their class tables `dialogSize`, `toastPosition`, `barSize`, `statsOrientation`), `dialogs.ts` (`getDialogs`, `setDialogs`, `DialogsApi`, `ConfirmRequest`, `PromptRequest`, `AlertRequest`) and `toaster.ts` (`getToaster`, `setToaster`, `Toast`, `NewToast`, `ToastTone`, `ToastAction`, `ToastOutcome`, `ToasterApi`), plus the prop types below. `colourToken` on a `SegmentBar` segment or a `TimelineEntry` is a CSS custom-property name your theme declares — see `ui`'s `colourTokenStyle`.
 
 | Type | What it is |
 | --- | --- |
@@ -16,7 +16,7 @@ Dialogs, toasts, progress — chrome around something that just happened, or is 
 
 ```svelte
 <script lang="ts">
-  import { Dialog, ConfirmDialog, Toaster, getToaster, LoadingBoundary, ProgressBar, Stats, StatTile, Button, Skeleton } from '@thomasfosterau/components';
+  import { Dialog, ConfirmDialog, DialogHost, getDialogs, Toaster, getToaster, LoadingBoundary, ProgressBar, Stats, StatTile, Button, Skeleton } from '@thomasfosterau/components';
 </script>
 
 <Dialog title="Move this plant?" description="It keeps its history — only the bed changes.">
@@ -29,8 +29,8 @@ Dialogs, toasts, progress — chrome around something that just happened, or is 
   {#snippet trigger({ props })}<Button {...props} tone="error">Delete garden</Button>{/snippet}
 </ConfirmDialog>
 
-<!-- Root layout: one region for the whole app. -->
-<Toaster position="bottom-end">{@render children()}</Toaster>
+<!-- Root layout: one region and one dialog host for the whole app. -->
+<Toaster position="bottom-end"><DialogHost>{@render children()}</DialogHost></Toaster>
 ```
 
 ```svelte
@@ -45,6 +45,16 @@ Dialogs, toasts, progress — chrome around something that just happened, or is 
     hideBed(bed);
     const id = toaster.add({ title: 'Bed deleted', action: { label: 'Undo', onAction: () => showBed(bed) } });
     if ((await toaster.result(id)) !== 'action') await purgeBed(bed); // 'dismissed' or 'timeout'
+  }
+
+  // Anywhere below a DialogHost (one in the root layout, next to the Toaster).
+  const dialogs = getDialogs();
+  async function onDeleteKey(bed: Bed) {
+    if (await dialogs.confirm({ title: `Delete ${bed.name}?`, confirmLabel: 'Delete', tone: 'error' })) await deleteBed(bed);
+  }
+  async function rename(bed: Bed) {
+    const name = await dialogs.prompt({ title: 'Rename bed', label: 'Name', value: bed.name }); // undefined when cancelled
+    if (name !== undefined) await renameBed(bed, name);
   }
 
   // 'loading' only for a FIRST read; 'refreshing' while a re-fetch runs over content already on screen.

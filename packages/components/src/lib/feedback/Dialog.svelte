@@ -58,6 +58,12 @@ A modal on bits-ui’s `Dialog`, wearing daisyUI’s `modal-box`.
      * first button); `undefined` or `null` keeps the default.
      */
     initialFocus?: (() => HTMLElement | null | undefined) | undefined;
+    /**
+     * The element to focus when the dialog closes, for a dialog opened from
+     * code with no trigger; `undefined` or `null` returns focus to the
+     * element focused before it opened.
+     */
+    finalFocus?: (() => HTMLElement | null | undefined) | undefined;
     /** The dialog body, under the title and description. */
     children: Snippet<[]>;
   }
@@ -72,6 +78,7 @@ A modal on bits-ui’s `Dialog`, wearing daisyUI’s `modal-box`.
     trigger,
     actions,
     initialFocus,
+    finalFocus,
     children,
   }: Props = $props();
 </script>
@@ -84,6 +91,7 @@ A modal on bits-ui’s `Dialog`, wearing daisyUI’s `modal-box`.
   {trigger}
   {actions}
   {initialFocus}
+  {finalFocus}
   {children}
   layout="modal"
   contentClass={[
