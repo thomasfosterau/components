@@ -34,6 +34,7 @@ export { default as Pagination } from './Pagination.svelte';
 export { default as PaginationFooter } from './PaginationFooter.svelte';
 export { default as ResultCount } from './ResultCount.svelte';
 export { default as KanbanBoard } from './KanbanBoard.svelte';
+export { default as JsonView } from './JsonView.svelte';
 export { default as SortableList } from './SortableList.svelte';
 export { default as Table } from './Table.svelte';
 export { default as TaskList } from './TaskList.svelte';
@@ -58,6 +59,12 @@ export {
   type TaskStatus,
 } from './task-list.ts';
 export * from './tree-view.ts';
+export {
+  formatJsonPath,
+  type JsonEntry,
+  type JsonKind,
+  type JsonPathSegment,
+} from './json-path.ts';
 export type {
   VirtualAlign,
   VirtualKey,
