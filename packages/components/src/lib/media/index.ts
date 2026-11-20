@@ -17,6 +17,7 @@ export {
   type EmbedSource,
   type EmbedSourceOptions,
 } from './embed-providers.ts';
+export { default as ImageCompare } from './ImageCompare.svelte';
 export {
   imageDimensions,
   ImageDimensionsUnavailable,
