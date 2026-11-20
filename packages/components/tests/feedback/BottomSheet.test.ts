@@ -177,3 +177,82 @@ test('dragging the grabber up rests the sheet at the next detent up', async () =
   await expect.element(handle()).toHaveAttribute('aria-valuenow', '1');
   expect(height()).toBeCloseTo(844 * 0.92, 0);
 });
+
+/** Dispatch a one-finger touch event at `y` on `target`; returns whether it was cancelled. */
+const touchAt = (type: string, target: Element, y: number): boolean => {
+  const point = new Touch({ identifier: 1, target, clientX: 100, clientY: y });
+  const event = new TouchEvent(type, {
+    touches: type === 'touchend' ? [] : [point],
+    changedTouches: [point],
+    bubbles: true,
+    cancelable: true,
+  });
+  target.dispatchEvent(event);
+  return event.defaultPrevented;
+};
+
+const body = (): Element => {
+  const element = sheet().element().querySelector('[data-dialog-body]');
+  if (element === null) throw new Error('no sheet body');
+  return element;
+};
+
+test('touch: pulling down on the body at the top drags the sheet down a detent', async () => {
+  const screen = await render(BottomSheetFixture, {});
+  handle().element().focus();
+  await userEvent.keyboard('{ArrowUp}');
+  await expect.element(screen.getByTestId('detent')).toHaveTextContent('1');
+
+  const target = body();
+  touchAt('touchstart', target, 300);
+  expect(touchAt('touchmove', target, 320)).toBe(true);
+  touchAt('touchmove', target, 420);
+  touchAt('touchend', target, 420);
+
+  await expect.element(screen.getByTestId('detent')).toHaveTextContent('0');
+  await expect.element(screen.getByTestId('open')).toHaveTextContent('true');
+});
+
+test('touch: a body scrolled away from the top scrolls instead of dragging', async () => {
+  const screen = await render(BottomSheetFixture, { rows: 60 });
+  handle().element().focus();
+  await userEvent.keyboard('{ArrowUp}');
+  const target = body();
+  // No CSS loads in the suite: make the body a scroller inline.
+  if (target instanceof HTMLElement)
+    Object.assign(target.style, { overflowY: 'auto', height: '200px' });
+  target.scrollTop = 200;
+  await expect.poll(() => target.scrollTop).toBeGreaterThan(0);
+
+  touchAt('touchstart', target, 300);
+  expect(touchAt('touchmove', target, 340)).toBe(false);
+  touchAt('touchmove', target, 500);
+  touchAt('touchend', target, 500);
+
+  await expect.element(screen.getByTestId('detent')).toHaveTextContent('1');
+});
+
+test('touch: pushing up on the body at the top scrolls, never drags', async () => {
+  const screen = await render(BottomSheetFixture, { rows: 60 });
+  const target = body();
+
+  touchAt('touchstart', target, 400);
+  expect(touchAt('touchmove', target, 380)).toBe(false);
+  expect(touchAt('touchmove', target, 450)).toBe(false);
+  touchAt('touchend', target, 450);
+
+  await expect.element(screen.getByTestId('detent')).toHaveTextContent('0');
+  await expect.element(screen.getByTestId('open')).toHaveTextContent('true');
+});
+
+test('touch: a long pull down from the lowest detent closes a dismissible sheet', async () => {
+  const screen = await render(BottomSheetFixture, {});
+  const target = body();
+
+  touchAt('touchstart', target, 300);
+  touchAt('touchmove', target, 320);
+  touchAt('touchmove', target, 800);
+  touchAt('touchend', target, 800);
+
+  await expect.element(screen.getByTestId('open')).toHaveTextContent('false');
+});

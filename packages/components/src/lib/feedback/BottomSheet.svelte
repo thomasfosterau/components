@@ -27,14 +27,28 @@ A panel that rises from the bottom edge and rests at one of several heights (det
   The drag: the grabber captures the pointer and the sheet follows it; on
   release it snaps to the nearest detent, or one further in the direction of
   a fast flick. Released below half the lowest detent, or flicked down from
-  the lowest, it closes when `dismissible` and snaps back otherwise. Only the
-  grabber drags: the body scrolls natively and never drags the sheet.
+  the lowest, it closes when `dismissible` and snaps back otherwise. A finger
+  pulling down on the body while it is scrolled to the top drags the sheet
+  too, as on iOS; every other touch on the body scrolls it natively, and a
+  mouse on the body never drags.
 
   The grabber's 44×44 hit area (WCAG 2.5.5) is inline too, so no theme can
   shrink it. The height is an inline style, set from the detent (`50dvh`) or, while
   dragging, the pointer: data, not a design token. It eases between detents,
   and under `prefers-reduced-motion` snaps without easing.
 -->
+<script module lang="ts">
+  /** How far, in px, a touch moves before it is decided as a drag or a scroll. */
+  const SLOP = 6;
+
+  const findTouch = (list: TouchList, id: number): Touch | undefined =>
+    Array.from(list).find((entry) => entry.identifier === id);
+
+  /** The sheet body a touch began in, if any. */
+  const bodyOf = (target: EventTarget | null): HTMLElement | null =>
+    target instanceof Element ? target.closest<HTMLElement>('[data-dialog-body]') : null;
+</script>
+
 <script lang="ts">
   import { X } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
@@ -168,28 +182,6 @@ A panel that rises from the bottom edge and rests at one of several heights (det
     return Math.min(panel.offsetHeight + overflow, window.innerHeight * 0.92);
   };
 
-  const onHandlePointerdown = (event: PointerEvent): void => {
-    if (event.button !== 0 || !(event.currentTarget instanceof HTMLElement)) return;
-    const panel = event.currentTarget.closest<HTMLElement>('[data-bottom-sheet]');
-    if (panel === null) return;
-    event.currentTarget.setPointerCapture(event.pointerId);
-    const content = naturalHeight(panel);
-    drag = {
-      pointerId: event.pointerId,
-      startY: event.clientY,
-      startHeight: panel.getBoundingClientRect().height,
-      heights: detents.map((value) => (value === 'content' ? content : value * window.innerHeight)),
-      samples: [{ t: event.timeStamp, y: event.clientY }],
-    };
-    event.preventDefault();
-  };
-
-  const onHandlePointermove = (event: PointerEvent): void => {
-    if (drag?.pointerId !== event.pointerId) return;
-    dragHeight = Math.max(0, drag.startHeight + drag.startY - event.clientY);
-    drag.samples = [...drag.samples.filter((sample) => event.timeStamp - sample.t < 100), { t: event.timeStamp, y: event.clientY }];
-  };
-
   /** Where a release at `height` with downward speed `velocity` comes to rest; `-1` closes. */
   const restingIndex = (heights: readonly number[], height: number, velocity: number): number => {
     if (velocity > FLICK) {
@@ -208,15 +200,33 @@ A panel that rises from the bottom edge and rests at one of several heights (det
     return nearest;
   };
 
-  const onHandlePointerup = (event: PointerEvent): void => {
-    if (drag?.pointerId !== event.pointerId) return;
+  /** Start following the pointer or finger from `y`, on the sheet `panel`. */
+  const beginDrag = (pointerId: number, y: number, t: number, panel: HTMLElement): void => {
+    const content = naturalHeight(panel);
+    drag = {
+      pointerId,
+      startY: y,
+      startHeight: panel.getBoundingClientRect().height,
+      heights: detents.map((value) => (value === 'content' ? content : value * window.innerHeight)),
+      samples: [{ t, y }],
+    };
+  };
+
+  const moveDrag = (y: number, t: number): void => {
+    if (drag === undefined) return;
+    dragHeight = Math.max(0, drag.startHeight + drag.startY - y);
+    drag.samples = [...drag.samples.filter((sample) => t - sample.t < 100), { t, y }];
+  };
+
+  const endDrag = (y: number, t: number): void => {
+    if (drag === undefined) return;
     const { heights, samples } = drag;
     // From the release point, not the last move: a quick drag can end before
-    // any pointermove is dispatched.
-    const height = Math.max(0, drag.startHeight + drag.startY - event.clientY);
+    // any move is dispatched.
+    const height = Math.max(0, drag.startHeight + drag.startY - y);
     const first = samples[0];
-    const elapsed = first === undefined ? 0 : event.timeStamp - first.t;
-    const velocity = first === undefined || elapsed <= 0 ? 0 : (event.clientY - first.y) / elapsed;
+    const elapsed = first === undefined ? 0 : t - first.t;
+    const velocity = first === undefined || elapsed <= 0 ? 0 : (y - first.y) / elapsed;
     drag = undefined;
     dragHeight = undefined;
     const next = restingIndex(heights, height, velocity);
@@ -224,10 +234,100 @@ A panel that rises from the bottom edge and rests at one of several heights (det
     else detent = Math.max(0, next);
   };
 
-  const onHandlePointercancel = (event: PointerEvent): void => {
-    if (drag?.pointerId !== event.pointerId) return;
+  const cancelDrag = (): void => {
     drag = undefined;
     dragHeight = undefined;
+  };
+
+  const onHandlePointerdown = (event: PointerEvent): void => {
+    if (event.button !== 0 || !(event.currentTarget instanceof HTMLElement)) return;
+    const panel = event.currentTarget.closest<HTMLElement>('[data-bottom-sheet]');
+    if (panel === null) return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    beginDrag(event.pointerId, event.clientY, event.timeStamp, panel);
+    event.preventDefault();
+  };
+
+  const onHandlePointermove = (event: PointerEvent): void => {
+    if (drag?.pointerId === event.pointerId) moveDrag(event.clientY, event.timeStamp);
+  };
+
+  const onHandlePointerup = (event: PointerEvent): void => {
+    if (drag?.pointerId === event.pointerId) endDrag(event.clientY, event.timeStamp);
+  };
+
+  const onHandlePointercancel = (event: PointerEvent): void => {
+    if (drag?.pointerId === event.pointerId) cancelDrag();
+  };
+
+  /**
+   * A finger pulling down on the body while it is scrolled to the top drags
+   * the sheet, as on iOS; any other touch scrolls the body natively. The
+   * choice is made once per touch, on its first clear movement, and touch
+   * events rather than pointer events are used because only a non-passive
+   * `touchmove` can stop the browser's own scroll once a drag is chosen.
+   */
+  const dragFromBody: Attachment<HTMLElement> = (grabberNode) => {
+    const panel = grabberNode.closest<HTMLElement>('[data-bottom-sheet]');
+    if (panel === null) return;
+    /** The touch being decided or dragged: its id, where it began, and whether it drags. */
+    let touch:
+      | { id: number; startY: number; atTop: boolean; mode: 'undecided' | 'drag' | 'scroll' }
+      | undefined;
+
+    const onStart = (event: TouchEvent): void => {
+      const body = bodyOf(event.target);
+      const first = event.touches[0];
+      if (body === null || event.touches.length !== 1 || first === undefined) {
+        touch = undefined;
+        return;
+      }
+      touch = {
+        id: first.identifier,
+        startY: first.clientY,
+        atTop: body.scrollTop <= 0,
+        mode: 'undecided',
+      };
+    };
+
+    const onMove = (event: TouchEvent): void => {
+      if (touch === undefined) return;
+      const point = findTouch(event.touches, touch.id);
+      if (point === undefined) return;
+      if (touch.mode === 'undecided') {
+        const dy = point.clientY - touch.startY;
+        if (Math.abs(dy) < SLOP) return;
+        const body = bodyOf(event.target);
+        const pullsDown = dy > 0 && touch.atTop && (body?.scrollTop ?? 0) <= 0;
+        touch.mode = pullsDown ? 'drag' : 'scroll';
+        if (pullsDown) beginDrag(-1 - touch.id, touch.startY, event.timeStamp, panel);
+      }
+      if (touch.mode !== 'drag') return;
+      event.preventDefault();
+      moveDrag(point.clientY, event.timeStamp);
+    };
+
+    const onEnd = (event: TouchEvent): void => {
+      if (touch === undefined) return;
+      const point = findTouch(event.changedTouches, touch.id);
+      if (point === undefined) return;
+      if (touch.mode === 'drag') {
+        if (event.type === 'touchcancel') cancelDrag();
+        else endDrag(point.clientY, event.timeStamp);
+      }
+      touch = undefined;
+    };
+
+    panel.addEventListener('touchstart', onStart, { passive: true });
+    panel.addEventListener('touchmove', onMove, { passive: false });
+    panel.addEventListener('touchend', onEnd);
+    panel.addEventListener('touchcancel', onEnd);
+    return () => {
+      panel.removeEventListener('touchstart', onStart);
+      panel.removeEventListener('touchmove', onMove);
+      panel.removeEventListener('touchend', onEnd);
+      panel.removeEventListener('touchcancel', onEnd);
+    };
   };
 
   /** Non-modal: Escape inside collapses to the lowest detent. A listener, since a landmark takes no handlers. */
@@ -261,6 +361,7 @@ A panel that rises from the bottom edge and rests at one of several heights (det
       onpointermove={onHandlePointermove}
       onpointerup={onHandlePointerup}
       onpointercancel={onHandlePointercancel}
+      {@attach dragFromBody}
     >
       <span class="bg-base-content/30 block h-1.5 w-10 rounded-full"></span>
     </div>
