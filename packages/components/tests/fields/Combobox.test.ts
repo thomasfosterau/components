@@ -370,3 +370,111 @@ test('postedValue="query": typing again after arrowing forgets the navigation', 
   const data = onSubmitted.mock.calls[0]?.[0];
   expect(data?.getAll('query')).toEqual(['rosa']);
 });
+
+const newTaxon = (query: string): Taxon => ({ id: `new-${query.toLowerCase()}`, name: query });
+
+test('onCreate: a query with no exact match ends the list with a create option', async () => {
+  const screen = await render(ComboboxFormFixture, {
+    items: TAXA,
+    onCreate: (query) => Promise.resolve(newTaxon(query)),
+  });
+
+  const input = screen.getByRole('combobox', { name: 'Taxon' });
+  await userEvent.fill(input, 'rosa');
+  const options = screen.getByRole('option');
+  await expect.element(options.last()).toHaveAccessibleName('Create “rosa”');
+  expect(options.elements()).toHaveLength(3);
+
+  await userEvent.fill(input, 'Rosa canina');
+  await expect.element(screen.getByRole('option', { name: /Rosa canina/ })).toBeInTheDocument();
+  expect(screen.getByRole('option', { name: /Create/ }).elements()).toHaveLength(0);
+});
+
+test('onCreate: choosing it creates once, then selects and posts the new item', async () => {
+  const onCreate = vi.fn<(query: string, signal: AbortSignal) => Promise<Taxon>>((query) =>
+    Promise.resolve(newTaxon(query)),
+  );
+  const onSelect = vi.fn<(item: Taxon) => void>();
+  const screen = await render(ComboboxFormFixture, { items: TAXA, onCreate, onSelect });
+
+  const input = screen.getByRole('combobox', { name: 'Taxon' });
+  await userEvent.fill(input, 'Rosa gallica');
+  await userEvent.click(screen.getByRole('option', { name: 'Create “Rosa gallica”' }));
+
+  await expect.element(screen.getByTestId('selected')).toHaveTextContent('new-rosa gallica');
+  expect(onCreate).toHaveBeenCalledTimes(1);
+  expect(onCreate.mock.calls[0]?.[0]).toBe('Rosa gallica');
+  expect(onSelect).toHaveBeenCalledWith({ id: 'new-rosa gallica', name: 'Rosa gallica' });
+  await expect.element(input).toHaveValue('Rosa gallica');
+  const hidden = screen.container.querySelector<HTMLInputElement>('input[name="taxonId"]');
+  expect(hidden?.value).toBe('new-rosa gallica');
+});
+
+test('onCreate: the input is busy and the status says so while it runs', async () => {
+  const pendingCreate = Promise.withResolvers<Taxon>();
+  const screen = await render(ComboboxFormFixture, {
+    items: TAXA,
+    onCreate: () => pendingCreate.promise,
+  });
+
+  const input = screen.getByRole('combobox', { name: 'Taxon' });
+  await userEvent.fill(input, 'Rosa gallica');
+  await userEvent.click(screen.getByRole('option', { name: /Create/ }));
+
+  await expect.element(input).toHaveAttribute('aria-busy', 'true');
+  await expect.element(screen.getByRole('status')).toHaveTextContent('Creating…');
+  pendingCreate.resolve(newTaxon('Rosa gallica'));
+  await expect.element(input).not.toHaveAttribute('aria-busy');
+});
+
+test('onCreate: a rejection shows the error and leaves the selection alone', async () => {
+  const screen = await render(ComboboxFormFixture, {
+    items: TAXA,
+    value: 'rosa-rugosa',
+    onCreate: () => Promise.reject(new Error('409')),
+    createErrorLabel: 'That name is taken.',
+  });
+
+  const input = screen.getByRole('combobox', { name: 'Taxon' });
+  await userEvent.fill(input, 'Rosa gallica');
+  await userEvent.click(screen.getByRole('option', { name: /Create/ }));
+
+  await expect.element(screen.getByRole('alert')).toHaveTextContent('That name is taken.');
+  await expect.element(screen.getByTestId('selected')).toHaveTextContent('rosa-rugosa');
+});
+
+test('onCreate: typing again aborts a create in flight', async () => {
+  const signals: AbortSignal[] = [];
+  const screen = await render(ComboboxFormFixture, {
+    items: TAXA,
+    onCreate: (_query, signal) => {
+      signals.push(signal);
+      return new Promise<Taxon>(() => undefined);
+    },
+  });
+
+  const input = screen.getByRole('combobox', { name: 'Taxon' });
+  await userEvent.fill(input, 'Rosa gallica');
+  await userEvent.click(screen.getByRole('option', { name: /Create/ }));
+  await expect.poll(() => signals.length).toBe(1);
+  await userEvent.type(input, 'x');
+
+  expect(signals[0]?.aborted).toBe(true);
+  await expect.element(screen.getByTestId('selected')).toHaveTextContent('none');
+});
+
+test('onCreate works with an asynchronous search too', async () => {
+  const onCreate = vi.fn<(query: string, signal: AbortSignal) => Promise<Taxon>>((query) =>
+    Promise.resolve(newTaxon(query)),
+  );
+  const screen = await render(ComboboxFormFixture, {
+    onSearch: slowSearch(0),
+    debounceMs: 10,
+    onCreate,
+  });
+
+  await userEvent.fill(screen.getByRole('combobox', { name: 'Taxon' }), 'Rubus idaeus');
+  await userEvent.click(screen.getByRole('option', { name: 'Create “Rubus idaeus”' }));
+
+  await expect.element(screen.getByTestId('selected')).toHaveTextContent('new-rubus idaeus');
+});
