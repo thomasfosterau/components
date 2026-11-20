@@ -21,9 +21,11 @@ The daisyUI `btn` with tone, variant and size; `loading` disables it and sets `a
   import type { HTMLButtonAttributes } from 'svelte/elements';
   import Spinner from './Spinner.svelte';
   import {
+    buttonShape,
     buttonSize,
     buttonTone,
     buttonVariant,
+    type ButtonShape,
     type ButtonVariant,
     type Size,
     type Tone,
@@ -42,6 +44,11 @@ The daisyUI `btn` with tone, variant and size; `loading` disables it and sets `a
      * @defaultValue `'md'`
      */
     size?: Size | undefined;
+    /**
+     * Outline; `'pill'` is fully rounded, as chips are.
+     * @defaultValue `'default'`
+     */
+    shape?: ButtonShape | undefined;
     /** Disables the button, marks it busy and shows a spinner. */
     loading?: boolean | undefined;
     /** Full-width. */
@@ -58,6 +65,7 @@ The daisyUI `btn` with tone, variant and size; `loading` disables it and sets `a
     size = 'md',
     loading = false,
     block = false,
+    shape = 'default',
     icon,
     children,
     type = 'button',
@@ -77,6 +85,7 @@ The daisyUI `btn` with tone, variant and size; `loading` disables it and sets `a
     tone !== undefined && buttonTone[tone],
     buttonVariant[variant],
     buttonSize[size],
+    buttonShape[shape],
     block && 'btn-block',
     className,
   ]}

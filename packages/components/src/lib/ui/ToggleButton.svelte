@@ -21,7 +21,14 @@ A button that stays pressed (`aria-pressed`), on bits-ui `Toggle`.
   import type { Snippet } from 'svelte';
   import type { HTMLButtonAttributes } from 'svelte/elements';
   import { toggleClasses } from './toggle-classes.ts';
-  import { buttonSize, type ButtonVariant, type Size, type Tone } from './tones.ts';
+  import {
+    buttonShape,
+    buttonSize,
+    type ButtonShape,
+    type ButtonVariant,
+    type Size,
+    type Tone,
+  } from './tones.ts';
   import Tooltip from './Tooltip.svelte';
 
   type Props = Omit<HTMLButtonAttributes, 'type' | 'children'> & {
@@ -41,6 +48,11 @@ A button that stays pressed (`aria-pressed`), on bits-ui `Toggle`.
     variant?: ButtonVariant | undefined;
     /** @defaultValue `'md'` */
     size?: Size | undefined;
+    /**
+     * Outline; `'pill'` is fully rounded, as chips are.
+     * @defaultValue `'default'`
+     */
+    shape?: ButtonShape | undefined;
     /** Leading icon. */
     icon?: Snippet<[]> | undefined;
     /** Icon shown in place of `icon` while pressed (an outlined star becomes a filled one). */
@@ -72,6 +84,7 @@ A button that stays pressed (`aria-pressed`), on bits-ui `Toggle`.
     tone = 'neutral',
     variant = 'ghost',
     size = 'md',
+    shape = 'default',
     icon,
     pressedIcon,
     tooltip = false,
@@ -99,6 +112,7 @@ A button that stays pressed (`aria-pressed`), on bits-ui `Toggle`.
         class={[
           'btn',
           buttonSize[size],
+          buttonShape[shape],
           toggleClasses(on, tone, variant),
           iconOnly && 'btn-square',
           className,

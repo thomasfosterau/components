@@ -24,9 +24,11 @@ An `<a>` styled as a daisyUI `btn`, for navigation that reads as an action; it k
   import type { HTMLAnchorAttributes } from 'svelte/elements';
   import { getComponentsContext } from '../context.svelte.ts';
   import {
+    buttonShape,
     buttonSize,
     buttonTone,
     buttonVariant,
+    type ButtonShape,
     type ButtonVariant,
     type Size,
     type Tone,
@@ -47,6 +49,11 @@ An `<a>` styled as a daisyUI `btn`, for navigation that reads as an action; it k
      * @defaultValue `'md'`
      */
     size?: Size | undefined;
+    /**
+     * Outline; `'pill'` is fully rounded, as chips are.
+     * @defaultValue `'default'`
+     */
+    shape?: ButtonShape | undefined;
     /** Renders the button as unavailable without removing its text. */
     disabled?: boolean | undefined;
     /** Full-width. */
@@ -66,6 +73,7 @@ An `<a>` styled as a daisyUI `btn`, for navigation that reads as an action; it k
     size = 'md',
     disabled = false,
     block = false,
+    shape = 'default',
     external = false,
     icon,
     children,
@@ -90,6 +98,7 @@ An `<a>` styled as a daisyUI `btn`, for navigation that reads as an action; it k
     tone !== undefined && buttonTone[tone],
     buttonVariant[variant],
     buttonSize[size],
+    buttonShape[shape],
     block && 'btn-block',
     disabled && 'btn-disabled',
     className,

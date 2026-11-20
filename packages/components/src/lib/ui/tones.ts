@@ -57,6 +57,15 @@ export const buttonVariant: Record<ButtonVariant, string> = {
   link: 'btn-link',
 };
 
+/** A button's outline: daisyUI's rounded rectangle, or a fully rounded pill (chips). */
+export type ButtonShape = 'default' | 'pill';
+
+/** Literal class per `ButtonShape`; a lookup table so Tailwind's scanner sees every class. */
+export const buttonShape: Record<ButtonShape, string> = {
+  default: '',
+  pill: 'rounded-full',
+};
+
 /** Literal daisyUI class per `Size` for `Button`; a lookup table so Tailwind's scanner sees every class. */
 export const buttonSize: Record<Size, string> = {
   xs: 'btn-xs',
