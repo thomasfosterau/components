@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import Image from '../../lib/media/Image.svelte';
+import { thumbHashPlaceholder } from '../../lib/media/thumbhash.ts';
 import { maskShape } from '../../lib/ui/tones.ts';
 
 const meta = {
@@ -87,5 +88,48 @@ export const Masked: Story = {
     width: 240,
     height: 240,
     class: maskShape.hexagon,
+  },
+};
+
+/** A dominant-colour placeholder fills the reserved box until the image paints. */
+export const ColourPlaceholder: Story = {
+  args: {
+    src: 'https://placehold.co/640x360',
+    alt: 'A garden bed with a colour placeholder',
+    width: 640,
+    height: 360,
+    placeholder: { kind: 'color', value: '#a3b18a' },
+  },
+};
+
+/** A ThumbHash decoded to a tiny preview with `thumbHashPlaceholder`, over its average colour. */
+export const ThumbHashPlaceholder: Story = {
+  args: {
+    src: 'https://placehold.co/640x360',
+    alt: 'A garden bed with a ThumbHash placeholder',
+    width: 640,
+    height: 360,
+    placeholder: thumbHashPlaceholder('nvcJdJqPdXlwiHiIiIqLj/d4iA=='),
+  },
+};
+
+export const SkeletonPlaceholder: Story = {
+  args: {
+    src: 'https://placehold.co/640x360',
+    alt: 'A garden bed with a skeleton placeholder',
+    width: 640,
+    height: 360,
+    placeholder: 'skeleton',
+  },
+};
+
+/** A failed load keeps the alt text visible, with a Retry button. */
+export const ErrorWithRetry: Story = {
+  args: {
+    src: '/__missing-image__.png',
+    alt: 'North bed in June',
+    width: 320,
+    height: 180,
+    retryable: true,
   },
 };

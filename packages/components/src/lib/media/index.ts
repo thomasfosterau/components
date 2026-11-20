@@ -22,3 +22,13 @@ export {
   ImageDimensionsUnavailable,
   type ImageDimensions,
 } from './image-dimensions.ts';
+export { placeholderStyle, type ImagePhase, type ImagePlaceholder } from './image-placeholder.ts';
+export {
+  rgbaToDataUrl,
+  thumbHashAspectRatio,
+  thumbHashAverage,
+  thumbHashBytes,
+  thumbHashPlaceholder,
+  thumbHashToRgba,
+  type ThumbHashColour,
+} from './thumbhash.ts';

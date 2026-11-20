@@ -81,6 +81,12 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 </Carousel>
 ```
 
+While it loads, an `Image` can show a `placeholder` painted as the `<img>`'s own background, so it is server-rendered and needs no extra element: `{ kind: 'lqip', src, color? }` (a tiny preview, usually a `data:` URI from your pipeline), `{ kind: 'color', value }`, or `'skeleton'`. `thumbHashPlaceholder(hash)` turns a base64 [ThumbHash](https://evanw.github.io/thumbhash/) into an `lqip` placeholder, on the server or the client; it lives in its own module, so an app that never calls it doesn't ship the decoder. Without a placeholder the image fades in once loaded (`fade`, on by default, never animating under reduced motion). When it fails, the default fallback keeps the alt text visible with `errorLabel` and, with `retryable`, a Retry button that re-requests a same-origin URL with a `retry` query; pass `fallback` (given `{ retry }`) to draw your own. `bind:phase` reads `'loading'`, `'loaded'` or `'error'`.
+
+```svelte
+<Image src={photo.url} alt={photo.alt} width={1280} height={720} placeholder={thumbHashPlaceholder(photo.thumbhash)} retryable />
+```
+
 A daisyUI mask on an `Image` needs no prop: pass it as `class`, from the `maskShape` table so Tailwind sees it (`<Image class={maskShape.hexagon} … />`). Never mask a focusable element; the mask clips its focus ring.
 
 `Embed` is a click-to-load facade for a third-party iframe: a poster, one button and a link to the content on the provider's site, with nothing requested from the provider until the button is pressed (preconnect hints go in on hover or focus). Pressing it swaps in the iframe, autoplaying a video, and moves focus into it; `eager` loads it at once without autoplay. `provider` is `youtube` (on `youtube-nocookie.com`), `vimeo` (`dnt=1`), `google-maps` (the map's embed URL as `id`) or `generic` (an `https:` URL whose origin is in `allowedOrigins`); `embedSource(provider, id, options)` is that mapping as data, returning `undefined` for anything the provider doesn't embed. `consent={{ granted, grant }}` gates loading on a consent category your app tracks: until it is granted, the button reads "Allow YouTube content and play" and calls `grant` before loading.
