@@ -39,6 +39,18 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
     grabber?: Snippet<[]> | undefined;
     /** Extra attributes on the panel (`style`, `data-*`): `BottomSheet`'s live height. */
     contentProps?: Record<string, unknown> | undefined;
+    /**
+     * Whether the dialog is modal right now. When false the overlay hides,
+     * focus is not trapped, the page takes pointer input, a click outside
+     * doesn't close it and `aria-modal` is dropped. Escape still closes it.
+     */
+    modal?: boolean | undefined;
+    /**
+     * Set when `modal` can change while open. bits-ui fixes its scroll lock at
+     * open, so the frame locks the page's scroll itself, following `modal`;
+     * the overlay blocks pointer input.
+     */
+    modalityChanges?: boolean | undefined;
     children: Snippet<[]>;
   }
 
@@ -56,6 +68,8 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
     finalFocus,
     grabber,
     contentProps,
+    modal = true,
+    modalityChanges = false,
     children,
   }: Props = $props();
 
@@ -79,6 +93,26 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
     open = false;
   };
   const sheet = $derived(layout === 'sheet');
+
+  $effect(() => {
+    if (!modalityChanges || !open || !modal) return;
+    const root = document.documentElement;
+    const previous = root.style.overflow;
+    root.style.overflow = 'hidden';
+    return () => {
+      root.style.overflow = previous;
+    };
+  });
+
+  /** When `modal` last turned on: bits-ui settles a click outside after a delay, by which time it may have. */
+  let modalSince = 0;
+  $effect(() => {
+    if (modal) modalSince = performance.now();
+  });
+  /** A press that began while the dialog was not modal never closes it. */
+  const onInteractOutside = (event: PointerEvent): void => {
+    if (event.timeStamp < modalSince) event.preventDefault();
+  };
 </script>
 
 <Dialog.Root bind:open>
@@ -92,30 +126,45 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
   <Dialog.Portal>
     <!-- daisyUI's `modal-backdrop` is a child of an open `.modal`; this is
          the same scrim as an element bits-ui can animate and dismiss from. -->
-    <Dialog.Overlay class="bg-base-300/60 fixed inset-0 z-40" />
-    <Dialog.Content {...contentProps} class={contentClass} {onOpenAutoFocus} {onCloseAutoFocus}>
-      {@render grabber?.()}
-      <div class={['flex items-start justify-between gap-4', sheet && 'px-4 pt-4']}>
-        <Dialog.Title class={hideTitle ? 'sr-only' : 'text-lg font-semibold'}>{title}</Dialog.Title>
-        <Dialog.Close>
-          {#snippet child({ props })}
-            <IconButtonCore {...props} label={closeLabel} size="sm" class="-mt-1 -mr-1 ms-auto">
-              {#snippet icon()}<X class="size-4" />{/snippet}
-            </IconButtonCore>
-          {/snippet}
-        </Dialog.Close>
-      </div>
-      {#if description !== undefined}
-        <Dialog.Description class={['text-base-content/70 mt-1 text-sm leading-6', sheet && 'px-4']}>
-          {description}
-        </Dialog.Description>
-      {/if}
-      <div data-dialog-body class={sheet ? 'min-h-0 flex-1 overflow-y-auto p-4' : 'py-4'}>{@render children()}</div>
-      {#if actions}
-        <div class={sheet ? 'border-base-300 flex justify-end gap-2 border-t p-4' : 'modal-action'}>
-          {@render actions({ close })}
+    <Dialog.Overlay class={['bg-base-300/60 fixed inset-0 z-40', !modal && 'hidden']} />
+    <Dialog.Content
+      {...contentProps}
+      class={contentClass}
+      {onOpenAutoFocus}
+      {onCloseAutoFocus}
+      trapFocus={modal}
+      preventScroll={!modalityChanges}
+      preventBodyPointerEvents={modal}
+      interactOutsideBehavior={modal ? 'close' : 'ignore'}
+      {onInteractOutside}
+    >
+      <!-- `child`, so `aria-modal` can follow `modal`: bits-ui always sets it. -->
+      {#snippet child({ props: panel })}
+        <div {...panel} aria-modal={modal ? 'true' : undefined}>
+          {@render grabber?.()}
+          <div class={['flex items-start justify-between gap-4', sheet && 'px-4 pt-4']}>
+            <Dialog.Title class={hideTitle ? 'sr-only' : 'text-lg font-semibold'}>{title}</Dialog.Title>
+            <Dialog.Close>
+              {#snippet child({ props })}
+                <IconButtonCore {...props} label={closeLabel} size="sm" class="-mt-1 -mr-1 ms-auto">
+                  {#snippet icon()}<X class="size-4" />{/snippet}
+                </IconButtonCore>
+              {/snippet}
+            </Dialog.Close>
+          </div>
+          {#if description !== undefined}
+            <Dialog.Description class={['text-base-content/70 mt-1 text-sm leading-6', sheet && 'px-4']}>
+              {description}
+            </Dialog.Description>
+          {/if}
+          <div data-dialog-body class={sheet ? 'min-h-0 flex-1 overflow-y-auto p-4' : 'py-4'}>{@render children()}</div>
+          {#if actions}
+            <div class={sheet ? 'border-base-300 flex justify-end gap-2 border-t p-4' : 'modal-action'}>
+              {@render actions({ close })}
+            </div>
+          {/if}
         </div>
-      {/if}
+      {/snippet}
     </Dialog.Content>
   </Dialog.Portal>
 </Dialog.Root>

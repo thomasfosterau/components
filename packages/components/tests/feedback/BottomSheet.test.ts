@@ -65,6 +65,38 @@ test('non-modal: a named region, and the page behind it stays usable', async () 
   await expect.element(screen.getByTestId('behind')).toHaveTextContent('1');
 });
 
+test('interactiveBelow: the page stays usable at that detent and turns modal above it', async () => {
+  const screen = await render(BottomSheetFixture, { interactiveBelow: 0 });
+
+  const dialog = page.getByRole('dialog', { name: 'Results' });
+  await expect.element(dialog).not.toHaveAttribute('aria-modal');
+  await screen.getByRole('button', { name: 'Behind the sheet' }).click();
+  await expect.element(screen.getByTestId('behind')).toHaveTextContent('1');
+  await expect.element(screen.getByTestId('open')).toHaveTextContent('true');
+  expect(document.documentElement.style.overflow).not.toBe('hidden');
+
+  handle().element().focus();
+  await userEvent.keyboard('{ArrowUp}');
+  await expect.element(dialog).toHaveAttribute('aria-modal', 'true');
+  expect(document.documentElement.style.overflow).toBe('hidden');
+
+  await userEvent.keyboard('{ArrowDown}');
+  await expect.element(dialog).not.toHaveAttribute('aria-modal');
+  expect(document.documentElement.style.overflow).not.toBe('hidden');
+
+  await userEvent.keyboard('{Escape}');
+  await expect.element(page.getByRole('dialog')).not.toBeInTheDocument();
+});
+
+test('interactiveBelow: focus can leave the sheet at an interactive detent', async () => {
+  const screen = await render(BottomSheetFixture, { interactiveBelow: 0 });
+  const behind = screen.getByRole('button', { name: 'Behind the sheet' }).element();
+
+  behind.focus();
+  await expect.poll(() => document.activeElement).toBe(behind);
+  await expect.element(screen.getByTestId('open')).toHaveTextContent('true');
+});
+
 test('non-modal: Escape collapses to the lowest detent and does not close', async () => {
   const screen = await render(BottomSheetFixture, { modal: false });
 

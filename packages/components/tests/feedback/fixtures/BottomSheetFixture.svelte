@@ -7,13 +7,14 @@
   interface Props {
     open?: boolean | undefined;
     modal?: boolean | undefined;
+    interactiveBelow?: number | undefined;
     dismissible?: boolean | undefined;
     detents?: readonly SheetDetent[] | undefined;
     detentLabels?: readonly string[] | undefined;
     rows?: number | undefined;
   }
 
-  let { open = true, modal, dismissible, detents, detentLabels, rows = 3 }: Props = $props();
+  let { open = true, modal, interactiveBelow, dismissible, detents, detentLabels, rows = 3 }: Props = $props();
 
   // svelte-ignore state_referenced_locally
   let shown = $state(open);
@@ -32,6 +33,7 @@
   title="Results"
   description="Beds near you."
   {modal}
+  {interactiveBelow}
   {dismissible}
   {detents}
   {detentLabels}

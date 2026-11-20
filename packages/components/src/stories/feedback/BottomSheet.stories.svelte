@@ -11,7 +11,7 @@
       docs: {
         description: {
           component:
-            'A sheet that rests at detents. Drag the grabber, or focus it and use ↑/↓, Home and End. Modal by default, with the same dialog contract as `Drawer`; `modal={false}` is a named region over a page that stays usable, where Escape collapses rather than closes.',
+            'A sheet that rests at detents. Drag the grabber, or focus it and use ↑/↓, Home and End. Modal by default, with the same dialog contract as `Drawer`; `modal={false}` is a named region over a page that stays usable, where Escape collapses rather than closes. `interactiveBelow` keeps a modal sheet\'s lower detents non-modal.',
         },
       },
     },
@@ -22,6 +22,7 @@
   let modalOpen = $state(false);
   let mapDetent = $state(0);
   let mapOpen = $state(true);
+  let peekOpen = $state(true);
   let fitOpen = $state(false);
   let pinnedOpen = $state(false);
 </script>
@@ -58,6 +59,21 @@
     title="Results"
     detents={[0.2, 0.5, 0.92]}
     detentLabels={['Collapsed', 'Half', 'Full']}
+  >
+    {@render bedList()}
+  </BottomSheet>
+</Story>
+
+<Story name="Modal only when pulled up">
+  <div class="bg-base-200 text-base-content/60 flex h-[80dvh] items-start justify-center pt-8">
+    <Button onclick={() => (peekOpen = true)}>Map (usable at Peek): show results</Button>
+  </div>
+  <BottomSheet
+    bind:open={peekOpen}
+    interactiveBelow={0}
+    title="Results"
+    detents={[0.2, 0.5, 0.92]}
+    detentLabels={['Peek', 'Half', 'Full']}
   >
     {@render bedList()}
   </BottomSheet>
