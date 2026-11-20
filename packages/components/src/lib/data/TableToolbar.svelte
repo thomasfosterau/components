@@ -14,7 +14,7 @@ The bar above a `Table`: the selection count, the bulk actions while rows are se
   - The bulk actions are a `ui/Toolbar` (`role="toolbar"`, one Tab stop,
     arrow keys within) named by the same count text, shown only while
     something is selected. The caller renders `ToolbarButton`s into it.
-  - Select-all's second step (#394): while every row on the page is
+  - Select-all's second step: while every row on the page is
     selected and `total` is larger than the page, the toolbar ends with a
     `ToolbarButton` ("Select all 310") that calls `onSelectAllTotal`. Once
     taken (or once `selected` holds `total` keys) the count reads
