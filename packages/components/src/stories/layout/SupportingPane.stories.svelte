@@ -9,7 +9,7 @@
       docs: {
         description: {
           component:
-            'A main pane with an inspector: a `complementary` column from `expandAt` up, a `Drawer` below it. Resize the canvas below 1024px and use the toggle to see the drawer.',
+            'A main pane with an inspector: a `complementary` column from `expandAt` up, a `Drawer` (or, with `compact="sheet"`, a `BottomSheet`) below it. Resize the canvas below 1024px and use the toggle to see the drawer.',
         },
       },
     },
@@ -25,6 +25,21 @@
 
 <Story name="Inspector over a canvas">
   <SupportingPane title="Properties" toggleLabel="Properties" supporting={properties}>
+    <div class="bg-base-200 text-base-content/60 flex h-80 items-center justify-center rounded-box">
+      Plan canvas
+    </div>
+  </SupportingPane>
+</Story>
+
+<Story name="Sheet on a phone" parameters={{ viewport: { defaultViewport: 'mobile1' } }}>
+  <SupportingPane
+    title="Properties"
+    toggleLabel="Properties"
+    supporting={properties}
+    compact="sheet"
+    open={false}
+    sheetDetents={['content', 0.92]}
+  >
     <div class="bg-base-200 text-base-content/60 flex h-80 items-center justify-center rounded-box">
       Plan canvas
     </div>
