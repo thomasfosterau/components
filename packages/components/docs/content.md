@@ -81,6 +81,12 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 </Carousel>
 ```
 
+While it loads, an `Image` can show a `placeholder` painted as the `<img>`'s own background, so it is server-rendered and needs no extra element: `{ kind: 'lqip', src, color? }` (a tiny preview, usually a `data:` URI from your pipeline), `{ kind: 'color', value }`, or `'skeleton'`. `thumbHashPlaceholder(hash)` turns a base64 [ThumbHash](https://evanw.github.io/thumbhash/) into an `lqip` placeholder, on the server or the client; it lives in its own module, so an app that never calls it doesn't ship the decoder. Without a placeholder the image fades in once loaded (`fade`, on by default, never animating under reduced motion). When it fails, the default fallback keeps the alt text visible with `errorLabel` and, with `retryable`, a Retry button that re-requests a same-origin URL with a `retry` query; pass `fallback` (given `{ retry }`) to draw your own. `bind:phase` reads `'loading'`, `'loaded'` or `'error'`.
+
+```svelte
+<Image src={photo.url} alt={photo.alt} width={1280} height={720} placeholder={thumbHashPlaceholder(photo.thumbhash)} retryable />
+```
+
 A daisyUI mask on an `Image` needs no prop: pass it as `class`, from the `maskShape` table so Tailwind sees it (`<Image class={maskShape.hexagon} … />`). Never mask a focusable element; the mask clips its focus ring.
 
 `imageDimensions(file: Blob): Promise<ImageDimensions>` (`ImageDimensions` is `{ width, height }`, in pixels) reads an image file's intrinsic pixel size with `createImageBitmap`, in the browser, so an upload form can submit `width` / `height` with the binary (it is what `ImageInput` measures with). It rejects with `ImageDimensionsUnavailable` where there is no `createImageBitmap` (on a server), and with the browser's own error for a file that does not decode.
