@@ -16,6 +16,8 @@
  */
 
 export { default as ConfirmDialog } from './ConfirmDialog.svelte';
+export { default as ConsentBanner } from './ConsentBanner.svelte';
+export { default as ConsentSettings } from './ConsentSettings.svelte';
 export { default as Dialog } from './Dialog.svelte';
 export { default as DialogHost } from './DialogHost.svelte';
 export { default as BottomSheet } from './BottomSheet.svelte';
@@ -36,6 +38,7 @@ export type { StatDelta } from './StatTile.svelte';
 export type { StepItem, StepState } from './Steps.svelte';
 export type { TimelineDate, TimelineEntry } from './Timeline.svelte';
 
+export * from './consent.svelte.ts';
 export * from './dialogs.ts';
 export * from './sizes.ts';
 export * from './toaster.ts';
