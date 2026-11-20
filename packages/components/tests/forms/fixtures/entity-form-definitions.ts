@@ -3,7 +3,7 @@
  * command pair shaped like the apps' creative-work family: a client-id create,
  * a required title, a required FK behind a gated picker, an optional note, a
  * multiline summary, a date, a numeric field, an enum-kind status, and a
- * contributor-style row list.
+ * contributor-style row list. `flagForm` adds boolean-kind fields.
  */
 
 import { defineEntityForm } from '@thomasfosterau/effect-forms-svelte';
@@ -58,5 +58,31 @@ export const thingForm = defineEntityForm(
       optionLabels: { draft: () => 'Draft', published: () => 'Published' },
     }),
     f.rows('rows', RowsWidget, () => ({ label: 'Contributors' })),
+  ],
+);
+
+const CreateFlag = Schema.Struct({
+  name: Schema.String,
+  isPinned: Schema.Boolean,
+  isDraft: Schema.optional(Schema.Boolean),
+});
+
+const UpdateFlag = Schema.Struct({
+  id: Uuid,
+  name: Schema.optional(Schema.String),
+  isPinned: Schema.optional(Schema.Boolean),
+  isDraft: Schema.optional(Schema.NullOr(Schema.Boolean)),
+});
+
+export const flagForm = defineEntityForm(
+  {
+    create: CreateFlag,
+    update: UpdateFlag,
+    submit: { create: () => 'Create flag', update: () => 'Save flag' },
+  },
+  (f) => [
+    f.text('name', { label: () => 'Name', required: true }),
+    f.text('isPinned', { label: () => 'Pinned', required: true }),
+    f.text('isDraft', { label: () => 'Draft' }),
   ],
 );

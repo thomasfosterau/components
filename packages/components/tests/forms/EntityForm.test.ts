@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import type { EntityFormDefinition, FormStore } from '@thomasfosterau/effect-forms-svelte';
 import EntityForm from '../../src/lib/forms/EntityForm.svelte';
-import { thingForm } from './fixtures/entity-form-definitions.ts';
+import { flagForm, thingForm } from './fixtures/entity-form-definitions.ts';
 
 /**
  * The store `EntityForm` hands its `enhance` prop: validated by the mode's
@@ -276,5 +276,48 @@ describe('saveBar', () => {
     await expect
       .element(screen.getByRole('region', { name: 'Not saved yet' }))
       .toHaveClass('top-0');
+  });
+});
+
+const optionTexts = (select: Element | null): (string | undefined)[] =>
+  Array.from(select?.querySelectorAll('option') ?? [], (o) => o.textContent?.trim());
+
+describe('boolean fields', () => {
+  it('renders a boolean-kind text entry as a labelled No / Yes select that blank seeds to No', async () => {
+    const screen = await render(EntityForm, { definition: flagForm, mode: 'create' });
+    const pinned = screen.getByRole('combobox', { name: /Pinned/ });
+    await expect.element(pinned).toHaveValue('false');
+    expect(optionTexts(pinned.element())).toEqual(['No', 'Yes']);
+  });
+
+  it('seeds from initial and posts the chosen literal', async () => {
+    const screen = await render(EntityForm, {
+      definition: flagForm,
+      mode: 'update',
+      initial: { id: '6f1d0c1e-2a3b-4c5d-8e9f-0a1b2c3d4e5f', name: 'A', isPinned: 'true' },
+    });
+    const pinned = screen.getByRole('combobox', { name: /Pinned/ });
+    await expect.element(pinned).toHaveValue('true');
+    await userEvent.selectOptions(pinned, 'false');
+    const form = screen.container.querySelector('form');
+    expect(form === null ? null : new FormData(form).get('isPinned')).toBe('false');
+  });
+
+  it('takes its option labels from props, and per field from fieldProps', async () => {
+    const screen = await render(EntityForm, {
+      definition: flagForm,
+      mode: 'create',
+      trueLabel: 'Sí',
+      falseLabel: 'No',
+      fieldProps: { isDraft: { trueLabel: 'Draft', falseLabel: 'Published' } },
+    });
+    expect(optionTexts(screen.getByRole('combobox', { name: /Pinned/ }).element())).toEqual([
+      'No',
+      'Sí',
+    ]);
+    expect(optionTexts(screen.getByRole('combobox', { name: 'Draft' }).element())).toEqual([
+      'Published',
+      'Draft',
+    ]);
   });
 });
