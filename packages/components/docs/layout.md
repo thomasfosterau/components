@@ -37,6 +37,22 @@ Without `AppShell`, `Sidebar` and `BottomNav` take the same list as `destination
 <BottomNav class="sm:hidden" {destinations} />
 ```
 
+**Drill-down screens.** For list → item → sub-item flows on a phone, render each screen as a `StackPage` (`title`, `backHref`) inside a `NavigationStack`, and report navigations to the stack from the router. A push slides the new screen in and focuses its `h1`; a pop slides back and returns focus to the row the reader opened, the step most web apps miss. The Back link is a real link named for where it goes ("Back to Beds"), and on touch a swipe from the leading edge follows it. Routing stays the app's; in SvelteKit the root layout wires it in three lines:
+
+```svelte
+<script lang="ts">
+  import { onNavigate } from '$app/navigation';
+  import { createNavigationStack, NavigationStack } from '@thomasfosterau/components';
+
+  const stack = createNavigationStack();
+  onNavigate((navigation) => stack.onNavigate(navigation));
+</script>
+
+<NavigationStack>{@render children()}</NavigationStack>
+```
+
+`onNavigate` infers the direction (browser Back, or a link to the current screen's `backHref`, is a pop; anything else a push); pass a second argument (`'push' | 'pop' | 'replace'`) to override it. The slides are in `theme.css` and stand down under `prefers-reduced-motion`; without the View Transitions API navigation is instant and focus behaves the same.
+
 `layout` also exports `types.ts` (`Crumb`, `TabItem`, `FilterOption`, `TabsMode`, `TabsVariant`, `tabsVariant`, `tabsSize`) and `nav-destination.ts` (`NavDestination`, `NavBreakpoints`, `MediumAt`, `ExpandedAt`).
 
 ```svelte

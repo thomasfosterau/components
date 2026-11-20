@@ -36,10 +36,12 @@ export { default as Main } from './Main.svelte';
 export { default as SkipLink } from './SkipLink.svelte';
 export { default as Navbar } from './Navbar.svelte';
 export { default as NavigationRail } from './NavigationRail.svelte';
+export { default as NavigationStack } from './NavigationStack.svelte';
 export { default as PageHeader } from './PageHeader.svelte';
 export { default as Section } from './Section.svelte';
 export { default as Sidebar } from './Sidebar.svelte';
 export { default as Spacer } from './Spacer.svelte';
+export { default as StackPage } from './StackPage.svelte';
 export { default as Splitter } from './Splitter.svelte';
 export { default as SupportingPane } from './SupportingPane.svelte';
 export { default as Tabs } from './Tabs.svelte';
@@ -57,3 +59,10 @@ export {
 } from './dashboard.ts';
 export * from './space.ts';
 export * from './types.ts';
+export {
+  createNavigationStack,
+  getNavigationStack,
+  NavigationStackState,
+  type NavigationDirection,
+  type StackNavigation,
+} from './stack-direction.svelte.ts';
