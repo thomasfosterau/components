@@ -14,6 +14,7 @@
     "packages/components/src/lib/seo/index.ts",
     "packages/components/src/lib/forms/entity-form.ts",
     "packages/components/src/lib/ui/context-menu.ts",
+    "packages/components/src/lib/media/qr/index.ts",
     "packages/mapbox/src/lib/index.ts",
     "packages/*/src/stories/**/*.stories.{ts,svelte}",
     "packages/*/tests/**/*.test.ts",
@@ -86,12 +87,18 @@
   },
   "duplicates": {
     // A deliberate copy of packages/components/tests/canvas/pointer.ts.
-    "ignore": ["packages/mapbox/tests/pointer.ts"]
+    "ignore": [
+      "packages/mapbox/tests/pointer.ts",
+      // Vendored: kept as close to upstream as the build allows.
+      "packages/components/src/lib/media/qr/qrcodegen.ts"
+    ]
   },
   "health": {
     "maxCyclomatic": 20,
     "maxCognitive": 15,
     "maxCrap": 30,
+    // Vendored: kept as close to upstream as the build allows.
+    "ignore": ["packages/components/src/lib/media/qr/qrcodegen.ts"],
     // Written by `vp run test:coverage` (root vite.config.ts).
     "coverage": "coverage/coverage-final.json"
   }
