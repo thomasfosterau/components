@@ -38,7 +38,7 @@
   ];
 </script>
 
-<Story name="Inside Navbar">
+<Story name="Inside Navbar" asChild>
   <Navbar label="Primary" menuLabel="Open the site menu">
     {#snippet start()}
       <a href="/" rel="home" class="text-primary text-xl font-bold">Garden guide</a>
@@ -53,7 +53,7 @@
   <div class="h-96"></div>
 </Story>
 
-<Story name="Featured panel">
+<Story name="Featured panel" asChild>
   <NavigationMenu {sections} label="Sections">
     {#snippet panel(section)}
       <div class="grid gap-4 sm:grid-cols-[10rem_1fr]">
@@ -72,6 +72,6 @@
   <div class="h-96"></div>
 </Story>
 
-<Story name="Vertical" parameters={{ viewport: { defaultViewport: 'mobile1' } }}>
+<Story name="Vertical" parameters={{ viewport: { defaultViewport: 'mobile1' } }} asChild>
   <NavigationMenu {sections} label="Sections" orientation="vertical" />
 </Story>
