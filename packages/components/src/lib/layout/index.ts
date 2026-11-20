@@ -35,6 +35,7 @@ export { default as ListDetailLayout } from './ListDetailLayout.svelte';
 export { default as Main } from './Main.svelte';
 export { default as SkipLink } from './SkipLink.svelte';
 export { default as Navbar } from './Navbar.svelte';
+export { default as NavigationMenu } from './NavigationMenu.svelte';
 export { default as NavigationRail } from './NavigationRail.svelte';
 export { default as NavigationStack } from './NavigationStack.svelte';
 export { default as PageHeader } from './PageHeader.svelte';
