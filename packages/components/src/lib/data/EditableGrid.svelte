@@ -60,7 +60,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     commit; a commit whose save is rejected leaves it, a new commit empties
     the redo side, and the whole history is dropped once a row it names
     leaves `allRows`.
-  - Copy and paste (#425), in navigation mode: Ctrl/⌘+C copies the active
+  - Copy and paste, in navigation mode: Ctrl/⌘+C copies the active
     cell's text (`format`, a date's ISO form, else the value) through the
     `copy` event's `clipboardData`, unless the reader has selected text of
     their own. Ctrl/⌘+V into an editable cell reads the `paste` event's
@@ -71,6 +71,18 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     commits nothing and marks the cell in error with `pasteFailedLabel` or
     the messages, announced through the polite region. In edit mode both
     are the editor control's own.
+  - Range selection: Shift+arrow keys (and Shift+Home/End/Page
+    keys) extend a block of body cells from the cell they started on; each
+    cell in it carries `aria-selected="true"` and the grid
+    `aria-multiselectable="true"`. Any other move, a click, Escape or
+    opening an editor drops it. Copy writes the block as tab-separated
+    lines. Pasting a tab-separated block (a spreadsheet's copy) fills the
+    cells from the range's top-left, or the active cell, and one value
+    pasted over a range fills every cell in it. It is all or nothing: a
+    block running past the grid commits nothing and announces
+    `pasteOutsideLabel`, and a cell that cannot take its text or fails
+    `validate` is marked in error and nothing is committed. A paste that
+    lands is one undoable step.
 
   `virtual` (for a large import): every row of the result is in the
   grid's matrix but only a window of them is in the DOM. The window is
@@ -105,6 +117,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
   import {
     cellErrors,
     cellKey,
+    clipboardTable,
     copyText,
     currentValue,
     editorText,
@@ -117,6 +130,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     pastedValue,
     rejectionMessage,
     sameCellValue,
+    tableText,
     travel,
     withChange,
     withoutStep,
@@ -127,15 +141,20 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
   } from './grid-edit.ts';
   import {
     clampPoint,
+    extendsRange,
     gridEditKey,
     gridEditStart,
     gridHistoryKey,
     gridMove,
+    gridRange,
+    inGridRange,
+    isMultiCell,
     pointAfterCommit,
     type GridEditKey,
     type GridEditStart,
     type GridHistoryKey,
     type GridPoint,
+    type GridRange,
   } from './grid-keys.ts';
   import { columnClass, tableSize } from './table-classes.ts';
   import { VirtualWindow } from './virtual.svelte.ts';
@@ -210,6 +229,8 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     changedLabel: string;
     /** A paste's error when the cell's editor cannot take the pasted text. */
     pasteFailedLabel: string;
+    /** What is announced when a pasted block runs past the grid. */
+    pasteOutsideLabel: string;
     /** Keep an undo history, which Ctrl/⌘+Z and Ctrl/⌘+Shift+Z walk. */
     undo: boolean;
     /** What is announced when an edit is undone. */
@@ -252,6 +273,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     saveFailedLabel,
     changedLabel,
     pasteFailedLabel,
+    pasteOutsideLabel,
     undo,
     undoneLabel,
     redoneLabel,
@@ -357,6 +379,17 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
   const page = $derived(virtual ? Math.max(1, Math.floor(rowWindow.viewportSize / pitch)) : pageStep);
   const bounds = $derived({ rows: rows.length + 1, cols: shownColumns.length + offset, page });
   const at = $derived(clampPoint(active, bounds));
+  /** Range selection's fixed corner: where a Shift+arrow run started, or `undefined`. */
+  let anchor = $state<GridPoint | undefined>();
+  const isBodyPoint = (point: GridPoint): boolean => point.row >= 1 && point.col >= offset;
+  /** The selected block of two or more body cells, or `undefined`. */
+  const selectedRange = $derived.by((): GridRange | undefined => {
+    if (anchor === undefined) return undefined;
+    const corner = clampPoint(anchor, bounds);
+    if (!isBodyPoint(corner) || !isBodyPoint(at)) return undefined;
+    const range = gridRange(corner, at);
+    return isMultiCell(range) ? range : undefined;
+  });
   /**
    * `virtual`: the window, plus the active cell's row wherever it is. Focus
    * in the grid is always on the active cell (`onfocusin` makes it so), so
@@ -488,6 +521,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     else if (kind === 'select') draft = typeof value === 'string' ? value : '';
     else draft = value;
     draftErrors = [];
+    anchor = undefined;
     edit = { key: cellKey(rowKey(target.row), target.column.key), ...target, point };
     active = point;
     flushSync();
@@ -582,6 +616,26 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     });
   }
 
+  /** Several cells (a pasted block) written together, and recorded as one undoable step. */
+  function applyAll(entries: readonly (CellTarget<T> & { readonly value: unknown })[]): void {
+    const step: EditStep<T> = entries
+      .map(({ row, column, value }) => ({
+        rowKey: rowKey(row),
+        column: column.key,
+        row,
+        from: currentValue(lookup, column, row),
+        to: value,
+      }))
+      .filter((change) => !sameCellValue(change.from, change.to));
+    const recorded = undo && step.length > 0;
+    if (recorded) history = withStep(history, step);
+    for (const { row, column, value } of entries) {
+      write(row, column, value, () => {
+        if (recorded) history = withoutStep(history, step);
+      });
+    }
+  }
+
   /** A step's cells as they stand now, or `undefined` if any is gone or no longer editable. */
   function stepTargets(step: EditStep<T>): (CellTarget<T> & { readonly change: CellChange<T> })[] | undefined {
     const targets: (CellTarget<T> & { readonly change: CellChange<T> })[] = [];
@@ -668,7 +722,15 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     const next = gridMove(event, at, bounds);
     if (next !== undefined) {
       event.preventDefault();
+      const corner = extendsRange(event) && isBodyPoint(at) && isBodyPoint(next) ? (anchor ?? at) : undefined;
       focusPoint(next);
+      // After the focus, whose `focusin` drops any range.
+      anchor = corner;
+      return;
+    }
+    if (event.key === 'Escape' && selectedRange !== undefined) {
+      event.preventDefault();
+      anchor = undefined;
       return;
     }
     const start = gridEditStart(event);
@@ -685,33 +747,68 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     else editModeKey(event);
   }
 
-  /** A body cell the reader is on in navigation mode, with no text of their own selected. */
-  function clipboardCell(): ReturnType<typeof cellAt> {
-    if (edit !== undefined) return undefined;
+  /** Whether the clipboard keys are the grid's: navigation mode, with no text of the reader's own selected. */
+  function clipboardFree(): boolean {
+    if (edit !== undefined) return false;
     const highlighted = document.getSelection();
-    if (highlighted !== null && !highlighted.isCollapsed) return undefined;
-    return cellAt(at);
+    return highlighted === null || highlighted.isCollapsed;
   }
 
+  /** A range's body cells, row by row. */
+  function rangeCells(range: GridRange): ReturnType<typeof cellAt>[][] {
+    const lines: ReturnType<typeof cellAt>[][] = [];
+    for (let row = range.top; row <= range.bottom; row++) {
+      const line: ReturnType<typeof cellAt>[] = [];
+      for (let col = range.left; col <= range.right; col++) line.push(cellAt({ row, col }));
+      lines.push(line);
+    }
+    return lines;
+  }
+
+  const cellCopy = (target: ReturnType<typeof cellAt>): string =>
+    target === undefined ? '' : copyText(target.column, currentValue(lookup, target.column, target.row));
+
   function oncopy(event: ClipboardEvent): void {
-    const target = clipboardCell();
-    if (target === undefined || event.clipboardData === null) return;
-    event.clipboardData.setData('text/plain', copyText(target.column, currentValue(lookup, target.column, target.row)));
+    if (!clipboardFree() || event.clipboardData === null) return;
+    const target = cellAt(at);
+    if (selectedRange === undefined && target === undefined) return;
+    const text =
+      selectedRange === undefined
+        ? cellCopy(target)
+        : tableText(rangeCells(selectedRange).map((line) => line.map(cellCopy)));
+    event.clipboardData.setData('text/plain', text);
     event.preventDefault();
+  }
+
+  /** Say `message` in the polite region, cleared first so the same words twice are said twice. */
+  function announce(message: string): void {
+    announcement = '';
+    flushSync();
+    announcement = message;
   }
 
   /** A paste the cell refused: marked in error with `message`, and announced. */
   function refusePaste(target: CellTarget<T>, message: string): void {
     saveErrors.set(cellKey(rowKey(target.row), target.column.key), message);
-    announcement = '';
-    flushSync();
-    announcement = cellErrorLabel({ ...target, message });
+    announce(cellErrorLabel({ ...target, message }));
   }
 
-  function onpaste(event: ClipboardEvent): void {
-    const target = clipboardCell();
+  /** One cell's pasted text as the value to commit, or why the cell refuses it. */
+  function pasteInto(
+    target: CellTarget<T>,
+    text: string,
+  ): { readonly ok: true; readonly value: unknown } | { readonly ok: false; readonly message: string } {
+    const result = isCellEditable(target.column, target.row, editing) ? pastedValue(target.column, text) : undefined;
+    if (result === undefined || !result.ok) return { ok: false, message: pasteFailedLabel };
+    const messages = target.column.validate?.(result.value, target.row) ?? [];
+    return messages.length > 0 ? { ok: false, message: messages.join(' ') } : result;
+  }
+
+  /** The active cell's own paste: one value, through its editor's rules. */
+  function pasteOne(event: ClipboardEvent, text: string): void {
+    const target = cellAt(at);
     if (target === undefined || !isCellEditable(target.column, target.row, editing)) return;
-    const result = pastedValue(target.column, event.clipboardData?.getData('text/plain') ?? '');
+    const result = pastedValue(target.column, text);
     if (result === undefined) return;
     event.preventDefault();
     if (!result.ok) {
@@ -723,11 +820,64 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     else apply(target.row, target.column, result.value);
   }
 
+  /**
+   * Where a block lands: every cell of the selected range for one value,
+   * else the block's own shape from the range's top-left or the active cell.
+   */
+  function pasteArea(block: readonly (readonly string[])[], single: boolean): GridRange {
+    const corner = selectedRange ?? gridRange(at, at);
+    if (single) return corner;
+    const width = Math.max(...block.map((line) => line.length));
+    return { top: corner.top, left: corner.left, bottom: corner.top + block.length - 1, right: corner.left + width - 1 };
+  }
+
+  /** A block pasted across cells: all of it committed as one undoable step, or none of it. */
+  function pasteBlock(block: readonly (readonly string[])[], single: boolean): void {
+    const area = pasteArea(block, single);
+    if (area.bottom > rows.length || area.right > shownColumns.length + offset - 1) {
+      announce(pasteOutsideLabel);
+      return;
+    }
+    const entries: (CellTarget<T> & { readonly value: unknown })[] = [];
+    const failures: (CellTarget<T> & { readonly message: string })[] = [];
+    rangeCells(area).forEach((line, row) => {
+      line.forEach((target, col) => {
+        const text = single ? block[0]?.[0] : block[row]?.[col];
+        if (target === undefined || text === undefined) return;
+        const result = pasteInto(target, text);
+        if (result.ok) entries.push({ ...target, value: result.value });
+        else failures.push({ ...target, message: result.message });
+      });
+    });
+    const [failure] = failures;
+    if (failure !== undefined) {
+      for (const { row, column, message } of failures) saveErrors.set(cellKey(rowKey(row), column.key), message);
+      announce(failures.length === 1 ? cellErrorLabel(failure) : errorsLabel(failures.length));
+      return;
+    }
+    applyAll(entries);
+  }
+
+  function onpaste(event: ClipboardEvent): void {
+    if (!clipboardFree() || !isBodyPoint(at)) return;
+    const text = event.clipboardData?.getData('text/plain') ?? '';
+    const block = clipboardTable(text);
+    const single = block.length === 1 && block[0]?.length === 1;
+    if (single && selectedRange === undefined) {
+      pasteOne(event, text);
+      return;
+    }
+    event.preventDefault();
+    pasteBlock(block, single);
+  }
+
+
   function onfocusin(event: FocusEvent): void {
     if (!(event.target instanceof Element)) return;
     const cell = event.target.closest('[data-grid-row]');
     if (!(cell instanceof HTMLElement)) return;
     active = { row: Number(cell.dataset['gridRow']), col: Number(cell.dataset['gridCol']) };
+    anchor = undefined;
   }
 
   function onfocusout(event: FocusEvent): void {
@@ -887,6 +1037,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
        cell keeps its own `tabindex="-1"`: a focused cell that stopped being
        focusable would blur, and the blur would commit the edit just opened. -->
   {@const widget = editable && namedEditor(column) === 'checkbox'}
+  {@const inRange = selectedRange !== undefined && inGridRange(selectedRange, point)}
   <svelte:element
     this={column.rowHeader ? 'th' : 'td'}
     scope={column.rowHeader ? 'row' : undefined}
@@ -896,12 +1047,14 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
       column.rowHeader && 'font-normal',
       // A fixed-height row: the editor's field takes the cell's vertical padding.
       virtual && edit?.key === key && 'py-0',
+      inRange && 'bg-primary/10',
       columnClass(column),
     ]}
     data-grid-row={point.row}
     data-grid-col={point.col}
     aria-colindex={point.col + 1}
     tabindex={widget ? undefined : tabStop(point.row, point.col)}
+    aria-selected={inRange ? 'true' : undefined}
     aria-readonly={editable ? undefined : 'true'}
     aria-invalid={errorIndex.has(key) ? 'true' : undefined}
     aria-describedby={describedBy(key, changed)}
@@ -1044,6 +1197,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     aria-describedby={hintId}
     aria-rowcount={rowCount + 1}
     aria-colcount={shownColumns.length + offset}
+    aria-multiselectable="true"
     class={[
       'table bg-base-100',
       tableSize[size],

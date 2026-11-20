@@ -224,6 +224,20 @@ export function pastedValue<T>(column: TableColumn<T>, input: string): PasteResu
   return pastedText(column, text);
 }
 
+/**
+ * Clipboard text as rows of cells: lines split on line breaks and cells on
+ * tabs, the way a spreadsheet writes a copied block (one trailing line break
+ * dropped). Quoted cells holding tabs or line breaks are not unquoted.
+ */
+export function clipboardTable(text: string): string[][] {
+  const lines = text.replace(/\r?\n$/, '').split(/\r\n|\n|\r/);
+  return lines.map((line) => line.split('\t'));
+}
+
+/** Rows of cell texts as tab-separated lines, for a copied range. */
+export const tableText = (rows: readonly (readonly string[])[]): string =>
+  rows.map((cells) => cells.join('\t')).join('\n');
+
 /** The message a rejected save carries, or `fallback` when it carries none. */
 export function rejectionMessage(reason: unknown, fallback: string): string {
   if (reason instanceof Error && reason.message !== '') return reason.message;

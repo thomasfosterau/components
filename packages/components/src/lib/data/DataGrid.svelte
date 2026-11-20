@@ -40,6 +40,10 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
   copies the focused cell's text, and Ctrl/⌘+V pastes into an editable one,
   parsed and validated as its editor would and committed as one undoable
   edit; text the cell cannot take marks it in error (`pasteFailedLabel`).
+  Shift+arrow keys select a block of cells (`aria-selected`): Ctrl/⌘+C
+  copies it as tab-separated lines, and a block pasted from a spreadsheet
+  fills the cells from the block's top-left (or the active cell), all or
+  nothing, as one undoable edit; one value pasted over a block fills it.
 
   `virtual` (editing grids only) replaces paging with windowing, for an
   import of thousands of rows: the whole sorted, filtered result is one
@@ -221,6 +225,12 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
      */
     pasteFailedLabel?: string | undefined;
     /**
+     * An editing grid: what is announced when a pasted block of cells runs
+     * past the grid's last row or column from where it would land.
+     * @defaultValue `"The pasted cells don't fit in the grid from here."`
+     */
+    pasteOutsideLabel?: string | undefined;
+    /**
      * An editing grid: keep an undo history of committed edits. Ctrl/⌘+Z
      * undoes the last one and Ctrl/⌘+Shift+Z (or Ctrl+Y) redoes it, with
      * focus on a cell of the grid (in an open editor those keys are the
@@ -315,6 +325,7 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
     saveFailedLabel = 'The change could not be saved.',
     changedLabel = 'Changed',
     pasteFailedLabel = "That can't go in this cell.",
+    pasteOutsideLabel = "The pasted cells don't fit in the grid from here.",
     undo = true,
     undoneLabel = (target) => `Undid ${target.column.header} for ${rowName(target.row)}`,
     redoneLabel = (target) => `Redid ${target.column.header} for ${rowName(target.row)}`,
@@ -477,6 +488,7 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
       {saveFailedLabel}
       {changedLabel}
       {pasteFailedLabel}
+      {pasteOutsideLabel}
       {undo}
       {undoneLabel}
       {redoneLabel}
