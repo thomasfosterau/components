@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import { cleanup, render } from 'vitest-browser-svelte';
 import Head from '../../src/lib/seo/Head.svelte';
 import HeadWithContext from './fixtures/HeadWithContext.svelte';
+import HeadWithSite from './fixtures/HeadWithSite.svelte';
 
 const meta = (key: string): string | null =>
   document.head
@@ -223,5 +224,69 @@ describe('links', () => {
     await render(Head, { title: 'T', prevUrl: '/page/1', nextUrl: '/page/3' });
     expect(link('prev')).toBe('/page/1');
     expect(link('next')).toBe('/page/3');
+  });
+});
+
+describe('site defaults from setSeoContext', () => {
+  const site = {
+    siteName: 'Example',
+    titleSeparator: ' · ',
+    description: 'The site.',
+    pathname: () => '/books/1',
+    canonicalHref: (path: string) => new URL(path, 'https://example.org').href,
+    locales: ['en', 'de'],
+    ogLocale: 'en_AU',
+    feed: [
+      { path: '/feed.json', title: 'JSON' },
+      { path: '/feed.xml', type: 'application/rss+xml', title: 'RSS' },
+    ],
+    defaultImage: { url: 'https://example.org/og-default.png', alt: 'Example' },
+    twitterCard: 'summary',
+    twitterSite: '@example',
+  } as const;
+
+  it('fills every site-wide tag a page does not set', async () => {
+    await render(HeadWithSite, { site, title: 'Dune' });
+    expect(document.title).toBe('Dune · Example');
+    expect(meta('og:site_name')).toBe('Example');
+    expect(meta('description')).toBe('The site.');
+    expect(link('canonical')).toBe('https://example.org/books/1');
+    expect(meta('og:url')).toBe('https://example.org/books/1');
+    expect(meta('og:locale')).toBe('en_AU');
+    expect(alternates().map((alternate) => alternate.lang)).toEqual(['en', 'de', 'x-default']);
+    expect(
+      Array.from(document.head.querySelectorAll('link[rel="alternate"]:not([hreflang])'), (el) =>
+        el.getAttribute('href'),
+      ),
+    ).toEqual(['https://example.org/feed.json', 'https://example.org/feed.xml']);
+    expect(meta('og:image')).toBe('https://example.org/og-default.png');
+    expect(meta('twitter:card')).toBe('summary');
+    expect(meta('twitter:site')).toBe('@example');
+  });
+
+  it('lets every page prop win over the site default', async () => {
+    await render(HeadWithSite, {
+      site,
+      title: 'Dune',
+      siteName: 'Other',
+      titleSeparator: ' | ',
+      description: 'A book.',
+      pathname: '/books/2',
+      ogLocale: 'de_DE',
+      twitterCard: 'summary_large_image',
+      image: { url: 'https://example.org/dune.png' },
+    });
+    expect(document.title).toBe('Dune | Other');
+    expect(meta('description')).toBe('A book.');
+    expect(link('canonical')).toBe('https://example.org/books/2');
+    expect(meta('og:locale')).toBe('de_DE');
+    expect(meta('twitter:card')).toBe('summary_large_image');
+    expect(meta('og:image')).toBe('https://example.org/dune.png');
+  });
+
+  it('falls back to the site description for a blank one, and to the site name for a blank title', async () => {
+    await render(HeadWithSite, { site, title: ' ', description: ' ' });
+    expect(document.title).toBe('Example');
+    expect(meta('description')).toBe('The site.');
   });
 });
