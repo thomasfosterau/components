@@ -18,6 +18,10 @@ A panel that rises from the bottom edge and rests at one of several heights (det
   - Non-modal: a `<section>` named by its title, so a `region` landmark; no
     trap, nothing inert. Escape inside it collapses it to the lowest detent
     rather than closing it. The close button is there while `dismissible`.
+  - Modal with `interactiveBelow`: the modal contract at detents above it;
+    at it and below, no overlay, no trap and no `aria-modal`, and a click on
+    the page doesn't close it. It stays a `role="dialog"`, and Escape still
+    closes it.
   - The grabber is a focusable `role="slider"` named by `handleLabel`, with
     `aria-valuenow` (the detent's index), `aria-valuemin` 0, `aria-valuemax`
     the last index and `aria-valuetext` from `detentLabels`. ↑/↓ move one
@@ -71,6 +75,13 @@ A panel that rises from the bottom edge and rests at one of several heights (det
      */
     modal?: boolean | undefined;
     /**
+     * For a modal sheet: the highest detent index at which the page behind
+     * stays usable (no overlay, no focus trap, no scroll lock), as under a
+     * map's results sheet that turns modal once pulled up. Omit to be modal
+     * at every detent.
+     */
+    interactiveBelow?: number | undefined;
+    /**
      * Whether dragging below the lowest detent closes the sheet (and, when
      * non-modal, whether it has a close button).
      * @defaultValue `true`
@@ -104,6 +115,7 @@ A panel that rises from the bottom edge and rests at one of several heights (det
     detents = [0.5, 0.92],
     detent = $bindable(0),
     modal = true,
+    interactiveBelow,
     dismissible = true,
     closeLabel = 'Close',
     handleLabel = 'Resize sheet',
@@ -124,6 +136,7 @@ A panel that rises from the bottom edge and rests at one of several heights (det
 
   const last = $derived(Math.max(0, detents.length - 1));
   const index = $derived(Math.min(Math.max(0, Math.round(detent)), last));
+  const modalNow = $derived(interactiveBelow === undefined || index > interactiveBelow);
   /** The sheet's height in px while a drag is in progress. */
   let dragHeight = $state<number | undefined>(undefined);
 
@@ -279,6 +292,8 @@ A panel that rises from the bottom edge and rests at one of several heights (det
     {children}
     {grabber}
     layout="sheet"
+    modal={modalNow}
+    modalityChanges={interactiveBelow !== undefined}
     contentClass={panelClass}
     contentProps={{ ...rest, style, 'data-bottom-sheet': '' }}
   />
