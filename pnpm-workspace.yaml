@@ -15,7 +15,7 @@ catalog:
   effect: 4.1.4
   # Peers `effect` at its own exact version: moves with `effect`.
   '@effect/vitest': 4.1.4
-  '@thomasfosterau/effect-document': ^0.2.0
+  '@thomasfosterau/effect-document': ^0.2.1
   # effect-document's optional peer for its readers; packages/import's suite reads CSV with it.
   '@thomasfosterau/effect-parse': ^0.6.1
   '@lucide/svelte': ^1.76.0
@@ -77,7 +77,7 @@ catalogs:
     svelte: ^5.40.0
     '@thomasfosterau/effect-forms-svelte': ^0.4.2
     effect: ^4.0.0
-    '@thomasfosterau/effect-document': ^0.2.0
+    '@thomasfosterau/effect-document': ^0.2.1
     prosemirror-model: ^1.0.0
     prosemirror-view: ^1.0.0
   published:
