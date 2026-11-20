@@ -91,3 +91,20 @@ Without `AppShell`, `Sidebar` and `BottomNav` take the same list as `destination
 | `FitsBreakpoint` | `20rem`, `28rem`, `36rem`, `48rem`, `64rem` |
 
 `ui/Stack` is a different thing: daisyUI's overlapping pile of cards.
+
+### Scroll behaviours
+
+`Navbar` and `PageHeader` take the top-bar behaviours the platforms ship (iOS large titles, Compose's `TopAppBar` scroll behaviours), so an app doesn't write its own scroll listeners. Each reads the scroll position at most once per frame, from the window or from `scrollContainer`.
+
+```svelte
+<Navbar scrollBehavior="pinned" {start} />
+<Main>
+  <PageHeader title="Tomato ‘Black Krim’" collapsedTitle="Black Krim" scrollBehavior="collapse" />
+  …
+</Main>
+```
+
+- **`Navbar` `scrollBehavior`.** `'static'` (the default) is in the flow. `'pinned'` sticks to the top. `'hide-on-scroll'` sticks, slides away while scrolling down, and comes back scrolling up or as soon as anything in it takes focus, so a keyboard user never tabs into a hidden bar. Under `prefers-reduced-motion` a hide-on-scroll bar stays pinned.
+- **`elevateOnScroll`.** The bar's border and shadow appear only once content is under it (`data-scrolled` is set then). It is on by default for a stuck bar.
+- **Anchors land below a stuck bar.** A pinned or hide-on-scroll `Navbar` sets `--navbar-offset` (its height, or `0px` while hidden) and `scroll-padding-top: var(--navbar-offset)` on the scroller, and removes both when it unmounts.
+- **`PageHeader` `scrollBehavior="collapse"`.** When the large title scrolls up under the top (below a stuck `Navbar`), a compact bar with `collapsedTitle` fades in. It falls back to `title` when that is a string. The bar is `position: fixed`, so nothing below it moves. It is `aria-hidden`, so the heading stays the page's one `h1` at every scroll position. Under reduced motion it switches at halfway instead of fading.
