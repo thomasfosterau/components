@@ -407,7 +407,7 @@ A grid of tiles the reader can rearrange: in edit mode each tile moves by its ha
   };
 
   const onPointerMove = (event: PointerEvent): void => {
-    if (press === undefined || event.pointerId !== press.pointerId) return;
+    if (press?.pointerId !== event.pointerId) return;
     pointer = { x: event.clientX, y: event.clientY };
     if (held !== undefined || startDrag(press)) follow();
   };
