@@ -111,3 +111,5 @@ Buttons, badges and surfaces — the family every other family builds on: `Alert
   switchLabel={(language) => m.switch_language({ language })}
 />
 ```
+
+**A floating action button is the screen's one primary action.** `FloatingActionButton` is fixed bottom-end above the safe area (`position` moves it to `start` or `center`, or `inline` leaves placement to you); it renders a link when given `href`, and its name is always `label`, visible when `extended`. `collapseOnScroll` folds an extended label away while the page scrolls down and brings it back on the way up. `FabMenu` is a speed dial for two or three related actions: a disclosure button (`aria-expanded`) revealing a labelled group of buttons and links, closed by Escape, by choosing an item or by focus leaving. Neither imports bits-ui. Give the page's last row room (`pb-24`) so the button never covers it.

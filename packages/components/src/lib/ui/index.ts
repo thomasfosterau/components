@@ -37,6 +37,8 @@ export { default as DropdownMenu } from './DropdownMenu.svelte';
 export { default as EmptyState } from './EmptyState.svelte';
 export { default as ExternalLink } from './ExternalLink.svelte';
 export { default as FloatingPanel } from './FloatingPanel.svelte';
+export { default as FabMenu } from './FabMenu.svelte';
+export { default as FloatingActionButton } from './FloatingActionButton.svelte';
 export { default as Heading } from './Heading.svelte';
 export { default as ExpandableText } from './ExpandableText.svelte';
 export { default as IconButton } from './IconButton.svelte';
@@ -82,6 +84,7 @@ export { default as Truncate } from './Truncate.svelte';
 export { default as VisuallyHidden } from './VisuallyHidden.svelte';
 
 export * from './colour-token.ts';
+export type { FabMenuItem, FabPosition, FabSize } from './fab.ts';
 export * from './menu-context.ts';
 export * from './slug.ts';
 export * from './truncate.ts';
