@@ -18,6 +18,7 @@ export {
   type EmbedSourceOptions,
 } from './embed-providers.ts';
 export { default as ImageCompare } from './ImageCompare.svelte';
+export { default as Lightbox, type LightboxImage } from './Lightbox.svelte';
 export {
   imageDimensions,
   ImageDimensionsUnavailable,

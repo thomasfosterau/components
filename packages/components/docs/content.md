@@ -93,6 +93,12 @@ While it loads, an `Image` can show a `placeholder` painted as the `<img>`'s own
 
 `ImageCompare`'s divider is a bits-ui slider (`role="slider"`, named by `sliderLabel`), so it takes the arrow, Page, Home and End keys and announces `valueText(value)`; name the whole comparison with `aria-label`. Both images keep their own `alt`. `dir="rtl"` puts the leading image on the right.
 
+`Lightbox` opens an image, or a set, full screen on bits-ui's `Dialog`. Give it `thumbnails` for a list of "View {alt}" buttons that open it, or bind `index` and set it yourself (`undefined` is closed). Every image needs `alt`, which the live region also reads ("Image 3 of 12: …"). ←/→ move between images and Home/End go to the ends, but **while zoomed the arrow keys pan instead**, and Escape resets the zoom before a second Escape closes. Pinch, Ctrl+wheel, double-click, swipe and swipe-down-to-close each have a button or key, and the zoom transition is off under `prefers-reduced-motion`.
+
+```svelte
+<Lightbox images={photos} thumbnails aria-label="Photos of Bed 4" />
+```
+
 A daisyUI mask on an `Image` needs no prop: pass it as `class`, from the `maskShape` table so Tailwind sees it (`<Image class={maskShape.hexagon} … />`). Never mask a focusable element; the mask clips its focus ring.
 
 `Embed` is a click-to-load facade for a third-party iframe: a poster, one button and a link to the content on the provider's site, with nothing requested from the provider until the button is pressed (preconnect hints go in on hover or focus). Pressing it swaps in the iframe, autoplaying a video, and moves focus into it; `eager` loads it at once without autoplay. `provider` is `youtube` (on `youtube-nocookie.com`), `vimeo` (`dnt=1`), `google-maps` (the map's embed URL as `id`) or `generic` (an `https:` URL whose origin is in `allowedOrigins`); `embedSource(provider, id, options)` is that mapping as data, returning `undefined` for anything the provider doesn't embed. `consent={{ granted, grant }}` gates loading on a consent category your app tracks: until it is granted, the button reads "Allow YouTube content and play" and calls `grant` before loading.
