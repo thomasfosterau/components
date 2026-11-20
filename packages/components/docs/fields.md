@@ -52,6 +52,17 @@ Which date control: `DateInput` (the native control, in the barrel) for a single
 
 Which multi-choice control: `CheckboxGroup` when every option fits on screen (about seven or fewer), `MultiSelect` for a longer list, `Select` for a single native choice.
 
+Which colour control: `ColorSwatchGroup` (in the barrel) when the reader picks from a fixed palette, such as a tag's colour; `ColorPicker` from `@thomasfosterau/components/color-picker` when they may need a colour outside it. `ColorPicker` puts the palette and an HSV editor (a saturation and brightness square, hue and opacity strips, a hex field and, in Chromium, an eyedropper) in a popover. The editor writes `format` (`'hex'` by default; `'rgb'`, `'hsl'` or `'oklch'`), with an alpha term only when `alpha` is set; a picked swatch writes its own `value` unchanged. A swatch's name is its `label`, never its hex, and the trigger's description reads the current colour's name. Both read hex, `rgb()`, `hsl()` and `oklch()`; a colour outside sRGB is clipped for the editor.
+
+```svelte
+<FormField label="Bed colour">
+  {#snippet children(control)}<ColorPicker {...control} name="colour" swatches={bedColours} bind:value={colour} />{/snippet}
+</FormField>
+<ColorSwatchGroup label="Tag colour" name="tagColour" swatches={tagColours} bind:value={tagColour} />
+```
+
+The native `<input type="color">` remains an option where none of that is needed: it is sRGB `#rrggbb` only, with no alpha or presets, and its picker differs by browser and OS.
+
 `Combobox` posts the selected id under `name` (a hidden input) by default. `postedValue="query"` makes it a search box instead: `name` goes on the visible input, so a plain `<form method="GET">` posts the typed text with JavaScript on or off, and Enter submits that form unless the reader moved to a suggestion with the arrow keys (clicking a suggestion still commits it, and `onSelect` receives it). `hideLabel` keeps `label` as the accessible name but renders it `sr-only`; `portal={false}` renders the listbox inside the component rather than in `<body>`, still floating.
 
 ```svelte
