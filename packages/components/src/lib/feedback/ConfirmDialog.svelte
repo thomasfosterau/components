@@ -105,6 +105,11 @@ A destructive action behind a modal confirmation, run either as a callback (`onC
     redirectTo?: string | undefined;
     /** Extra classes, merged last. */
     class?: string | undefined;
+    /**
+     * The element to focus when the dialog closes; `undefined` or `null`
+     * returns focus to the element focused before it opened.
+     */
+    finalFocus?: (() => HTMLElement | null | undefined) | undefined;
     /** The opening control — the caller's own element, spreading `props`. */
     trigger?: Snippet<[{ props: Record<string, unknown> }]> | undefined;
     /** Extra body content: a list of what will be destroyed, a reason field. */
@@ -127,6 +132,7 @@ A destructive action behind a modal confirmation, run either as a callback (`onC
     redirectTo,
     class: className,
     trigger,
+    finalFocus,
     children,
   }: Props = $props();
 
@@ -154,7 +160,7 @@ A destructive action behind a modal confirmation, run either as a callback (`onC
   const enhanceForm = (node: HTMLFormElement): void | (() => void) => form?.enhance?.(node);
 </script>
 
-<Dialog bind:open {title} {description} {closeLabel} {size} class={className} {trigger}>
+<Dialog bind:open {title} {description} {closeLabel} {size} class={className} {trigger} {finalFocus}>
   {#if children}
     {@render children()}
   {/if}

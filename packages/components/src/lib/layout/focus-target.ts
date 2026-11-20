@@ -1,6 +1,6 @@
 /**
  * Moving the sequential focus starting point to an in-page target, shared by
- * `SkipLink` and `BackToTop`.
+ * `SkipLink`, `BackToTop` and `DialogHost`.
  *
  * Some browsers scroll to a fragment without moving the focus starting point,
  * so the next Tab would continue from where the link was. The GOV.UK technique
@@ -18,12 +18,10 @@ export interface FocusTargetOptions {
 }
 
 /**
- * Focus the element with id `targetId`, making it focusable for that one
- * visit if it is not already. Returns whether the element exists.
+ * Focus `element`, making it focusable for that one visit if it is not
+ * already.
  */
-export const focusTarget = (targetId: string, options: FocusTargetOptions = {}): boolean => {
-  const element = document.getElementById(targetId);
-  if (element === null) return false;
+export const focusElement = (element: HTMLElement, options: FocusTargetOptions = {}): void => {
   if (!element.hasAttribute('tabindex')) {
     element.setAttribute('tabindex', '-1');
     element.style.outline = 'none';
@@ -37,5 +35,15 @@ export const focusTarget = (targetId: string, options: FocusTargetOptions = {}):
     );
   }
   element.focus({ preventScroll: options.preventScroll === true });
+};
+
+/**
+ * Focus the element with id `targetId`, making it focusable for that one
+ * visit if it is not already. Returns whether the element exists.
+ */
+export const focusTarget = (targetId: string, options: FocusTargetOptions = {}): boolean => {
+  const element = document.getElementById(targetId);
+  if (element === null) return false;
+  focusElement(element, options);
   return true;
 };

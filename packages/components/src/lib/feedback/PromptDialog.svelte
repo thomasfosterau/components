@@ -133,6 +133,11 @@ A modal that asks for one short text value — rename, a new name, type-to-confi
     size?: DialogSize | undefined;
     /** Extra classes, merged last. */
     class?: string | undefined;
+    /**
+     * The element to focus when the dialog closes; `undefined` or `null`
+     * returns focus to the element focused before it opened.
+     */
+    finalFocus?: (() => HTMLElement | null | undefined) | undefined;
     /** The opening control — the caller's own element, spreading `props`. */
     trigger?: Snippet<[{ props: Record<string, unknown> }]> | undefined;
   }
@@ -160,6 +165,7 @@ A modal that asks for one short text value — rename, a new name, type-to-confi
     size = 'sm',
     class: className,
     trigger,
+    finalFocus,
   }: Props = $props();
 
   const baseId = $props.id();
@@ -279,6 +285,7 @@ A modal that asks for one short text value — rename, a new name, type-to-confi
   class={className}
   {trigger}
   {initialFocus}
+  {finalFocus}
 >
   <form
     method={form === undefined ? undefined : 'POST'}

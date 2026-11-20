@@ -33,6 +33,8 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
     actions?: Snippet<[{ close: () => void }]> | undefined;
     /** The element to focus on open, instead of bits-ui's first focusable one. */
     initialFocus?: (() => HTMLElement | null | undefined) | undefined;
+    /** The element to focus on close, instead of the one focused before it opened. */
+    finalFocus?: (() => HTMLElement | null | undefined) | undefined;
     /** Rendered first inside the panel, above the title row: `BottomSheet`'s grabber. */
     grabber?: Snippet<[]> | undefined;
     /** Extra attributes on the panel (`style`, `data-*`): `BottomSheet`'s live height. */
@@ -51,6 +53,7 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
     trigger,
     actions,
     initialFocus,
+    finalFocus,
     grabber,
     contentProps,
     children,
@@ -59,6 +62,14 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
   /** Hand focus to `initialFocus`'s element when it names one; otherwise bits-ui's default. */
   const onOpenAutoFocus = (event: Event): void => {
     const target = initialFocus?.();
+    if (target === null || target === undefined) return;
+    event.preventDefault();
+    target.focus();
+  };
+
+  /** Hand focus to `finalFocus`'s element when it names one; otherwise bits-ui's return. */
+  const onCloseAutoFocus = (event: Event): void => {
+    const target = finalFocus?.();
     if (target === null || target === undefined) return;
     event.preventDefault();
     target.focus();
@@ -82,7 +93,7 @@ The modal body `Dialog` and `Drawer` share; internal, not exported.
     <!-- daisyUI's `modal-backdrop` is a child of an open `.modal`; this is
          the same scrim as an element bits-ui can animate and dismiss from. -->
     <Dialog.Overlay class="bg-base-300/60 fixed inset-0 z-40" />
-    <Dialog.Content {...contentProps} class={contentClass} {onOpenAutoFocus}>
+    <Dialog.Content {...contentProps} class={contentClass} {onOpenAutoFocus} {onCloseAutoFocus}>
       {@render grabber?.()}
       <div class={['flex items-start justify-between gap-4', sheet && 'px-4 pt-4']}>
         <Dialog.Title class={hideTitle ? 'sr-only' : 'text-lg font-semibold'}>{title}</Dialog.Title>
