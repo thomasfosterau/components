@@ -60,6 +60,17 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     commit; a commit whose save is rejected leaves it, a new commit empties
     the redo side, and the whole history is dropped once a row it names
     leaves `allRows`.
+  - Copy and paste (#425), in navigation mode: Ctrl/⌘+C copies the active
+    cell's text (`format`, a date's ISO form, else the value) through the
+    `copy` event's `clipboardData`, unless the reader has selected text of
+    their own. Ctrl/⌘+V into an editable cell reads the `paste` event's
+    `clipboardData` (no permission prompt), turns the text into the editor's
+    value (`parse`, a number, a select option by value or label, an ISO
+    date), runs `validate` and commits as Enter does, without moving: one
+    undoable step. Text the editor cannot take, or that fails `validate`,
+    commits nothing and marks the cell in error with `pasteFailedLabel` or
+    the messages, announced through the polite region. In edit mode both
+    are the editor control's own.
 
   `virtual` (for a large import, #427): every row of the result is in the
   grid's matrix but only a window of them is in the DOM. The window is
@@ -94,6 +105,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
   import {
     cellErrors,
     cellKey,
+    copyText,
     currentValue,
     editorText,
     emptyEditHistory,
@@ -102,6 +114,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     isCellEditable,
     namedEditor,
     originalValue,
+    pastedValue,
     rejectionMessage,
     sameCellValue,
     travel,
@@ -195,6 +208,8 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     saveFailedLabel: string;
     /** A changed cell's description in batch mode. */
     changedLabel: string;
+    /** A paste's error when the cell's editor cannot take the pasted text. */
+    pasteFailedLabel: string;
     /** Keep an undo history, which Ctrl/⌘+Z and Ctrl/⌘+Shift+Z walk. */
     undo: boolean;
     /** What is announced when an edit is undone. */
@@ -236,6 +251,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     commitErrorLabel,
     saveFailedLabel,
     changedLabel,
+    pasteFailedLabel,
     undo,
     undoneLabel,
     redoneLabel,
@@ -279,7 +295,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
   /** `'cell'` mode: committed values whose save is in flight. */
   const pending = new SvelteMap<string, unknown>();
   const busy = new SvelteSet<string>();
-  /** `'cell'` mode: why a cell's last save was rejected. */
+  /** Why a cell's last save (`'cell'` mode) or paste was rejected. */
   const saveErrors = new SvelteMap<string, string>();
   const controllers = new Map<string, AbortController>();
   /** The undo history; immutable values, replaced on every change. */
@@ -669,6 +685,44 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     else editModeKey(event);
   }
 
+  /** A body cell the reader is on in navigation mode, with no text of their own selected. */
+  function clipboardCell(): ReturnType<typeof cellAt> {
+    if (edit !== undefined) return undefined;
+    const highlighted = document.getSelection();
+    if (highlighted !== null && !highlighted.isCollapsed) return undefined;
+    return cellAt(at);
+  }
+
+  function oncopy(event: ClipboardEvent): void {
+    const target = clipboardCell();
+    if (target === undefined || event.clipboardData === null) return;
+    event.clipboardData.setData('text/plain', copyText(target.column, currentValue(lookup, target.column, target.row)));
+    event.preventDefault();
+  }
+
+  /** A paste the cell refused: marked in error with `message`, and announced. */
+  function refusePaste(target: CellTarget<T>, message: string): void {
+    saveErrors.set(cellKey(rowKey(target.row), target.column.key), message);
+    announcement = '';
+    flushSync();
+    announcement = cellErrorLabel({ ...target, message });
+  }
+
+  function onpaste(event: ClipboardEvent): void {
+    const target = clipboardCell();
+    if (target === undefined || !isCellEditable(target.column, target.row, editing)) return;
+    const result = pastedValue(target.column, event.clipboardData?.getData('text/plain') ?? '');
+    if (result === undefined) return;
+    event.preventDefault();
+    if (!result.ok) {
+      refusePaste(target, pasteFailedLabel);
+      return;
+    }
+    const messages = target.column.validate?.(result.value, target.row) ?? [];
+    if (messages.length > 0) refusePaste(target, messages.join(' '));
+    else apply(target.row, target.column, result.value);
+  }
+
   function onfocusin(event: FocusEvent): void {
     if (!(event.target instanceof Element)) return;
     const cell = event.target.closest('[data-grid-row]');
@@ -1001,6 +1055,8 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     {onkeydown}
     {onfocusin}
     {onfocusout}
+    {oncopy}
+    {onpaste}
   >
     {#if caption !== undefined}
       <caption id={captionId} class={captionHidden ? 'sr-only' : 'p-3 text-start text-sm font-medium'}>

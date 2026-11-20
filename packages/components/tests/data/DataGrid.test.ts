@@ -769,3 +769,162 @@ test('a virtual grid’s error summary scrolls a distant row into the window and
   expect(box.bottom).toBeLessThanOrEqual(scroller.getBoundingClientRect().bottom + 1);
   expect(box.top).toBeGreaterThanOrEqual(scroller.getBoundingClientRect().top);
 });
+
+/**
+ * Fire a clipboard event at the focused cell, as Ctrl/⌘+C or Ctrl/⌘+V would,
+ * carrying `text` for a paste. A real key press would need clipboard
+ * permissions the runner does not grant; the grid only reads the event's
+ * `clipboardData`, so the event is the contract.
+ */
+const clipboard = (
+  type: 'copy' | 'paste',
+  text = '',
+): { data: DataTransfer; prevented: boolean } => {
+  const data = new DataTransfer();
+  if (type === 'paste') data.setData('text/plain', text);
+  const event = new ClipboardEvent(type, { clipboardData: data, bubbles: true, cancelable: true });
+  (document.activeElement ?? document.body).dispatchEvent(event);
+  return { data, prevented: event.defaultPrevented };
+};
+
+test('copy puts the focused cell’s value on the clipboard', async () => {
+  const screen = await render(EditableDataGridFixture, { more: true });
+
+  await userEvent.click(screen.getByRole('gridcell', { name: '30' }));
+  const count = clipboard('copy');
+  expect(count.prevented).toBe(true);
+  expect(count.data.getData('text/plain')).toBe('30');
+
+  await userEvent.click(screen.getByRole('gridcell', { name: 'India' }));
+  expect(clipboard('copy').data.getData('text/plain')).toBe('India');
+
+  // A date is copied in its ISO form, so it pastes back.
+  await userEvent.keyboard('{End}');
+  await userEvent.keyboard('{ArrowLeft}');
+  expect(clipboard('copy').data.getData('text/plain')).toBe('2026-03-01');
+});
+
+test('copy leaves the reader’s own text selection to the browser', async () => {
+  const screen = await render(EditableDataGridFixture);
+
+  await userEvent.click(screen.getByRole('gridcell', { name: 'India' }));
+  const text = screen.getByRole('gridcell', { name: 'India' }).element().firstChild;
+  if (text !== null) document.getSelection()?.selectAllChildren(text.parentNode ?? text);
+
+  expect(clipboard('copy').prevented).toBe(false);
+});
+
+test('paste into a number cell commits the parsed number, without moving', async () => {
+  const screen = await render(EditableDataGridFixture, { editing: 'batch' });
+
+  await userEvent.click(screen.getByRole('gridcell', { name: '30' }));
+  expect(clipboard('paste', '42\n').prevented).toBe(true);
+
+  await expect.poll(changeList).toBe('basil.count:30>42');
+  await expect.poll(focusedText).toBe('42');
+});
+
+test('paste that the editor cannot take commits nothing and marks the cell', async () => {
+  const screen = await render(EditableDataGridFixture, {
+    editing: 'batch',
+    pasteFailedLabel: 'Not a number.',
+  });
+
+  await userEvent.click(screen.getByRole('gridcell', { name: '30' }));
+  clipboard('paste', 'abc');
+
+  await expect.poll(changeList).toBe('');
+  const cell = screen.getByRole('gridcell', { name: '30' });
+  await expect.element(cell).toHaveAttribute('aria-invalid', 'true');
+  await expect.element(cell).toHaveAccessibleDescription('Not a number.');
+  await expect
+    .element(screen.getByRole('button', { name: 'Basil, Count: Not a number.' }))
+    .toBeInTheDocument();
+
+  // A good paste clears it.
+  clipboard('paste', '31');
+  await expect.poll(changeList).toBe('basil.count:30>31');
+  await expect
+    .element(screen.getByRole('gridcell', { name: '31' }))
+    .not.toHaveAttribute('aria-invalid');
+});
+
+test('paste runs validate, and a failing value commits nothing', async () => {
+  const screen = await render(EditableDataGridFixture, { editing: 'batch' });
+
+  await userEvent.click(screen.getByRole('gridcell', { name: '30' }));
+  clipboard('paste', '-3');
+
+  await expect.poll(changeList).toBe('');
+  await expect
+    .element(screen.getByRole('gridcell', { name: '30' }))
+    .toHaveAccessibleDescription('Must not be negative.');
+});
+
+test('paste into a select cell matches an option by value or label', async () => {
+  const screen = await render(EditableDataGridFixture, { editing: 'batch' });
+
+  await userEvent.click(screen.getByRole('gridcell', { name: 'herb' }));
+  clipboard('paste', 'Fruit');
+  await expect.poll(changeList).toBe('basil.kind:herb>fruit');
+
+  clipboard('paste', 'bulb');
+  await expect.poll(changeList).toBe('basil.kind:herb>bulb');
+
+  clipboard('paste', 'Tree');
+  await expect.poll(changeList).toBe('basil.kind:herb>bulb');
+  await expect
+    .element(screen.getByRole('button', { name: "Basil, Kind: That can't go in this cell." }))
+    .toBeInTheDocument();
+});
+
+test('paste into a date cell takes an ISO date', async () => {
+  const screen = await render(EditableDataGridFixture, { editing: 'batch', more: true });
+
+  await userEvent.click(screen.getByRole('gridcell', { name: 'India' }));
+  await userEvent.keyboard('{ArrowRight}');
+  clipboard('paste', '2026-04-20');
+
+  await expect.poll(changeList).toBe('basil.planted:2026-03-01>2026-04-20');
+});
+
+test('a pasted edit is one undoable step', async () => {
+  const screen = await render(EditableDataGridFixture, { editing: 'batch' });
+
+  await userEvent.click(screen.getByRole('gridcell', { name: 'Basil' }));
+  clipboard('paste', 'Thai basil');
+  await expect.poll(changeList).toBe('basil.name:Basil>Thai basil');
+
+  await userEvent.keyboard('{Control>}z{/Control}');
+  await expect.poll(changeList).toBe('');
+});
+
+test('paste leaves read-only and checkbox cells alone', async () => {
+  const screen = await render(EditableDataGridFixture, { editing: 'batch' });
+
+  await userEvent.click(screen.getByRole('gridcell', { name: 'India' }));
+  expect(clipboard('paste', 'Chile').prevented).toBe(false);
+  await userEvent.click(screen.getByRole('gridcell', { name: 'bulb' }));
+  expect(clipboard('paste', 'herb').prevented).toBe(false);
+
+  await expect.poll(changeList).toBe('');
+});
+
+test('cell mode: a paste is saved through onCellCommit', async () => {
+  const onCellCommit = vi.fn<(change: CellChange<unknown>, signal: AbortSignal) => Promise<void>>(
+    async () => {},
+  );
+  const screen = await render(EditableDataGridFixture, { onCellCommit });
+
+  await userEvent.click(screen.getByRole('gridcell', { name: '9' }));
+  clipboard('paste', '12');
+
+  expect(onCellCommit).toHaveBeenCalledOnce();
+  expect(onCellCommit.mock.calls[0]?.[0]).toMatchObject({
+    rowKey: 'tomato',
+    column: 'count',
+    from: 9,
+    to: 12,
+  });
+  await expect.element(screen.getByRole('gridcell', { name: '12' })).toBeInTheDocument();
+});

@@ -28,6 +28,7 @@
     selection?: 'none' | 'single' | 'multiple' | undefined;
     errorsLabel?: ((count: number) => string) | undefined;
     changedLabel?: string | undefined;
+    pasteFailedLabel?: string | undefined;
     undo?: boolean | undefined;
     /** Apply each `'cell'` commit to the rows before resolving, as a caller would. */
     persist?: boolean | undefined;
@@ -43,6 +44,7 @@
     selection,
     errorsLabel,
     changedLabel,
+    pasteFailedLabel,
     undo,
     persist = true,
     more = false,
@@ -148,6 +150,7 @@
   {selection}
   {errorsLabel}
   {changedLabel}
+  {pasteFailedLabel}
   {undo}
   bind:changes
 />

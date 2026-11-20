@@ -36,7 +36,10 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
   (`undo`, on by default): Ctrl/⌘+Z undoes the last committed edit and
   Ctrl/⌘+Shift+Z or Ctrl+Y redoes it, while a cell is focused rather than
   open. In `'batch'` an undo rewrites `changes`; in `'cell'` it is one more
-  `onCellCommit`, from the saved value back to the earlier one.
+  `onCellCommit`, from the saved value back to the earlier one. Ctrl/⌘+C
+  copies the focused cell's text, and Ctrl/⌘+V pastes into an editable one,
+  parsed and validated as its editor would and committed as one undoable
+  edit; text the cell cannot take marks it in error (`pasteFailedLabel`).
 
   `virtual` (editing grids only) replaces paging with windowing, for an
   import of thousands of rows: the whole sorted, filtered result is one
@@ -211,6 +214,13 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
      */
     changedLabel?: string | undefined;
     /**
+     * An editing grid: the error a cell shows when text pasted into it
+     * (Ctrl/⌘+V) is something its editor cannot take, such as letters in a
+     * number column or a value that is not one of a select's options.
+     * @defaultValue `"That can't go in this cell."`
+     */
+    pasteFailedLabel?: string | undefined;
+    /**
      * An editing grid: keep an undo history of committed edits. Ctrl/⌘+Z
      * undoes the last one and Ctrl/⌘+Shift+Z (or Ctrl+Y) redoes it, with
      * focus on a cell of the grid (in an open editor those keys are the
@@ -304,6 +314,7 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
       `${error.column.header} for ${rowName(error.row)} was not saved: ${error.message}`,
     saveFailedLabel = 'The change could not be saved.',
     changedLabel = 'Changed',
+    pasteFailedLabel = "That can't go in this cell.",
     undo = true,
     undoneLabel = (target) => `Undid ${target.column.header} for ${rowName(target.row)}`,
     redoneLabel = (target) => `Redid ${target.column.header} for ${rowName(target.row)}`,
@@ -465,6 +476,7 @@ A `Table` with client-side sorting, filtering across every column and paging, fo
       {commitErrorLabel}
       {saveFailedLabel}
       {changedLabel}
+      {pasteFailedLabel}
       {undo}
       {undoneLabel}
       {redoneLabel}
