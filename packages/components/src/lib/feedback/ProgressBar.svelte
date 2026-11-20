@@ -7,6 +7,8 @@ A native `<progress>` in a daisyUI tone.
   Native rather than a `div role="progressbar"`: the element already carries
   the role, the value semantics and the platform's own indeterminate
   rendering, and no hand-rolled version gets the indeterminate state right.
+  It is for completion of a task; a measurement (storage used, soil
+  moisture) is a `Meter`.
 
   ARIA contract: `label` is the accessible name (a `<progress>` takes no name
   from its contents), and `aria-valuetext` carries the percentage as words so

@@ -108,3 +108,12 @@ export const drawerHeight: Record<DrawerSize, string> = {
  * (`0.5` is half the screen), or `'content'` to fit what it holds.
  */
 export type SheetDetent = number | 'content';
+
+/** Literal daisyUI `--size` class per `Size` for `RadialProgress`; a lookup table so Tailwind's scanner sees every class. */
+export const radialSize: Record<'xs' | 'sm' | 'md' | 'lg' | 'xl', string> = {
+  xs: '[--size:2rem] text-[0.6rem]',
+  sm: '[--size:3rem] text-xs',
+  md: '[--size:4rem] text-sm',
+  lg: '[--size:5rem] text-base',
+  xl: '[--size:6rem] text-lg',
+};
