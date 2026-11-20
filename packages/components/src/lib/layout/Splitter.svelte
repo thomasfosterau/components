@@ -7,7 +7,8 @@ Two panes side by side (or stacked) with a draggable, keyboard-operable divider 
   beside its properties panel, a list beside the record it opens. Nest a
   Splitter inside a pane for three-way layouts.
 
-  Hand-rolled, deliberately: bits-ui has no splitter primitive, and paneforge
+  The handle is `SplitterHandle`, shared with `ListDetailLayout`'s
+  `resizable` divider. Hand-rolled, deliberately: bits-ui has no splitter primitive, and paneforge
   (its authors' resizable panes) is a third-party runtime dependency, which
   under AGENTS.md would force a separate package for a contract this small:
   one focusable separator, five keys and a captured pointer.
@@ -29,6 +30,7 @@ Two panes side by side (or stacked) with a draggable, keyboard-operable divider 
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
+  import SplitterHandle from './SplitterHandle.svelte';
 
   type Orientation = 'horizontal' | 'vertical';
 
@@ -101,92 +103,11 @@ Two panes side by side (or stacked) with a draggable, keyboard-operable divider 
     horizontal: 'row',
     vertical: 'column',
   };
-  const handleClasses: Record<Orientation, string> = {
-    horizontal: 'cursor-col-resize before:inset-x-[-4px] before:inset-y-0',
-    vertical: 'cursor-row-resize before:inset-x-0 before:inset-y-[-4px]',
-  };
-  const separatorOrientation: Record<Orientation, Orientation> = {
-    horizontal: 'vertical',
-    vertical: 'horizontal',
-  };
 
   let container = $state<HTMLDivElement | undefined>(undefined);
-  /** The size Enter restores after a collapse. */
-  let restoreTo = 50;
-  /** The pointer drag in progress: its id and the size it started from. */
-  let drag: { readonly pointerId: number; readonly from: number } | undefined;
 
-  const clamp = (value: number): number => Math.min(maxSize, Math.max(minSize, value));
-  const collapsed = $derived(collapsible && size === 0);
-  const current = $derived(collapsed ? 0 : clamp(size));
-
-  const rtl = (): boolean =>
-    orientation === 'horizontal' && container !== undefined && getComputedStyle(container).direction === 'rtl';
-
-  const settle = (next: number): void => {
-    if (next === current) return;
-    size = next;
-    onCommit?.(next);
-  };
-
-  /** One arrow press: from collapsed, growing opens at `minSize`. */
-  const nudge = (direction: 1 | -1): void => {
-    if (collapsed) {
-      if (direction === 1) settle(minSize);
-      return;
-    }
-    settle(clamp(current + direction * step));
-  };
-
-  const keys: Record<Orientation, { readonly shrink: string; readonly grow: string }> = {
-    horizontal: { shrink: 'ArrowLeft', grow: 'ArrowRight' },
-    vertical: { shrink: 'ArrowUp', grow: 'ArrowDown' },
-  };
-
-  const onkeydown = (event: KeyboardEvent): void => {
-    const { shrink, grow } = keys[orientation];
-    const flip = rtl() ? -1 : 1;
-    if (event.key === shrink) nudge(flip === 1 ? -1 : 1);
-    else if (event.key === grow) nudge(flip === 1 ? 1 : -1);
-    else if (event.key === 'Home') settle(minSize);
-    else if (event.key === 'End') settle(maxSize);
-    else if (event.key === 'Enter' && collapsible) {
-      if (collapsed) settle(clamp(restoreTo));
-      else {
-        restoreTo = current;
-        settle(0);
-      }
-    } else return;
-    event.preventDefault();
-  };
-
-  /** The leading size the pointer at this event stands for. */
-  const sizeAt = (event: PointerEvent): number => {
-    if (container === undefined) return current;
-    const rect = container.getBoundingClientRect();
-    if (orientation === 'vertical') return clamp(((event.clientY - rect.top) / rect.height) * 100);
-    const offset = rtl() ? rect.right - event.clientX : event.clientX - rect.left;
-    return clamp((offset / rect.width) * 100);
-  };
-
-  const onpointerdown = (event: PointerEvent): void => {
-    if (event.button !== 0 || !(event.currentTarget instanceof HTMLElement)) return;
-    event.currentTarget.setPointerCapture(event.pointerId);
-    drag = { pointerId: event.pointerId, from: current };
-    event.preventDefault();
-  };
-
-  const onpointermove = (event: PointerEvent): void => {
-    if (drag?.pointerId !== event.pointerId) return;
-    size = sizeAt(event);
-  };
-
-  const stopDrag = (event: PointerEvent): void => {
-    if (drag?.pointerId !== event.pointerId) return;
-    const { from } = drag;
-    drag = undefined;
-    if (current !== from) onCommit?.(current);
-  };
+  // The handle clamps and commits; this is the same reading of `size`, for the pane.
+  const current = $derived(collapsible && size === 0 ? 0 : Math.min(maxSize, Math.max(minSize, size)));
 </script>
 
 <div
@@ -199,29 +120,19 @@ Two panes side by side (or stacked) with a draggable, keyboard-operable divider 
   <div id={startId} class="min-h-0 min-w-0 overflow-auto" style:flex="0 0 {current}%">
     {@render start()}
   </div>
-  <!-- A focusable separator is a widget (ARIA 1.2, the APG window splitter);
-       Svelte's role table only knows the static, non-interactive one. -->
-  <!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
-  <div
-    role="separator"
-    tabindex="0"
-    aria-label={handleLabel}
-    aria-orientation={separatorOrientation[orientation]}
-    aria-valuenow={Math.round(current)}
-    aria-valuemin={collapsible ? 0 : minSize}
-    aria-valuemax={maxSize}
-    aria-controls={startId}
-    class={[
-      'relative touch-none bg-base-300 before:absolute before:content-[""] hover:bg-primary focus-visible:bg-primary focus-visible:outline-none',
-      handleClasses[orientation],
-    ]}
-    {onkeydown}
-    {onpointerdown}
-    {onpointermove}
-    onpointerup={stopDrag}
-    onpointercancel={stopDrag}
-    style:flex="0 0 0.25rem"
-  ></div>
+  <SplitterHandle
+    bind:value={size}
+    min={minSize}
+    max={maxSize}
+    {step}
+    {collapsible}
+    {orientation}
+    label={handleLabel}
+    controls={startId}
+    container={() => container}
+    {onCommit}
+    style="flex: 0 0 0.25rem"
+  />
   <div class="min-h-0 min-w-0 overflow-auto" style:flex="1 1 0%">
     {@render end()}
   </div>

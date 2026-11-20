@@ -54,3 +54,17 @@
     <ListDetailLayout {list} {detail} {placeholder} showDetail backHref="#" focusTarget="bed-4" />
   </div>
 </Story>
+
+<Story name="Resizable list">
+  <div class="border-base-300 h-96 border">
+    <ListDetailLayout
+      {list}
+      {detail}
+      {placeholder}
+      showDetail
+      backHref="#"
+      resizable
+      handleLabel="Resize the bed list"
+    />
+  </div>
+</Story>
