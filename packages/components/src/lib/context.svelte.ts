@@ -2,10 +2,10 @@
  * The app-integration seam.
  *
  * A component here must not import `$app/*`: that would tie the package to
- * SvelteKit and make it untestable outside one. The four things an app has
- * to supply — how a path becomes an href, how to navigate, which href is the
- * current page, and which locale `Intl` should format for — are read from
- * this injected context instead. It carries NO copy: every user-facing
+ * SvelteKit and make it untestable outside one. The things an app has to
+ * supply — how a path becomes an href, how to navigate, which href is the
+ * current page, which locale `Intl` should format for, and how a POST form
+ * is progressively enhanced — are read from this injected context instead. It carries NO copy: every user-facing
  * string a component renders is a prop with an English default, so an i18n
  * app passes its own messages at the call site.
  *
@@ -20,7 +20,7 @@
 
 import { getContext, setContext } from 'svelte';
 
-/** What an app supplies through `setComponentsContext`: link resolution, navigation, the current-page check and the formatting locale. */
+/** What an app supplies through `setComponentsContext`: link resolution, navigation, the current-page check, the formatting locale and form enhancement. */
 export interface ComponentsContext {
   /**
    * The locale(s) `Intl` formatters use when a component is given none.
@@ -34,7 +34,17 @@ export interface ComponentsContext {
   readonly navigate: (url: string) => Promise<void> | void;
   /** Whether `href` is the page currently shown — drives `aria-current="page"`. */
   readonly isCurrent: (href: string) => boolean;
+  /**
+   * The app's progressive enhancement for a POST `<form>` (in SvelteKit, a
+   * wrapper over `$app/forms`' `enhance`), returning its teardown if it has
+   * one. Every form-mode component given no `enhance` of its own uses this;
+   * `undefined` leaves those forms as plain POSTs.
+   */
+  readonly enhance: EnhanceForm | undefined;
 }
+
+/** A progressive enhancement attached to a `<form>` element, returning its teardown if it has one. */
+export type EnhanceForm = (form: HTMLFormElement) => void | (() => void);
 
 const hasWindow = (): boolean => typeof globalThis.window !== 'undefined';
 
@@ -49,6 +59,7 @@ export const defaultComponentsContext: ComponentsContext = {
     if (hasWindow()) globalThis.window.location.assign(url);
   },
   isCurrent: (href) => href !== '' && href === currentPathname(),
+  enhance: undefined,
 };
 
 const CONTEXT_KEY = Symbol('@thomasfosterau/components:context');
@@ -66,6 +77,7 @@ export function setComponentsContext(context: {
     href: context.href ?? defaultComponentsContext.href,
     navigate: context.navigate ?? defaultComponentsContext.navigate,
     isCurrent: context.isCurrent ?? defaultComponentsContext.isCurrent,
+    enhance: context.enhance ?? defaultComponentsContext.enhance,
   });
 }
 

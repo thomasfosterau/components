@@ -1,9 +1,11 @@
 <!-- ConfirmDialog in whichever mode the test asks for. The default context
      navigates by assigning `window.location`, which would take the test runner
-     with it — so the fixture injects its own `navigate`. -->
+     with it — so the fixture injects its own `navigate`, and the context's
+     `enhance` when a test passes one. -->
 <script lang="ts">
   import { setComponentsContext } from '../../../src/lib/context.svelte.ts';
   import ConfirmDialog from '../../../src/lib/feedback/ConfirmDialog.svelte';
+  import type { EnhanceForm } from '../../../src/lib/context.svelte.ts';
   import type { ConfirmForm } from '../../../src/lib/feedback/ConfirmDialog.svelte';
   import Button from '../../../src/lib/ui/Button.svelte';
 
@@ -15,6 +17,7 @@
     onNavigate?: ((url: string) => void) | undefined;
     confirmLabel?: string | undefined;
     failureMessage?: string | undefined;
+    contextEnhance?: EnhanceForm | undefined;
   }
 
   let {
@@ -25,9 +28,11 @@
     onNavigate,
     confirmLabel,
     failureMessage,
+    contextEnhance,
   }: Props = $props();
 
-  setComponentsContext({ navigate: (url) => onNavigate?.(url) });
+  // svelte-ignore state_referenced_locally
+  setComponentsContext({ navigate: (url) => onNavigate?.(url), enhance: contextEnhance });
 </script>
 
 <p data-testid="open-state">{open ? 'open' : 'closed'}</p>

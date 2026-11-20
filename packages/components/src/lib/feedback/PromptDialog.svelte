@@ -10,8 +10,9 @@ A modal that asks for one short text value — rename, a new name, type-to-confi
   in the field submits through the platform's implicit submission. In
   callback mode (`onConfirm`) the submit is prevented and the callback runs;
   in form mode (`form`) the browser POSTs the field under `form.name` to
-  `form.action`, with the app's `enhance` attached when it has one — the same
-  two modes as `ConfirmDialog`.
+  `form.action`, with the app's `enhance` attached when it has one (the
+  caller's, else the components context's) — the same two modes as
+  `ConfirmDialog`.
 
   ARIA and keyboard contract:
   - Everything `Dialog` gives (APG modal dialog: `aria-modal`, the title as
@@ -36,6 +37,7 @@ A modal that asks for one short text value — rename, a new name, type-to-confi
   import type { HTMLInputAttributes } from 'svelte/elements';
   import FormField from '../fields/FormField.svelte';
   import TextInput from '../fields/TextInput.svelte';
+  import { getComponentsContext } from '../context.svelte.ts';
   import Button from '../ui/Button.svelte';
   import type { Tone } from '../ui/tones.ts';
   import Dialog from './Dialog.svelte';
@@ -49,7 +51,7 @@ A modal that asks for one short text value — rename, a new name, type-to-confi
     readonly name: string;
     /** Extra fields to post, as hidden inputs inside the form. */
     readonly fields?: Readonly<Record<string, string>> | undefined;
-    /** The app's own `use:enhance`, applied to the `<form>`. */
+    /** The app's own `use:enhance`, applied to the `<form>`. Omitted, the components context's `enhance` applies. */
     readonly enhance?: ((form: HTMLFormElement) => void | (() => void)) | undefined;
   }
 
@@ -264,8 +266,15 @@ A modal that asks for one short text value — rename, a new name, type-to-confi
     }
   };
 
-  /** The app's `enhance`, as an attachment so omitting it is a no-op. */
-  const enhanceForm = (node: HTMLFormElement): void | (() => void) => form?.enhance?.(node);
+  const context = getComponentsContext();
+
+  /**
+   * In form mode, the caller's `enhance`, else the context's, as an
+   * attachment so having neither is a no-op. Callback mode never enhances:
+   * its submit is prevented.
+   */
+  const enhanceForm = (node: HTMLFormElement): void | (() => void) =>
+    form === undefined ? undefined : (form.enhance ?? context.enhance)?.(node);
 
   /** Focus the field on open, with its value selected so typing replaces it. */
   const initialFocus = (): HTMLElement | undefined => {
