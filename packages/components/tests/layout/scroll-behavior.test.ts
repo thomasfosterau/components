@@ -7,7 +7,7 @@
 
 import { afterEach, expect, test, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
-import { collapseProgress, nextHidden } from '../../src/lib/layout/scroll-behavior.ts';
+import { barFrame, collapseProgress, nextHidden } from '../../src/lib/layout/scroll-behavior.ts';
 import ScrollChromeFixture from './fixtures/ScrollChromeFixture.svelte';
 
 afterEach(() => {
@@ -45,6 +45,21 @@ test('collapseProgress runs 0 to 1 as the title passes the line, snapping under 
   expect(collapseProgress(-60, 40, 0)).toBe(1);
   expect(collapseProgress(-10, 40, 0, true)).toBe(0);
   expect(collapseProgress(-30, 40, 0, true)).toBe(1);
+});
+
+test('barFrame spans a scroll container, below its navbar offset', () => {
+  const container = document.createElement('div');
+  container.style.cssText =
+    'position: absolute; top: 40px; left: 30px; width: 200px; height: 100px;';
+  container.style.setProperty('--navbar-offset', '12px');
+  document.body.append(container);
+  expect(barFrame(container)).toEqual({ top: 52, left: 30, width: 200 });
+  container.remove();
+  expect(barFrame(undefined)).toEqual({
+    top: 0,
+    left: 0,
+    width: document.documentElement.clientWidth,
+  });
 });
 
 test('a static bar is left as it was', async () => {

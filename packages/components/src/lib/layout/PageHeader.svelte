@@ -36,6 +36,7 @@ The block at the top of a page: its heading, supporting facts and actions.
   import type { HTMLAttributes } from 'svelte/elements';
   import type { HeadingLevel } from '../ui/tones.ts';
   import {
+    barFrame,
     collapseProgress,
     reducedMotion,
     watchScroll,
@@ -112,18 +113,10 @@ The block at the top of a page: its heading, supporting facts and actions.
 
   const measure = (): void => {
     if (heading === undefined) return;
-    const scroller = scrollContainer ?? document.documentElement;
-    const offset =
-      Number.parseFloat(getComputedStyle(scroller).getPropertyValue('--navbar-offset')) || 0;
-    const scroll = scrollContainer?.getBoundingClientRect();
-    const top = (scroll?.top ?? 0) + offset;
-    frame = {
-      top,
-      left: scroll?.left ?? 0,
-      width: scroll?.width ?? document.documentElement.clientWidth,
-    };
+    const bar = barFrame(scrollContainer);
     const large = heading.getBoundingClientRect();
-    progress = collapseProgress(large.top, large.height, top, reducedMotion());
+    frame = bar;
+    progress = collapseProgress(large.top, large.height, bar.top, reducedMotion());
   };
 
   $effect(() => {

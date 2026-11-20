@@ -72,6 +72,23 @@ export const collapseProgress = (
   return progress >= 0.5 ? 1 : 0;
 };
 
+/**
+ * Where a collapsed title bar goes, in viewport px: across the top of
+ * `container` (or the viewport), below a stuck `Navbar`'s `--navbar-offset`.
+ */
+export const barFrame = (
+  container: HTMLElement | undefined,
+): { readonly top: number; readonly left: number; readonly width: number } => {
+  const scroller = container ?? document.documentElement;
+  const offset =
+    Number.parseFloat(getComputedStyle(scroller).getPropertyValue('--navbar-offset')) || 0;
+  if (container === undefined) {
+    return { top: offset, left: 0, width: document.documentElement.clientWidth };
+  }
+  const box = container.getBoundingClientRect();
+  return { top: box.top + offset, left: box.left, width: box.width };
+};
+
 /** Whether the reader asked for reduced motion; read when needed, not cached. */
 export const reducedMotion = (): boolean =>
   globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
