@@ -321,7 +321,7 @@ A board of columns holding cards that move within and between columns by draggin
     const step = Math.sign(to.column - at.column);
     if (!enforceLimits || step === 0) return to;
     let column = to.column;
-    while (on[column] && !hasRoom(on[column])) column += step;
+    for (let lane = on[column]; lane !== undefined && !hasRoom(lane); lane = on[column]) column += step;
     return on[column] ? { ...to, column } : to;
   };
 
