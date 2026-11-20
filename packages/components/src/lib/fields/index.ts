@@ -15,6 +15,7 @@
  * @module
  */
 
+export { default as AngleSlider } from './AngleSlider.svelte';
 export { default as Checkbox } from './Checkbox.svelte';
 export { default as CheckboxGroup } from './CheckboxGroup.svelte';
 export { default as ColorSwatchGroup, type ColorSwatch } from './ColorSwatchGroup.svelte';
@@ -64,3 +65,5 @@ export type { CropArea, CropPlace, CropReadout, CropRotation } from './crop.ts';
 export type { CropExportOptions } from './crop-export.ts';
 
 export { cardBrand, luhnValid, maskPresets, type Mask, type MaskPreset } from './mask.ts';
+
+export { compass8, compass16, type AngleZero } from './angle.ts';
