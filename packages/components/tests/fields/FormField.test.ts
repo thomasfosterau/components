@@ -1,6 +1,7 @@
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import FormFieldFixture from './fixtures/FormFieldFixture.svelte';
+import FormFieldHelpFixture from './fixtures/FormFieldHelpFixture.svelte';
 import FormFieldRoleFixture from './fixtures/FormFieldRoleFixture.svelte';
 
 /**
@@ -128,4 +129,15 @@ test('a click on the label focuses a roving group’s current tab stop', async (
 
   await screen.getByText('Watering').click();
   await expect.element(screen.getByRole('radio', { name: 'Weekly' })).toHaveFocus();
+});
+
+test('help sits beside the label, not inside it, and the label still focuses the input', async () => {
+  const screen = await render(FormFieldHelpFixture);
+
+  const help = screen.getByRole('button', { name: 'Information: Hardiness zone' }).element();
+  expect(help.closest('label')).toBeNull();
+  await expect.element(screen.getByRole('textbox', { name: 'Zone' })).toBeInTheDocument();
+
+  await screen.getByText('Zone', { exact: true }).click();
+  await expect.element(screen.getByRole('textbox', { name: 'Zone' })).toHaveFocus();
 });

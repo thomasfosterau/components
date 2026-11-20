@@ -31,6 +31,23 @@ Every primitive accepts it by spread — `<TextInput {...control} bind:value />`
 
 **When a control uses `labelId`.** `<label for>` names only a labelable element (`input`, `select`, `textarea`, `button`, `meter`, `output`, `progress`); every primitive above is one, and ignores `labelId` (it never reaches the DOM as an attribute). A control whose focusable part is a role on a `span` or `div` — a `role="slider"` thumb, a `role="group"` or `radiogroup` root, a segmented date group — points `aria-labelledby={control.labelId}` at the label instead, and `FormField` forwards a click on its label to it (the control itself if focusable, else its first focusable descendant). `Fieldset` hands its `children` a `FieldsetControl` (`{ labelId }`, the `<legend>`'s id) for the same purpose. `RadioGroup` is its own frame with its own `legend`, so it takes neither.
 
+## Contextual help
+
+`ContextualHelp` is an ⓘ (or, with `variant="help"`, a ?) button that opens a popover with a heading, a paragraph and an optional `learnMore` link. Use it for an explanation a reader needs now and then: "What's a hardiness zone?", "How is this score calculated?". It opens on click, Enter or Space, never on hover, so it works on touch and can hold a link. Its trigger is named `Information: <title>`, and it never joins the field's `aria-describedby`, because its content is too long to hear on every focus. A short note everyone needs belongs in `hint` instead.
+
+Beside a field label, pass it as `FormField`'s `help` snippet. It renders after the label text but outside the `<label>`, so clicking the label still focuses the control:
+
+```svelte
+<FormField label="Zone">
+  {#snippet help()}
+    <ContextualHelp title="Hardiness zone">The coldest winter your plants can survive.</ContextualHelp>
+  {/snippet}
+  {#snippet children(control)}
+    <TextInput {...control} />
+  {/snippet}
+</FormField>
+```
+
 ## Translating `requiredLabel` once
 
 `FormField`, `Fieldset`, `CheckboxGroup` and `RadioGroup` each take `requiredLabel = '(required)'`, the screen-reader text after a required field's label. Like every other string, it is a prop. The components context carries no copy, by design. An i18n app wraps the frame once and imports the wrapper everywhere, rather than threading the prop through every call site:
