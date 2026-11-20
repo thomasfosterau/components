@@ -19,14 +19,17 @@ A main pane with a supporting panel (properties, comments, a legend): a column b
     is given) is a button with `aria-expanded` and, while the column is
     shown, `aria-controls`; closing the column leaves focus on it.
   - Narrow: `Drawer`'s modal-dialog contract, named by `title`; Escape closes
-    it and focus returns to the toggle.
+    it and focus returns to the toggle. With `compact="sheet"` it is a
+    `BottomSheet` instead, with the same dialog contract plus its grabber.
 
-  There is no `sheet` presentation or draggable divider yet.
+  There is no draggable divider yet.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
+  import BottomSheet from '../feedback/BottomSheet.svelte';
   import Drawer from '../feedback/Drawer.svelte';
+  import type { SheetDetent } from '../feedback/sizes.ts';
   import Button from '../ui/Button.svelte';
   import { expandQuery, type ExpandAt } from './types.ts';
 
@@ -55,10 +58,17 @@ A main pane with a supporting panel (properties, comments, a legend): a column b
     /** Text of the built-in toggle; omit to render none and drive `open` yourself. */
     toggleLabel?: string | undefined;
     /**
-     * Accessible name of the drawer's close button.
+     * Accessible name of the drawer's or sheet's close button.
      * @defaultValue `'Close'`
      */
     closeLabel?: string | undefined;
+    /**
+     * How the panel is presented below `expandAt`: a side `Drawer`, or a `BottomSheet`.
+     * @defaultValue `'drawer'`
+     */
+    compact?: 'drawer' | 'sheet' | undefined;
+    /** The sheet's detents, when `compact` is `'sheet'`; `BottomSheet`'s default when omitted. */
+    sheetDetents?: readonly SheetDetent[] | undefined;
   }
 
   let {
@@ -70,6 +80,8 @@ A main pane with a supporting panel (properties, comments, a legend): a column b
     expandAt = 'lg',
     toggleLabel,
     closeLabel = 'Close',
+    compact = 'drawer',
+    sheetDetents,
     class: className,
     ...rest
   }: Props = $props();
@@ -140,6 +152,10 @@ A main pane with a supporting panel (properties, comments, a legend): a column b
         {@render supporting()}
       </aside>
     {/if}
+  {:else if compact === 'sheet'}
+    <BottomSheet bind:open {title} {closeLabel} detents={sheetDetents}>
+      {@render supporting()}
+    </BottomSheet>
   {:else}
     <Drawer bind:open {title} {closeLabel} {side}>
       {@render supporting()}

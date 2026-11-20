@@ -1,6 +1,6 @@
 /**
  * `SupportingPane`: a named `complementary` column with an `aria-expanded`
- * toggle on wide screens, and a `Drawer` dialog with focus return on narrow
+ * toggle on wide screens, and a `Drawer` (or `BottomSheet`) dialog with focus return on narrow
  * ones.
  */
 
@@ -41,6 +41,22 @@ test('narrow: the toggle opens a drawer, and Escape returns focus to it', async 
   const dialog = page.getByRole('dialog', { name: 'Properties' });
   await expect.element(dialog).toBeVisible();
   await expect.element(dialog).toHaveTextContent('Bed 4 is 2 × 1.2 m.');
+
+  await userEvent.keyboard('{Escape}');
+  expect(page.getByRole('dialog').elements()).toHaveLength(0);
+  await expect.element(toggle).toHaveFocus();
+});
+
+test('narrow with compact="sheet": the panel is a bottom sheet with a grabber', async () => {
+  await page.viewport(390, 800);
+  const screen = await render(SupportingPaneFixture, { compact: 'sheet' });
+
+  const toggle = screen.getByRole('button', { name: 'Properties', exact: true });
+  await userEvent.click(toggle);
+  const dialog = page.getByRole('dialog', { name: 'Properties' });
+  await expect.element(dialog).toHaveTextContent('Bed 4 is 2 × 1.2 m.');
+  await expect.element(dialog.getByRole('slider', { name: 'Resize sheet' })).toBeInTheDocument();
+  expect(dialog.element().hasAttribute('data-bottom-sheet')).toBe(true);
 
   await userEvent.keyboard('{Escape}');
   expect(page.getByRole('dialog').elements()).toHaveLength(0);
