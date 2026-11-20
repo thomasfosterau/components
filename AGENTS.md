@@ -19,4 +19,6 @@ Read [README.md](README.md) and [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) fir
 
 ## Fallow
 
-The pre-commit hook runs `vp run fallow:audit`, which runs the test suites for coverage first, so commits are slow; don't bypass it. Fix what it reports rather than working around it; `vp exec fallow explain <issue-type>` explains a finding.
+The pre-commit hook runs `vp run fallow:audit`, which runs the test suites for coverage first, so commits are slow; don't bypass it. Fix what it reports rather than working around it.
+
+The `fallow` agent skill is linked into `.claude/skills/` from the installed package after `vp install`.
