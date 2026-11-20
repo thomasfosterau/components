@@ -79,6 +79,10 @@ Locale-aware rendering of dates, numbers, lists, relative time and search-result
 <Carousel items={photos} label="Photos of Bed 4" autoplay={6000}>
   {#snippet slide(photo)}<Image id={photo.id} alt={photo.alt} width={1280} height={720} />{/snippet}
 </Carousel>
+<ImageCompare aria-label="Bed 4, March and November" beforeLabel="March" afterLabel="November" bind:value>
+  {#snippet before()}<Image id={march.id} alt="Bed 4 in March" width={1280} height={720} />{/snippet}
+  {#snippet after()}<Image id={november.id} alt="Bed 4 in November" width={1280} height={720} />{/snippet}
+</ImageCompare>
 ```
 
 While it loads, an `Image` can show a `placeholder` painted as the `<img>`'s own background, so it is server-rendered and needs no extra element: `{ kind: 'lqip', src, color? }` (a tiny preview, usually a `data:` URI from your pipeline), `{ kind: 'color', value }`, or `'skeleton'`. `thumbHashPlaceholder(hash)` turns a base64 [ThumbHash](https://evanw.github.io/thumbhash/) into an `lqip` placeholder, on the server or the client; it lives in its own module, so an app that never calls it doesn't ship the decoder. Without a placeholder the image fades in once loaded (`fade`, on by default, never animating under reduced motion). When it fails, the default fallback keeps the alt text visible with `errorLabel` and, with `retryable`, a Retry button that re-requests a same-origin URL with a `retry` query; pass `fallback` (given `{ retry }`) to draw your own. `bind:phase` reads `'loading'`, `'loaded'` or `'error'`.
@@ -86,6 +90,8 @@ While it loads, an `Image` can show a `placeholder` painted as the `<img>`'s own
 ```svelte
 <Image src={photo.url} alt={photo.alt} width={1280} height={720} placeholder={thumbHashPlaceholder(photo.thumbhash)} retryable />
 ```
+
+`ImageCompare`'s divider is a bits-ui slider (`role="slider"`, named by `sliderLabel`), so it takes the arrow, Page, Home and End keys and announces `valueText(value)`; name the whole comparison with `aria-label`. Both images keep their own `alt`. `dir="rtl"` puts the leading image on the right.
 
 A daisyUI mask on an `Image` needs no prop: pass it as `class`, from the `maskShape` table so Tailwind sees it (`<Image class={maskShape.hexagon} … />`). Never mask a focusable element; the mask clips its focus ring.
 
