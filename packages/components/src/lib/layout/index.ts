@@ -39,6 +39,7 @@ export { default as PageHeader } from './PageHeader.svelte';
 export { default as Section } from './Section.svelte';
 export { default as Sidebar } from './Sidebar.svelte';
 export { default as Spacer } from './Spacer.svelte';
+export { default as Splitter } from './Splitter.svelte';
 export { default as SupportingPane } from './SupportingPane.svelte';
 export { default as Tabs } from './Tabs.svelte';
 export { default as VStack } from './VStack.svelte';
