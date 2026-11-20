@@ -45,6 +45,12 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   enhancement); a SvelteKit app passes its `$app/forms`-backed `enhanceForm`,
   which this package cannot import.
 
+  **Booleans.** A `text` entry over a boolean-kind field renders as a
+  two-option `Select`, false first, posting the `"true"` / `"false"` the
+  boolean adapter reads; a blank value shows (and posts) false. The option
+  labels are `trueLabel` / `falseLabel`, overridable per key through
+  `fieldProps[key]`.
+
   **Form-level messages.** The store's `formErrors` and the caller's
   `messages` (a failure the store never saw, such as a server action's
   `fail(500, { message })`) share one `FormErrors` block, store errors first.
@@ -157,6 +163,16 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
      */
     pendingLabel?: string | undefined;
     /**
+     * The true option of a boolean field; `fieldProps[key].trueLabel` overrides it per field.
+     * @defaultValue `'Yes'`
+     */
+    trueLabel?: string | undefined;
+    /**
+     * The false option of a boolean field; `fieldProps[key].falseLabel` overrides it per field.
+     * @defaultValue `'No'`
+     */
+    falseLabel?: string | undefined;
+    /**
      * The empty option of a select entry.
      * @defaultValue `'Choose…'`
      */
@@ -216,6 +232,8 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
     cancelLabel = 'Cancel',
     pendingLabel = 'Saving…',
     selectPlaceholder = 'Choose…',
+    trueLabel = 'Yes',
+    falseLabel = 'No',
     requiredLabel,
     messages,
     errorSummary = false,
@@ -306,6 +324,20 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
       label: entry.options.optionLabels[value]?.() ?? value,
     }));
 
+  const isBoolean = (entry: ScalarEntry): boolean =>
+    configured.definition.fieldFor(entry.key).kind === 'boolean';
+
+  /** A per-key label override from `fieldProps`, when it is a string. */
+  const fieldLabel = (key: string, prop: 'trueLabel' | 'falseLabel'): string | undefined => {
+    const value = fieldProps[key]?.[prop];
+    return P.isString(value) ? value : undefined;
+  };
+
+  const booleanOptions = (entry: ScalarEntry) => [
+    { value: 'false', label: fieldLabel(entry.key, 'falseLabel') ?? falseLabel },
+    { value: 'true', label: fieldLabel(entry.key, 'trueLabel') ?? trueLabel },
+  ];
+
   const inputMode = (entry: ScalarEntry): Option.Option<'numeric'> =>
     Option.orElse(Option.fromNullishOr(entry.options.inputmode), () =>
       configured.definition.fieldFor(entry.key).kind === 'number'
@@ -344,9 +376,19 @@ Renders an `@thomasfosterau/effect-forms-svelte` `defineEntityForm` definition t
   });
 </script>
 
-<!-- A scalar entry's control: a textarea, a date input or a text input. -->
+<!-- A scalar entry's control: a boolean select, a textarea, a date input or a text input. -->
 {#snippet scalarInput(entry: ScalarEntry, control: FieldControl)}
-  {#if entry.multiline}
+  {#if isBoolean(entry)}
+    <Select
+      {...control}
+      name={entry.key}
+      options={booleanOptions(entry)}
+      bind:value={
+        () => (getField(entry.key) === 'true' ? 'true' : 'false'),
+        (next: string) => setField(entry.key, next)
+      }
+    />
+  {:else if entry.multiline}
     <Textarea
       {...control}
       name={entry.key}
