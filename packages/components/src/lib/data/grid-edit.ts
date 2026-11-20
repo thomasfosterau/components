@@ -12,6 +12,7 @@ import {
   CalendarDateTime,
   ZonedDateTime,
   getLocalTimeZone,
+  parseDate,
 } from '@internationalized/date';
 import { toFieldOptions } from '../fields/field-types.ts';
 import type {
@@ -149,6 +150,78 @@ function plainText(value: unknown): string {
   if (typeof value === 'string') return value;
   if (typeof value === 'number' || typeof value === 'boolean') return String(value);
   return JSON.stringify(value);
+}
+
+/**
+ * The text a cell is copied as: the column's `format`, a date's ISO form (so
+ * a spreadsheet or another grid reads it back), else the value as plain text.
+ */
+export function copyText<T>(column: TableColumn<T>, value: unknown): string {
+  if (column.format !== undefined) return column.format(value);
+  if (isDateValue(value)) return value.toString();
+  return plainText(value);
+}
+
+/** What pasting text into a cell comes to: a value to commit, or text the editor cannot take. */
+export type PasteResult = { readonly ok: true; readonly value: unknown } | { readonly ok: false };
+
+const pasted = (value: unknown): PasteResult => ({ ok: true, value });
+const refused: PasteResult = { ok: false };
+
+/** A `'select'` column's option whose value or label is `text` (labels compared without case). */
+function pastedOption<T>(column: TableColumn<T>, text: string): PasteResult {
+  const options = toFieldOptions(column.options ?? []);
+  const lower = text.toLocaleLowerCase();
+  const option =
+    options.find((candidate) => candidate.value === text) ??
+    options.find((candidate) => candidate.label.toLocaleLowerCase() === lower);
+  return option === undefined ? refused : pasted(option.value);
+}
+
+/** A `'number'` column's value from text: empty is no value, anything not a finite number is refused. */
+function pastedNumber(text: string): PasteResult {
+  if (text === '') return pasted(undefined);
+  const value = Number(text);
+  return Number.isFinite(value) ? pasted(value) : refused;
+}
+
+/** A `'date'` column's value from an ISO date (`2026-03-14`); empty is no value. */
+function pastedDate(text: string): PasteResult {
+  if (text === '') return pasted(undefined);
+  try {
+    return pasted(parseDate(text));
+  } catch {
+    return refused;
+  }
+}
+
+/** A `'text'` (or snippet) column's value: the text through the column's `parse`, which may throw. */
+function pastedText<T>(column: TableColumn<T>, text: string): PasteResult {
+  if (column.parse === undefined) return pasted(text);
+  try {
+    return pasted(column.parse(text));
+  } catch {
+    return refused;
+  }
+}
+
+/**
+ * Pasted text as the value a cell's editor would commit: through `parse` for
+ * text, as a number, as a select option by value or label, or as an ISO date.
+ * One trailing line break (what a spreadsheet adds to a copied cell) is
+ * dropped; text that still spans cells (a tab or a line break) is refused.
+ * `undefined` when the cell takes no pasting at all: a checkbox, or a
+ * snippet editor without a `parse`.
+ */
+export function pastedValue<T>(column: TableColumn<T>, input: string): PasteResult | undefined {
+  const kind = namedEditor(column);
+  if (kind === 'checkbox' || (kind === undefined && column.parse === undefined)) return undefined;
+  const text = input.replace(/\r?\n$/, '');
+  if (/[\t\r\n]/.test(text)) return refused;
+  if (kind === 'number') return pastedNumber(text.trim());
+  if (kind === 'select') return pastedOption(column, text.trim());
+  if (kind === 'date') return pastedDate(text.trim());
+  return pastedText(column, text);
 }
 
 /** The message a rejected save carries, or `fallback` when it carries none. */

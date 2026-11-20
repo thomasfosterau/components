@@ -8,6 +8,7 @@ import { expect, test } from 'vite-plus/test';
 import {
   cellErrors,
   cellKey,
+  copyText,
   currentValue,
   editorText,
   emptyEditHistory,
@@ -15,6 +16,7 @@ import {
   historyFor,
   historyLimit,
   isCellEditable,
+  pastedValue,
   rejectionMessage,
   sameCellValue,
   travel,
@@ -149,4 +151,61 @@ test('the history is dropped once a row it names is gone', () => {
   const history = withStep(emptyEditHistory<Item>(), [change(6)]);
   expect(historyFor(history, new Set(['a', 'b']))).toBe(history);
   expect(historyFor(history, new Set(['b']))).toEqual(emptyEditHistory());
+});
+
+/** A bare column of `Item`s with `extra` over it. */
+const column = (extra: Partial<TableColumn<Item>> = {}): TableColumn<Item> => ({
+  key: 'k',
+  header: 'K',
+  value: () => '',
+  editable: true,
+  ...extra,
+});
+
+test('copyText: the column format, a date in ISO form, else plain text', () => {
+  expect(copyText(column(), 12)).toBe('12');
+  expect(copyText(column(), undefined)).toBe('');
+  expect(copyText(column(), new CalendarDate(2026, 3, 14))).toBe('2026-03-14');
+  expect(copyText(column({ format: (value) => `#${String(value)}` }), 12)).toBe('#12');
+});
+
+test('pastedValue: each named editor reads text as its own value', () => {
+  const number = column({ editor: 'number' });
+  const select = column({ editor: 'select', options: [{ value: 'herb', label: 'Herb' }] });
+  const date = column({ editor: 'date' });
+
+  expect(pastedValue(column(), 'Basil\r\n')).toEqual({ ok: true, value: 'Basil' });
+  expect(pastedValue(column({ parse: (text) => text.length }), 'abc')).toEqual({
+    ok: true,
+    value: 3,
+  });
+  expect(
+    pastedValue(
+      column({
+        parse: () => {
+          throw new Error('no');
+        },
+      }),
+      'abc',
+    ),
+  ).toEqual({ ok: false });
+  expect(pastedValue(column(), 'a\tb')).toEqual({ ok: false });
+  expect(pastedValue(column(), 'a\nb')).toEqual({ ok: false });
+
+  expect(pastedValue(number, ' 42 ')).toEqual({ ok: true, value: 42 });
+  expect(pastedValue(number, '')).toEqual({ ok: true, value: undefined });
+  expect(pastedValue(number, 'abc')).toEqual({ ok: false });
+
+  expect(pastedValue(select, 'herb')).toEqual({ ok: true, value: 'herb' });
+  expect(pastedValue(select, 'HERB')).toEqual({ ok: true, value: 'herb' });
+  expect(pastedValue(select, 'tree')).toEqual({ ok: false });
+
+  expect(pastedValue(date, '2026-03-14')).toEqual({
+    ok: true,
+    value: new CalendarDate(2026, 3, 14),
+  });
+  expect(pastedValue(date, '')).toEqual({ ok: true, value: undefined });
+  expect(pastedValue(date, '14/03/2026')).toEqual({ ok: false });
+
+  expect(pastedValue(column({ editor: 'checkbox' }), 'true')).toBeUndefined();
 });
