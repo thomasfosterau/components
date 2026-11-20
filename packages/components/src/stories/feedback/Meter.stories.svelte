@@ -17,7 +17,7 @@
   });
 </script>
 
-<Story name="Storage with thresholds">
+<Story name="Storage with thresholds" asChild>
   <div class="flex max-w-md flex-col gap-4">
     {#each [2.1, 6.4, 9.3] as used (used)}
       <Meter
@@ -34,14 +34,14 @@
   </div>
 </Story>
 
-<Story name="Radial: soil moisture (meter)">
+<Story name="Radial: soil moisture (meter)" asChild>
   <div class="flex gap-6">
     <RadialProgress label="Bed 1 soil moisture" kind="meter" value={0.34} max={1} tone="info" />
     <RadialProgress label="Bed 2 soil moisture" kind="meter" value={0.72} max={1} tone="success" size="lg" />
   </div>
 </Story>
 
-<Story name="Radial: upload (progress)">
+<Story name="Radial: upload (progress)" asChild>
   <div class="flex gap-6">
     <RadialProgress label="Uploading photos" value={62} />
     <RadialProgress label="Preparing upload" />
