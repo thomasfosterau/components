@@ -43,8 +43,24 @@ export interface ComponentsContext {
   readonly enhance: EnhanceForm | undefined;
 }
 
-/** A progressive enhancement attached to a `<form>` element, returning its teardown if it has one. */
-export type EnhanceForm = (form: HTMLFormElement) => void | (() => void);
+/**
+ * A progressive enhancement attached to a `<form>` element, returning its
+ * teardown if it has one. A component that shows a pending state passes
+ * `submission`; call its `onSubmit` when the request starts and `onResult`
+ * when it settles, or the component never leaves its idle state.
+ */
+export type EnhanceForm = (
+  form: HTMLFormElement,
+  submission?: FormSubmission,
+) => void | (() => void);
+
+/** The lifecycle hooks a component hands an {@link EnhanceForm}. */
+export interface FormSubmission {
+  /** The enhanced request has started. */
+  readonly onSubmit: () => void;
+  /** The request settled; `type` is the action result's (`'success'`, `'failure'`, `'redirect'`, `'error'`). */
+  readonly onResult: (result: { readonly type: string }) => void;
+}
 
 const hasWindow = (): boolean => typeof globalThis.window !== 'undefined';
 

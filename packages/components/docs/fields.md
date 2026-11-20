@@ -1,6 +1,6 @@
 # Fields and forms
 
-Form controls wired through the `FormField` + `FieldControl` contract, and the parts of a form that are not one control (`ErrorSummary`, `FormErrors`, `FormActions`, `SearchForm`, `HiddenField`, `SaveBar`, the leave guard). Each component's props, defaults, snippets and ARIA contract are in its doc comments, so they show on hover in your editor and in the generated `.d.ts`; this guide covers what a doc comment cannot: how the family fits together, which component to choose, and worked examples.
+Form controls wired through the `FormField` + `FieldControl` contract, and the parts of a form that are not one control (`AuthCard`, `ErrorSummary`, `FormErrors`, `FormActions`, `SearchForm`, `HiddenField`, `SaveBar`, the leave guard). Each component's props, defaults, snippets and ARIA contract are in its doc comments, so they show on hover in your editor and in the generated `.d.ts`; this guide covers what a doc comment cannot: how the family fits together, which component to choose, and worked examples.
 
 Form controls wired through the `FormField` + `FieldControl` contract. `FormField` (one control) or `Fieldset` (a group) owns the label, hint and errors; it derives `hintId`/`errorId` from a single `id` and hands `children` a `FieldControl`:
 
@@ -133,6 +133,32 @@ The split from `fields` is by who owns the message: a `FormErrors` message has n
 <!-- A GET form on purpose: a search result should be a URL people can bookmark, share and go back to. -->
 <SearchForm action="/search" name="query" label="Search the site" placeholder="Scientific or common name" />
 ```
+
+### Auth pages: `AuthCard`
+
+`AuthCard` is the whole sign-in, sign-up or password-reset card: a POST form with a heading, the form-level errors, an email field, your own fields (`fields`), a link to the sibling page and a submit button. `redirectTo` is posted as a hidden field. With no enhancement it is a plain POST; with one (its `enhance`, else the components context's) the button shows `pendingLabel` while the request is in flight, and `onResult` hears how it settled.
+
+```svelte
+<AuthCard
+  title="Sign in"
+  redirectTo={data.redirectTo}
+  errors={form?.errors}
+  email={form?.email}
+  emailErrors={form?.fieldErrors?.email}
+  altHref="/sign-up"
+  altLabel="Create an account"
+  submitLabel="Sign in"
+  pendingLabel="Signing in…"
+>
+  {#snippet fields()}
+    <FormField label="Password" required>
+      {#snippet children(control)}<PasswordInput {...control} name="password" />{/snippet}
+    </FormField>
+  {/snippet}
+</AuthCard>
+```
+
+The pending state needs an enhancement that reports the request's lifecycle: see `enhance` in [Getting started](getting-started.md#app-integration).
 
 ### Unsaved changes: `SaveBar` and the leave guard
 

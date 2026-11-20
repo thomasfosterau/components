@@ -63,7 +63,14 @@ Every component that needs to resolve a link, navigate, know the current page, f
     href: localizeHref,
     navigate: goto,
     isCurrent: (href) => page.url.pathname === href,
-    enhance: (form) => enhance(form).destroy,
+    enhance: (form, submission) =>
+      enhance(form, () => {
+        submission?.onSubmit();
+        return async ({ result, update }) => {
+          submission?.onResult(result);
+          await update();
+        };
+      }).destroy,
   });
 </script>
 ```
@@ -74,7 +81,7 @@ Every component that needs to resolve a link, navigate, know the current page, f
 | `href` | `(path: string) => string` | Resolving an app-relative path to the href actually rendered — base-path or locale-prefix logic lives here, once. |
 | `navigate` | `(url: string) => Promise<void> \| void` | Client-side navigation (`ConfirmDialog`'s `redirectTo`, `ConfirmButton`'s `redirectTo`, `CommandPalette`'s `href` rows). |
 | `isCurrent` | `(href: string) => boolean` | `aria-current="page"` decisions (`Breadcrumbs`, `Tabs` in `links` mode, `FilterBar`, `Sidebar`). |
-| `enhance` | `((form: HTMLFormElement) => void \| (() => void)) \| undefined` | Progressive enhancement for every form-mode POST (`ConfirmDialog` and `PromptDialog` with `form`) that is not given its own `form.enhance`. Its return value is the teardown. |
+| `enhance` | `((form: HTMLFormElement, submission?: FormSubmission) => void \| (() => void)) \| undefined` | Progressive enhancement for every form-mode POST (`ConfirmDialog` and `PromptDialog` with `form`, `AuthCard`) that is not given its own. Its return value is the teardown. A component with a pending state passes `submission`: call its `onSubmit` when the request starts and `onResult` with the action result when it settles, as above, or that component stays idle. |
 
 Every member is optional in the object you pass — an omitted one falls back individually to `defaultComponentsContext` (identity `href`, `window.location.assign` for navigation, pathname equality for `isCurrent`, runtime-default locale, no form enhancement), so every component works unwired in a story or a test. The object's type is exported as `ComponentsContext` (every member required; `setComponentsContext` takes the same members, each optional), and `getComponentsContext()` reads the merged result back for a component of your own.
 
