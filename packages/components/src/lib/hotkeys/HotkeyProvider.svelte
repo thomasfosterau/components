@@ -58,6 +58,8 @@ The single global `keydown` listener that drives the hotkey registry; hotkeys ne
   // inherently branchy; splitting it would scatter the buffer state machine
   // across helpers and hurt readability more than the branch count does.
   function onKeydown(event: KeyboardEvent): void {
+    // A shortcut is being recorded: the keys are the recording, not commands.
+    if (registry.paused) return;
     // While a hotkey-owned dialog is open, or focus sits in an editable
     // element, only `allowInEditable` actions (the palette toggle) may fire —
     // bits-ui owns keyboard interaction inside its dialogs, and typing must
