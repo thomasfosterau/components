@@ -327,16 +327,16 @@ importers:
         version: 4.1.4(effect@4.1.4)(vitest@5.1.0)
       '@storybook/addon-svelte-csf':
         specifier: 'catalog:'
-        version: 5.1.6(@storybook/svelte@10.6.7(storybook@10.6.7(@types/react@19.3.0)(react@19.3.1)(vite-plus@1.5.1(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(@vitest/browser-playwright@5.1.0)(@vitest/coverage-istanbul@5.1.0)(@vitest/ui@5.1.0)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(playwright@1.65.1)(svelte@5.57.3)(yaml@2.9.1)))(svelte@5.57.3))(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.5.1(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3))(@voidzero-dev/vite-plus-core@1.5.1(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(storybook@10.6.7(@types/react@19.3.0)(react@19.3.1)(vite-plus@1.5.1(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(@vitest/browser-playwright@5.1.0)(@vitest/coverage-istanbul@5.1.0)(@vitest/ui@5.1.0)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(playwright@1.65.1)(svelte@5.57.3)(yaml@2.9.1)))(svelte@5.57.3)
+        version: 5.1.6(@storybook/svelte@10.6.7(storybook@10.6.7(@types/react@19.3.0)(react@19.3.1)(vite-plus@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(@vitest/browser-playwright@5.1.0)(@vitest/coverage-istanbul@5.1.0)(@vitest/ui@5.1.0)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(playwright@1.65.1)(svelte@5.57.3)(yaml@2.9.1)))(svelte@5.57.3))(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3))(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(storybook@10.6.7(@types/react@19.3.0)(react@19.3.1)(vite-plus@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(@vitest/browser-playwright@5.1.0)(@vitest/coverage-istanbul@5.1.0)(@vitest/ui@5.1.0)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(playwright@1.65.1)(svelte@5.57.3)(yaml@2.9.1)))(svelte@5.57.3)
       '@storybook/sveltekit':
         specifier: 'catalog:'
-        version: 10.6.7(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.5.1(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3))(@voidzero-dev/vite-plus-core@1.5.1(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(storybook@10.6.7(@types/react@19.3.0)(react@19.3.1)(vite-plus@1.5.1(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(@vitest/browser-playwright@5.1.0)(@vitest/coverage-istanbul@5.1.0)(@vitest/ui@5.1.0)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(playwright@1.65.1)(svelte@5.57.3)(yaml@2.9.1)))(svelte@5.57.3)
+        version: 10.6.7(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3))(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(storybook@10.6.7(@types/react@19.3.0)(react@19.3.1)(vite-plus@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(@vitest/browser-playwright@5.1.0)(@vitest/coverage-istanbul@5.1.0)(@vitest/ui@5.1.0)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(playwright@1.65.1)(svelte@5.57.3)(yaml@2.9.1)))(svelte@5.57.3)
       '@sveltejs/package':
         specifier: 'catalog:'
         version: 3.0.2(@typescript/typescript6@6.0.2)(svelte@5.57.3)
       '@sveltejs/vite-plugin-svelte':
         specifier: 'catalog:'
-        version: 7.3.1(@voidzero-dev/vite-plus-core@1.5.1(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3)
+        version: 7.3.1(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.57.3)
       '@thomasfosterau/effect-document':
         specifier: 'catalog:'
         version: 0.2.0(@thomasfosterau/effect-parse@0.6.1(effect@4.1.4))(effect@4.1.4)
@@ -348,7 +348,7 @@ importers:
         version: 26.6.6
       '@vitest/browser-playwright':
         specifier: 'catalog:'
-        version: 5.1.0(@voidzero-dev/vite-plus-core@1.5.1(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(playwright@1.65.1)(vitest@5.1.0)
+        version: 5.1.0(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(playwright@1.65.1)(vitest@5.1.0)
       effect:
         specifier: 4.1.4
         version: 4.1.4

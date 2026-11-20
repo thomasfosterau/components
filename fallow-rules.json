@@ -72,6 +72,13 @@
       "message": "@thomasfosterau/charts is independent of the Svelte packages (packages/charts/AGENTS.md § Boundary)."
     },
     {
+      "id": "charts-svelte-by-package-name",
+      "kind": "banned-import",
+      "specifiers": ["../spec", "../core"],
+      "files": ["packages/charts/src/svelte/**"],
+      "message": "svelte-package copies src/svelte alone into dist/svelte, so a relative path to spec or core breaks in the published package. Import `@thomasfosterau/charts` or `@thomasfosterau/charts/core` instead (packages/charts/AGENTS.md § Boundary)."
+    },
+    {
       "id": "import-core-independent",
       "kind": "banned-import",
       "specifiers": [
