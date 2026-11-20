@@ -78,3 +78,5 @@ Buttons, badges and surfaces — the family every other family builds on: `Alert
 
 <ThemeToggle lightTheme="garden-light" darkTheme="garden-dark" storageKey="garden:theme" />
 ```
+
+**A floating panel is a tool window, not a dialog box.** `FloatingPanel` is non-modal: a `role="dialog"` without `aria-modal` or a focus trap, so the canvas or map behind it stays usable. Choose it for a layers list, an inspector or a legend the reader moves out of the way; choose `Popover` for something anchored and transient, `Dialog` or `Drawer` for something that demands an answer. Render it inside its `boundary` (a positioned element) to keep it there; `rect` is in pixels from the boundary's corner and keeps its proportion when the boundary resizes, so bind and persist it if you like. The title bar is the keyboard route to every gesture: arrows move it, Shift+arrows resize it, Home and End send it to an edge, Enter maximises, and each change is announced. F6 cycles focus between open panels and the page, and Escape returns to the page without closing the panel.
