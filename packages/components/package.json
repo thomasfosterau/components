@@ -85,7 +85,8 @@
   "dependencies": {
     "@internationalized/date": "catalog:",
     "@lucide/svelte": "catalog:",
-    "bits-ui": "catalog:"
+    "bits-ui": "catalog:",
+    "esm-env": "catalog:"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "catalog:",
