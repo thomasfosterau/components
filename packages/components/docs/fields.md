@@ -27,6 +27,7 @@ Every primitive accepts it by spread — `<TextInput {...control} bind:value />`
 | `Combobox` | one | filtered as you type | a long or fetched list (`onSearch`) |
 | `Listbox` | one or several | a fixed-height inline list, one tab stop | 20 to a few hundred options to scan at once, with typeahead and range selection |
 | `Cascader` | one path through a hierarchy | one column per level, in a popover | taxonomy, location or category trees; children can load lazily (`loadChildren`) and `searchable` finds a node at any depth |
+| `TransferList` | several, in order | two inline lists, available and chosen | building an ordered subset, such as report columns; `orderable` adds Move up/down and Alt+↑/↓, `searchable` a filter per list |
 
 **When a control uses `labelId`.** `<label for>` names only a labelable element (`input`, `select`, `textarea`, `button`, `meter`, `output`, `progress`); every primitive above is one, and ignores `labelId` (it never reaches the DOM as an attribute). A control whose focusable part is a role on a `span` or `div` — a `role="slider"` thumb, a `role="group"` or `radiogroup` root, a segmented date group — points `aria-labelledby={control.labelId}` at the label instead, and `FormField` forwards a click on its label to it (the control itself if focusable, else its first focusable descendant). `Fieldset` hands its `children` a `FieldsetControl` (`{ labelId }`, the `<legend>`'s id) for the same purpose. `RadioGroup` is its own frame with its own `legend`, so it takes neither.
 
