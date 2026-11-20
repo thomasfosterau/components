@@ -190,6 +190,10 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     changes?: CellChange<T>[] | undefined;
     /** Rows in the whole result, for `aria-rowcount`. */
     rowCount: number;
+    /** The second select-all step's total; see `Table`. */
+    selectAllTotal: number | undefined;
+    /** The second select-all step; see `Table`. */
+    onSelectAllTotal: (() => void) | undefined;
     /** How many result rows come before the first on screen. */
     rowOffset: number;
     /** Rows Page Up / Page Down move by. */
@@ -285,6 +289,11 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     selectColumnLabel,
     bulkActions,
     selectedCountLabel,
+    selectAllTotalLabel,
+    allSelectedLabel,
+    clearSelectionLabel,
+    selectAllTotal,
+    onSelectAllTotal,
     hiddenColumns = $bindable(undefined),
     columnMenu = false,
     columnMenuLabel,
@@ -338,7 +347,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
 
   /** The columns drawn, the strings, and where the data columns start (past the selection column). */
   const layout = $derived.by(() => {
-    const given = { selectRowLabel, selectAllLabel, selectColumnLabel, selectedCountLabel, columnMenuLabel };
+    const given = { selectRowLabel, selectAllLabel, selectColumnLabel, selectedCountLabel, selectAllTotalLabel, allSelectedLabel, clearSelectionLabel, columnMenuLabel };
     const withSelection = selection !== 'none';
     return {
       view: columnView(columns, hiddenColumns, columnMenu),
@@ -1169,6 +1178,13 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     clear={() => select(new Set())}
     {bulkActions}
     selectedCountLabel={labels.selectedCountLabel}
+    pageSelected={selection === 'multiple' && pageState === 'all'}
+    pageSize={pageKeys.length}
+    total={selectAllTotal}
+    {onSelectAllTotal}
+    selectAllTotalLabel={labels.selectAllTotalLabel}
+    allSelectedLabel={labels.allSelectedLabel}
+    clearSelectionLabel={labels.clearSelectionLabel}
     columnChoices={view.choices}
     columnMenuLabel={labels.columnMenuLabel}
     onColumnToggle={(key, visible) => {

@@ -213,6 +213,24 @@ export interface TableChoiceProps<T> {
    */
   selectedCountLabel?: ((count: number) => string) | undefined;
   /**
+   * The second select-all step's button text, once every row on the page
+   * is selected and more rows exist (`selectAllTotal` on `Table`).
+   * @defaultValue `"Select all <n>"`
+   */
+  selectAllTotalLabel?: ((total: number) => string) | undefined;
+  /**
+   * The count text once that second step is taken, in place of
+   * `selectedCountLabel`.
+   * @defaultValue `"All <n> selected"`
+   */
+  allSelectedLabel?: ((total: number) => string) | undefined;
+  /**
+   * The button that replaces the second select-all step once it is taken,
+   * which empties the selection.
+   * @defaultValue `'Clear selection'`
+   */
+  clearSelectionLabel?: string | undefined;
+  /**
    * The `key`s of the columns not drawn. Bindable; the caller persists it.
    * @defaultValue the columns marked `defaultHidden`
    */

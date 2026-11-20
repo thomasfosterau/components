@@ -469,3 +469,46 @@ test('the columns menu takes its label as a prop', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Colonnes' }));
   await expect.element(screen.getByRole('menu', { name: 'Colonnes' })).toBeInTheDocument();
 });
+
+test('select-all offers a second step to select every row past the page', async () => {
+  const onSelectAllTotal = vi.fn<() => void>();
+  const screen = await render(TableFixture, {
+    sortable: false,
+    selection: 'multiple',
+    rows: rows.slice(0, 2),
+    selectAllTotal: 310,
+    onSelectAllTotal,
+  });
+  const step = screen.getByRole('button', { name: 'Select all 310' });
+
+  // Not while only part of the page is selected.
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Select Basil' }));
+  await expect.element(step).not.toBeInTheDocument();
+
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Select Tomato' }));
+  await expect.element(step).toBeInTheDocument();
+  await userEvent.click(step);
+
+  expect(onSelectAllTotal).toHaveBeenCalledOnce();
+  const status = screen.getByRole('status');
+  await expect.element(status).toHaveTextContent('All 310 selected');
+  const clear = screen.getByRole('button', { name: 'Clear selection' });
+  await expect.element(clear).toHaveFocus();
+
+  await userEvent.click(clear);
+  expect(selectedKeys()).toBe('');
+  await expect.element(status).toHaveTextContent('');
+});
+
+test('no second step when the total fits on the page', async () => {
+  const screen = await render(TableFixture, {
+    sortable: false,
+    selection: 'multiple',
+    selectAllTotal: 3,
+    onSelectAllTotal: () => {},
+  });
+
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Select all on this page' }));
+  await expect.element(screen.getByRole('status')).toHaveTextContent('3 selected');
+  expect(screen.getByRole('button', { name: /Select all/ }).elements()).toHaveLength(0);
+});

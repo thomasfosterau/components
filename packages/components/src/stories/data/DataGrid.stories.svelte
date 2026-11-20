@@ -244,7 +244,8 @@
 
 <Story name="Selection and columns">
   <!-- Selections are keyed by row, so they survive the filter, a sort and a
-       page change; select-all covers the page on screen. -->
+       page change; select-all covers the page on screen, and once the
+       page is selected the toolbar offers "Select all <n>" for the rest. -->
   <DataGrid
     rows={devices}
     {columns}
