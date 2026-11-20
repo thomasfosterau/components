@@ -116,3 +116,12 @@ Dialogs, toasts, progress — chrome around something that just happened, or is 
 `hasConsent` is true for a `required` category and false for any other until the reader chooses. `category(id)` is live, so the embed loads as soon as consent is granted anywhere, and activating the embed grants it.
 
 Accept and Reject are deliberately the same button: a prominent Accept beside a buried Reject is the pattern regulators fine. The banner is a region in reading order, not a dialog, so it traps no focus and is not announced on every page.
+
+## Progress or meter
+
+`ProgressBar` is the completion of a task heading to done: an upload, a batch of seeds germinating. A measurement that is not "in progress" (storage used, soil moisture, a battery) is a `Meter`, which screen readers announce as a gauge rather than as something loading. `Meter` is a native `<meter>`: give it `low`, `high` and `optimum` and the platform picks good, fair or poor, drawn in the success, warning and error tokens. Colour alone never carries the threshold, so set `valueText` ("7.2 GB of 10 GB") or `showValue`. `RadialProgress` draws either as a daisyUI ring: `role="progressbar"` by default, `kind="meter"` for a measurement, and indeterminate when a progress ring has no `value`.
+
+```svelte
+<Meter label="Storage used" value={7.2} max={10} low={5} high={8} optimum={0} valueText="7.2 GB of 10 GB" showValue />
+<RadialProgress label="Soil moisture" kind="meter" value={0.34} max={1} />
+```
