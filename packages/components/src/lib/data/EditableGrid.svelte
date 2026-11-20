@@ -96,7 +96,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
     cellKey,
     currentValue,
     editorText,
-    emptyHistory,
+    emptyEditHistory,
     formatCellValue,
     historyFor,
     isCellEditable,
@@ -283,7 +283,7 @@ The `role="grid"` table an editing `DataGrid` draws; internal, not exported.
   const saveErrors = new SvelteMap<string, string>();
   const controllers = new Map<string, AbortController>();
   /** The undo history; immutable values, replaced on every change. */
-  let history = $state.raw<EditHistory<T>>(emptyHistory());
+  let history = $state.raw<EditHistory<T>>(emptyEditHistory());
 
   // Replaced rows invalidate the history: an old edit replayed onto new data
   // would write values the reader never typed there.

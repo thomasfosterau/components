@@ -10,7 +10,7 @@ import {
   cellKey,
   currentValue,
   editorText,
-  emptyHistory,
+  emptyEditHistory,
   formatCellValue,
   historyFor,
   historyLimit,
@@ -115,14 +115,14 @@ test('a rejection’s message, or the fallback', () => {
 test('undo and redo walk the history one step at a time', () => {
   const first = [change(6)];
   const second = [change(7, 6)];
-  const history = withStep(withStep(emptyHistory<Item>(), first), second);
+  const history = withStep(withStep(emptyEditHistory<Item>(), first), second);
   const undone = travel(history, 'undo');
   expect(undone?.step).toBe(second);
   expect(undone?.history).toEqual({ past: [first], future: [second] });
-  const redone = travel(undone?.history ?? emptyHistory(), 'redo');
+  const redone = travel(undone?.history ?? emptyEditHistory(), 'redo');
   expect(redone?.step).toBe(second);
   expect(redone?.history).toEqual(history);
-  expect(travel(emptyHistory<Item>(), 'undo')).toBeUndefined();
+  expect(travel(emptyEditHistory<Item>(), 'undo')).toBeUndefined();
   expect(travel(history, 'redo')).toBeUndefined();
 });
 
@@ -130,7 +130,7 @@ test('a new step clears the redo side, and the oldest steps fall off', () => {
   const step = [change(6)];
   const after: EditHistory<Item> = { past: [], future: [step] };
   expect(withStep(after, [change(8)]).future).toEqual([]);
-  let long = emptyHistory<Item>();
+  let long = emptyEditHistory<Item>();
   for (let at = 0; at <= historyLimit; at += 1) long = withStep(long, [change(at)]);
   expect(long.past).toHaveLength(historyLimit);
   expect(long.past[0]).toEqual([change(1)]);
@@ -146,7 +146,7 @@ test('a rejected step leaves the history, or goes back where it came from', () =
 });
 
 test('the history is dropped once a row it names is gone', () => {
-  const history = withStep(emptyHistory<Item>(), [change(6)]);
+  const history = withStep(emptyEditHistory<Item>(), [change(6)]);
   expect(historyFor(history, new Set(['a', 'b']))).toBe(history);
-  expect(historyFor(history, new Set(['b']))).toEqual(emptyHistory());
+  expect(historyFor(history, new Set(['b']))).toEqual(emptyEditHistory());
 });

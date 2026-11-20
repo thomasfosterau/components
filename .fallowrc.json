@@ -98,8 +98,12 @@
       { "from": "charts-core", "allow": ["charts-spec"] },
       // Reaches spec and core by the package's own name, never by relative
       // path: svelte-package copies src/svelte alone into dist/svelte
-      // (packages/charts/tsconfig.svelte.json).
-      { "from": "charts-svelte", "allow": [] },
+      // (packages/charts/tsconfig.svelte.json). fallow resolves that name to
+      // the sources through the workspace link, so the zone allows the edge
+      // it cannot tell apart from a relative one, as `import-svelte` does
+      // below; fallow-rules.json's `charts-svelte-by-package-name` bans the
+      // relative form.
+      { "from": "charts-svelte", "allow": ["charts-spec", "charts-core"] },
       { "from": "charts-prosemirror", "allow": ["charts-spec", "charts-core"] },
       { "from": "charts-vega", "allow": ["charts-spec", "charts-core"] },
       // The headless core reaches no other package by relative path; the
@@ -116,8 +120,8 @@
       // path: svelte-package copies src/svelte alone into dist/svelte
       // (packages/import/tsconfig.svelte.json). fallow resolves that name to
       // the core's source through the workspace link, so the zone has to
-      // allow the edge it cannot tell apart from a relative one; the charts
-      // zones above report the same imports for the same reason.
+      // allow the edge it cannot tell apart from a relative one, as
+      // `charts-svelte` does above.
       { "from": "import-svelte", "allow": ["import"] }
     ]
   },

@@ -174,7 +174,7 @@ export interface EditHistory<T> {
 export const historyLimit = 100;
 
 /** A history with nothing to undo or redo. */
-export const emptyHistory = <T>(): EditHistory<T> => ({ past: [], future: [] });
+export const emptyEditHistory = <T>(): EditHistory<T> => ({ past: [], future: [] });
 
 /** `history` with a new step: undoable, and every step that could be redone is gone. */
 export function withStep<T>(history: EditHistory<T>, step: EditStep<T>): EditHistory<T> {
@@ -225,5 +225,5 @@ export function historyFor<T>(
   if (steps.length === 0) return history;
   return steps.every((step) => step.every((change) => rowKeys.has(change.rowKey)))
     ? history
-    : emptyHistory();
+    : emptyEditHistory();
 }
