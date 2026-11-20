@@ -158,7 +158,7 @@ A line-by-line diff of two texts, unified or side by side, with word highlights 
 
 {#snippet side(line: DiffLine | undefined, number: number | undefined, focusTarget: string | undefined, hidden: boolean)}
   {#if lineNumbers}
-    <td class={[numberCell, line && rowTone[line.kind]]}>{number ?? ''}</td>
+    <td class={[numberCell, line ? rowTone[line.kind] : 'bg-base-200']}>{number ?? ''}</td>
   {/if}
   <td
     class={[textCell, line ? rowTone[line.kind] : 'bg-base-200']}

@@ -41,22 +41,22 @@
   );
 </script>
 
-<Story name="Prose revision">
+<Story name="Prose revision" asChild>
   <DiffView before={description.before} after={description.after} />
 </Story>
 
-<Story name="Side by side">
+<Story name="Side by side" asChild>
   <DiffView before={description.before} after={description.after} layout="split" />
 </Story>
 
-<Story name="JSON row">
+<Story name="JSON row" asChild>
   <DiffView before={json.before} after={json.after} mono />
 </Story>
 
-<Story name="Long text with collapsed runs">
+<Story name="Long text with collapsed runs" asChild>
   <DiffView before={long.join('\n')} after={longAfter.join('\n')} mono />
 </Story>
 
-<Story name="No changes">
+<Story name="No changes" asChild>
   <DiffView before={description.before} after={description.before} />
 </Story>
