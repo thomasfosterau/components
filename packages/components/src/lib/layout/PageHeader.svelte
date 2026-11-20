@@ -23,11 +23,25 @@ The block at the top of a page: its heading, supporting facts and actions.
   `<main>`, `<article>`, `<aside>`, `<nav>` or `<section>`. A page header is
   inside `Main`, so it is not a banner, which is correct: the banner is the
   site chrome (`Navbar`), of which there is one per page.
+
+  `scrollBehavior="collapse"`: as the large title scrolls up under the top
+  of the viewport (below a stuck `Navbar`, through `--navbar-offset`), a
+  compact bar with the title fades in. That bar is fixed, so nothing below
+  moves, and it is a visual duplicate (`aria-hidden`): the heading stays the
+  one heading, in the tree at every scroll position. Under reduced motion
+  the bar switches at halfway rather than fading.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import type { HeadingLevel } from '../ui/tones.ts';
+  import {
+    barFrame,
+    collapseProgress,
+    reducedMotion,
+    watchScroll,
+    type PageHeaderScrollBehavior,
+  } from './scroll-behavior.ts';
 
   // `children` is dropped from the native attributes as well as `title`: the
   // DOM typings declare it required, and here it is one of the optional
@@ -57,6 +71,19 @@ The block at the top of a page: its heading, supporting facts and actions.
     actions?: Snippet<[]> | undefined;
     /** Free content under the whole header block — a tab strip, a filter row. */
     children?: Snippet<[]> | undefined;
+    /**
+     * `'collapse'` shows a compact bar with the title once the large title
+     * scrolls away.
+     * @defaultValue `'static'`
+     */
+    scrollBehavior?: PageHeaderScrollBehavior | undefined;
+    /**
+     * The compact bar's text.
+     * @defaultValue `title`, when it is a string
+     */
+    collapsedTitle?: string | undefined;
+    /** The element that scrolls, when it is not the window. */
+    scrollContainer?: HTMLElement | undefined;
   }
 
   let {
@@ -69,16 +96,56 @@ The block at the top of a page: its heading, supporting facts and actions.
     meta,
     actions,
     children,
+    scrollBehavior = 'static',
+    collapsedTitle,
+    scrollContainer,
     class: className,
     ...rest
   }: Props = $props();
+
+  const compactTitle = $derived(collapsedTitle ?? (typeof title === 'string' ? title : undefined));
+  const collapses = $derived(scrollBehavior === 'collapse' && compactTitle !== undefined);
+
+  let heading: HTMLElement | undefined = $state();
+  let progress = $state(0);
+  /** Where the compact bar sits: under the top of the scroller and any stuck `Navbar`. */
+  let frame = $state({ top: 0, left: 0, width: 0 });
+
+  const measure = (): void => {
+    if (heading === undefined) return;
+    const bar = barFrame(scrollContainer);
+    const large = heading.getBoundingClientRect();
+    frame = bar;
+    progress = collapseProgress(large.top, large.height, bar.top, reducedMotion());
+  };
+
+  $effect(() => {
+    if (collapses) return watchScroll(scrollContainer, measure);
+  });
 
   // The page title's scale is the page's, not the outline's — an `<h2>` used
   // as a page heading (a panel, a dialog body) still reads as the title.
   const titleClasses = 'text-3xl font-semibold tracking-tight text-balance sm:text-4xl';
 </script>
 
+<svelte:window onresize={collapses ? measure : undefined} />
+
 <header {...rest} class={['space-y-3', className]}>
+  {#if collapses}
+    <div
+      aria-hidden="true"
+      data-collapsed-title
+      class="bg-base-100/95 border-base-300 pointer-events-none z-30 truncate border-b px-4 py-2 text-center font-semibold backdrop-blur transition-opacity duration-150 motion-reduce:transition-none"
+      style:position="fixed"
+      style:top="{frame.top}px"
+      style:left="{frame.left}px"
+      style:width="{frame.width}px"
+      style:opacity={progress}
+      style:visibility={progress === 0 ? 'hidden' : 'visible'}
+    >
+      {compactTitle}
+    </div>
+  {/if}
   {#if eyebrow}
     <div class="text-base-content/70 text-sm">{@render eyebrow()}</div>
   {/if}
@@ -91,7 +158,7 @@ The block at the top of a page: its heading, supporting facts and actions.
         </div>
       {/if}
       <div class="min-w-0 flex-1 space-y-1">
-        <svelte:element this={`h${headingLevel}`} class={titleClasses}>
+        <svelte:element this={`h${headingLevel}`} bind:this={heading} class={titleClasses}>
           {#if typeof title === 'string'}
             {title}
           {:else}
