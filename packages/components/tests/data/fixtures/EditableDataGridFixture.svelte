@@ -29,6 +29,7 @@
     errorsLabel?: ((count: number) => string) | undefined;
     changedLabel?: string | undefined;
     pasteFailedLabel?: string | undefined;
+    pasteOutsideLabel?: string | undefined;
     undo?: boolean | undefined;
     /** Apply each `'cell'` commit to the rows before resolving, as a caller would. */
     persist?: boolean | undefined;
@@ -45,6 +46,7 @@
     errorsLabel,
     changedLabel,
     pasteFailedLabel,
+    pasteOutsideLabel,
     undo,
     persist = true,
     more = false,
@@ -151,6 +153,7 @@
   {errorsLabel}
   {changedLabel}
   {pasteFailedLabel}
+  {pasteOutsideLabel}
   {undo}
   bind:changes
 />

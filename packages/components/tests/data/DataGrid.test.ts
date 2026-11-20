@@ -928,3 +928,89 @@ test('cell mode: a paste is saved through onCellCommit', async () => {
   });
   await expect.element(screen.getByRole('gridcell', { name: '12' })).toBeInTheDocument();
 });
+
+/** The body cells marked selected, by their text. */
+const selectedCells = (): string[] =>
+  [
+    ...document.querySelectorAll(
+      '[role="gridcell"][aria-selected="true"], th[aria-selected="true"]',
+    ),
+  ].map((cell) => cell.textContent?.trim() ?? '');
+
+test('Shift+arrows select a block of cells, which copies as tab-separated lines', async () => {
+  const screen = await render(EditableDataGridFixture, { editing: 'batch' });
+
+  await expect.element(screen.getByRole('grid')).toHaveAttribute('aria-multiselectable', 'true');
+  await userEvent.click(screen.getByRole('gridcell', { name: 'Basil' }));
+  await userEvent.keyboard('{Shift>}{ArrowRight}{ArrowDown}{/Shift}');
+
+  await expect.poll(selectedCells).toEqual(['Basil', '30', 'Tomato', '9']);
+  await expect.poll(focusedText).toBe('9');
+  expect(clipboard('copy').data.getData('text/plain')).toBe('Basil\t30\nTomato\t9');
+
+  // Escape drops the range; a plain move does too.
+  await userEvent.keyboard('{Escape}');
+  await expect.poll(selectedCells).toEqual([]);
+  await userEvent.keyboard('{Shift>}{ArrowUp}{/Shift}');
+  await expect.poll(selectedCells).toEqual(['30', '9']);
+  await userEvent.keyboard('{ArrowLeft}');
+  await expect.poll(selectedCells).toEqual([]);
+  expect(clipboard('copy').data.getData('text/plain')).toBe('Basil');
+});
+
+test('a pasted block fills the cells from the active one, as one undoable step', async () => {
+  const screen = await render(EditableDataGridFixture, { editing: 'batch' });
+
+  await userEvent.click(screen.getByRole('gridcell', { name: 'Basil' }));
+  expect(clipboard('paste', 'Sage\t5\r\nPepper\t7\r\n').prevented).toBe(true);
+
+  await expect
+    .poll(changeList)
+    .toBe('basil.name:Basil>Sage,basil.count:30>5,tomato.name:Tomato>Pepper,tomato.count:9>7');
+
+  await userEvent.keyboard('{Control>}z{/Control}');
+  await expect.poll(changeList).toBe('');
+});
+
+test('a pasted block is all or nothing', async () => {
+  const screen = await render(EditableDataGridFixture, { editing: 'batch' });
+
+  await userEvent.click(screen.getByRole('gridcell', { name: 'Basil' }));
+  clipboard('paste', 'Sage\t-1');
+
+  await expect.poll(changeList).toBe('');
+  await expect
+    .element(screen.getByRole('gridcell', { name: '30' }))
+    .toHaveAccessibleDescription('Must not be negative.');
+
+  // A read-only cell in the block refuses it too.
+  await userEvent.click(screen.getByRole('gridcell', { name: 'bulb' }));
+  await userEvent.keyboard('{ArrowLeft}{ArrowLeft}');
+  clipboard('paste', 'Leek\t5\tbulb');
+  await expect.poll(changeList).toBe('');
+});
+
+test('a pasted block that runs past the grid commits nothing and says so', async () => {
+  const screen = await render(EditableDataGridFixture, {
+    editing: 'batch',
+    pasteOutsideLabel: 'Too big.',
+  });
+
+  await userEvent.click(screen.getByRole('gridcell', { name: 'Garlic' }));
+  expect(clipboard('paste', 'Leek\nOnion').prevented).toBe(true);
+
+  await expect.element(screen.getByText('Too big.')).toBeInTheDocument();
+  await expect.poll(changeList).toBe('');
+});
+
+test('one value pasted over a selected block fills every cell', async () => {
+  const screen = await render(EditableDataGridFixture, { editing: 'batch' });
+
+  await userEvent.click(screen.getByRole('gridcell', { name: '30' }));
+  await userEvent.keyboard('{Shift>}{ArrowDown}{ArrowDown}{/Shift}');
+  clipboard('paste', '12\n');
+
+  await expect.poll(changeList).toBe('basil.count:30>12,tomato.count:9>12,garlic.count:100>12');
+  await userEvent.keyboard('{Control>}z{/Control}');
+  await expect.poll(changeList).toBe('');
+});

@@ -8,6 +8,7 @@ import { expect, test } from 'vite-plus/test';
 import {
   cellErrors,
   cellKey,
+  clipboardTable,
   copyText,
   currentValue,
   editorText,
@@ -19,6 +20,7 @@ import {
   pastedValue,
   rejectionMessage,
   sameCellValue,
+  tableText,
   travel,
   withChange,
   withoutStep,
@@ -208,4 +210,19 @@ test('pastedValue: each named editor reads text as its own value', () => {
   expect(pastedValue(date, '14/03/2026')).toEqual({ ok: false });
 
   expect(pastedValue(column({ editor: 'checkbox' }), 'true')).toBeUndefined();
+});
+
+test('clipboard text reads as rows of tab-separated cells, and writes back', () => {
+  expect(clipboardTable('a\tb\r\nc\td\r\n')).toEqual([
+    ['a', 'b'],
+    ['c', 'd'],
+  ]);
+  expect(clipboardTable('one')).toEqual([['one']]);
+  expect(clipboardTable('x\n\ny')).toEqual([['x'], [''], ['y']]);
+  expect(
+    tableText([
+      ['a', 'b'],
+      ['c', ''],
+    ]),
+  ).toBe('a\tb\nc\t');
 });

@@ -135,3 +135,38 @@ export function pointAfterCommit(key: GridEditKey, at: GridPoint, bounds: GridBo
   }
   return at;
 }
+
+/** A rectangle of cells, inclusive: what Shift+arrows select. */
+export interface GridRange {
+  readonly top: number;
+  readonly bottom: number;
+  readonly left: number;
+  readonly right: number;
+}
+
+/** The rectangle with `anchor` and `at` at opposite corners. */
+export const gridRange = (anchor: GridPoint, at: GridPoint): GridRange => ({
+  top: Math.min(anchor.row, at.row),
+  bottom: Math.max(anchor.row, at.row),
+  left: Math.min(anchor.col, at.col),
+  right: Math.max(anchor.col, at.col),
+});
+
+/** Whether `point` is inside `range`. */
+export const inGridRange = (range: GridRange, point: GridPoint): boolean =>
+  point.row >= range.top &&
+  point.row <= range.bottom &&
+  point.col >= range.left &&
+  point.col <= range.right;
+
+/** Whether `range` covers more than one cell. */
+export const isMultiCell = (range: GridRange): boolean =>
+  range.bottom > range.top || range.right > range.left;
+
+/**
+ * Whether a navigation-mode key extends the selected range rather than
+ * moving: Shift with an arrow, Home, End, Page Up or Page Down, and no
+ * Ctrl, ⌘ or Alt.
+ */
+export const extendsRange = (event: GridKeyEvent): boolean =>
+  event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey && event.key in plainMoves;

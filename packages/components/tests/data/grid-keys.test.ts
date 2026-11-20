@@ -6,10 +6,14 @@
 import { expect, test } from 'vite-plus/test';
 import {
   clampPoint,
+  extendsRange,
   gridEditKey,
   gridEditStart,
   gridHistoryKey,
   gridMove,
+  gridRange,
+  inGridRange,
+  isMultiCell,
   isPrintableKey,
   pointAfterCommit,
   type GridKeyEvent,
@@ -112,4 +116,20 @@ test('Ctrl/⌘+Z undoes; Ctrl/⌘+Shift+Z and Ctrl+Y redo; nothing else does', (
   expect(gridHistoryKey(key('y', { metaKey: true }))).toBeUndefined();
   expect(gridHistoryKey(key('z'))).toBeUndefined();
   expect(gridHistoryKey(key('z', { ctrlKey: true, altKey: true }))).toBeUndefined();
+});
+
+test('a range spans its two corners whichever way round they are', () => {
+  const range = gridRange({ row: 3, col: 2 }, { row: 1, col: 0 });
+  expect(range).toEqual({ top: 1, bottom: 3, left: 0, right: 2 });
+  expect(inGridRange(range, { row: 2, col: 1 })).toBe(true);
+  expect(inGridRange(range, { row: 4, col: 1 })).toBe(false);
+  expect(isMultiCell(range)).toBe(true);
+  expect(isMultiCell(gridRange({ row: 2, col: 1 }, { row: 2, col: 1 }))).toBe(false);
+});
+
+test('only Shift with a plain move extends a range', () => {
+  expect(extendsRange(key('ArrowDown', { shiftKey: true }))).toBe(true);
+  expect(extendsRange(key('ArrowDown'))).toBe(false);
+  expect(extendsRange(key('ArrowDown', { shiftKey: true, ctrlKey: true }))).toBe(false);
+  expect(extendsRange(key('a', { shiftKey: true }))).toBe(false);
 });
