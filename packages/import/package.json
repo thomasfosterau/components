@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.schemastore.org/package",
   "name": "@thomasfosterau/components-import",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A data import mapper: map any table a user has onto an app's Effect Schema, with a serialisable, versioned mapping spec and a Svelte 5 UI",
   "keywords": [
     "csv",

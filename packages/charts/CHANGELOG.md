@@ -1,5 +1,12 @@
 # @thomasfosterau/charts
 
+## 0.2.1
+
+### Patch Changes
+
+- f335320: Drop the references to the Swift `ChartSpecKit` package from the README and doc comments: it is removed from the repository for now. The Swift column of the capability matrix now describes a planned interpreter.
+- f335320: Tidy doc comments: drop issue references and update guide links to their new locations.
+
 ## 0.2.0
 
 ### Minor Changes
