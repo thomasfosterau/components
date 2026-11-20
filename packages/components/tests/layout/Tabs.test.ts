@@ -1,8 +1,9 @@
-import { userEvent } from 'vite-plus/test/browser';
+import { page, userEvent } from 'vite-plus/test/browser';
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import Tabs from '../../src/lib/layout/Tabs.svelte';
 import TabsFixture from './fixtures/TabsFixture.svelte';
+import OverflowRowsFixture from './fixtures/OverflowRowsFixture.svelte';
 import type { TabItem } from '../../src/lib/layout/types.ts';
 
 const items: readonly TabItem[] = [
@@ -166,4 +167,33 @@ test('the variant and size classes come from the lookup tables', async () => {
   const nav = screen.getByRole('navigation', { name: 'Results views' });
   await expect.element(nav).toHaveClass('tabs-lift');
   await expect.element(nav).toHaveClass('tabs-sm');
+});
+
+test('links overflow: tabs that do not fit are links in a More menu, and the current tab stays', async () => {
+  await render(OverflowRowsFixture);
+
+  const nav = page.getByRole('navigation', { name: 'Sections' });
+  const more = nav.getByRole('button', { name: 'More' });
+  await expect.element(more).toBeVisible();
+  await expect
+    .element(nav.getByRole('link', { name: 'Section number 7' }))
+    .toHaveAttribute('aria-current', 'page');
+
+  await more.click();
+  const menu = page.getByRole('menu', { name: 'More' });
+  const entries = menu.getByRole('menuitem').elements();
+  expect(entries.length).toBeGreaterThan(0);
+  expect(
+    entries.every(
+      (entry) => entry.tagName === 'A' && entry.getAttribute('href')?.startsWith('/sections/'),
+    ),
+  ).toBe(true);
+  expect(entries.map((entry) => entry.textContent?.trim())).not.toContain('Section number 7');
+});
+
+test('panels mode ignores overflow and keeps the tablist', async () => {
+  const screen = await render(Tabs, { items, overflow: true, label: 'Results views' });
+
+  await expect.element(screen.getByRole('tablist', { name: 'Results views' })).toBeInTheDocument();
+  expect(document.querySelector('[aria-haspopup="menu"]')).toBeNull();
 });

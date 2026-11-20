@@ -31,6 +31,7 @@ A tab strip that is either a tab widget over panels (`mode="panels"`) or navigat
   import { Tabs as BitsTabs } from 'bits-ui';
   import type { Snippet } from 'svelte';
   import { getComponentsContext } from '../context.svelte.ts';
+  import Overflow, { type OverflowItemAttributes } from '../ui/Overflow.svelte';
   import type { Size } from '../ui/tones.ts';
   import { tabsSize, tabsVariant, type TabItem, type TabsMode, type TabsVariant } from './types.ts';
 
@@ -66,6 +67,16 @@ A tab strip that is either a tab widget over panels (`mode="panels"`) or navigat
     size?: Size | undefined;
     /** One panel's content, in `panels` mode. Without it, no panels render. */
     panel?: Snippet<[TabItem]> | undefined;
+    /**
+     * In `links` mode, move the tabs that don't fit into a "More" menu; the current tab always stays. `panels` mode ignores it: a menu item cannot be a `tab`.
+     * @defaultValue `false`
+     */
+    overflow?: boolean | undefined;
+    /**
+     * Names the "More" menu button, with `overflow`.
+     * @defaultValue `'More'`
+     */
+    moreLabel?: string | undefined;
     /** Extra classes, merged last. */
     class?: string | undefined;
   }
@@ -78,6 +89,8 @@ A tab strip that is either a tab widget over panels (`mode="panels"`) or navigat
     variant = 'border',
     size = 'md',
     panel,
+    overflow = false,
+    moreLabel = 'More',
     class: className,
   }: Props = $props();
 
@@ -96,23 +109,53 @@ A tab strip that is either a tab widget over panels (`mode="panels"`) or navigat
     value !== ''
       ? value === item.value
       : item.href !== undefined && context.isCurrent(context.href(item.href));
+
+  const overflowEntries = $derived(
+    items.map((item) => ({
+      id: item.value,
+      label: item.label,
+      href: item.href,
+      disabled: item.disabled,
+      current: item.disabled !== true && isCurrentLink(item),
+      item,
+    })),
+  );
 </script>
 
-{#if mode === 'links'}
+{#snippet linkTab(item: TabItem, attributes: OverflowItemAttributes)}
+  {#if item.disabled === true}
+    <span {...attributes} class="tab tab-disabled" aria-disabled="true">{item.label}</span>
+  {:else}
+    {@const current = isCurrentLink(item)}
+    <a
+      {...attributes}
+      href={context.href(item.href ?? '')}
+      class={['tab', current && 'tab-active']}
+      aria-current={current ? 'page' : undefined}
+    >
+      {item.label}
+    </a>
+  {/if}
+{/snippet}
+
+{#snippet overflowTab(entry: (typeof overflowEntries)[number], _index: number, attributes: OverflowItemAttributes)}
+  {@render linkTab(entry.item, attributes)}
+{/snippet}
+
+{#if mode === 'links' && overflow}
+  <nav aria-label={label}>
+    <Overflow
+      items={overflowEntries}
+      item={overflowTab}
+      {moreLabel}
+      triggerClass="tab"
+      class={[...stripClasses, className]}
+    />
+  </nav>
+{:else if mode === 'links'}
   <nav aria-label={label} class={[...stripClasses, className]}>
     {#each items as item (item.value)}
-      {#if item.disabled === true}
-        <span class="tab tab-disabled" aria-disabled="true">{item.label}</span>
-      {:else}
-        {@const current = isCurrentLink(item)}
-        <a
-          href={context.href(item.href ?? '')}
-          class={['tab', current && 'tab-active']}
-          aria-current={current ? 'page' : undefined}
-        >
-          {item.label}
-        </a>
-      {/if}
+      {@render linkTab(item, {})}
     {/each}
   </nav>
 {:else}

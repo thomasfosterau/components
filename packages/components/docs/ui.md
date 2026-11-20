@@ -10,6 +10,16 @@ Buttons, badges and surfaces — the family every other family builds on: `Alert
 - **`colour-token.ts`** — `colourTokenStyle`, for binding a component's colour custom property to a theme token, and the two properties it binds: `BADGE_COLOUR_PROPERTY` (`'--badge-colour'`, `Badge`'s) and `CHIP_COLOUR_PROPERTY` (`'--chip-colour'`, `Chip`'s).
 - **`menu-context.ts`** — `MenuMode` (`'dropdown' | 'context' | 'nav'`) and `getMenuMode()`, which tells a menu item of your own which kind of menu it is in: `'dropdown'` inside a `DropdownMenu`, `'context'` inside a `ContextMenu`, otherwise `'nav'`.
 
+**A row that might not fit: `Overflow`.** It shows as many of its `items` as fit and moves the rest, lowest `priority` first, into a trailing "More" `DropdownMenu`, loaded with a dynamic `import()` the first time anything overflows. A `pinned` or `current` item never moves. `collapseFrom` picks the end that goes first (`'middle'` keeps the first and last, as `Breadcrumbs overflow` does), and each hidden item appears exactly once, in the menu, as a `MenuItem` that keeps its `href` and `aria-current`. In a `div` row, the `item` snippet spreads its third argument onto its root element; in a `ul` or `ol` the component wraps each item in an `<li>`. Until the first measure the row wraps, so a reader without script sees every item; `data-overflow-ready` marks the measured row. `Tabs mode="links"` and `Breadcrumbs` take an `overflow` prop built on it. Panel tabs don't: a menu item cannot be a `tab`.
+
+```svelte
+<Overflow items={actions} aria-label="Bed actions" class="gap-1">
+  {#snippet item(action, _index, attributes)}
+    <button {...attributes} class="btn btn-sm" onclick={action.onSelect}>{action.label}</button>
+  {/snippet}
+</Overflow>
+```
+
 **A context menu is never the only route to an action.** It is invisible until summoned: keyboard users can open it with Shift+F10 or the Menu key on the focused region, but touch screen-reader users and many keyboard users never discover it. Put every action in a `ContextMenu` somewhere visible as well — a row's "More" `DropdownMenu`, a toolbar. The menu children (`MenuItem`, `MenuSeparator`, `MenuCheckboxItem`, `MenuRadioGroup` / `MenuRadioItem`, `MenuSub`) import nothing from bits-ui: `DropdownMenu` and `ContextMenu` lend them their bits-ui parts through context, so a page that only renders a navigation `Menu` never loads the menu runtime.
 
 - **`slug.ts`** — `slugify`, used by `Heading`.

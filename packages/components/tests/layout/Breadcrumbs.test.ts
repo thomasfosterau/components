@@ -1,7 +1,9 @@
+import { page } from 'vite-plus/test/browser';
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import Breadcrumbs from '../../src/lib/layout/Breadcrumbs.svelte';
 import BreadcrumbsItemFixture from './fixtures/BreadcrumbsItemFixture.svelte';
+import OverflowRowsFixture from './fixtures/OverflowRowsFixture.svelte';
 
 const items = [
   { label: 'Home', href: '/' },
@@ -67,4 +69,34 @@ test('an item snippet keeps the aria-current contract on the <li>', async () => 
       .closest('li')
       ?.getAttribute('aria-current'),
   ).toBeNull();
+});
+
+test('overflow collapses the middle crumbs into a "Show path" menu, keeping the first and the current page', async () => {
+  await render(OverflowRowsFixture);
+
+  const nav = page.getByRole('navigation', { name: 'Breadcrumb' });
+  const more = nav.getByRole('button', { name: 'Show path' });
+  await expect.element(more).toBeVisible();
+  await expect.element(more).toHaveTextContent('…');
+  await expect.element(nav.getByRole('link', { name: 'Home' })).toBeVisible();
+  await expect.element(nav.getByText('Booths')).toHaveAttribute('aria-current', 'page');
+
+  const shownLinks = nav
+    .getByRole('link')
+    .elements()
+    .map((link) => link.textContent?.trim());
+  await more.click();
+  const menu = page.getByRole('menu', { name: 'Show path' });
+  const hiddenLinks = menu
+    .getByRole('menuitem')
+    .elements()
+    .map((link) => link.textContent?.trim());
+  expect(hiddenLinks.length).toBeGreaterThan(0);
+  expect([shownLinks[0], ...hiddenLinks, ...shownLinks.slice(1)]).toEqual([
+    'Home',
+    'Elections and referendums',
+    'Federal election 2025',
+    'House of Representatives',
+    'Division of Kingsford Smith',
+  ]);
 });
