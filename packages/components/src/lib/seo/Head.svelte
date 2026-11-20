@@ -30,9 +30,16 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
    * the site), `feed.title` defaults to `'Latest changes'`, and the share
    * card's alt text defaults to `"<title> — <siteName>"` (the title alone without a `siteName`) via `shareCardAlt`.
    *
+   * **Site defaults.** Every site-wide prop (`siteName`, `titleSeparator`,
+   * `description`, `pathname`, `canonicalHref`, `locales`, `ogLocale`,
+   * `feed`, `robots`, `defaultImage`, `shareCardPath`, `shareCardAlt`,
+   * `twitterCard`, `twitterSite`) falls back to {@link setSeoContext}'s value,
+   * so an app sets them once in its root layout. A prop always wins.
+   *
    * Renders only into `<svelte:head>`; there is no markup in the body.
    */
   import { getComponentsContext } from '../context.svelte.ts';
+  import { getSeoContext } from './context.ts';
   import { OG_IMAGE_HEIGHT, OG_IMAGE_WIDTH, ogImageUrl, type OgImageCard } from './og-image.ts';
   import type {
     AlternateLink,
@@ -51,10 +58,10 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
     siteName?: string | undefined;
     /**
      * Between the title and `siteName`.
-     * @defaultValue `' | '`
+     * @defaultValue the site's, else `' | '`
      */
     titleSeparator?: string | undefined;
-    /** Meta and Open Graph description. */
+    /** Meta and Open Graph description. Blank or absent falls back to the site's. */
     description?: string | null | undefined;
     /** Meta keywords. */
     keywords?: readonly string[] | undefined;
@@ -68,7 +75,7 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
     pathname?: string | undefined;
     /**
      * Resolves an app-relative path to an absolute URL on the production origin.
-     * @defaultValue the components context’s `href`
+     * @defaultValue the site's, else the components context’s `href`
      */
     canonicalHref?: ((path: string) => string) | undefined;
     /** Explicit `hreflang` alternates. Wins over `locales`. */
@@ -82,8 +89,8 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
     locales?: readonly string[] | undefined;
     /** `og:locale`, in Open Graph's `language_TERRITORY` form. */
     ogLocale?: string | undefined;
-    /** An RSS, Atom or JSON Feed link. */
-    feed?: FeedLink | undefined;
+    /** An RSS, Atom or JSON Feed link, or several (one per format). */
+    feed?: FeedLink | readonly FeedLink[] | undefined;
     /** The robots directive. */
     robots?: Robots | undefined;
     /** An explicit share image. Wins over `shareCard` and `defaultImage`. */
@@ -92,7 +99,7 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
     shareCard?: OgImageCard | undefined;
     /**
      * Where the share-card renderer is mounted.
-     * @defaultValue `/og`
+     * @defaultValue the site's, else `/og`
      */
     shareCardPath?: string | undefined;
     /**
@@ -112,7 +119,7 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
     tags?: readonly string[] | undefined;
     /**
      * The Twitter / X card type.
-     * @defaultValue `'summary_large_image'`
+     * @defaultValue the site's, else `'summary_large_image'`
      */
     twitterCard?: TwitterCard | undefined;
     /** The site’s Twitter / X handle. */
@@ -127,8 +134,8 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
 
   let {
     title,
-    siteName = undefined,
-    titleSeparator = ' | ',
+    siteName: siteNameProp = undefined,
+    titleSeparator: titleSeparatorProp = undefined,
     description = undefined,
     keywords = undefined,
     type = undefined,
@@ -137,7 +144,7 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
     pathname = undefined,
     canonicalHref = undefined,
     alternates = undefined,
-    locales = undefined,
+    locales: localesProp = undefined,
     ogLocale = undefined,
     feed = undefined,
     robots = undefined,
@@ -150,7 +157,7 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
     modified = undefined,
     section = undefined,
     tags = undefined,
-    twitterCard = 'summary_large_image',
+    twitterCard = undefined,
     twitterSite = undefined,
     twitterCreator = undefined,
     prevUrl = undefined,
@@ -158,6 +165,19 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
   }: Props = $props();
 
   const context = getComponentsContext();
+  const site = getSeoContext();
+
+  const siteName = $derived(siteNameProp ?? site.siteName);
+  const titleSeparator = $derived(titleSeparatorProp ?? site.titleSeparator ?? ' | ');
+  const locales = $derived(localesProp ?? site.locales);
+  const resolvedTwitterCard = $derived(twitterCard ?? site.twitterCard ?? 'summary_large_image');
+  const resolvedTwitterSite = $derived(twitterSite ?? site.twitterSite);
+  const resolvedRobots = $derived(robots ?? site.robots);
+  const feeds = $derived.by((): readonly FeedLink[] => {
+    const links = feed ?? site.feed;
+    if (links === undefined) return [];
+    return Array.isArray(links) ? links : [links as FeedLink];
+  });
 
   /** Schema.org type → Open Graph type, so `og:type` is never empty. */
   const schemaToOpenGraph: Record<SchemaPageType, OpenGraphType> = {
@@ -169,7 +189,7 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
     ProfilePage: 'profile',
   };
 
-  const resolveHref = $derived(canonicalHref ?? context.href);
+  const resolveHref = $derived(canonicalHref ?? site.canonicalHref ?? context.href);
 
   const resolvedTitle = $derived.by(() => {
     const trimmed = title.trim();
@@ -177,15 +197,20 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
     return siteName === undefined || siteName === '' ? trimmed : `${trimmed}${titleSeparator}${siteName}`;
   });
 
-  const resolvedDescription = $derived(
-    description === null || description === undefined || description.trim() === ''
-      ? undefined
-      : description,
-  );
+  const isBlank = (text: string | null | undefined): boolean =>
+    text === null || text === undefined || text.trim() === '';
+
+  const resolvedDescription = $derived.by((): string | undefined => {
+    if (!isBlank(description)) return description ?? undefined;
+    return isBlank(site.description) ? undefined : site.description;
+  });
 
   const resolvedCanonical = $derived.by((): string | undefined => {
     if (canonical !== undefined) return canonical;
-    const path = pathname ?? (typeof window === 'undefined' ? undefined : window.location.pathname);
+    const path =
+      pathname ??
+      site.pathname?.() ??
+      (typeof window === 'undefined' ? undefined : window.location.pathname);
     return path === undefined ? undefined : resolveHref(path);
   });
 
@@ -201,7 +226,8 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
   );
 
   const resolvedOgLocale = $derived.by((): string | undefined => {
-    if (ogLocale !== undefined) return ogLocale;
+    const explicit = ogLocale ?? site.ogLocale;
+    if (explicit !== undefined) return explicit;
     const locale = context.locale();
     const first = typeof locale === 'string' ? locale : locale?.[0];
     return first === undefined ? undefined : first.replace(/-/g, '_');
@@ -209,20 +235,23 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
 
   const cardImage = $derived.by((): HeadImage | undefined => {
     if (image !== undefined || shareCard === undefined) return undefined;
-    const url = ogImageUrl(shareCard, { href: resolveHref, basePath: shareCardPath });
+    const url = ogImageUrl(shareCard, {
+      href: resolveHref,
+      basePath: shareCardPath ?? site.shareCardPath,
+    });
     if (url === undefined) return undefined;
     const alt =
-      shareCardAlt?.(shareCard) ??
+      (shareCardAlt ?? site.shareCardAlt)?.(shareCard) ??
       (siteName === undefined || siteName === ''
         ? shareCard.title.trim()
         : `${shareCard.title.trim()} — ${siteName}`);
     return { url, alt, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT, type: 'image/png' };
   });
 
-  const resolvedImage = $derived(image ?? cardImage ?? defaultImage);
+  const resolvedImage = $derived(image ?? cardImage ?? defaultImage ?? site.defaultImage);
 
   const robotsContent = $derived(
-    `${(robots?.index ?? true) ? 'index' : 'noindex'}, ${(robots?.follow ?? true) ? 'follow' : 'nofollow'}`,
+    `${(resolvedRobots?.index ?? true) ? 'index' : 'noindex'}, ${(resolvedRobots?.follow ?? true) ? 'follow' : 'nofollow'}`,
   );
 
   const resolvedSection = $derived(section?.trim() === '' ? undefined : section);
@@ -254,14 +283,14 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
   {#if resolvedCanonical !== undefined}
     <link rel="canonical" href={resolvedCanonical} />
   {/if}
-  {#if feed !== undefined}
+  {#each feeds as link (link.path)}
     <link
       rel="alternate"
-      type={feed.type ?? 'application/feed+json'}
-      href={resolveHref(feed.path)}
-      title={feed.title ?? 'Latest changes'}
+      type={link.type ?? 'application/feed+json'}
+      href={resolveHref(link.path)}
+      title={link.title ?? 'Latest changes'}
     />
-  {/if}
+  {/each}
   <meta name="robots" content={robotsContent} />
 
   <meta property="og:title" content={resolvedTitle} />
@@ -279,9 +308,9 @@ Per-page `<head>` metadata: title, description, canonical URL, `hreflang` altern
     <meta property="og:description" content={resolvedDescription} />
   {/if}
 
-  <meta name="twitter:card" content={twitterCard} />
-  {#if twitterSite !== undefined}
-    <meta name="twitter:site" content={twitterSite} />
+  <meta name="twitter:card" content={resolvedTwitterCard} />
+  {#if resolvedTwitterSite !== undefined}
+    <meta name="twitter:site" content={resolvedTwitterSite} />
   {/if}
   {#if twitterCreator !== undefined}
     <meta name="twitter:creator" content={twitterCreator} />

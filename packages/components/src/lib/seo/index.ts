@@ -5,7 +5,8 @@
  *
  * `<Head>` emits the title, canonical, `hreflang`, Open Graph and Twitter /
  * X tags; `<JsonLd>` emits one XSS-safe JSON-LD block; `serializeJsonLd` is
- * the escaping serialiser underneath it; `ogImageUrl` builds the
+ * the escaping serialiser underneath it; `setSeoContext` sets `<Head>`'s
+ * site-wide defaults once; `ogImageUrl` builds the
  * content-addressed share-card URL `<Head>` emits, with the param names and
  * caps a card renderer reads back.
  *
@@ -13,6 +14,7 @@
  */
 
 export { default as Head } from './Head.svelte';
+export { getSeoContext, setSeoContext, type SeoContext } from './context.ts';
 export { default as JsonLd } from './JsonLd.svelte';
 export { serializeJsonLd, type JsonLdObject } from './json-ld.ts';
 export {

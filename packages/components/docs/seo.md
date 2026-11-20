@@ -12,7 +12,7 @@ Each component's props, defaults, snippets and ARIA contract are in its doc comm
 | `OgImageUrlOptions` | `ogImageUrl`'s second argument: `{ href?, basePath? }`. `href` resolves the card path to the emitted URL (identity by default; `Head` passes its `canonicalHref`), `basePath` is where the renderer is mounted (default `'/og'`). |
 | `HeadImage` | A share image: `{ url, alt?, width?, height?, type? }`; `url` must be absolute, `type` is the MIME type. `Head`'s `image` and `defaultImage`. |
 | `AlternateLink` | One `<link rel="alternate" hreflang>`: `{ href, lang }`, `lang` a BCP 47 tag or `x-default`. `Head`'s `alternates`. |
-| `FeedLink` | `Head`'s `feed`: `{ path, title? = 'Latest changes', type? = 'application/feed+json' }`; `path` is resolved through `canonicalHref` like the canonical URL. |
+| `FeedLink` | `Head`'s `feed` (one, or an array of them): `{ path, title? = 'Latest changes', type? = 'application/feed+json' }`; `path` is resolved through `canonicalHref` like the canonical URL. |
 | `Robots` | `Head`'s `robots`: `{ index?, follow? }`, both defaulting to `true`. The `robots` meta is always emitted. |
 | `OpenGraphType` | `'website' \| 'article' \| 'profile'` — `Head`'s `openGraphType`, which wins over the one derived from `type`. |
 | `SchemaPageType` | `'WebPage' \| 'WebSite' \| 'CollectionPage' \| 'Article' \| 'BlogPosting' \| 'ProfilePage'` — `Head`'s `type`, used only to derive `og:type`. |
@@ -45,3 +45,37 @@ Each component's props, defaults, snippets and ARIA contract are in its doc comm
 />
 <JsonLd data={buildBlogPostingJsonLd(post)} />
 ```
+
+**Site defaults, set once.** Most of those props are the same on every page. Set them once in the root layout with `setSeoContext`, and a page passes only what is its own; any prop a page does pass wins:
+
+```svelte
+<!-- +layout.svelte -->
+<script lang="ts">
+  import { setSeoContext } from '@thomasfosterau/components/seo';
+  import { page } from '$app/state';
+  import { locales } from '$lib/paraglide/runtime';
+  import * as m from '$lib/paraglide/messages';
+
+  const canonicalHref = (path: string) => new URL(path, 'https://example.org').href;
+
+  setSeoContext({
+    siteName: m.site_name(),
+    description: m.site_description(),
+    pathname: () => page.url.pathname,
+    canonicalHref,
+    locales,
+    feed: [
+      { path: '/feed.json', title: m.feed_title() },
+      { path: '/feed.xml', type: 'application/rss+xml', title: m.feed_title() },
+    ],
+    defaultImage: { url: canonicalHref('/og-default.png'), alt: m.site_name(), width: 1200, height: 630, type: 'image/png' },
+  });
+</script>
+```
+
+```svelte
+<!-- a page -->
+<Head title={post.title} description={post.summary} type="BlogPosting" shareCard={{ id: post.id, title: post.title }} />
+```
+
+`SeoContext` covers `siteName`, `titleSeparator`, `description` (used when a page's is absent or blank), `pathname` (a function, read on every render), `canonicalHref`, `locales`, `ogLocale`, `feed`, `robots`, `defaultImage`, `shareCardPath`, `shareCardAlt`, `twitterCard` and `twitterSite`. `feed` takes one `FeedLink` or several, on the context and on `Head`.
