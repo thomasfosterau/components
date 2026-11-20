@@ -93,3 +93,21 @@ Buttons, badges and surfaces — the family every other family builds on: `Alert
 ```
 
 **A floating panel is a tool window, not a dialog box.** `FloatingPanel` is non-modal: a `role="dialog"` without `aria-modal` or a focus trap, so the canvas or map behind it stays usable. Choose it for a layers list, an inspector or a legend the reader moves out of the way; choose `Popover` for something anchored and transient, `Dialog` or `Drawer` for something that demands an answer. Render it inside its `boundary` (a positioned element) to keep it there; `rect` is in pixels from the boundary's corner and keeps its proportion when the boundary resizes, so bind and persist it if you like. The title bar is the keyboard route to every gesture: arrows move it, Shift+arrows resize it, Home and End send it to an edge, Enter maximises, and each change is announced. F6 cycles focus between open panels and the page, and Escape returns to the page without closing the panel.
+
+`LanguageSwitcher` names each locale in its own language (`Intl.DisplayNames`, so no hand-written map) and picks its shape by count: with two locales, one control naming the other language ("Español", announced as "Switch to Español"); with more, a `DropdownMenu`. Pass `href` and the items are links that work without JavaScript, or `onSelect` to switch in place:
+
+```svelte
+<script lang="ts">
+  import { LanguageSwitcher } from '@thomasfosterau/components';
+  import { getLocale, locales, setLocale } from '$lib/paraglide/runtime';
+  import * as m from '$lib/paraglide/messages';
+</script>
+
+<LanguageSwitcher
+  {locales}
+  current={getLocale()}
+  onSelect={setLocale}
+  label={m.language()}
+  switchLabel={(language) => m.switch_language({ language })}
+/>
+```

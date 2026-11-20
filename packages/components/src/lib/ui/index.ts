@@ -68,6 +68,8 @@ export { default as Stack } from './Stack.svelte';
 export { default as StatusDot } from './StatusDot.svelte';
 export { default as Swap } from './Swap.svelte';
 export { default as ThemeToggle } from './ThemeToggle.svelte';
+export { default as LanguageSwitcher } from './LanguageSwitcher.svelte';
+export { languageEndonyms } from './language-names.ts';
 export { default as ToggleButton } from './ToggleButton.svelte';
 export { default as ToggleGroup } from './ToggleGroup.svelte';
 export { default as Toolbar } from './Toolbar.svelte';
