@@ -1,5 +1,24 @@
 # @thomasfosterau/components-mapbox
 
+## 0.2.3
+
+### Patch Changes
+
+- f335320: Tidy doc comments: drop issue references and update guide links to their new locations.
+- Updated dependencies [dfaf918]
+- Updated dependencies [a8e4098]
+- Updated dependencies [89ba5de]
+- Updated dependencies [72bf89d]
+- Updated dependencies [2690757]
+- Updated dependencies [532a1e8]
+- Updated dependencies [330879b]
+- Updated dependencies [c58b512]
+- Updated dependencies [e3ab0d1]
+- Updated dependencies [26046a3]
+- Updated dependencies [f335320]
+- Updated dependencies [9c1a899]
+  - @thomasfosterau/components@0.5.0
+
 ## 0.2.2
 
 ### Patch Changes
