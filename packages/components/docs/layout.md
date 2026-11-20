@@ -158,3 +158,27 @@ Without `AppShell`, `Sidebar` and `BottomNav` take the same list as `destination
 - **Sizes are presets**, not free resizing: `sm` 1×1, `md` 2×1, `lg` 2×2, `wide` 4×1 and `tall` 1×2 (columns × rows, `tileSizes`), clamped to the grid. A tile's `sizes` lists the ones its menu offers; the first is its size when the layout has no entry for it.
 - **Columns.** `columns` is a count per breakpoint, read from the grid's own width (`{ sm: 2, md: 4, lg: 6 }` by default, one column below `sm`), or a fixed number. The layout is stored at the widest count. A narrower grid repacks the tiles in reading order, and there the handle and menu reorder tiles rather than move them in two dimensions, so editing on a phone doesn't scramble the desktop layout.
 - **Reading order is DOM order.** Tiles render top to bottom, then start to end, after every change, so Tab order and a screen reader's order always match what is on screen. Each tile is a `section` named by its heading (`headingLevel`, `h2` by default), and every pick-up, move, drop, resize, removal and reset is announced in one polite live region (`announcements`).
+
+## Table of contents
+
+`TableOfContents` is an "On this page" `<nav>` for a long page. Point `container` at the element whose headings to list (`Heading` gives them stable ids), or pass `entries` yourself. `levels` picks the heading levels (default `[2, 3]`), and deeper levels nest under shallower ones.
+
+```svelte
+<div class="flex items-start gap-8">
+  <article id="guide">…</article>
+  <TableOfContents container="#guide" sticky offset={64} class="w-56 shrink-0" />
+</div>
+```
+
+The links are plain `#id` hrefs, so they work without scripts. With scripts, a click scrolls to the section (without smoothing under reduced motion), moves focus to its heading so a keyboard or screen reader user's position follows, and replaces the URL hash without a new history entry. SvelteKit warns about direct `history` calls, so pass its `replaceState`:
+
+```svelte
+<script lang="ts">
+  import { replaceState } from '$app/navigation';
+  import { page } from '$app/state';
+</script>
+
+<TableOfContents container="#guide" replaceHash={(hash) => replaceState(hash, page.state)} />
+```
+
+The section being read is marked `aria-current="location"`, with a border and a heavier weight, from an `IntersectionObserver`. It is never announced, because a live region would speak on every scroll. Under a sticky header, set `offset` to its height: targets get a matching `scroll-margin-top`, and the spy ignores the band the header covers. Below `collapseBelow` (default `'lg'`) the list folds into a closed `Disclosure`; `false` keeps it open at every width.

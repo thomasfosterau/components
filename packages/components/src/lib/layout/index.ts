@@ -44,6 +44,7 @@ export { default as Spacer } from './Spacer.svelte';
 export { default as StackPage } from './StackPage.svelte';
 export { default as Splitter } from './Splitter.svelte';
 export { default as SupportingPane } from './SupportingPane.svelte';
+export { default as TableOfContents } from './TableOfContents.svelte';
 export { default as Tabs } from './Tabs.svelte';
 export { default as VStack } from './VStack.svelte';
 
@@ -58,6 +59,7 @@ export {
   type TileSize,
 } from './dashboard.ts';
 export * from './space.ts';
+export * from './table-of-contents.ts';
 export * from './types.ts';
 export {
   createNavigationStack,
