@@ -60,6 +60,11 @@
       "svelte": "./dist/fields/dates.js",
       "default": "./dist/fields/dates.js"
     },
+    "./color-picker": {
+      "types": "./dist/fields/color-picker.d.ts",
+      "svelte": "./dist/fields/color-picker.js",
+      "default": "./dist/fields/color-picker.js"
+    },
     "./hotkeys": {
       "types": "./dist/hotkeys/index.d.ts",
       "svelte": "./dist/hotkeys/index.js",
