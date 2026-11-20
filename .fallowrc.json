@@ -18,7 +18,6 @@
     "packages/*/tests/setup.ts",
     "packages/components/.storybook/*.ts",
     "packages/charts/scripts/*.ts",
-    "scripts/publish.mjs",
     "**/vite.config.ts",
     "packages/import/vite.svelte.config.ts",
     "**/svelte.config.js"

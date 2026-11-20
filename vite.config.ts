@@ -69,6 +69,31 @@ export default defineConfig({
         dependsOn: [{ from: 'dependencies', task: 'check' }],
         cache: false,
       },
+      // The release job's publish script (.github/workflows/release.yml),
+      // after every package's `build` on the same commit: pnpm packs
+      // (rewriting `catalog:` and `workspace:*`) and publishes every public
+      // package whose version is not on npm yet, in dependency order, under
+      // OIDC trusted publishing with provenance; then `changeset git-tag` tags
+      // each version not tagged yet and reports the new tags to
+      // `changesets/action` through `CHANGESETS_OUTPUT`, which pushes them and
+      // creates the GitHub releases. A failed publish stops before tagging; a
+      // re-run publishes only what is missing. Uncached, so the OIDC request
+      // variables reach pnpm. Depends only on builds: this runs with
+      // `id-token: write`.
+      release: {
+        command: [
+          'vp pm publish -r --access public --no-git-checks -- --ignore-scripts',
+          'changeset git-tag',
+        ],
+        dependsOn: [{ from: 'dependencies', task: 'build' }],
+        cache: false,
+      },
+      // What `release` would publish, without publishing or tagging.
+      'release:dry-run': {
+        command: 'vp pm publish -r --access public --dry-run --no-git-checks -- --ignore-scripts',
+        dependsOn: [{ from: 'dependencies', task: 'build' }],
+        cache: false,
+      },
       // Every suite in one run with one Istanbul map, which `fallow audit`
       // reads. Not a CI gate. The Svelte suites need `sync`, and mapbox's
       // imports packages/components' `dist/`. `--maxWorkers=1` runs one file

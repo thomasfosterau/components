@@ -11,7 +11,7 @@
 
 ## Toolchain
 
-[Vite+](https://viteplus.dev) (`vp`) manages Node, pnpm and every tool. Use `vp` rather than `pnpm`/`npx` (`vp exec <bin>`, `vp run <task>`); the exceptions are `pnpm changeset` and the release path.
+[Vite+](https://viteplus.dev) (`vp`) manages Node, pnpm and every tool. Use `vp` rather than `pnpm`/`npx` (`vp exec <bin>`, `vp run <task>`); the exception is `pnpm changeset`. The release runs `vp run release` (`vp pm publish -r`, then `changeset git-tag`); `vp run release:dry-run` shows what it would publish.
 
 - Every external version lives in the `pnpm-workspace.yaml` catalog; a `package.json` names only `catalog:`, `catalog:peers` or `workspace:*`. After editing the catalog, run `vp install` and commit `pnpm-lock.yaml`.
 - `vp install` also patches `tsc`/oxlint with `@effect/tsgo`.
@@ -27,6 +27,7 @@
 | `vp run -r build` | Every package's `dist/`. |
 | `vp run --filter ./packages/components storybook` | Storybook on port 6006 (`storybook:build` for the static build). |
 | `vp run ci` | Everything CI runs, in order. |
+| `vp run release:dry-run` | Builds every package and shows what `vp run release` would publish. |
 
 ## Coding guidelines
 
