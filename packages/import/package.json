@@ -59,6 +59,7 @@
     "svelte": "catalog:",
     "svelte-check": "catalog:",
     "typescript": "catalog:",
+    "vitest": "catalog:",
     "vitest-browser-svelte": "catalog:"
   },
   "peerDependencies": {
