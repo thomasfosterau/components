@@ -94,7 +94,7 @@ export function toIsoDuration(value: DurationValue): string {
 interface DurationFormatConstructor {
   new (
     locales?: string | readonly string[],
-    options?: { style?: DurationStyle },
+    options?: { style?: DurationStyle; secondsDisplay?: 'always' | 'auto' },
   ): { format(value: DurationValue): string };
 }
 
@@ -141,7 +141,10 @@ export function formatDuration(
   const present = presentFields(value);
   const Native = nativeDurationFormat();
   if (Native !== undefined) {
-    return new Native(locales, { style }).format(present);
+    // The native formatter rejects a duration with no fields and hides zero ones; zero reads as zero seconds.
+    return Object.keys(present).length === 0
+      ? new Native(locales, { style, secondsDisplay: 'always' }).format({ seconds: 0 })
+      : new Native(locales, { style }).format(present);
   }
   if (style === 'digital') return digital(value);
   const unitDisplay = style;
