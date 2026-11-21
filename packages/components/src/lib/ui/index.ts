@@ -18,6 +18,7 @@
  * @module
  */
 
+export { default as ActionChip } from './ActionChip.svelte';
 export { default as Accordion } from './Accordion.svelte';
 export { default as AccordionItem } from './AccordionItem.svelte';
 export { default as Alert } from './Alert.svelte';
@@ -28,6 +29,7 @@ export { default as Button } from './Button.svelte';
 export { default as ButtonGroup } from './ButtonGroup.svelte';
 export { default as Card } from './Card.svelte';
 export { default as Chip } from './Chip.svelte';
+export { default as ChipGroup } from './ChipGroup.svelte';
 export { default as CodeBlock } from './CodeBlock.svelte';
 export { default as ConfirmButton } from './ConfirmButton.svelte';
 export { default as CopyButton } from './CopyButton.svelte';
