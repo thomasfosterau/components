@@ -31,6 +31,7 @@ export { default as ImageCropper } from './ImageCropper.svelte';
 export { default as ImageInput } from './ImageInput.svelte';
 export { default as MentionInput } from './MentionInput.svelte';
 export { default as Listbox } from './Listbox.svelte';
+export { default as MaskedInput } from './MaskedInput.svelte';
 export { default as MultiSelect } from './MultiSelect.svelte';
 export { default as NumberField } from './NumberField.svelte';
 export { default as PasswordInput } from './PasswordInput.svelte';
@@ -61,3 +62,5 @@ export { parseMentions, serializeMentions } from './mentions.ts';
 export type { MentionOption, MentionToken, MentionTrigger, ParsedMentions } from './mentions.ts';
 export type { CropArea, CropPlace, CropReadout, CropRotation } from './crop.ts';
 export type { CropExportOptions } from './crop-export.ts';
+
+export { cardBrand, luhnValid, maskPresets, type Mask, type MaskPreset } from './mask.ts';
