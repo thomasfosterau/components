@@ -132,6 +132,21 @@ Prefer a plain `TextInput` with a hint ("For example, 0412 345 678") and validat
 </FormField>
 ```
 
+### Angles and bearings: `AngleSlider`
+
+`AngleSlider` is a round dial for a direction: a bed's aspect, wind or slope direction, a rotation. The thumb is an APG `slider` that wraps from 359° to 0° on a full circle; clockwise is always "increase", whichever way 0° points (`zero="north"`, the default, or `"east"`) and whatever the text direction. Drag anywhere on the dial, or press a mark to jump to it; `restrictToMarks` allows only the marks. `compass` adds N/E/S/W marks and names the compass point in `aria-valuetext` ("135 degrees, south-east"; `compassLabels` translates the names). A slider can't be typed into, so pair it with a `NumberField` for exact values:
+
+```svelte
+<FormField label="Aspect">
+  {#snippet children(control)}
+    <div class="flex items-center gap-4">
+      <AngleSlider {...control} compass bind:value={aspect} name="aspect" />
+      <NumberField aria-label="Aspect in degrees" min={0} max={360} bind:value={aspect} />
+    </div>
+  {/snippet}
+</FormField>
+```
+
 `fields` also exports `field-types.ts` (`FieldControl`, `FieldsetControl`, `FieldSize`, `FieldOption`, `FieldOptionInput`, `toFieldOptions`) and the daisyUI size tables (`inputSize`, `textareaSize`, `selectSize`, `checkboxSize`, `toggleSize`, `fileInputSize`, `rangeSize`, `pinCellSize`, `inputButtonSize`, each a `Record<FieldSize, string>`), and from `PushToggle` the `PushEnableResult` type (`{ _tag: 'enabled' | PushDeclineReason }`) and `PushDeclineReason` (`'unsupported' | 'unavailable' | 'denied'` — why `enable` did not subscribe, each with its own message prop).
 
 ```svelte
