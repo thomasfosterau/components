@@ -5,8 +5,8 @@
 - Branch off `trunk` and open a pull request into `trunk`; it is squash-merged. Never commit to `trunk` directly.
 - Open a draft PR as soon as you start, so others can see the work. Keep one PR per change, even a large one, and keep it free of conflicts (rebase onto `origin/trunk`; don't merge `trunk` in). Getting CI green is the author's job.
 - Found something out of scope? File an issue and move on. Keep issue bodies evergreen: context, problem and suggested fix in the body, not in a trail of comments.
-- Dependabot updates dependencies daily. Update one by hand only when your change needs it, or for the moves Dependabot can't make:
-  - On a `toolchain` PR that bumps `vite-plus`: set the `vite` alias (`npm:@voidzero-dev/vite-plus-core@<version>`) to the same version, and the `.devcontainer/devcontainer.json` image tag with it.
+- Dependabot updates dependencies daily. Update one by hand only when your change needs it, or for the moves Dependabot can't make, which go in a PR from a new branch started from its PR's head (never push to a `dependabot/*` branch, which stops it rebasing; Dependabot closes its own PR once yours merges):
+  - When a `toolchain` update bumps `vite-plus`: set the `vite` alias (`npm:@voidzero-dev/vite-plus-core@<version>`) to the same version, and the `.devcontainer/devcontainer.json` image tag with it.
   - `typescript` (TS6) and `@typescript/native` (TS7) are npm aliases: move them with `@effect/tsgo`, to versions its `components` table (`node_modules/@effect/tsgo/dist/effect-tsgo.cjs`) supports, or `pnpm install`'s `prepare` fails.
 
 ## Toolchain
