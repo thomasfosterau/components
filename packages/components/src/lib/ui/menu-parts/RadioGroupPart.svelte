@@ -17,7 +17,11 @@ Internal: the bits-ui radio group a `MenuRadioGroup` renders inside a `DropdownM
 </script>
 
 <li role="none" class={className}>
-  <DropdownMenu.RadioGroup {value} {onValueChange}>
+  <DropdownMenu.RadioGroup
+    {value}
+    {onValueChange}
+    class="flex flex-col items-stretch gap-0 p-0 hover:bg-transparent active:bg-transparent"
+  >
     {#if label !== undefined}
       <DropdownMenu.GroupHeading class="menu-title px-2">{label}</DropdownMenu.GroupHeading>
     {/if}

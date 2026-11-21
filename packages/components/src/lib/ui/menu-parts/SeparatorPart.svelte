@@ -15,5 +15,5 @@ Internal: the bits-ui separator a `MenuSeparator` renders inside a `DropdownMenu
 </script>
 
 <li role="none">
-  <DropdownMenu.Separator class={['divider my-1 h-px', className]} />
+  <DropdownMenu.Separator class={['bg-base-content/10 pointer-events-none my-1 h-px p-0', className]} />
 </li>
