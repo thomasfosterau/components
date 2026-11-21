@@ -41,6 +41,7 @@ export { default as RadioGroup } from './RadioGroup.svelte';
 export { default as Rating } from './Rating.svelte';
 export { default as SearchInput } from './SearchInput.svelte';
 export { default as Select } from './Select.svelte';
+export { default as SignaturePad } from './SignaturePad.svelte';
 export { default as Slider } from './Slider.svelte';
 export { default as TagsInput } from './TagsInput.svelte';
 export { default as Textarea } from './Textarea.svelte';
@@ -67,3 +68,5 @@ export type { CropExportOptions } from './crop-export.ts';
 export { cardBrand, luhnValid, maskPresets, type Mask, type MaskPreset } from './mask.ts';
 
 export { compass8, compass16, type AngleZero } from './angle.ts';
+
+export { signatureToPng, type SignatureValue } from './signature.ts';

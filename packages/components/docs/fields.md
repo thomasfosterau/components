@@ -147,6 +147,16 @@ Prefer a plain `TextInput` with a hint ("For example, 0412 345 678") and validat
 </FormField>
 ```
 
+### Signatures: `SignaturePad`
+
+`SignaturePad` takes a signature drawn with a finger, pen or mouse, or a typed name instead. Its value is `{ kind: 'drawn' | 'typed', svg, typedName? }`, or `undefined` while empty; `name` posts the SVG, and `signatureToPng(value, { width, height })` renders a PNG `Blob` for storage or a PDF.
+
+- Drawing is pointer-only, so the **Type** tab is the keyboard and screen-reader path. `allowTyped={false}` removes it and makes the field fail WCAG 2.1.1 (keyboard); development builds warn. Whether a typed name counts as a signature is a legal question for the app.
+- The pad is `role="img"` named by `padLabel` and described by its status ("Sign above" / "Signature drawn") and a pointer to the Type tab. It is not focusable, because there is nothing to do there from a keyboard.
+- Undo removes the last stroke; Clear empties the pad. One stroke draws at a time, so a hand resting on a tablet while a pen draws is ignored.
+- `required` blocks the form while empty and shows `requiredMessage` ("Sign or type your name").
+- The exported SVG and PNG use a fixed dark ink (`exportInk`), not a theme token: they are data that must print the same whatever theme the person signed in.
+
 `fields` also exports `field-types.ts` (`FieldControl`, `FieldsetControl`, `FieldSize`, `FieldOption`, `FieldOptionInput`, `toFieldOptions`) and the daisyUI size tables (`inputSize`, `textareaSize`, `selectSize`, `checkboxSize`, `toggleSize`, `fileInputSize`, `rangeSize`, `pinCellSize`, `inputButtonSize`, each a `Record<FieldSize, string>`), and from `PushToggle` the `PushEnableResult` type (`{ _tag: 'enabled' | PushDeclineReason }`) and `PushDeclineReason` (`'unsupported' | 'unavailable' | 'denied'` — why `enable` did not subscribe, each with its own message prop).
 
 ```svelte
