@@ -58,6 +58,29 @@ The matching rules `HotkeyProvider` runs are exported as pure functions, for a c
 </script>
 ```
 
+## Rebinding shortcuts
+
+`HotkeyEditor` lists every registered command with its shortcut, as a table a settings page can drop in. Each row records a new shortcut with `HotkeyInput`, disables it, or resets it to the default; a switch turns off every single-key shortcut and sequence at once. That switch is what WCAG 2.1.4 (Character Key Shortcuts) asks for when an app binds plain letters, since speech input can fire them by accident.
+
+Changes land in the registry: `overrides` (a chord per action id, `null` for disabled) replaces each action's registered trigger in `active`, `paletteActions` and `hotkeys`, so dispatch, the help dialog and the palette's hints all follow. Pass the saved overrides to `createHotkeyRegistry` and persist them from `onOverridesChange`; `singleKeyEnabled` is a plain field on the registry, so save it the same way if the app keeps it.
+
+```svelte
+<script lang="ts">
+  const hotkeys = createHotkeyRegistry({
+    isAdmin: () => user?.isAdmin === true,
+    overrides: settings.hotkeys,
+    onOverridesChange: (overrides) => saveSettings({ hotkeys: overrides }),
+  });
+</script>
+```
+
+```svelte
+<!-- The settings page. -->
+<HotkeyEditor />
+```
+
+`HotkeyInput` also works on its own, with or without a registry. It is a read-only field that records the next key press in the registry's own syntax (`'$mod+shift+k'`), shows it with the platform's glyphs (⌘⇧K, or Ctrl+Shift+K) and describes it in words for a screen reader. Tab always moves on, Escape drops a refused attempt and Backspace clears. It refuses the browser's own shortcuts (`reserved`), a key without Ctrl, ⌘ or Alt unless `requireModifier` is off, and, inside a registry, a chord another command holds, offering to take it over. Registry dispatch is paused while it has focus, so recording a shortcut never runs one.
+
 ## Command palette
 
 One component, because a palette is one thing: a dialog, a query box, and rows from wherever the app has them. It composes this library's `Dialog` with bits-ui's `Command`, taking rows from up to three places at once — a mounted hotkey registry's `paletteActions`, a static `items` prop, and an asynchronous `onSearch` — none required.

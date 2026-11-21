@@ -274,3 +274,92 @@ describe('the unregister closure', () => {
     );
   });
 });
+
+describe('overrides', () => {
+  test('an override replaces the trigger on every surface; null disables; reset restores', () => {
+    const saved = vi.fn<(overrides: Readonly<Record<string, string | null>>) => void>();
+    let registry!: HotkeyRegistry;
+    let triggers: unknown[] = [];
+    let bindings: unknown[] = [];
+    const cleanup = $effect.root(() => {
+      registry = new HotkeyRegistry({
+        isAdmin: () => true,
+        overrides: { b: null },
+        onOverridesChange: saved,
+      });
+      $effect(() => {
+        triggers = registry.hotkeys.map((entry) => [entry.action.id, entry.action.trigger]);
+        bindings = registry.bindings.map((binding) => [
+          binding.id,
+          binding.trigger,
+          binding.overridden,
+        ]);
+      });
+    });
+    try {
+      registry.register('global', [
+        action('a', { trigger: '$mod+a' }),
+        action('b', { trigger: 'b' }),
+      ]);
+      flushSync();
+      expect(triggers).toEqual([['a', '$mod+a']]);
+      expect(bindings).toEqual([
+        ['a', '$mod+a', false],
+        ['b', undefined, true],
+      ]);
+
+      registry.setBinding('a', '$mod+j');
+      flushSync();
+      expect(triggers).toEqual([['a', '$mod+j']]);
+      expect(saved).toHaveBeenLastCalledWith({ b: null, a: '$mod+j' });
+      expect(registry.conflicts('$MOD+J').map((binding) => binding.id)).toEqual(['a']);
+      expect(registry.conflicts('$mod+j', 'a')).toEqual([]);
+
+      registry.reset('b');
+      flushSync();
+      expect(triggers).toEqual([
+        ['a', '$mod+j'],
+        ['b', 'b'],
+      ]);
+      expect(saved).toHaveBeenLastCalledWith({ a: '$mod+j' });
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('singleKeyEnabled off drops single keys and sequences but keeps chords', () => {
+    let registry!: HotkeyRegistry;
+    let ids: string[] = [];
+    const cleanup = $effect.root(() => {
+      registry = new HotkeyRegistry({ isAdmin: () => true });
+      $effect(() => {
+        ids = registry.active
+          .filter((entry) => entry.action.trigger !== undefined)
+          .map((entry) => entry.action.id);
+      });
+    });
+    try {
+      registry.register('global', [
+        action('chord', { trigger: '$mod+k' }),
+        action('key', { trigger: '?' }),
+        action('sequence', { trigger: ['g', 'p'] }),
+      ]);
+      registry.singleKeyEnabled = false;
+      flushSync();
+      expect(ids).toEqual(['chord']);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('pauses nest, and a resume function only counts once', () => {
+    const registry = new HotkeyRegistry({ isAdmin: () => true });
+    const first = registry.pause();
+    const second = registry.pause();
+    first();
+    first();
+    expect(registry.paused).toBe(true);
+    second();
+    expect(registry.paused).toBe(false);
+  });
+});

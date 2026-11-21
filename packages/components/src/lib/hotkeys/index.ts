@@ -27,9 +27,16 @@ export {
   registerHotkeys,
   tryGetHotkeyRegistry,
 } from './context.svelte.ts';
-export { HotkeyRegistry, type HotkeyRegistryOptions } from './registry.svelte.ts';
+export {
+  HotkeyRegistry,
+  isSingleKeyTrigger,
+  type HotkeyBinding,
+  type HotkeyRegistryOptions,
+} from './registry.svelte.ts';
 export { default as HotkeyBadge } from './HotkeyBadge.svelte';
+export { default as HotkeyEditor } from './HotkeyEditor.svelte';
 export { default as HotkeyHelpDialog } from './HotkeyHelpDialog.svelte';
+export { default as HotkeyInput } from './HotkeyInput.svelte';
 export { default as HotkeyProvider } from './HotkeyProvider.svelte';
 export {
   SEQUENCE_TIMEOUT_MS,
@@ -44,6 +51,17 @@ export {
   type SequenceMatch,
   type TriggerDisplay,
 } from './match.ts';
+export {
+  chordOf,
+  chordParts,
+  defaultReservedHotkeys,
+  hasModifier,
+  isModifierOnly,
+  shownChordNames,
+  spokenChordNames,
+  triggerText,
+  type ChordNames,
+} from './record.ts';
 export type {
   CommandAction,
   CommandActionGroup,
