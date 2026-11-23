@@ -8,7 +8,7 @@ catalogMode: strict
 catalog:
   # A required peer of bits-ui, made a dependency of packages/components so consumers needn't know it.
   '@internationalized/date': ^3.8.1
-  'mapbox-gl': ^3.35.1
+  'mapbox-gl': ^3.35.2
   '@changesets/cli': ^3.0.3
   # Optional peer of `/entity-form`; a devDependency for its suite and story.
   '@thomasfosterau/effect-forms-svelte': ^0.4.2
