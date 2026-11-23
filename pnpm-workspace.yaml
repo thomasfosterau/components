@@ -17,7 +17,7 @@ catalog:
   '@effect/vitest': 4.1.4
   '@thomasfosterau/effect-document': ^0.2.1
   # effect-document's optional peer for its readers; packages/import's suite reads CSV with it.
-  '@thomasfosterau/effect-parse': ^0.6.1
+  '@thomasfosterau/effect-parse': ^0.6.2
   '@lucide/svelte': ^1.76.0
   # DEV/BROWSER conditions, resolved by the consumer's bundler; Svelte itself depends on it.
   esm-env: ^1.2.2

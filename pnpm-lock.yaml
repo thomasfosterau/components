@@ -219,8 +219,8 @@ catalogs:
       specifier: ^0.4.2
       version: 0.4.2
     '@thomasfosterau/effect-parse':
-      specifier: ^0.6.1
-      version: 0.6.1
+      specifier: ^0.6.2
+      version: 0.6.2
     '@types/d3-scale':
       specifier: ^4.0.9
       version: 4.0.9
@@ -451,7 +451,7 @@ importers:
         version: 8.0.0(@testing-library/dom@10.4.2)(vitest@5.1.0)
       '@thomasfosterau/effect-forms-svelte':
         specifier: 'catalog:'
-        version: 0.4.2(@sveltejs/kit@3.4.0(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@8.3.8000(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@8.3.8000(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.1(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)(svelte@5.58.0)
+        version: 0.4.2(@sveltejs/kit@3.4.0(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@8.3.8000(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@8.3.8000(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)(svelte@5.58.0)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -509,10 +509,10 @@ importers:
         version: 7.3.1(@voidzero-dev/vite-plus-core@8.3.8000(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0)
       '@thomasfosterau/effect-document':
         specifier: 'catalog:'
-        version: 0.2.1(@thomasfosterau/effect-parse@0.6.1(effect@4.1.4))(effect@4.1.4)
+        version: 0.2.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.4))(effect@4.1.4)
       '@thomasfosterau/effect-parse':
         specifier: 'catalog:'
-        version: 0.6.1(effect@4.1.4)
+        version: 0.6.2(effect@4.1.4)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -1915,9 +1915,9 @@ packages:
       '@thomasfosterau/effect-ext': ^0.1.0 || ^0.2.0 || ^0.3.0
       effect: 4.1.4
 
-  '@thomasfosterau/effect-parse@0.6.1':
-    resolution: {integrity: sha512-UIthSDPfrrtixQXAt1zlo7EFC1GHclnpvYQYu0ojiEpM5Qb6DfFMi6+2m8elKQOYayl0YYtEThOTGFs1Ftm4Ew==}
-    engines: {node: '>=22', pnpm: '>=11'}
+  '@thomasfosterau/effect-parse@0.6.2':
+    resolution: {integrity: sha512-v/fMXkcN96G/2waTEOSlY4+CBhw/ndBKbjtSWKn3U6Q4vZJePTKFZFIgSIxKOmvgdmFDBokNqQIv84NigzYvqg==}
+    engines: {node: '>=22'}
     peerDependencies:
       effect: 4.1.4
 
@@ -3510,10 +3510,12 @@ packages:
   yuku-core@0.19.0:
     resolution: {integrity: sha512-kYK9e1XdfirNhkipzW0wmMcSWcVF/CWnuugodfVYRCUwvoBefweL9HzB96OiKEhsx78V5WbUxbJqlizMX869Qg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku-parser@0.19.0:
     resolution: {integrity: sha512-XrBh9ZiQK5mJVRxZBAvD6LwRyAYrK3MFtH3+onyuxFL5hFD44EC3QOmIC1FjTj6H2MMwq46/NAI+NZxLZPZgxg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   zimmerframe@1.1.2:
     resolution: {integrity: sha512-rAbqEGa8ovJy4pyBxZM70hg4pE6gDgaQ0Sl9M3enG3I0d6H4XSAM3GeNGLKnsBpuijUow064sf7ww1nutC5/3w==}
@@ -4469,38 +4471,38 @@ snapshots:
     dependencies:
       '@testing-library/dom': 10.4.2
 
-  '@thomasfosterau/effect-document@0.2.1(@thomasfosterau/effect-parse@0.6.1(effect@4.1.4))(effect@4.1.4)':
+  '@thomasfosterau/effect-document@0.2.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.4))(effect@4.1.4)':
     dependencies:
-      '@thomasfosterau/effect-ext': 0.3.1(@thomasfosterau/effect-parse@0.6.1(effect@4.1.4))(effect@4.1.4)
+      '@thomasfosterau/effect-ext': 0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.4))(effect@4.1.4)
       effect: 4.1.4
       fflate: 0.8.3
     optionalDependencies:
-      '@thomasfosterau/effect-parse': 0.6.1(effect@4.1.4)
+      '@thomasfosterau/effect-parse': 0.6.2(effect@4.1.4)
     transitivePeerDependencies:
       - '@effect/platform-browser'
       - '@effect/platform-node'
 
-  '@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.1(effect@4.1.4))(effect@4.1.4)':
+  '@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.4))(effect@4.1.4)':
     dependencies:
       effect: 4.1.4
     optionalDependencies:
-      '@thomasfosterau/effect-parse': 0.6.1(effect@4.1.4)
+      '@thomasfosterau/effect-parse': 0.6.2(effect@4.1.4)
 
-  '@thomasfosterau/effect-forms-svelte@0.4.2(@sveltejs/kit@3.4.0(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@8.3.8000(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@8.3.8000(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.1(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)(svelte@5.58.0)':
+  '@thomasfosterau/effect-forms-svelte@0.4.2(@sveltejs/kit@3.4.0(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@8.3.8000(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@8.3.8000(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)(svelte@5.58.0)':
     dependencies:
-      '@thomasfosterau/effect-ext': 0.3.1(@thomasfosterau/effect-parse@0.6.1(effect@4.1.4))(effect@4.1.4)
-      '@thomasfosterau/effect-forms': 0.5.0(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.1(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)
+      '@thomasfosterau/effect-ext': 0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.4))(effect@4.1.4)
+      '@thomasfosterau/effect-forms': 0.5.0(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)
       effect: 4.1.4
       svelte: 5.58.0
     optionalDependencies:
       '@sveltejs/kit': 3.4.0(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@8.3.8000(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@8.3.8000(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0)
 
-  '@thomasfosterau/effect-forms@0.5.0(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.1(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)':
+  '@thomasfosterau/effect-forms@0.5.0(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)':
     dependencies:
-      '@thomasfosterau/effect-ext': 0.3.1(@thomasfosterau/effect-parse@0.6.1(effect@4.1.4))(effect@4.1.4)
+      '@thomasfosterau/effect-ext': 0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.4))(effect@4.1.4)
       effect: 4.1.4
 
-  '@thomasfosterau/effect-parse@0.6.1(effect@4.1.4)':
+  '@thomasfosterau/effect-parse@0.6.2(effect@4.1.4)':
     dependencies:
       effect: 4.1.4
 
