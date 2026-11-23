@@ -41,7 +41,7 @@ catalog:
   '@testing-library/jest-dom': ^8.0.0
   '@types/node': ^26.6.6
   # Pins `vitest` exactly, so it follows the `vitest` entry below.
-  '@vitest/browser-playwright': 5.1.0
+  '@vitest/browser-playwright': 5.1.1
   bits-ui: ^2.21.0
   daisyui: ^5.8.2
   # Exact: each release expects one Chromium revision. 1.56.1–1.59.x hang
@@ -58,8 +58,8 @@ catalog:
   # vite-plus version).
   vite-plus: 1.7.0
   vite: npm:@voidzero-dev/vite-plus-core@8.3.8000
-  vitest: 5.1.0
-  '@vitest/coverage-istanbul': 5.1.0
+  vitest: 5.1.1
+  '@vitest/coverage-istanbul': 5.1.1
   # `effect-tsgo patch` (the root `prepare`) supports only the TypeScript,
   # oxlint and tsrs versions in its `components` table
   # (node_modules/@effect/tsgo/dist/effect-tsgo.cjs); check it before bumping
