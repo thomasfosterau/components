@@ -189,8 +189,8 @@ catalogs:
       specifier: ^3.8.1
       version: 3.12.4
     '@lucide/svelte':
-      specifier: ^1.76.0
-      version: 1.76.0
+      specifier: ^1.77.0
+      version: 1.77.0
     '@storybook/addon-a11y':
       specifier: ^10.6.7
       version: 10.6.7
@@ -417,7 +417,7 @@ importers:
         version: 3.12.4
       '@lucide/svelte':
         specifier: 'catalog:'
-        version: 1.76.0(svelte@5.58.0)
+        version: 1.77.0(svelte@5.58.0)
       bits-ui:
         specifier: 'catalog:'
         version: 2.21.0(@internationalized/date@3.12.4)(@sveltejs/kit@3.4.0(@sveltejs/vite-plugin-svelte@7.3.1(@voidzero-dev/vite-plus-core@8.3.8000(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@8.3.8000(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.58.0))(svelte@5.58.0)
@@ -999,8 +999,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@lucide/svelte@1.76.0':
-    resolution: {integrity: sha512-cDlhnZsqXm/ktY7ZBir7baKJhvSRRADQe7iZyMYks5qeZeQqTfeH9M+BVsyInt3DrERBYiPrfxf5RmRSgPnUzA==}
+  '@lucide/svelte@1.77.0':
+    resolution: {integrity: sha512-gXjmQ4VK3Mh/M11Nn/XCeln3XZByR4MxX5o+NMfr/Wg9MQs+BffvXTnW+0WvmjV1u58TXJhXvgJZHrMASUnqow==}
     peerDependencies:
       svelte: ^5.58.0
 
@@ -3894,7 +3894,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@lucide/svelte@1.76.0(svelte@5.58.0)':
+  '@lucide/svelte@1.77.0(svelte@5.58.0)':
     dependencies:
       svelte: 5.58.0
 
