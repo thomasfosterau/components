@@ -270,8 +270,8 @@ catalogs:
       specifier: ^1.25.13
       version: 1.25.13
     prosemirror-view:
-      specifier: ^1.42.9
-      version: 1.42.9
+      specifier: ^1.43.0
+      version: 1.43.0
     storybook:
       specifier: ^10.6.7
       version: 10.6.7
@@ -393,7 +393,7 @@ importers:
         version: 1.25.13
       prosemirror-view:
         specifier: 'catalog:'
-        version: 1.42.9
+        version: 1.43.0
       svelte:
         specifier: ^5.58.0
         version: 5.58.0
@@ -3046,8 +3046,8 @@ packages:
   prosemirror-transform@1.12.2:
     resolution: {integrity: sha512-PE/aY0HEY4zczvmqrilgkUK/WautF0chvMqkmM/iN5/aPHvwrCWaQZjS6CIZp+K84YrvPFqrL+YArrfJX8xX7g==}
 
-  prosemirror-view@1.42.9:
-    resolution: {integrity: sha512-bKbfzeKZOu2H2JQU2TaJmYu6EBcor3VnGIR4jR31cbEt1ztUnfUB6bKGV1+fJzOJdrVWR+tRU0208zM3oQx4wA==}
+  prosemirror-view@1.43.0:
+    resolution: {integrity: sha512-MZOUuhD+Gv7Cp7UlgvyhptUfb920NkLBgymhyhaM8xp+JXQyLhkssS2EXZvMI3ZU3vRoz5z7mRC32udVgNYHqg==}
 
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
@@ -3510,10 +3510,12 @@ packages:
   yuku-core@0.19.0:
     resolution: {integrity: sha512-kYK9e1XdfirNhkipzW0wmMcSWcVF/CWnuugodfVYRCUwvoBefweL9HzB96OiKEhsx78V5WbUxbJqlizMX869Qg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku-parser@0.19.0:
     resolution: {integrity: sha512-XrBh9ZiQK5mJVRxZBAvD6LwRyAYrK3MFtH3+onyuxFL5hFD44EC3QOmIC1FjTj6H2MMwq46/NAI+NZxLZPZgxg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   zimmerframe@1.1.2:
     resolution: {integrity: sha512-rAbqEGa8ovJy4pyBxZM70hg4pE6gDgaQ0Sl9M3enG3I0d6H4XSAM3GeNGLKnsBpuijUow064sf7ww1nutC5/3w==}
@@ -5457,13 +5459,13 @@ snapshots:
     dependencies:
       prosemirror-model: 1.25.13
       prosemirror-transform: 1.12.2
-      prosemirror-view: 1.42.9
+      prosemirror-view: 1.43.0
 
   prosemirror-transform@1.12.2:
     dependencies:
       prosemirror-model: 1.25.13
 
-  prosemirror-view@1.42.9:
+  prosemirror-view@1.43.0:
     dependencies:
       prosemirror-model: 1.25.13
       prosemirror-state: 1.4.4
