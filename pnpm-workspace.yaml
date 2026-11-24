@@ -64,7 +64,7 @@ catalog:
   # oxlint and tsrs versions in its `components` table
   # (node_modules/@effect/tsgo/dist/effect-tsgo.cjs); check it before bumping
   # this, `@typescript/native` or `vite-plus`.
-  '@effect/tsgo': 0.73.2
+  '@effect/tsgo': 0.73.4
   # TS7, Effect-patched by `prepare`; type-checks packages/charts and packages/import.
   '@typescript/native': npm:typescript@7.0.2
   '@enfect/oxlint': 0.10.0
