@@ -42,7 +42,7 @@ catalog:
   '@types/node': ^26.6.6
   # Pins `vitest` exactly, so it follows the `vitest` entry below.
   '@vitest/browser-playwright': 5.1.1
-  bits-ui: ^2.21.0
+  bits-ui: ^2.22.0
   daisyui: ^5.8.2
   # Exact: each release expects one Chromium revision. 1.56.1–1.59.x hang
   # extracting the browser on Node >= 26.1.0.
