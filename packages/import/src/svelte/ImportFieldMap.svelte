@@ -7,12 +7,10 @@ The import's field map: one row per target field, each choosing the source colum
   sample of the values the chosen column holds. The choices are pre-filled
   from `suggestMapping` and marked as suggestions until the user picks a
   column themselves. A column may feed more than one field, and the columns
-  no field reads are listed, so it is visible what the import drops. A
-  checkbox says whether the first row is the header; until slice 4's read
-  options land, it is the one read option, because a CSV whose columns are
-  all text gives the reader no reason to guess it.
+  no field reads are listed, so it is visible what the import drops. The
+  table is read as `read` says, which `ImportReadOptions` sets.
 
-  `choices` and `read` are bindable. A required field with no column is an
+  `choices` is bindable. A required field with no column is an
   error only once `showErrors` is set (the mapper sets it when the user
   tries to go on), so the step does not open on a wall of errors.
 
@@ -22,7 +20,7 @@ The import's field map: one row per target field, each choosing the source colum
   polite `role="status"` region, so a change is announced.
 -->
 <script lang="ts" generics="S extends ServiceFreeTarget">
-  import { Checkbox, FormField, Select } from '@thomasfosterau/components';
+  import { FormField, Select } from '@thomasfosterau/components';
   import {
     sourceTableFromRegion,
     suggestMapping,
@@ -47,7 +45,7 @@ The import's field map: one row per target field, each choosing the source colum
     target: ImportTarget<S>;
     /** The table to map: the source step's chosen table. */
     table: TableRegion;
-    /** Where the header is and how many rows are skipped. Bindable. */
+    /** Where the header is and how many rows are skipped, as the read options step set them. */
     read: SourceRead;
     /** Each target field's column, keyed by field. Bindable; seeded from the suggestions. */
     choices?: FieldChoices | undefined;
@@ -61,11 +59,6 @@ The import's field map: one row per target field, each choosing the source colum
      * @defaultValue `3`
      */
     sampleSize?: number | undefined;
-    /**
-     * The header checkbox's label.
-     * @defaultValue `'The first row is the header'`
-     */
-    headerRowLabel?: string | undefined;
     /**
      * The column picker's choice for no column.
      * @defaultValue `'Don’t import'`
@@ -111,11 +104,10 @@ The import's field map: one row per target field, each choosing the source colum
   let {
     target,
     table,
-    read = $bindable(),
+    read,
     choices = $bindable({}),
     showErrors = false,
     sampleSize = 3,
-    headerRowLabel = 'The first row is the header',
     notMappedLabel = 'Don’t import',
     columnLabel = (position) => `Column ${position}`,
     suggestedLabel = 'Suggested from the column headers.',
@@ -152,11 +144,6 @@ The import's field map: one row per target field, each choosing the source colum
       untrack(() => choices),
     );
   });
-
-  const hasHeader = $derived(read.headerRow !== undefined);
-  const setHeader = (on: boolean): void => {
-    read = on ? { headerRow: 0, skipRows: read.skipRows } : { skipRows: read.skipRows };
-  };
 
   const cellText = (cell: SourceCell): string => {
     if (cell === undefined) return '';
@@ -195,8 +182,6 @@ The import's field map: one row per target field, each choosing the source colum
 </script>
 
 <div {...rest} class={['flex flex-col gap-4', className]}>
-  <Checkbox label={headerRowLabel} checked={hasHeader} onchange={(event) => setHeader(event.currentTarget.checked)} />
-
   {#each target.descriptor.fields as field (field.key)}
     {@const choice = choices[field.key]}
     {@const hint = hintOf(field)}

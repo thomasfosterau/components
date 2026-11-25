@@ -1,23 +1,24 @@
 <!-- @component
-A data import as a guided flow: pick a file, match its columns to the app's fields, and import the records the app's Schema decodes.
+A data import as a guided flow: pick a file, check how it is read, match its columns to the app's fields, and import the records the app's Schema decodes.
 -->
 <!--
-  ImportMapper — its three steps in order: `ImportSource`
-  (pick the file, detect its format, choose a table), `ImportFieldMap`
+  ImportMapper — its four steps in order: `ImportSource`
+  (pick the file, detect its format, choose a table), `ImportReadOptions`
+  (the header row and the rows to skip, previewed live), `ImportFieldMap`
   (match columns to target fields, pre-filled from the headers) and
   `ImportSubmit` (map every row, report issues, hand the records to
-  `onSubmit`). Read options and the review grid are later slices; until
-  then the field map carries the one read option a CSV needs, whether the
-  first row is the header.
+  `onSubmit`). The review grid is a later addition.
 
   A required field with no column blocks going on: the attempt shows each
   such field's error and moves focus to the first of them. Going back keeps
-  every choice; choosing another file or table starts the map again.
+  every choice; choosing another file or table starts the read and the map
+  again. Changing the read keeps the columns the user chose and re-seeds
+  the suggestions from the new headers.
 
   `onSubmit`'s `records` are values of the target's Schema type, so an app's
   `S` flows from `importTarget(schema)` to the records it receives. Each step
   component's own copy can be overridden through `sourceProps`,
-  `fieldMapProps` and `submitProps`.
+  `readOptionsProps`, `fieldMapProps` and `submitProps`.
 
   ARIA contract: the steps are core `Steps`, an ordered list named by
   `label` with `aria-current="step"` on the current one. Each step's panel is
@@ -35,6 +36,7 @@ A data import as a guided flow: pick a file, match its columns to the app's fiel
   import { tick, type ComponentProps } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import ImportFieldMap from './ImportFieldMap.svelte';
+  import ImportReadOptions from './ImportReadOptions.svelte';
   import ImportSource from './ImportSource.svelte';
   import ImportSubmit from './ImportSubmit.svelte';
   import {
@@ -80,6 +82,11 @@ A data import as a guided flow: pick a file, match its columns to the app's fiel
     sourceLabel?: string | undefined;
     /**
      * The second step's name.
+     * @defaultValue `'Check the table'`
+     */
+    readOptionsLabel?: string | undefined;
+    /**
+     * The third step's name.
      * @defaultValue `'Match the columns'`
      */
     fieldMapLabel?: string | undefined;
@@ -100,6 +107,8 @@ A data import as a guided flow: pick a file, match its columns to the app's fiel
     continueLabel?: string | undefined;
     /** Copy and options for the source step; `formats` and `source` are the mapper's. */
     sourceProps?: Omit<ComponentProps<typeof ImportSource>, 'formats' | 'source'> | undefined;
+    /** Copy and options for the read options step; the table and read are the mapper's. */
+    readOptionsProps?: Omit<ComponentProps<typeof ImportReadOptions>, 'table' | 'read'> | undefined;
     /** Copy and options for the field map; the target, table, read and choices are the mapper's. */
     fieldMapProps?:
       | Omit<
@@ -125,11 +134,13 @@ A data import as a guided flow: pick a file, match its columns to the app's fiel
     headingLevel = 2,
     label = 'Import progress',
     sourceLabel = 'Choose a file',
+    readOptionsLabel = 'Check the table',
     fieldMapLabel = 'Match the columns',
     submitLabel = 'Import',
     backLabel = 'Back',
     continueLabel = 'Continue',
     sourceProps,
+    readOptionsProps,
     fieldMapProps,
     submitProps,
     class: className,
@@ -148,10 +159,12 @@ A data import as a guided flow: pick a file, match its columns to the app's fiel
 
   const steps = $derived([
     { id: 'source', label: sourceLabel },
+    { id: 'read', label: readOptionsLabel },
     { id: 'fields', label: fieldMapLabel },
     { id: 'submit', label: submitLabel },
   ]);
-  const titles = $derived([sourceLabel, fieldMapLabel, submitLabel]);
+  const titles = $derived([sourceLabel, readOptionsLabel, fieldMapLabel, submitLabel]);
+  const last = 3;
 
   // A new file or table starts the map again, from the table's own header guess.
   let mappedTable: unknown = undefined;
@@ -176,8 +189,8 @@ A data import as a guided flow: pick a file, match its columns to the app's fiel
   };
 
   const advance = async (): Promise<void> => {
-    if (step === 0) {
-      if (source !== undefined) await goTo(1);
+    if (step < 2) {
+      if (source !== undefined) await goTo(step + 1);
       return;
     }
     if (missingRequired(target, choices).length > 0) {
@@ -186,7 +199,7 @@ A data import as a guided flow: pick a file, match its columns to the app's fiel
       panel?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
       return;
     }
-    await goTo(2);
+    await goTo(last);
   };
 </script>
 
@@ -207,8 +220,10 @@ A data import as a guided flow: pick a file, match its columns to the app's fiel
     {#if step === 0}
       <ImportSource {...sourceProps} {formats} bind:source />
     {:else if step === 1 && source !== undefined}
-      <ImportFieldMap {...fieldMapProps} {target} table={source.table} bind:read bind:choices {showErrors} />
-    {:else if step === 2 && spec !== undefined && table !== undefined}
+      <ImportReadOptions {...readOptionsProps} table={source.table} bind:read />
+    {:else if step === 2 && source !== undefined}
+      <ImportFieldMap {...fieldMapProps} {target} table={source.table} {read} bind:choices {showErrors} />
+    {:else if step === last && spec !== undefined && table !== undefined}
       <ImportSubmit {...submitProps} {target} {spec} {table} {onSubmit} {invalidRows} {maxRows} />
     {/if}
   </section>
@@ -217,7 +232,7 @@ A data import as a guided flow: pick a file, match its columns to the app's fiel
     {#if step > 0}
       <Button type="button" variant="ghost" onclick={() => goTo(step - 1)}>{backLabel}</Button>
     {/if}
-    {#if step < 2}
+    {#if step < last}
       <Button type="button" tone="primary" disabled={step === 0 && source === undefined} onclick={advance}>
         {continueLabel}
       </Button>

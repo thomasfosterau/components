@@ -51,11 +51,9 @@ test('without a header row, the columns are numbered and nothing is suggested', 
     props: {
       target: contactTarget,
       table,
-      read: { headerRow: 0, skipRows: 0 },
+      read: { skipRows: 0 },
     },
   });
-
-  await screen.getByRole('checkbox', { name: 'The first row is the header' }).click();
 
   const name = screen.getByRole('combobox', { name: /^Full name/u });
   await expect.element(name).toHaveValue('');

@@ -216,6 +216,25 @@ export const defaultRead = (region: TableRegion): SourceRead => {
   return isHeaderLike ? { headerRow: 0, skipRows: 0 } : guess;
 };
 
+/**
+ * `read` with its header row on or off. Turned on, a header the read
+ * already placed stays where it is, and otherwise it is the first row kept.
+ */
+export const withHeaderRow = (read: SourceRead, on: boolean): SourceRead =>
+  on ? { headerRow: read.headerRow ?? 0, skipRows: read.skipRows } : { skipRows: read.skipRows };
+
+/** `read` skipping `skipRows` rows, a whole number from 0; an empty or invalid entry is 0. */
+export const withSkipRows = (read: SourceRead, skipRows: number | undefined): SourceRead => {
+  const skip = Option.fromUndefinedOr(skipRows).pipe(
+    Option.filter(Number.isFinite),
+    Option.map((value) => Math.max(0, Math.trunc(value))),
+    Option.getOrElse(() => 0),
+  );
+  return read.headerRow === undefined
+    ? { skipRows: skip }
+    : { headerRow: read.headerRow, skipRows: skip };
+};
+
 /** The choices the suggestions give, keeping every choice the user has confirmed. */
 export const seedChoices = <S extends TargetSchema>(
   target: ImportTarget<S>,
