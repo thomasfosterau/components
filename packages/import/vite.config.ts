@@ -24,7 +24,7 @@ export default defineConfig({
       build: {
         command:
           'vp pack && svelte-package -i src/svelte -o dist/svelte --tsconfig tsconfig.svelte.json',
-        dependsOn: [{ task: 'build', from: 'dependencies' }],
+        dependsOn: [{ task: 'build', from: ['dependencies', 'devDependencies'] }],
         cache: {
           output: ['dist/**'],
         },
@@ -32,7 +32,7 @@ export default defineConfig({
       check: {
         command:
           'tsc -p tsconfig.json && tsc -p tsconfig.pure.json && svelte-check --tsconfig ./tsconfig.svelte.json',
-        dependsOn: [{ task: 'build', from: 'dependencies' }],
+        dependsOn: [{ task: 'build', from: ['dependencies', 'devDependencies'] }],
         cache: {
           input: cacheInputs,
           output: [],
@@ -41,7 +41,7 @@ export default defineConfig({
       'test:unit': {
         command: 'vp test run tests && vp test run --config vite.svelte.config.ts',
         dependsOn: [
-          { task: 'build', from: 'dependencies' },
+          { task: 'build', from: ['dependencies', 'devDependencies'] },
           '@thomasfosterau/monorepo#browser:install',
         ],
         cache: {

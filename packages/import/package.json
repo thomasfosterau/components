@@ -41,15 +41,13 @@
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {
-    "@thomasfosterau/components": "workspace:*"
-  },
   "devDependencies": {
     "@effect/vitest": "catalog:",
     "@storybook/addon-svelte-csf": "catalog:",
     "@storybook/sveltekit": "catalog:",
     "@sveltejs/package": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@thomasfosterau/components": "workspace:*",
     "@thomasfosterau/effect-document": "catalog:",
     "@thomasfosterau/effect-parse": "catalog:",
     "@types/node": "catalog:",
@@ -63,6 +61,7 @@
     "vitest-browser-svelte": "catalog:"
   },
   "peerDependencies": {
+    "@thomasfosterau/components": "workspace:^",
     "@thomasfosterau/effect-document": "catalog:peers",
     "effect": "catalog:peers",
     "svelte": "catalog:peers"

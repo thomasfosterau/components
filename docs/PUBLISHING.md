@@ -6,7 +6,7 @@ Releases use [Changesets](https://github.com/changesets/changesets) and `vp pm p
 
 1. Commit a changeset with each releasable change (`pnpm changeset`).
 2. On every push to `trunk`, [`release.yml`](../.github/workflows/release.yml) opens or updates a "chore: version packages" PR while unreleased changesets exist.
-3. Merging that PR runs the `publish` job in the protected `release` environment, whose only publish step is `vp run release` (a task in the root [`vite.config.ts`](../vite.config.ts)). It builds every package, then `vp pm publish -r --access public --no-git-checks -- --ignore-scripts` packs (rewriting `catalog:` and `workspace:*`) and publishes every public package whose version isn't on npm yet, in dependency order, and `changeset git-tag` tags each new version; the action pushes the tags and creates the GitHub releases. A failed publish stops before tagging, and a re-run publishes only what is missing. There is no publish script.
+3. Merging that PR runs the `publish` job in the protected `release` environment, whose only publish step is `vp run release` (a task in the root [`vite.config.ts`](../vite.config.ts)). It builds every package, then `vp pm publish -r --access public --no-git-checks -- --ignore-scripts` packs (rewriting `catalog:` and `workspace:` specifiers) and publishes every public package whose version isn't on npm yet, in dependency order, and `changeset git-tag` tags each new version; the action pushes the tags and creates the GitHub releases. A failed publish stops before tagging, and a re-run publishes only what is missing. There is no publish script.
 
 `release` depends only on the builds: it runs with `id-token: write`, so nothing in it installs or fetches packages.
 

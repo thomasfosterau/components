@@ -35,9 +35,6 @@
       "default": "./dist/index.js"
     }
   },
-  "dependencies": {
-    "@thomasfosterau/components": "workspace:*"
-  },
   "devDependencies": {
     "@storybook/addon-svelte-csf": "catalog:",
     "@storybook/sveltekit": "catalog:",
@@ -45,6 +42,7 @@
     "@sveltejs/package": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@testing-library/jest-dom": "catalog:",
+    "@thomasfosterau/components": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "mapbox-gl": "catalog:",
@@ -55,6 +53,7 @@
     "vitest-browser-svelte": "catalog:"
   },
   "peerDependencies": {
+    "@thomasfosterau/components": "workspace:^",
     "mapbox-gl": "catalog:",
     "svelte": "catalog:peers"
   }

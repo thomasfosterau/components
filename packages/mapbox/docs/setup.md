@@ -12,7 +12,7 @@ pnpm add @thomasfosterau/components-mapbox @thomasfosterau/components mapbox-gl
 | --- | --- | --- |
 | `mapbox-gl` | `^3.33.0`, **required** | The engine `DynamicMap` (and therefore `Map`) renders with. It is reached only through a dynamic `import()` inside `DynamicMap`'s mount effect, so it lands in the chunk for the route that renders a live map and nowhere else. |
 | `svelte` | `^5.40.0` | A declared peer. The components are compiled by your build, not pre-compiled. |
-| `@thomasfosterau/components` | the exact version released alongside it | A runtime dependency, not a peer (installed with this package): `MapEditor` is built on its `/canvas` entry point. |
+| `@thomasfosterau/components` | the minor released alongside it (`^0.x.0`), **required** | A peer, so the map shares your app's copy and its context (`getComponentsContext()`): `MapEditor` is built on its `/canvas` entry point. |
 | `tailwindcss` | `^4.0.0` | Not a declared peer, but **required**: the components emit Tailwind classes and ship none. |
 | `daisyui` | `^5.0.0` | Same: the class vocabulary is daisyUI's (`bg-neutral`, `text-base-content`, `rounded-box`). |
 

@@ -1,5 +1,6 @@
 # Every external version lives here; package.json files use only `catalog:`,
-# `catalog:peers`, `catalog:published` or `workspace:*`.
+# `catalog:peers`, `catalog:published` or `workspace:*` (`workspace:^` for a
+# companion package's peer on @thomasfosterau/components).
 packages:
   - packages/*
 

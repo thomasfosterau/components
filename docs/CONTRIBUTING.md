@@ -13,7 +13,7 @@
 
 [Vite+](https://viteplus.dev) (`vp`) manages Node, pnpm and every tool. Use `vp` rather than `pnpm`/`npx` (`vp exec <bin>`, `vp run <task>`); the exception is `pnpm changeset`. The release runs `vp run release` (`vp pm publish -r`, then `changeset git-tag`); `vp run release:dry-run` shows what it would publish.
 
-- Every external version lives in the `pnpm-workspace.yaml` catalog; a `package.json` names only `catalog:`, `catalog:peers` or `workspace:*`. After editing the catalog, run `vp install` and commit `pnpm-lock.yaml`.
+- Every external version lives in the `pnpm-workspace.yaml` catalog; a `package.json` names only `catalog:`, `catalog:peers` or `workspace:*`, except that a companion package takes `@thomasfosterau/components` as a `workspace:^` peer (and a `workspace:*` dev dependency) so apps keep one copy and one context. After editing the catalog, run `vp install` and commit `pnpm-lock.yaml`.
 - `vp install` also patches `tsc`/oxlint with `@effect/tsgo`.
 - The browser suites need the exact Chromium the pinned `playwright` expects. Their tasks depend on the root `browser:install` task, which installs it on first use; set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use a Chromium you already have instead.
 - `vp install` also installs the git hooks: pre-commit runs `vp staged` (format and lint the staged files), then `vp run fallow:audit`.
