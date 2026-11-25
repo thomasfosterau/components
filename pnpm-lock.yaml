@@ -270,8 +270,8 @@ catalogs:
       specifier: ^1.25.13
       version: 1.25.13
     prosemirror-view:
-      specifier: ^1.43.0
-      version: 1.43.0
+      specifier: ^1.43.1
+      version: 1.43.1
     storybook:
       specifier: ^10.6.8
       version: 10.6.8
@@ -393,7 +393,7 @@ importers:
         version: 1.25.13
       prosemirror-view:
         specifier: 'catalog:'
-        version: 1.43.0
+        version: 1.43.1
       svelte:
         specifier: ^5.59.1
         version: 5.59.1
@@ -3066,8 +3066,8 @@ packages:
   prosemirror-transform@1.12.2:
     resolution: {integrity: sha512-PE/aY0HEY4zczvmqrilgkUK/WautF0chvMqkmM/iN5/aPHvwrCWaQZjS6CIZp+K84YrvPFqrL+YArrfJX8xX7g==}
 
-  prosemirror-view@1.43.0:
-    resolution: {integrity: sha512-MZOUuhD+Gv7Cp7UlgvyhptUfb920NkLBgymhyhaM8xp+JXQyLhkssS2EXZvMI3ZU3vRoz5z7mRC32udVgNYHqg==}
+  prosemirror-view@1.43.1:
+    resolution: {integrity: sha512-rInvs6bSncGi5ns8FfHdmSlqAg8u+fFwmwME6xx9zxnMgq4evMiiswqvam7LnOPLrMNjhw6ax542LWLIXDH1EA==}
 
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
@@ -5566,13 +5566,13 @@ snapshots:
     dependencies:
       prosemirror-model: 1.25.13
       prosemirror-transform: 1.12.2
-      prosemirror-view: 1.43.0
+      prosemirror-view: 1.43.1
 
   prosemirror-transform@1.12.2:
     dependencies:
       prosemirror-model: 1.25.13
 
-  prosemirror-view@1.43.0:
+  prosemirror-view@1.43.1:
     dependencies:
       prosemirror-model: 1.25.13
       prosemirror-state: 1.4.4
