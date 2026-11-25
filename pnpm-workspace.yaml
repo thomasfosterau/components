@@ -56,7 +56,7 @@ catalog:
   # vite-plus pins oxlint, oxfmt and vitest exactly: `vitest`, `@vitest/*` and
   # the `vite` alias follow what it depends on (the alias no longer shares the
   # vite-plus version).
-  vite-plus: 1.7.0
+  vite-plus: 1.8.0
   vite: npm:@voidzero-dev/vite-plus-core@8.3.8000
   vitest: 5.1.1
   '@vitest/coverage-istanbul': 5.1.1
