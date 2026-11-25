@@ -83,6 +83,7 @@ A modal on bits-ui’s `Dialog`, wearing daisyUI’s `modal-box`.
   }: Props = $props();
 </script>
 
+<!-- daisyUI only shows a `modal-box` inside an open `.modal`; the portalled content has none, so it opens itself, fading in from `@starting-style` and out on close. -->
 <DialogFrame
   bind:open
   {title}
@@ -96,6 +97,7 @@ A modal on bits-ui’s `Dialog`, wearing daisyUI’s `modal-box`.
   layout="modal"
   contentClass={[
     'modal-box fixed top-1/2 left-1/2 z-50 max-h-[calc(100svh-2rem)] w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2',
+    'data-[state=open]:scale-100 data-[state=open]:opacity-100 starting:data-[state=open]:scale-95 starting:data-[state=open]:opacity-0',
     dialogSize[size],
     className,
   ]}
