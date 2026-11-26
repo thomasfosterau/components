@@ -5,7 +5,8 @@ The import's first step: pick a file, detect its format among the ones the app a
   ImportSource — a `FileInput` for the user's file, then `detect` over the
   formats the app passes. The most likely format is chosen and shown with the
   sniffer's evidence; when more than one format fits, a `Select` lets the user
-  override it. The file is read with the chosen format's reader, and when it
+  override it. The file is read with the chosen format's reader (its
+  `readerWith` with the default choice, when it has one), and when it
   holds several tables (several sheets, several tables in a document) a second
   `Select` picks one. Nothing matching, a failed read and a file with no table
   are each a clear error rather than an empty step.
@@ -23,8 +24,9 @@ The import's first step: pick a file, detect its format among the ones the app a
   import type { HTMLAttributes } from 'svelte/elements';
   import {
     acceptOf,
+    defaultReaderChoice,
     detectFile,
-    readTables,
+    readFile,
     StepError,
     type DetectedFormat,
     type ImportFile,
@@ -175,7 +177,8 @@ The import's first step: pick a file, detect its format among the ones the app a
   ): Promise<void> => {
     const name = nameOf(candidate.format);
     try {
-      const tables = await readTables(chosenFile, candidate.format, signal);
+      const reader = candidate.format.readerWith === undefined ? undefined : defaultReaderChoice;
+      const { tables, encoding } = await readFile(chosenFile, candidate.format, { reader, signal });
       if (signal.aborted) return;
       const [first] = tables;
       if (first === undefined) {
@@ -183,7 +186,15 @@ The import's first step: pick a file, detect its format among the ones the app a
         return;
       }
       error = undefined;
-      setSource({ file: chosenFile, candidates: found, format: candidate.format, tables, table: first });
+      setSource({
+        file: chosenFile,
+        candidates: found,
+        format: candidate.format,
+        tables,
+        table: first,
+        reader,
+        encoding,
+      });
       status = detectedMessage(name, tables.length);
     } catch (cause) {
       if (signal.aborted) return;

@@ -4,7 +4,8 @@ A data import as a guided flow: pick a file, check how it is read, match its col
 <!--
   ImportMapper — its four steps in order: `ImportSource`
   (pick the file, detect its format, choose a table), `ImportReadOptions`
-  (the header row and the rows to skip, previewed live), `ImportFieldMap`
+  (the header row and the rows to skip, and a `readerWith` format's reader
+  options, previewed live), `ImportFieldMap`
   (match columns to target fields, pre-filled from the headers) and
   `ImportSubmit` (map every row, report issues, hand the records to
   `onSubmit`). The review grid is a later addition.
@@ -13,7 +14,10 @@ A data import as a guided flow: pick a file, check how it is read, match its col
   such field's error and moves focus to the first of them. Going back keeps
   every choice; choosing another file or table starts the read and the map
   again. Changing the read keeps the columns the user chose and re-seeds
-  the suggestions from the new headers.
+  the suggestions from the new headers. Changing the reader options reads
+  the whole file again with them on going on, keeping the header row and
+  skipped rows but starting the map again, as the columns may have moved;
+  a read that fails keeps the user on the step with its reason.
 
   `onSubmit`'s `records` are values of the target's Schema type, so an app's
   `S` flows from `importTarget(schema)` to the records it receives. Each step
@@ -27,7 +31,7 @@ A data import as a guided flow: pick a file, check how it is read, match its col
   are announced through each step's polite status region.
 -->
 <script lang="ts" generics="S extends ServiceFreeTarget">
-  import { Button, Steps } from '@thomasfosterau/components';
+  import { Alert, Button, Steps } from '@thomasfosterau/components';
   import {
     sourceTableFromRegion,
     type ImportTarget,
@@ -41,8 +45,13 @@ A data import as a guided flow: pick a file, check how it is read, match its col
   import ImportSubmit from './ImportSubmit.svelte';
   import {
     defaultRead,
+    defaultReaderChoice,
     missingRequired,
+    readFile,
+    sameReaderChoice,
     specFor,
+    StepError,
+    type ReaderChoice,
     type FieldChoices,
     type ServiceFreeTarget,
     type ImportFile,
@@ -65,6 +74,11 @@ A data import as a guided flow: pick a file, check how it is read, match its col
     invalidRows?: InvalidRowPolicy | undefined;
     /** The most rows an import takes; a larger table is refused. Omitted, there is no cap. */
     maxRows?: number | undefined;
+    /**
+     * The most records the read options step's preview read takes, for a format with a `readerWith`.
+     * @defaultValue `200`
+     */
+    previewRows?: number | undefined;
     /**
      * The heading level of each step's title.
      * @defaultValue `2`
@@ -105,10 +119,25 @@ A data import as a guided flow: pick a file, check how it is read, match its col
      * @defaultValue `'Continue'`
      */
     continueLabel?: string | undefined;
+    /**
+     * Shown when reading the whole file with the chosen reader options fails, with its reason after it.
+     * @defaultValue `'The file could not be read with these options.'`
+     */
+    readFailedMessage?: string | undefined;
+    /**
+     * Shown when the chosen reader options leave the file without its table.
+     * @defaultValue `'With these options, the file has no table to import.'`
+     */
+    noTableMessage?: string | undefined;
     /** Copy and options for the source step; `formats` and `source` are the mapper's. */
     sourceProps?: Omit<ComponentProps<typeof ImportSource>, 'formats' | 'source'> | undefined;
-    /** Copy and options for the read options step; the table and read are the mapper's. */
-    readOptionsProps?: Omit<ComponentProps<typeof ImportReadOptions>, 'table' | 'read'> | undefined;
+    /** Copy and options for the read options step; the table, file and how they are read are the mapper's. */
+    readOptionsProps?:
+      | Omit<
+          ComponentProps<typeof ImportReadOptions>,
+          'table' | 'read' | 'source' | 'reader' | 'previewRows'
+        >
+      | undefined;
     /** Copy and options for the field map; the target, table, read and choices are the mapper's. */
     fieldMapProps?:
       | Omit<
@@ -131,6 +160,7 @@ A data import as a guided flow: pick a file, check how it is read, match its col
     onSubmit,
     invalidRows = 'block',
     maxRows,
+    previewRows = 200,
     headingLevel = 2,
     label = 'Import progress',
     sourceLabel = 'Choose a file',
@@ -139,6 +169,8 @@ A data import as a guided flow: pick a file, check how it is read, match its col
     submitLabel = 'Import',
     backLabel = 'Back',
     continueLabel = 'Continue',
+    readFailedMessage = 'The file could not be read with these options.',
+    noTableMessage = 'With these options, the file has no table to import.',
     sourceProps,
     readOptionsProps,
     fieldMapProps,
@@ -152,6 +184,10 @@ A data import as a guided flow: pick a file, check how it is read, match its col
   let step = $state(0);
   let source = $state.raw<ImportFile | undefined>(undefined);
   let read = $state.raw<SourceRead>({ skipRows: 0 });
+  let reader = $state.raw<ReaderChoice>(defaultReaderChoice);
+  let readError = $state<string | undefined>(undefined);
+  let busy = $state(false);
+  let controller: AbortController | undefined;
   let choices = $state.raw<FieldChoices>({});
   let showErrors = $state(false);
   let heading = $state<HTMLElement | undefined>(undefined);
@@ -173,9 +209,48 @@ A data import as a guided flow: pick a file, check how it is read, match its col
     if (table === mappedTable) return;
     mappedTable = table;
     read = table === undefined ? { skipRows: 0 } : defaultRead(table);
+    reader = source?.reader ?? defaultReaderChoice;
+    readError = undefined;
     choices = {};
     showErrors = false;
   });
+
+  $effect(() => () => controller?.abort());
+
+  /**
+   * Reads the whole file again with the chosen reader options, keeping the
+   * read but not the choices, as the columns may have moved. Whether the
+   * step can go on.
+   */
+  const reread = async (file: ImportFile, choice: ReaderChoice): Promise<boolean> => {
+    controller?.abort();
+    controller = new AbortController();
+    const signal = controller.signal;
+    busy = true;
+    readError = undefined;
+    try {
+      const { tables, encoding } = await readFile(file.file, file.format, { reader: choice, signal });
+      if (signal.aborted) return false;
+      const next = tables[file.tables.indexOf(file.table)] ?? tables[0];
+      if (next === undefined) {
+        readError = noTableMessage;
+        return false;
+      }
+      // Marked as seen first, so the new table keeps the user's read.
+      mappedTable = next;
+      source = { ...file, tables, table: next, reader: choice, encoding };
+      choices = {};
+      showErrors = false;
+      return true;
+    } catch (cause) {
+      if (signal.aborted) return false;
+      const detail = cause instanceof StepError ? ` ${cause.message}` : '';
+      readError = `${readFailedMessage}${detail}`;
+      return false;
+    } finally {
+      if (!signal.aborted) busy = false;
+    }
+  };
 
   const table = $derived(source === undefined ? undefined : sourceTableFromRegion(source.table, read));
   const spec = $derived(
@@ -190,7 +265,13 @@ A data import as a guided flow: pick a file, check how it is read, match its col
 
   const advance = async (): Promise<void> => {
     if (step < 2) {
-      if (source !== undefined) await goTo(step + 1);
+      if (source === undefined) return;
+      const changed =
+        step === 1 &&
+        source.format.readerWith !== undefined &&
+        !sameReaderChoice(reader, source.reader);
+      if (changed && !(await reread(source, reader))) return;
+      await goTo(step + 1);
       return;
     }
     if (missingRequired(target, choices).length > 0) {
@@ -220,7 +301,17 @@ A data import as a guided flow: pick a file, check how it is read, match its col
     {#if step === 0}
       <ImportSource {...sourceProps} {formats} bind:source />
     {:else if step === 1 && source !== undefined}
-      <ImportReadOptions {...readOptionsProps} table={source.table} bind:read />
+      <ImportReadOptions
+        {...readOptionsProps}
+        table={source.table}
+        {source}
+        {previewRows}
+        bind:read
+        bind:reader
+      />
+      {#if readError !== undefined}
+        <Alert tone="error" live="assertive">{readError}</Alert>
+      {/if}
     {:else if step === 2 && source !== undefined}
       <ImportFieldMap {...fieldMapProps} {target} table={source.table} {read} bind:choices {showErrors} />
     {:else if step === last && spec !== undefined && table !== undefined}
@@ -233,7 +324,12 @@ A data import as a guided flow: pick a file, check how it is read, match its col
       <Button type="button" variant="ghost" onclick={() => goTo(step - 1)}>{backLabel}</Button>
     {/if}
     {#if step < last}
-      <Button type="button" tone="primary" disabled={step === 0 && source === undefined} onclick={advance}>
+      <Button
+        type="button"
+        tone="primary"
+        disabled={(step === 0 && source === undefined) || busy}
+        onclick={advance}
+      >
         {continueLabel}
       </Button>
     {/if}

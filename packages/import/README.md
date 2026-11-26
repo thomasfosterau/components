@@ -10,7 +10,7 @@ The `.` entry is the headless core: the target descriptor, the spec, the mapping
 pnpm add @thomasfosterau/components-import @thomasfosterau/components @thomasfosterau/effect-document effect
 ```
 
-The package is ESM-only. `effect` (`^4.0.0`), `@thomasfosterau/effect-document` (`^0.2.0`) and `@thomasfosterau/components` (the minor released alongside) are required peers, and `svelte` (`^5.40.0`) is one for the `./svelte` entry. This package loads no reader of effect-document's, so its readers' optional peer `@thomasfosterau/effect-parse` is yours to add when you import one such as `/csv` (`pnpm add @thomasfosterau/effect-parse`). The UI's styles are `@thomasfosterau/components`' daisyUI classes; set that package up as its README says.
+The package is ESM-only. `effect` (`^4.0.0`), `@thomasfosterau/effect-document` (`^0.3.0`) and `@thomasfosterau/components` (the minor released alongside) are required peers, and `svelte` (`^5.40.0`) is one for the `./svelte` entry. This package loads no reader of effect-document's, so its readers' optional peer `@thomasfosterau/effect-parse` is yours to add when you import one such as `/csv` (`pnpm add @thomasfosterau/effect-parse`). The UI's styles are `@thomasfosterau/components`' daisyUI classes; set that package up as its README says.
 
 ## Example
 
@@ -99,6 +99,30 @@ const program = Effect.gen(function* () {
 ```
 
 The formats you pass are the ones the file is detected among, and the only readers loaded; a workbook with several sheets lets the user pick one. The user then checks how the table is read: whether its first row is the header, and how many rows above it to skip (a title, a note), with a live preview of the first rows. The columns are matched to the fields from the headers (a field's key, title or `importAliases`) and the user confirms or changes each one. `invalidRows` decides what rows the Schema rejects do: `'block'` (the default) refuses the import while any remain, `'exclude'` leaves them out, `'allow'` passes them on in `result.invalid`. `result.spec` is the mapping as JSON, to store as a preset or replay on the server. `ImportSource`, `ImportReadOptions`, `ImportFieldMap` and `ImportSubmit` are the steps, for laying the flow out yourself.
+
+### Reader options
+
+A format can bring a reader factory, `readerWith`, and the read options step then offers that format's reader options too: the text encoding (detected by default), the separator (the format's own, a comma, a semicolon or a tab), the quote, whether rows may have different numbers of fields (on by default, so a title line narrower than the table reads), and whether numbers and true or false values are read as such. Each change re-reads the file for the preview, at most `previewRows` records (200 by default); the whole file is read with the options when the user goes on. `result.spec.source` records the encoding and the reader options, so a server can read the file the same way.
+
+```svelte
+<script lang="ts">
+  import * as Csv from '@thomasfosterau/effect-document/csv';
+
+  const formats = [
+    { ...Csv.format, readerWith: Csv.makeCsvReader },
+    // TSV's factory starts from the tab dialect, so its own separator stays a tab.
+    {
+      ...Csv.tsvFormat,
+      readerWith: (options: Csv.CsvReaderOptions) =>
+        Csv.makeCsvReader({ dialect: Csv.TsvDialect, ...options }),
+    },
+  ];
+</script>
+
+<ImportMapper {target} {formats} onSubmit={save} />
+```
+
+The factory takes `ImportReaderOptions`, the subset of effect-document's `CsvReaderOptions` the step sets (`dialect`, `allowVariableColumns`, `inferTypes`, `maxRows`), so it is meant for delimited text formats. A format without one reads as before, with its `reader` and no reader options.
 
 ## Entry points
 
