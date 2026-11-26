@@ -28,7 +28,7 @@ catalog:
   d3-shape: ^3.2.1
   happy-dom: ^21.0.4
   prosemirror-model: ^1.25.13
-  prosemirror-view: ^1.43.1
+  prosemirror-view: ^1.44.0
   vega: ^6.2.0
   vega-lite: ^6.4.3
   '@storybook/addon-a11y': ^10.6.8
