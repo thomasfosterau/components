@@ -4,6 +4,18 @@ const SAFE_SCHEMES: ReadonlySet<string> = new Set(['http', 'https', 'mailto', 't
 /** A URL scheme as the URL parser reads one: a letter, then letters, digits, `+`, `-` or `.`, then `:`. */
 const SCHEME = /^([a-z][a-z0-9+.-]*):/i;
 
+/** Whether the character at `index` is a C0 control or a space, which the URL parser trims from both ends. */
+const trimmed = (text: string, index: number): boolean => text.charCodeAt(index) <= 0x20;
+
+/** `text` without leading or trailing C0 controls and spaces. */
+function stripEnds(text: string): string {
+  let start = 0;
+  let end = text.length;
+  while (start < end && trimmed(text, start)) start += 1;
+  while (end > start && trimmed(text, end - 1)) end -= 1;
+  return text.slice(start, end);
+}
+
 /**
  * `value`, cleaned the way a browser cleans an `href`, when it is safe to
  * render from caller data; `undefined` otherwise.
@@ -16,8 +28,7 @@ const SCHEME = /^([a-z][a-z0-9+.-]*):/i;
  */
 export function safeHref(value: string | undefined): string | undefined {
   if (value === undefined) return undefined;
-  // oxlint-disable-next-line no-control-regex -- these are the characters the URL parser strips.
-  const cleaned = value.replaceAll(/[\t\n\r]/g, '').replaceAll(/^[\u0000- ]+|[\u0000- ]+$/g, '');
+  const cleaned = stripEnds(value.replaceAll(/[\t\n\r]/g, ''));
   const scheme = SCHEME.exec(cleaned)?.[1];
   return scheme === undefined || SAFE_SCHEMES.has(scheme.toLowerCase()) ? cleaned : undefined;
 }
