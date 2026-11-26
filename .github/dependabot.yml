@@ -54,6 +54,41 @@ updates:
         patterns:
           - 'tailwindcss'
           - '@tailwindcss/*'
+          - 'daisyui'
+      # Own packages release often and are 0.x (a minor can break): kept apart
+      # so one doesn't hold up unrelated updates.
+      thomasfosterau:
+        applies-to: version-updates
+        patterns:
+          - '@thomasfosterau/*'
+      ui:
+        applies-to: version-updates
+        patterns:
+          - 'bits-ui'
+          - '@lucide/svelte'
+          - '@internationalized/date'
+          - 'esm-env'
+      charts:
+        applies-to: version-updates
+        patterns:
+          - 'd3-*'
+          - '@types/d3-*'
+          - 'vega'
+          - 'vega-lite'
+          - 'prosemirror-*'
+      lint:
+        applies-to: version-updates
+        patterns:
+          - 'fallow'
+          - '@enfect/oxlint'
+      # Everything else, minor and patch only; majors still get their own PR.
+      other:
+        applies-to: version-updates
+        patterns:
+          - '*'
+        update-types:
+          - 'minor'
+          - 'patch'
     assignees:
       - thomasfosterau
 
@@ -68,6 +103,14 @@ updates:
       prefix: 'chore'
     cooldown:
       default-days: 1
+    groups:
+      actions:
+        applies-to: version-updates
+        patterns:
+          - '*'
+        update-types:
+          - 'minor'
+          - 'patch'
     assignees:
       - thomasfosterau
 
