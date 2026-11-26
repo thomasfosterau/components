@@ -23,6 +23,7 @@ import {
   type ImportSpec,
   type ImportTarget,
   type RowIssue,
+  type SourceCell,
   type SourceRead,
   type SourceTable,
   type TargetSchema,
@@ -277,6 +278,12 @@ export const unusedColumns = (width: number, choices: FieldChoices): ReadonlyArr
     Array.from({ length: width }, (_, index) => index),
     (index) => !Arr.contains(used, index),
   );
+};
+
+/** A cell as the UI shows it: its text, a `Date` as ISO 8601, nothing for an empty or invalid one. */
+export const cellDisplay = (cell: SourceCell): string => {
+  if (P.isDate(cell)) return Number.isNaN(cell.getTime()) ? '' : cell.toISOString();
+  return cell === undefined ? '' : String(cell);
 };
 
 /** How many columns the table has: its header's width, or its widest row. */

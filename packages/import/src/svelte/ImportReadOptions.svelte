@@ -24,13 +24,12 @@ The import's read options: whether the table has a header row and how many rows 
   import { Checkbox, FormField, NumberField, Table } from '@thomasfosterau/components';
   import {
     sourceTableFromRegion,
-    type SourceCell,
     type SourceRead,
     type SourceRow,
   } from '@thomasfosterau/components-import';
   import type { TableRegion } from '@thomasfosterau/effect-document/schema';
   import type { HTMLAttributes } from 'svelte/elements';
-  import { columnCount, withHeaderRow, withSkipRows } from './session.ts';
+  import { cellDisplay, columnCount, withHeaderRow, withSkipRows } from './session.ts';
 
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
     /** The table to read: the source step's chosen table. */
@@ -106,12 +105,6 @@ The import's read options: whether the table has a header row and how many rows 
   const source = $derived(sourceTableFromRegion(table, read));
   const preview = $derived(source.rows.slice(0, previewSize));
 
-  const cellText = (cell: SourceCell): string => {
-    if (cell === undefined) return '';
-    if (cell instanceof Date) return Number.isNaN(cell.getTime()) ? '' : cell.toISOString();
-    return String(cell);
-  };
-
   const columns = $derived([
     {
       key: 'row',
@@ -125,7 +118,7 @@ The import's read options: whether the table has a header row and how many rows 
       return {
         key: `column-${index}`,
         header: header === '' ? columnLabel(index + 1) : header,
-        value: (row: SourceRow) => cellText(row.cells[index]),
+        value: (row: SourceRow) => cellDisplay(row.cells[index]),
       };
     }),
   ]);

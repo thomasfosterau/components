@@ -26,13 +26,13 @@ The import's field map: one row per target field, each choosing the source colum
     suggestMapping,
     type FieldDescriptor,
     type ImportTarget,
-    type SourceCell,
     type SourceRead,
   } from '@thomasfosterau/components-import';
   import type { TableRegion } from '@thomasfosterau/effect-document/schema';
   import { untrack } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import {
+    cellDisplay,
     columnCount,
     seedChoices,
     unusedColumns,
@@ -145,16 +145,10 @@ The import's field map: one row per target field, each choosing the source colum
     );
   });
 
-  const cellText = (cell: SourceCell): string => {
-    if (cell === undefined) return '';
-    if (cell instanceof Date) return Number.isNaN(cell.getTime()) ? '' : cell.toISOString();
-    return String(cell).trim();
-  };
-
   const sampleOf = (column: number): readonly string[] =>
     source.rows
       .slice(0, sampleSize)
-      .map((row) => cellText(row.cells[column]))
+      .map((row) => cellDisplay(row.cells[column]).trim())
       .filter((text) => text !== '');
 
   const hintOf = (field: FieldDescriptor): string => {
