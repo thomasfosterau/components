@@ -25,6 +25,11 @@
 </script>
 
 <script lang="ts">
+  const manyItems: readonly TabItem[] = Array.from({ length: 12 }, (_, i) => ({
+    value: `section-${i + 1}`,
+    label: `Section number ${i + 1}`,
+  }));
+
   let selected = $state('tcp');
 </script>
 
@@ -42,6 +47,14 @@
       {#snippet panel(item)}<p class="leading-7">{item.label}</p>{/snippet}
     </Tabs>
     <p class="text-base-content/70 text-sm">Bound value: <code>{selected}</code></p>
+  </div>
+</Story>
+
+<Story name="Panels, scroll buttons" asChild>
+  <div class="max-w-sm">
+    <Tabs items={manyItems} label="Sections" scrollButtons>
+      {#snippet panel(item)}<p class="leading-7">{item.label}</p>{/snippet}
+    </Tabs>
   </div>
 </Story>
 
