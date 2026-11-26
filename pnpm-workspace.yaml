@@ -58,7 +58,7 @@ catalog:
   # the `vite` alias follow what it depends on (the alias no longer shares the
   # vite-plus version).
   vite-plus: 1.8.0
-  vite: npm:@voidzero-dev/vite-plus-core@8.3.8000
+  vite: npm:@voidzero-dev/vite-plus-core@8.3.8001
   vitest: 5.1.1
   '@vitest/coverage-istanbul': 5.1.1
   # `effect-tsgo patch` (the root `prepare`) supports only the TypeScript,
@@ -114,18 +114,16 @@ permissions:
 skills:
   dirs: [.claude/skills]
 
-# Storybook's peer ranges lag the toolchain; the overrides above force one copy.
+# storybook's `vite-plus` peer range (^0.1 || ^0.2) predates Vite+ 1.x.
 peerDependencyRules:
-  allowAny:
-    - vite-plus
-    - vitest
-    - '@sveltejs/kit'
   allowedVersions:
     vite-plus: '*'
-    vitest: '*'
-    '@sveltejs/kit': '*'
 
 # Minutes: hold new third-party releases for 24 hours.
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - '@thomasfosterau/*'
+# Vite+ selects Node.js (.node-version) and pnpm (packageManager); pnpm
+# must not download or switch to its own.
+runtimeOnFail: ignore
+pmOnFail: ignore
