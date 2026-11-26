@@ -2,7 +2,7 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import ImportMapper from '../svelte/ImportMapper.svelte';
   import type { ImportResult } from '../svelte/index.ts';
-  import { contactTarget, formats, pretendToSave } from './demo.ts';
+  import { contactTarget, formats, pretendToSave, workbookFormats } from './demo.ts';
 
   const { Story } = defineMeta({
     title: 'Import/ImportMapper',
@@ -29,4 +29,8 @@
 
 <Story name="Rows with issues left out" asChild>
   <ImportMapper target={contactTarget} {formats} onSubmit={saveContacts} invalidRows="exclude" />
+</Story>
+
+<Story name="CSV or a sheet of an Excel workbook" asChild>
+  <ImportMapper target={contactTarget} formats={workbookFormats} onSubmit={saveContacts} />
 </Story>

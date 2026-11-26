@@ -35,8 +35,10 @@ export default defineConfig({
   // configs say the same).
   optimizeDeps: {
     include: [
+      '@thomasfosterau/components > @lucide/svelte',
       '@thomasfosterau/effect-document',
       '@thomasfosterau/effect-document/csv',
+      '@thomasfosterau/effect-document/ooxml',
       '@thomasfosterau/effect-document/schema',
       'effect',
       'svelte',

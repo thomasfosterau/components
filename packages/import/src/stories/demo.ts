@@ -7,6 +7,7 @@ import {
 } from '@thomasfosterau/components-import';
 import { text } from '@thomasfosterau/effect-document';
 import * as Csv from '@thomasfosterau/effect-document/csv';
+import { Xlsx } from '@thomasfosterau/effect-document/ooxml';
 import { candidateTables, type TableRegion } from '@thomasfosterau/effect-document/schema';
 import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
@@ -27,6 +28,9 @@ export const contactTarget = Effect.runSync(importTarget(Contact));
 /** The formats the stories accept: CSV and TSV. */
 export const formats = [Csv.format, Csv.tsvFormat];
 
+/** The formats with Excel workbooks too, for a story that takes a sheet of one. */
+export const workbookFormats = [...formats, Xlsx.format];
+
 /** A CSV to try the stories with; one row's email has no `@`. */
 const sampleCsv =
   'Name,E-mail,Plan,Notes\nAda Lovelace,ada@example.com,pro,first\nNia,not-an-email,free,\nLin,lin@example.com,free,\n';
@@ -41,6 +45,11 @@ export const regionOf = (csv: string): TableRegion => {
 
 /** The one table of `sampleCsv`. */
 export const sampleRegion = regionOf(sampleCsv);
+
+/** A CSV whose table starts under a title line, for the read options. */
+export const titledRegion = regionOf(
+  'Contacts exported on 1 May,,\nName,E-mail,Plan\nAda Lovelace,ada@example.com,pro\nLin,lin@example.com,free\n',
+);
 
 /** `sampleCsv` as a table, read with its header. */
 export const sampleTable = sourceTableFromGrid(

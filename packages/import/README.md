@@ -2,7 +2,7 @@
 
 A data import mapper: take a table a user has (a CSV, a worksheet, a table in a document) and turn it into records of your app's [Effect Schema](https://effect.website), with every row that does not fit reported field by field and cell by cell. The mapping is a plain, versioned JSON spec, so you can store it and offer it again as a preset.
 
-The `.` entry is the headless core: the target descriptor, the spec, the mapping engine and the adapter that reads [`@thomasfosterau/effect-document`](https://www.npmjs.com/package/@thomasfosterau/effect-document)'s documents. The `./svelte` entry is the UI: `ImportMapper`, which takes a user from a file to records in three steps (pick the file, match its columns, import), built on [`@thomasfosterau/components`](https://www.npmjs.com/package/@thomasfosterau/components). It handles CSV and TSV today; read options, workbooks and a review grid follow.
+The `.` entry is the headless core: the target descriptor, the spec, the mapping engine and the adapter that reads [`@thomasfosterau/effect-document`](https://www.npmjs.com/package/@thomasfosterau/effect-document)'s documents. The `./svelte` entry is the UI: `ImportMapper`, which takes a user from a file to records in four steps (pick the file, check how its table is read, match its columns, import), built on [`@thomasfosterau/components`](https://www.npmjs.com/package/@thomasfosterau/components). It handles CSV, TSV and any sheet of an Excel workbook today; format-specific read options (a CSV's separator, quote and encoding) and a review grid follow.
 
 ## Install
 
@@ -74,6 +74,7 @@ const program = Effect.gen(function* () {
   import { importTarget } from '@thomasfosterau/components-import';
   import { ImportMapper, type ImportResult } from '@thomasfosterau/components-import/svelte';
   import * as Csv from '@thomasfosterau/effect-document/csv';
+  import { Xlsx } from '@thomasfosterau/effect-document/ooxml';
   import * as Effect from 'effect/Effect';
   import * as Schema from 'effect/Schema';
 
@@ -89,17 +90,22 @@ const program = Effect.gen(function* () {
   };
 </script>
 
-<ImportMapper {target} formats={[Csv.format, Csv.tsvFormat]} onSubmit={save} invalidRows="exclude" />
+<ImportMapper
+  {target}
+  formats={[Csv.format, Csv.tsvFormat, Xlsx.format]}
+  onSubmit={save}
+  invalidRows="exclude"
+/>
 ```
 
-The columns are matched to the fields from the headers (a field's key, title or `importAliases`) and the user confirms or changes each one. `invalidRows` decides what rows the Schema rejects do: `'block'` (the default) refuses the import while any remain, `'exclude'` leaves them out, `'allow'` passes them on in `result.invalid`. `result.spec` is the mapping as JSON, to store as a preset or replay on the server. `ImportSource`, `ImportFieldMap` and `ImportSubmit` are the steps, for laying the flow out yourself.
+The formats you pass are the ones the file is detected among, and the only readers loaded; a workbook with several sheets lets the user pick one. The user then checks how the table is read: whether its first row is the header, and how many rows above it to skip (a title, a note), with a live preview of the first rows. The columns are matched to the fields from the headers (a field's key, title or `importAliases`) and the user confirms or changes each one. `invalidRows` decides what rows the Schema rejects do: `'block'` (the default) refuses the import while any remain, `'exclude'` leaves them out, `'allow'` passes them on in `result.invalid`. `result.spec` is the mapping as JSON, to store as a preset or replay on the server. `ImportSource`, `ImportReadOptions`, `ImportFieldMap` and `ImportSubmit` are the steps, for laying the flow out yourself.
 
 ## Entry points
 
 | Entry | What | Peer to install |
 | --- | --- | --- |
 | `@thomasfosterau/components-import` | `importTarget` and its JSON descriptor, the `ImportSpec` Schema and `decodeImportSpec`, `applyMapping`, `suggestMapping`, `fingerprintOf`, `sourceTableFromRegion`, `regionRead`, `findRegion`, `sourceTableFromGrid` | `effect`, `@thomasfosterau/effect-document` |
-| `@thomasfosterau/components-import/svelte` | `ImportMapper`, and its steps `ImportSource`, `ImportFieldMap` and `ImportSubmit` | `svelte`, and the two above |
+| `@thomasfosterau/components-import/svelte` | `ImportMapper`, and its steps `ImportSource`, `ImportReadOptions`, `ImportFieldMap` and `ImportSubmit` | `svelte`, and the two above |
 
 ## Docs
 

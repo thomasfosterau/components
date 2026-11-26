@@ -23,6 +23,7 @@ import {
   type ImportSpec,
   type ImportTarget,
   type RowIssue,
+  type SourceCell,
   type SourceRead,
   type SourceTable,
   type TargetSchema,
@@ -216,6 +217,25 @@ export const defaultRead = (region: TableRegion): SourceRead => {
   return isHeaderLike ? { headerRow: 0, skipRows: 0 } : guess;
 };
 
+/**
+ * `read` with its header row on or off. Turned on, a header the read
+ * already placed stays where it is, and otherwise it is the first row kept.
+ */
+export const withHeaderRow = (read: SourceRead, on: boolean): SourceRead =>
+  on ? { headerRow: read.headerRow ?? 0, skipRows: read.skipRows } : { skipRows: read.skipRows };
+
+/** `read` skipping `skipRows` rows, a whole number from 0; an empty or invalid entry is 0. */
+export const withSkipRows = (read: SourceRead, skipRows: number | undefined): SourceRead => {
+  const skip = Option.fromUndefinedOr(skipRows).pipe(
+    Option.filter(Number.isFinite),
+    Option.map((value) => Math.max(0, Math.trunc(value))),
+    Option.getOrElse(() => 0),
+  );
+  return read.headerRow === undefined
+    ? { skipRows: skip }
+    : { headerRow: read.headerRow, skipRows: skip };
+};
+
 /** The choices the suggestions give, keeping every choice the user has confirmed. */
 export const seedChoices = <S extends TargetSchema>(
   target: ImportTarget<S>,
@@ -258,6 +278,12 @@ export const unusedColumns = (width: number, choices: FieldChoices): ReadonlyArr
     Array.from({ length: width }, (_, index) => index),
     (index) => !Arr.contains(used, index),
   );
+};
+
+/** A cell as the UI shows it: its text, a `Date` as ISO 8601, nothing for an empty or invalid one. */
+export const cellDisplay = (cell: SourceCell): string => {
+  if (P.isDate(cell)) return Number.isNaN(cell.getTime()) ? '' : cell.toISOString();
+  return cell === undefined ? '' : String(cell);
 };
 
 /** How many columns the table has: its header's width, or its widest row. */
