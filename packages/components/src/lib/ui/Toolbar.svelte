@@ -28,6 +28,7 @@ A `role="toolbar"` on bits-ui `Toolbar`: one Tab stop, arrow keys between its co
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import type { OverflowEntry, OverflowItemAttributes } from './Overflow.svelte';
+  import ItemsOrChildren from './ItemsOrChildren.svelte';
   import ToolbarOverflow from './ToolbarOverflow.svelte';
 
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -87,11 +88,7 @@ A `role="toolbar"` on bits-ui `Toolbar`: one Tab stop, arrow keys between its co
         aria-orientation={rowOrientation}
         class={['inline-flex', rowClass, rowOrientation === 'vertical' && 'flex-col', className]}
       >
-        {#if items !== undefined && item !== undefined}
-          {#each items as entry, index (entry.id)}{@render item(entry, index, {})}{/each}
-        {:else}
-          {@render children?.()}
-        {/if}
+        <ItemsOrChildren {items} {item} {children} />
       </div>
     {/if}
   {/snippet}

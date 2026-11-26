@@ -18,6 +18,7 @@ A named cluster of independent buttons in a daisyUI `join`; each stays its own T
 <script lang="ts" generics="T extends OverflowEntry">
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
+  import ItemsOrChildren from './ItemsOrChildren.svelte';
   import Overflow, { type OverflowEntry, type OverflowItemAttributes } from './Overflow.svelte';
 
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -82,10 +83,6 @@ A named cluster of independent buttons in a daisyUI `join`; each stays its own T
   />
 {:else}
   <div {...rest} role="group" aria-label={label} class={['join', orientationClass[orientation], className]}>
-    {#if items !== undefined && item !== undefined}
-      {#each items as entry, index (entry.id)}{@render item(entry, index, {})}{/each}
-    {:else}
-      {@render children?.()}
-    {/if}
+    <ItemsOrChildren {items} {item} {children} />
   </div>
 {/if}
