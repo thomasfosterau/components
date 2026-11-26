@@ -40,7 +40,7 @@ One event as a link (with `href`) or a button: named by its title, described by 
   const classes = $derived([
     'focus-visible:outline-primary flex w-full min-w-0 gap-1.5 rounded text-start focus-visible:outline-2',
     block
-      ? 'bg-base-200 border-base-300 hover:bg-base-300 items-start overflow-hidden border px-1 py-0.5 text-xs'
+      ? 'bg-base-200 border-base-300 hover:bg-base-300 flex-wrap content-start items-center gap-y-0 overflow-hidden border px-1 py-0.5 text-xs'
       : 'hover:bg-base-200 items-center',
     !block && (compact ? 'px-1 text-xs' : 'px-2 py-1'),
   ]);
@@ -51,10 +51,10 @@ One event as a link (with `href`) or a button: named by its title, described by 
 {#snippet body()}
   <span
     aria-hidden="true"
-    class={['status shrink-0', block && 'mt-1', statusTone[event.tone ?? 'neutral']]}
+    class={['status shrink-0', statusTone[event.tone ?? 'neutral']]}
   ></span>
   {#if time !== ''}<span aria-hidden="true" class="shrink-0 tabular-nums opacity-70">{time}</span>{/if}
-  <span class={block ? 'line-clamp-2 font-medium' : 'truncate'}>{event.title}</span>
+  <span class={block ? 'line-clamp-3 basis-full font-medium' : 'truncate'}>{event.title}</span>
 {/snippet}
 
 {#if event.href !== undefined}
