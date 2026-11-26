@@ -135,3 +135,18 @@ test('loadRange is called with the visible range, and navigating aborts the last
   );
   expect(signals[0]?.aborted).toBe(true);
 });
+
+test('an event whose href is not a safe URL is a button that calls onEventSelect', async () => {
+  const onEventSelect = vi.fn<(event: CalendarEvent) => void>();
+  const screen = await render(EventCalendarFixture, {
+    props: {
+      events: [{ id: 'evil', title: 'Evil', start: '2026-10-23', href: '\tJaVaScRiPt:alert(1)' }],
+      view: 'agenda',
+      onEventSelect,
+    },
+  });
+
+  await expect.element(screen.getByRole('link', { name: 'Evil' })).not.toBeInTheDocument();
+  await screen.getByRole('button', { name: 'Evil' }).click();
+  expect(onEventSelect).toHaveBeenCalledWith(expect.objectContaining({ id: 'evil' }));
+});

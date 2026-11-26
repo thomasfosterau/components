@@ -28,6 +28,7 @@ The summary rail beside an entity page’s prose: an optional header and image a
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
+  import { safeHref } from '../links/safe-href.ts';
   import Link from '../ui/Link.svelte';
   import type { HeadingLevel } from '../ui/tones.ts';
   import InfoboxHeader from './InfoboxHeader.svelte';
@@ -98,7 +99,8 @@ The summary rail beside an entity page’s prose: an optional header and image a
     <InfoboxRow label={row.label}>
       <ul class="flex flex-col gap-1">
         {#each row.links ?? [] as link (link.href)}
-          <li><Link href={link.href}>{link.label}</Link></li>
+          {@const href = safeHref(link.href)}
+          <li>{#if href === undefined}{link.label}{:else}<Link {href}>{link.label}</Link>{/if}</li>
         {/each}
       </ul>
     </InfoboxRow>

@@ -22,11 +22,18 @@ export type ImagePhase = 'loading' | 'loaded' | 'error';
 /** Strip what could end a declaration, so data can't add properties. */
 const cssValue = (value: string): string => value.replaceAll(/[;{}]/g, '');
 
+/** `url` percent-encoded where it could end a quoted CSS string: a quote, a backslash or a line break. */
+const cssUrl = (url: string): string =>
+  url.replaceAll(
+    /["\\\n\r\f]/g,
+    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')}`,
+  );
+
 /** The inline style that paints `placeholder`; `undefined` for none or a skeleton. */
 export const placeholderStyle = (placeholder: ImagePlaceholder | undefined): string | undefined => {
   if (placeholder === undefined || placeholder === 'skeleton') return undefined;
   if (placeholder.kind === 'color') return `background-color: ${cssValue(placeholder.value)}`;
-  const image = `background-image: url("${placeholder.src.replaceAll('"', '%22')}"); background-size: cover; background-position: center`;
+  const image = `background-image: url("${cssUrl(placeholder.src)}"); background-size: cover; background-position: center`;
   return placeholder.color === undefined
     ? image
     : `${image}; background-color: ${cssValue(placeholder.color)}`;

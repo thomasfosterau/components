@@ -29,3 +29,20 @@ test('a ThumbHash placeholder decodes on the server', () => {
   expect(body).toContain('background-image: url(&quot;data:image/png;base64,');
   expect(body).toContain('background-color: rgb(115 119 130 / 1.00)');
 });
+
+test('an image placeholder URL cannot end its CSS string', () => {
+  const { body } = render(Image, {
+    props: {
+      src: '/photo.jpg',
+      alt: 'A bed',
+      placeholder: {
+        kind: 'lqip',
+        src: '/x.png\\"\n; background-image: url(https://example.com/x)',
+      },
+    },
+  });
+
+  expect(body).toContain(
+    'url(&quot;/x.png%5C%22%0A; background-image: url(https://example.com/x)&quot;)',
+  );
+});

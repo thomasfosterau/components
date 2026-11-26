@@ -5,6 +5,7 @@ import {
   hsvToRgb,
   parseColor,
   rgbToHsv,
+  safeCssColor,
   type ColorFormat,
 } from '../../src/lib/fields/color.ts';
 
@@ -105,5 +106,28 @@ describe('contrastingInk', () => {
 
   test('is undefined for a colour it cannot parse', () => {
     expect(contrastingInk('currentColor')).toBeUndefined();
+  });
+});
+
+describe('safeCssColor', () => {
+  test.each([
+    '#3a7d44',
+    'rgb(58 125 68 / 50%)',
+    'hsl(130, 37%, 36%)',
+    'oklch(0.5 0.1 145)',
+    'rebeccapurple',
+  ])('keeps %j', (css) => {
+    expect(safeCssColor(css)).toBe(css);
+  });
+
+  test.each([
+    'red; background-image: url(https://example.com/x)',
+    'red !important',
+    'url(https://example.com/x)',
+    'red /* comment */',
+    'not-a-colour',
+    '"red"',
+  ])('drops %j', (css) => {
+    expect(safeCssColor(css)).toBeUndefined();
   });
 });

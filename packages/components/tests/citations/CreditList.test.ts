@@ -65,3 +65,18 @@ test('a caller-supplied roleLabel and position override the built-in defaults', 
   });
   await expect.element(screen.getByText('(illus.)', { exact: false })).toBeInTheDocument();
 });
+
+test('links a credit only when its href is a safe URL', async () => {
+  const screen = await render(CreditList, {
+    credits: [
+      { name: 'Smith, J.', href: 'https://example.com/smith' },
+      { name: 'Jones, A.', href: 'javascript:alert(1)' },
+    ],
+    role: 'author',
+  });
+  await expect
+    .element(screen.getByRole('link', { name: 'Smith, J.' }))
+    .toHaveAttribute('href', 'https://example.com/smith');
+  await expect.element(screen.getByText('Jones, A.')).toBeInTheDocument();
+  await expect.element(screen.getByRole('link', { name: 'Jones, A.' })).not.toBeInTheDocument();
+});

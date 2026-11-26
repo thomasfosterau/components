@@ -22,6 +22,7 @@ One label/value pair inside an `InfoboxSection`.
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
+  import { safeHref } from '../links/safe-href.ts';
   import Link from '../ui/Link.svelte';
 
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -31,7 +32,7 @@ One label/value pair inside an `InfoboxSection`.
     value?: string | number | undefined;
     /** Richer markup — a formatted quantity, a badge, more than one link. */
     children?: Snippet<[]> | undefined;
-    /** Wraps the row's content in a `Link` resolved through the components context. */
+    /** Wraps the row's content in a `Link` resolved through the components context; ignored unless relative or `http(s):`, `mailto:` or `tel:`. */
     href?: string | undefined;
     /** Passed through to `Link` — an off-site destination. */
     external?: boolean | undefined;
@@ -58,6 +59,7 @@ One label/value pair inside an `InfoboxSection`.
 
   const hasValue = $derived(value !== undefined && value !== '');
   const present = $derived(children !== undefined || hasValue);
+  const safe = $derived(safeHref(href));
 </script>
 
 {#if present || showEmpty}
@@ -70,8 +72,8 @@ One label/value pair inside an `InfoboxSection`.
   >
     <dt class="text-base-content/70 col-span-1 text-sm font-semibold select-none">{label}</dt>
     <dd class="col-span-2 text-sm">
-      {#if present && href !== undefined}
-        <Link {href} external={external ?? false}>
+      {#if present && safe !== undefined}
+        <Link href={safe} external={external ?? false}>
           {#if children}{@render children()}{:else}{value}{/if}
         </Link>
       {:else if present && children}

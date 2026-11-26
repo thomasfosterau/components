@@ -11,6 +11,7 @@ A journal article as "Authors, ‘Title’ (2019) <cite>Periodical</cite> 12 (3)
   English default.
 -->
 <script lang="ts">
+  import { safeHref } from '../links/safe-href.ts';
   import Year from '../formatting/Year.svelte';
   import CreditList from './CreditList.svelte';
   import DOILink from './DOILink.svelte';
@@ -65,6 +66,8 @@ A journal article as "Authors, ‘Title’ (2019) <cite>Periodical</cite> 12 (3)
     locales,
   }: Props = $props();
 
+  const url = $derived(safeHref(article.url));
+
   const authors = $derived(article.authors ?? []);
 </script>
 
@@ -108,7 +111,7 @@ A journal article as "Authors, ‘Title’ (2019) <cite>Periodical</cite> 12 (3)
   {#if article.periodical?.issn !== undefined}
     <ISSNLink issn={article.periodical.issn} />
   {/if}
-  {#if article.url !== undefined}
-    {availableOnlineLabel} <a itemprop="url" href={article.url}>{article.url}</a>
+  {#if url !== undefined}
+    {availableOnlineLabel} <a itemprop="url" href={url}>{url}</a>
   {/if}
 </span>

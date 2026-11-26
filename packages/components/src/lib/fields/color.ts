@@ -211,3 +211,18 @@ export function formatColor(colour: Rgba, format: ColorFormat, withAlpha = false
       return `#${hex2(colour.r)}${hex2(colour.g)}${hex2(colour.b)}${translucent ? hex2(colour.alpha) : ''}`;
   }
 }
+
+/** Characters a colour value needs; no `;`, `:`, quotes, braces, `!` or `*`, so nothing can end the declaration or open a comment. */
+const COLOUR_CHARACTERS = /^[\w\s#.,%()+\-/]+$/;
+
+/**
+ * `css` when it is a colour safe to put in an inline style, else `undefined`.
+ * In a browser, `CSS.supports('color', …)` decides; during SSR, where there
+ * is no `CSS`, only the character check applies.
+ */
+export function safeCssColor(css: string): string | undefined {
+  const text = css.trim();
+  if (!COLOUR_CHARACTERS.test(text)) return undefined;
+  if (typeof CSS !== 'undefined' && !CSS.supports('color', text)) return undefined;
+  return text;
+}

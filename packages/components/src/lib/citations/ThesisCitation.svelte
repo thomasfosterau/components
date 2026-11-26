@@ -9,6 +9,7 @@ A thesis as "Author, <cite>Title</cite> (2019) PhD thesis, University of Sydney"
   English default.
 -->
 <script lang="ts">
+  import { safeHref } from "../links/safe-href.ts";
   import Year from "../formatting/Year.svelte";
   import CreditList from "./CreditList.svelte";
   import Publisher from "./Publisher.svelte";
@@ -48,6 +49,8 @@ A thesis as "Author, <cite>Title</cite> (2019) PhD thesis, University of Sydney"
     locales,
   }: Props = $props();
 
+  const url = $derived(safeHref(thesis.url));
+
   const authors = $derived(thesis.authors ?? []);
 </script>
 
@@ -65,7 +68,7 @@ A thesis as "Author, <cite>Title</cite> (2019) PhD thesis, University of Sydney"
       <Publisher publisher={thesis.institution} itemprop="sourceOrganization" />
     {/if}
   {/if}
-  {#if thesis.url !== undefined}
-    {availableOnlineLabel} <a itemprop="url" href={thesis.url}>{thesis.url}</a>
+  {#if url !== undefined}
+    {availableOnlineLabel} <a itemprop="url" href={url}>{url}</a>
   {/if}
 </span>

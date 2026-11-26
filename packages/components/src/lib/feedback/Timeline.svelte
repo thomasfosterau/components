@@ -26,6 +26,7 @@ A vertical daisyUI `timeline` of dated entries.
   import type { Snippet } from 'svelte';
   import type { HTMLOlAttributes } from 'svelte/elements';
   import { getComponentsContext } from '../context.svelte.ts';
+  import { safeHref } from '../links/safe-href.ts';
   import { colourTokenStyle } from '../ui/colour-token.ts';
 
   /** The custom property an entry's `colourToken` is bound to. */
@@ -50,7 +51,7 @@ A vertical daisyUI `timeline` of dated entries.
     readonly start: TimelineDate;
     /** Omit for an open-ended, still-current entry. */
     readonly end?: TimelineDate | undefined;
-    /** Links the entry's label, through the components context. */
+    /** Links the entry's label, through the components context; ignored unless relative or `http(s):`, `mailto:` or `tel:`. */
     readonly href?: string | undefined;
     /** A CSS custom-property name the app's theme declares (`--party-alp`). */
     readonly colourToken?: string | undefined;
@@ -103,6 +104,7 @@ A vertical daisyUI `timeline` of dated entries.
   class={['timeline timeline-vertical timeline-compact timeline-snap-icon', className]}
 >
   {#each items as entry, index (entry.id)}
+    {@const href = safeHref(entry.href)}
     {@const current = entry.end === undefined}
     <li style={colourTokenStyle(TIMELINE_COLOUR_PROPERTY, entry.colourToken)}>
       {#if index > 0}<hr />{/if}
@@ -136,8 +138,8 @@ A vertical daisyUI `timeline` of dated entries.
           {@render itemBody(entry)}
         {:else}
           <p class="font-medium">
-            {#if entry.href !== undefined}
-              <a href={context.href(entry.href)} class="link link-hover">{entry.label}</a>
+            {#if href !== undefined}
+              <a href={context.href(href)} class="link link-hover">{entry.label}</a>
             {:else}
               {entry.label}
             {/if}

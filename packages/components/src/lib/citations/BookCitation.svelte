@@ -14,6 +14,7 @@ One book as a compact author–date reference with Schema.org `Book` microdata.
   Every string is a prop with an English default.
 -->
 <script lang="ts">
+  import { safeHref } from '../links/safe-href.ts';
   import Year from '../formatting/Year.svelte';
   import CreditList from './CreditList.svelte';
   import ISBNLink from './ISBNLink.svelte';
@@ -68,6 +69,8 @@ One book as a compact author–date reference with Schema.org `Book` microdata.
     locales,
   }: Props = $props();
 
+  const url = $derived(safeHref(book.url));
+
   const authors = $derived(book.authors ?? []);
 </script>
 
@@ -94,8 +97,8 @@ One book as a compact author–date reference with Schema.org `Book` microdata.
   {#if book.numberOfPages !== undefined}
     {pageCountLabel} <span itemprop="numberOfPages">{book.numberOfPages}</span>
   {/if}
-  {#if book.url !== undefined}
-    {availableOnlineLabel} <a itemprop="url" href={book.url}>{book.url}</a>
+  {#if url !== undefined}
+    {availableOnlineLabel} <a itemprop="url" href={url}>{url}</a>
   {/if}
   {#if book.isbn !== undefined}
     <ISBNLink isbn={book.isbn} itemprop="isbn" />

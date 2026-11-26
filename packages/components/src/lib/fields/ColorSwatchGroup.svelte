@@ -7,7 +7,10 @@ One colour from a palette of named swatches, on bits-ui's `RadioGroup`: a tag's 
   is named by its `label`, never its hex, so colour is never the only cue.
 
   The swatches are filled with the caller's colours through inline
-  `background-color`: that is data, not theme. The chrome (rings, focus
+  `background-color`: that is data, not theme. A value is used only when it
+  is a colour (`safeCssColor`), so it can't add other declarations; anything
+  else leaves the swatch unfilled. bits-ui takes `style` as an object, as
+  `style:` directives don't reach a component. The chrome (rings, focus
   outline) uses semantic tokens. The selected swatch's check is drawn in
   black or white, whichever contrasts more with that swatch (`color.ts`),
   and the swatch also gets a ring so the state survives a swatch close to
@@ -19,7 +22,7 @@ One colour from a palette of named swatches, on bits-ui's `RadioGroup`: a tag's 
 <script lang="ts" module>
   /** One preset colour. */
   export interface ColorSwatch {
-    /** A CSS colour: hex, `rgb()`, `hsl()`, `oklch()` or any other value `background-color` takes. */
+    /** A CSS colour: hex, `rgb()`, `hsl()`, `oklch()` or any other value `background-color` takes; anything else leaves the swatch unfilled. */
     readonly value: string;
     /** Accessible name, e.g. "Leaf green". */
     readonly label: string;
@@ -30,7 +33,7 @@ One colour from a palette of named swatches, on bits-ui's `RadioGroup`: a tag's 
   import { Check } from '@lucide/svelte';
   import { RadioGroup } from 'bits-ui';
   import type { HTMLAttributes } from 'svelte/elements';
-  import { contrastingInk } from './color.ts';
+  import { contrastingInk, safeCssColor } from './color.ts';
   import type { FieldSize } from './field-types.ts';
 
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'dir'> {
@@ -127,11 +130,14 @@ One colour from a palette of named swatches, on bits-ui's `RadioGroup`: a tag's 
   class={['flex flex-wrap gap-2', className]}
 >
   {#each swatches as swatch (swatch.value)}
+    {@const fill = safeCssColor(swatch.value)}
     <RadioGroup.Item
       value={swatch.value}
       aria-label={swatch.label}
       title={swatch.label}
-      style="background-color: {swatch.value}; color: {contrastingInk(swatch.value) ?? 'inherit'};"
+      style={fill === undefined
+        ? undefined
+        : { backgroundColor: fill, color: contrastingInk(fill) ?? 'inherit' }}
       class={[
         'rounded-field grid cursor-pointer place-items-center border border-base-content/20',
         'focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary',
