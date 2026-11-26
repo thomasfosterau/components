@@ -93,7 +93,7 @@
         "@thomasfosterau/effect-document/iwork"
       ],
       "files": ["packages/import/src/svelte/**"],
-      "message": "The `./svelte` entry of @thomasfosterau/components-import reaches the core library through @thomasfosterau/components and effect-document through its root and /schema only: the app passes the formats it accepts, so the entry loads no reader (and no effect-parse) of its own (packages/import/AGENTS.md § Boundary)."
+      "message": "The `./svelte` entry of @thomasfosterau/components-import reaches the core library through @thomasfosterau/components and effect-document through its root, /schema and /encoding only: the app passes the formats it accepts (and any reader factories), so the entry loads no reader (and no effect-parse) of its own (packages/import/AGENTS.md § Boundary)."
     },
     {
       "id": "effect-document-only-in-import",

@@ -42,3 +42,6 @@ export const workbookFile = async (
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   });
 };
+
+/** The formats with reader factories, and the CSV texts and sources their read options fix. */
+export { readerFormats, semicolonCsv, sourceOf, titledCsv } from '../../src/stories/demo.ts';

@@ -31,10 +31,16 @@ import {
 import {
   bytes,
   detect,
+  isTruncated,
   type Content,
   type Detectable,
   type ParseError,
 } from '@thomasfosterau/effect-document';
+import {
+  decodeText,
+  detectEncoding,
+  ENCODING_NAMES,
+} from '@thomasfosterau/effect-document/encoding';
 import {
   candidateTables,
   type Document,
@@ -58,18 +64,110 @@ export type ServiceFreeTarget = Schema.Struct<Schema.Struct.Fields> & {
   readonly DecodingServices: never;
 };
 
+/** Parses a file's content into a document: what the mapper needs of an effect-document `Reader`. */
+export interface ImportReader {
+  readonly read: (input: Content) => Effect.Effect<Document, ParseError>;
+}
+
+/** How a delimited text file splits into fields: effect-document's `CsvDialect`. */
+export interface ImportDialect {
+  readonly separator: string;
+  readonly linebreak: string;
+  readonly wrapper: string;
+  readonly doubleWrapper: string;
+}
+
+/**
+ * The options the mapper builds a reader with: the ones effect-document's
+ * delimited text reader (`Csv.makeCsvReader`) takes under the same names,
+ * so a format's `readerWith` can be that factory itself. Plain JSON, so a
+ * spec records them for a server to read the file the same way.
+ */
+export interface ImportReaderOptions {
+  /** The separator and quote; absent, the reader's own default. */
+  readonly dialect?: ImportDialect | undefined;
+  /** Whether rows may have different numbers of fields. */
+  readonly allowVariableColumns?: boolean | undefined;
+  /** Whether numbers and true or false values are read as such, rather than as text. */
+  readonly inferTypes?: boolean | undefined;
+  /** A preview read: at most this many records, the rest of the file left unread. */
+  readonly maxRows?: number | undefined;
+}
+
 /**
  * What the mapper needs of a format: what `detect` needs (its id, sniffer,
  * extensions and MIME types) and a reader. Every effect-document `Format`
  * is one, such as `Csv.format`; the type is structural because `Format` is
  * invariant in its profiles, so a `Format<CsvFeature>` is not an
  * `ImportFormat`.
+ *
+ * A delimited text format can add `readerWith`, a reader factory, such as
+ * `{ ...Csv.format, readerWith: Csv.makeCsvReader }`: the read options step
+ * then offers its text encoding, separator, quote, ragged rows and type
+ * inference, and previews them on a bounded read.
  */
 export interface ImportFormat extends Detectable {
-  readonly reader?:
-    | { readonly read: (input: Content) => Effect.Effect<Document, ParseError> }
-    | undefined;
+  readonly reader?: ImportReader | undefined;
+  /** Builds the format's reader with options; its presence offers them to the user. */
+  readonly readerWith?: ((options: ImportReaderOptions) => ImportReader) | undefined;
 }
+
+/** The field separator to read with: `'auto'` leaves it, and the quote, to the format's reader. */
+export type SeparatorChoice = 'auto' | ',' | ';' | '\t';
+
+/** The character a field is quoted with. */
+export type QuoteChoice = '"' | "'";
+
+/** How the user chose to read a file whose format has a `readerWith`. */
+export interface ReaderChoice {
+  /** The text encoding, by its WHATWG name (`'windows-1252'`), or `undefined` to detect it. */
+  readonly encoding: string | undefined;
+  readonly separator: SeparatorChoice;
+  /** Applies when `separator` is not `'auto'`. */
+  readonly quote: QuoteChoice;
+  /** Whether rows may have different numbers of fields, such as a title line above the table. */
+  readonly allowRaggedRows: boolean;
+  /** Whether numbers and true or false values are read as such. */
+  readonly inferTypes: boolean;
+}
+
+/** The first read of a file whose format has a `readerWith`: everything detected, ragged rows allowed. */
+export const defaultReaderChoice: ReaderChoice = {
+  encoding: undefined,
+  separator: 'auto',
+  quote: '"',
+  allowRaggedRows: true,
+  inferTypes: true,
+};
+
+/** Whether two reader choices read a file the same way; an absent one is the default. */
+export const sameReaderChoice = (
+  a: ReaderChoice | undefined,
+  b: ReaderChoice | undefined,
+): boolean => {
+  const x = a ?? defaultReaderChoice;
+  const y = b ?? defaultReaderChoice;
+  return (
+    x.encoding === y.encoding &&
+    x.separator === y.separator &&
+    (x.separator === 'auto' || x.quote === y.quote) &&
+    x.allowRaggedRows === y.allowRaggedRows &&
+    x.inferTypes === y.inferTypes
+  );
+};
+
+/** The reader options a choice gives, as a format's `readerWith` takes them. */
+export const readerOptionsOf = (choice: ReaderChoice): ImportReaderOptions => {
+  const options = { allowVariableColumns: choice.allowRaggedRows, inferTypes: choice.inferTypes };
+  if (choice.separator === 'auto') return options;
+  const dialect: ImportDialect = {
+    separator: choice.separator,
+    linebreak: '\n',
+    wrapper: choice.quote,
+    doubleWrapper: `${choice.quote}${choice.quote}`,
+  };
+  return { ...options, dialect };
+};
 
 /** A format `detect` found the file may be, with why. */
 export interface DetectedFormat {
@@ -90,6 +188,10 @@ export interface ImportFile {
   readonly tables: ReadonlyArray<TableRegion>;
   /** The table to import, one of `tables`. */
   readonly table: TableRegion;
+  /** How the file was read, when its format has a `readerWith`. */
+  readonly reader?: ReaderChoice | undefined;
+  /** The text encoding the file was decoded with, when its format has a `readerWith`. */
+  readonly encoding?: string | undefined;
 }
 
 /** What the user chose for one target field: a column by position, or none. */
@@ -144,12 +246,18 @@ export class StepError extends Error {
   override readonly name = 'StepError';
 }
 
-/** Runs a step's Effect as a promise, its failure's message as a {@link StepError}. */
+/** A failure's reason for the user: a `ParseError`'s `reason` (its `message` is empty), or its message. */
+const reasonOf = (error: { readonly message: string }): string =>
+  P.hasProperty(error, 'reason') && P.isString(error.reason) && error.reason !== ''
+    ? error.reason
+    : error.message;
+
+/** Runs a step's Effect as a promise, its failure's reason as a {@link StepError}. */
 const run = <A, E extends { readonly message: string }>(
   effect: Effect.Effect<A, E>,
   signal: AbortSignal,
 ): Promise<A> =>
-  Effect.runPromise(effect.pipe(Effect.mapError((error) => new StepError(error.message))), {
+  Effect.runPromise(effect.pipe(Effect.mapError((error) => new StepError(reasonOf(error)))), {
     signal,
   });
 
@@ -175,24 +283,84 @@ export const detectFile = async (
   );
 };
 
+/** A file, read: its candidate tables, and how. */
+export interface FileRead {
+  /** Every table in the file, in document order. */
+  readonly tables: ReadonlyArray<TableRegion>;
+  /** The text encoding the file was decoded with, when its format has a `readerWith`. */
+  readonly encoding: string | undefined;
+  /** Whether a `maxRows` read left rows out. */
+  readonly truncated: boolean;
+}
+
+/** `data` as text in `encoding`, or the encoding it looks like, with the encoding used. */
+const decoded = (
+  data: Uint8Array,
+  encoding: string | undefined,
+): Effect.Effect<
+  { readonly content: Content; readonly encoding: string },
+  StepError | ParseError
+> =>
+  Effect.gen(function* () {
+    const name = yield* Option.match(Option.fromUndefinedOr(encoding), {
+      onNone: () => Effect.map(detectEncoding(bytes(data)), (found) => found.encoding),
+      onSome: (wanted) =>
+        Effect.fromOption(Arr.findFirst(ENCODING_NAMES, (known) => known === wanted)).pipe(
+          Effect.mapError(() => new StepError(`"${wanted}" is not a text encoding.`)),
+        ),
+    });
+    const content = yield* decodeText(bytes(data), { encoding: name });
+    return { content, encoding: name };
+  });
+
 /**
- * Reads `file` as `format` and lists its candidate tables. Rejects with a
- * {@link StepError} when the format has no reader or the read fails.
+ * Reads `file` as `format` and lists its candidate tables. A format with a
+ * `readerWith` is read with `reader` (the default choice when omitted), at
+ * most `maxRows` records when that is set; any other with its `reader`.
+ * Rejects with a {@link StepError} when the format has no reader or the
+ * read fails.
  */
-export const readTables = async (
+export const readFile = async (
   file: File,
   format: ImportFormat,
-  signal: AbortSignal,
-): Promise<ReadonlyArray<TableRegion>> => {
+  options: {
+    readonly signal: AbortSignal;
+    readonly reader?: ReaderChoice | undefined;
+    readonly maxRows?: number | undefined;
+  },
+): Promise<FileRead> => {
   const data = new Uint8Array(await file.arrayBuffer());
-  const reading: Effect.Effect<ReadonlyArray<TableRegion>, StepError | ParseError> = Option.match(
-    Option.fromUndefinedOr(format.reader),
-    {
+  const plainRead = (): Effect.Effect<FileRead, StepError | ParseError> =>
+    Option.match(Option.fromUndefinedOr(format.reader), {
       onNone: () => Effect.fail(new StepError(`There is no reader for the format "${format.id}".`)),
-      onSome: (reader) => Effect.map(reader.read(bytes(data)), candidateTables),
-    },
-  );
-  return run(reading, signal);
+      onSome: (reader) =>
+        Effect.map(reader.read(bytes(data)), (doc) => ({
+          tables: candidateTables(doc),
+          encoding: undefined,
+          truncated: false,
+        })),
+    });
+  const reading = Option.match(Option.fromUndefinedOr(format.readerWith), {
+    onNone: plainRead,
+    onSome: (readerWith) =>
+      Effect.gen(function* () {
+        const choice = options.reader ?? defaultReaderChoice;
+        const text = yield* decoded(data, choice.encoding);
+        const readerOptions = readerOptionsOf(choice);
+        const reader = readerWith(
+          options.maxRows === undefined
+            ? readerOptions
+            : { ...readerOptions, maxRows: options.maxRows },
+        );
+        const doc = yield* reader.read(text.content);
+        return {
+          tables: candidateTables(doc),
+          encoding: text.encoding,
+          truncated: isTruncated(doc),
+        };
+      }),
+  });
+  return run(reading, options.signal);
 };
 
 /**
@@ -294,11 +462,12 @@ export const columnCount = (table: SourceTable): number =>
 const sourceOf = (source: ImportFile, read: SourceRead): ImportSource => {
   const base = {
     format: source.format.id,
-    readerOptions: {},
+    readerOptions: source.reader === undefined ? {} : readerOptionsOf(source.reader),
     table: source.table.locator,
     skipRows: read.skipRows,
   };
-  return read.headerRow === undefined ? base : { ...base, headerRow: read.headerRow };
+  const encoded = source.encoding === undefined ? base : { ...base, encoding: source.encoding };
+  return read.headerRow === undefined ? encoded : { ...encoded, headerRow: read.headerRow };
 };
 
 /** The spec for a file, its read and the field choices. */

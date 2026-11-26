@@ -11,6 +11,12 @@ import { Xlsx } from '@thomasfosterau/effect-document/ooxml';
 import { candidateTables, type TableRegion } from '@thomasfosterau/effect-document/schema';
 import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
+import {
+  defaultReaderChoice,
+  readerOptionsOf,
+  type ImportFile,
+  type ImportFormat,
+} from '../svelte/session.ts';
 
 /** A contact list, the example target. */
 const Contact = Schema.Struct({
@@ -27,6 +33,23 @@ export const contactTarget = Effect.runSync(importTarget(Contact));
 
 /** The formats the stories accept: CSV and TSV. */
 export const formats = [Csv.format, Csv.tsvFormat];
+
+/** CSV with its reader factory. */
+const csvWithOptions: ImportFormat = { ...Csv.format, readerWith: Csv.makeCsvReader };
+
+/**
+ * The formats with their reader factories, so the read options step offers
+ * the encoding, separator, quote, ragged rows and type inference. TSV's
+ * factory starts from the tab dialect, so its default separator stays a tab.
+ */
+export const readerFormats: readonly ImportFormat[] = [
+  csvWithOptions,
+  {
+    ...Csv.tsvFormat,
+    readerWith: (options: Csv.CsvReaderOptions) =>
+      Csv.makeCsvReader({ dialect: Csv.TsvDialect, ...options }),
+  },
+];
 
 /** The formats with Excel workbooks too, for a story that takes a sheet of one. */
 export const workbookFormats = [...formats, Xlsx.format];
@@ -50,6 +73,40 @@ export const sampleRegion = regionOf(sampleCsv);
 export const titledRegion = regionOf(
   'Contacts exported on 1 May,,\nName,E-mail,Plan\nAda Lovelace,ada@example.com,pro\nLin,lin@example.com,free\n',
 );
+
+/** A CSV separated by semicolons, which a comma-separated read takes as one column. */
+export const semicolonCsv =
+  'Name;E-mail;Plan\nAda Lovelace;ada@example.com;pro\nLin;lin@example.com;free\n';
+
+/** A CSV under a title line narrower than its table, which only a ragged read takes. */
+export const titledCsv =
+  'Contacts exported on 1 May\nName,E-mail,Plan\nAda Lovelace,ada@example.com,pro\nLin,lin@example.com,free\n';
+
+/**
+ * A CSV text as the source step hands it on, read as `format` with the
+ * default reader choice: the file, and its one table.
+ */
+export const sourceOf = (
+  name: string,
+  csv: string,
+  format: ImportFormat = csvWithOptions,
+): ImportFile => {
+  const reader = format.readerWith?.(readerOptionsOf(defaultReaderChoice)) ?? format.reader;
+  if (reader === undefined) throw new Error('The format has no reader.');
+  const doc = Effect.runSync(reader.read(text(csv)));
+  const [table] = candidateTables(doc);
+  if (table === undefined) throw new Error('The CSV has no table.');
+  const candidates = [{ format, confidence: 1, evidence: 'A CSV' }];
+  return {
+    file: new File([csv], name, { type: 'text/csv' }),
+    candidates,
+    format,
+    tables: [table],
+    table,
+    reader: format.readerWith === undefined ? undefined : defaultReaderChoice,
+    encoding: format.readerWith === undefined ? undefined : 'UTF-8',
+  };
+};
 
 /** `sampleCsv` as a table, read with its header. */
 export const sampleTable = sourceTableFromGrid(

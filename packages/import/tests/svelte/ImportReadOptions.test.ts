@@ -1,9 +1,11 @@
 import { userEvent } from 'vite-plus/test/browser';
+import * as Csv from '@thomasfosterau/effect-document/csv';
 import type { SourceRead } from '../../src/index.ts';
 import { expect, test } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import ImportReadOptions from '../../src/svelte/ImportReadOptions.svelte';
-import { regionOf } from './fixtures.ts';
+import type { ReaderChoice } from '../../src/svelte/session.ts';
+import { regionOf, semicolonCsv, sourceOf, titledCsv } from './fixtures.ts';
 
 const table = regionOf(
   'Name,E-mail\nAda Lovelace,ada@example.com\nLin,lin@example.com\nNia,nia@example.com\n',
@@ -82,4 +84,90 @@ test('a read that leaves no rows says so', async () => {
 
   await expect.element(screen.getByText('No rows to import.')).toBeVisible();
   await expect.element(screen.getByRole('status')).toHaveTextContent('0 rows to import.');
+});
+
+test('a format without a reader factory offers no reader options', async () => {
+  const source = sourceOf('contacts.csv', 'Name,E-mail\nAda,ada@example.com\n', Csv.format);
+  const screen = await render(ImportReadOptions, {
+    table: source.table,
+    read: { headerRow: 0, skipRows: 0 },
+    source,
+  });
+
+  await expect.element(screen.getByRole('table')).toBeVisible();
+  await expect.element(screen.getByRole('combobox', { name: 'Separator' })).not.toBeInTheDocument();
+  await expect
+    .element(screen.getByRole('combobox', { name: 'Text encoding' }))
+    .not.toBeInTheDocument();
+  await expect
+    .element(screen.getByRole('checkbox', { name: 'Rows may have different numbers of fields' }))
+    .not.toBeInTheDocument();
+});
+
+test('a semicolon CSV read as one column is split by choosing the semicolon', async () => {
+  const source = sourceOf('contacts.csv', semicolonCsv);
+  let reader: ReaderChoice | undefined;
+  const screen = await render(ImportReadOptions, {
+    table: source.table,
+    read: { headerRow: 0, skipRows: 0 },
+    source,
+    onReaderChange: (next: ReaderChoice) => {
+      reader = next;
+    },
+  });
+
+  expect(previewHeaders()).toEqual(['Row', 'Name;E-mail;Plan']);
+  await expect
+    .element(screen.getByRole('combobox', { name: 'Quote character' }))
+    .not.toBeInTheDocument();
+  await screen.getByRole('combobox', { name: 'Separator' }).selectOptions('Semicolon');
+
+  await expect.poll(previewHeaders).toEqual(['Row', 'Name', 'E-mail', 'Plan']);
+  expect(reader?.separator).toBe(';');
+  await expect.element(screen.getByRole('cell', { name: 'ada@example.com' })).toBeVisible();
+  await expect.element(screen.getByRole('status')).toHaveTextContent('2 rows to import.');
+  await expect.element(screen.getByRole('combobox', { name: 'Quote character' })).toHaveValue('"');
+});
+
+test('a title line narrower than the table needs ragged rows', async () => {
+  const source = sourceOf('contacts.csv', titledCsv);
+  const screen = await render(ImportReadOptions, {
+    table: source.table,
+    read: { headerRow: 0, skipRows: 1 },
+    source,
+  });
+
+  const ragged = screen.getByRole('checkbox', {
+    name: 'Rows may have different numbers of fields',
+  });
+  await expect.element(ragged).toBeChecked();
+  expect(previewHeaders()).toEqual(['Row', 'Name', 'E-mail', 'Plan']);
+  await ragged.click();
+
+  await expect
+    .element(screen.getByRole('alert'))
+    .toMatchTextContent(/^The file could not be read with these options\. Row \d+ has 3 columns/u);
+  await expect.element(screen.getByRole('table')).not.toBeInTheDocument();
+  await ragged.click();
+
+  await expect.element(screen.getByRole('table')).toBeVisible();
+  expect(previewHeaders()).toEqual(['Row', 'Name', 'E-mail', 'Plan']);
+  await expect.element(screen.getByRole('status')).toHaveTextContent('2 rows to import.');
+});
+
+test('a changed read previews a bounded read, and says the file has more', async () => {
+  const rows = Array.from({ length: 20 }, (_, index) => `Person ${index},p${index}@example.com`);
+  const source = sourceOf('people.csv', `Name,E-mail\n${rows.join('\n')}\n`);
+  const screen = await render(ImportReadOptions, {
+    table: source.table,
+    read: { headerRow: 0, skipRows: 0 },
+    source,
+    previewRows: 5,
+  });
+
+  await expect.element(screen.getByRole('status')).toHaveTextContent('20 rows to import.');
+  await screen.getByRole('checkbox', { name: 'Read numbers and true or false values' }).click();
+
+  await expect.element(screen.getByRole('status')).toHaveTextContent('At least 4 rows to import.');
+  await expect.element(screen.getByRole('cell', { name: 'Person 0' })).toBeVisible();
 });

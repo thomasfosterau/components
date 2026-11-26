@@ -15,8 +15,15 @@ export { default as ImportReadOptions } from './ImportReadOptions.svelte';
 export { default as ImportSource } from './ImportSource.svelte';
 export { default as ImportSubmit } from './ImportSubmit.svelte';
 export {
+  defaultReaderChoice,
   specFor,
   type DetectedFormat,
+  type ImportDialect,
+  type ImportReader,
+  type ImportReaderOptions,
+  type QuoteChoice,
+  type ReaderChoice,
+  type SeparatorChoice,
   type FieldChoice,
   type FieldChoices,
   type ImportFile,
