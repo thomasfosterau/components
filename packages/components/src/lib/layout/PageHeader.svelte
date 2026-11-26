@@ -29,7 +29,9 @@ The block at the top of a page: its heading, supporting facts and actions.
   compact bar with the title fades in. That bar is fixed, so nothing below
   moves, and it is a visual duplicate (`aria-hidden`): the heading stays the
   one heading, in the tree at every scroll position. Under reduced motion
-  the bar switches at halfway rather than fading.
+  the bar switches at halfway rather than fading. Where the browser has
+  scroll-driven animations, a CSS view timeline on the heading drives the
+  fade off the main thread; elsewhere a scroll handler does.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
@@ -39,6 +41,7 @@ The block at the top of a page: its heading, supporting facts and actions.
     barFrame,
     collapseProgress,
     reducedMotion,
+    scrollTimelines,
     watchScroll,
     type PageHeaderScrollBehavior,
   } from './scroll-behavior.ts';
@@ -108,19 +111,24 @@ The block at the top of a page: its heading, supporting facts and actions.
 
   let heading: HTMLElement | undefined = $state();
   let progress = $state(0);
-  /** Where the compact bar sits: under the top of the scroller and any stuck `Navbar`. */
-  let frame = $state({ top: 0, left: 0, width: 0 });
+  /** Where the compact bar sits: across the top of the scroller, below `--navbar-offset`. */
+  let frame = $state({ top: 0, left: 0, width: 0, offset: 0 });
+  /** Whether a CSS view timeline drives the fade, leaving `progress` unused. */
+  let timeline = false;
 
   const measure = (): void => {
-    if (heading === undefined) return;
     const bar = barFrame(scrollContainer);
-    const large = heading.getBoundingClientRect();
     frame = bar;
-    progress = collapseProgress(large.top, large.height, bar.top, reducedMotion());
+    if (timeline || heading === undefined) return;
+    const large = heading.getBoundingClientRect();
+    progress = collapseProgress(large.top, large.height, bar.top + bar.offset, reducedMotion());
   };
 
   $effect(() => {
-    if (collapses) return watchScroll(scrollContainer, measure);
+    if (!collapses) return;
+    timeline = scrollTimelines();
+    if (!timeline) return watchScroll(scrollContainer, measure);
+    measure();
   });
 
   // The page title's scale is the page's, not the outline's — an `<h2>` used
@@ -130,14 +138,14 @@ The block at the top of a page: its heading, supporting facts and actions.
 
 <svelte:window onresize={collapses ? measure : undefined} />
 
-<header {...rest} class={['space-y-3', className]}>
+<header {...rest} class={['space-y-3', collapses && 'page-title-scope', className]}>
   {#if collapses}
     <div
       aria-hidden="true"
       data-collapsed-title
-      class="bg-base-100/95 border-base-300 pointer-events-none z-30 truncate border-b px-4 py-2 text-center font-semibold backdrop-blur transition-opacity duration-150 motion-reduce:transition-none"
+      class="page-title-bar bg-base-100/95 border-base-300 pointer-events-none z-30 truncate border-b px-4 py-2 text-center font-semibold backdrop-blur transition-opacity duration-150 motion-reduce:transition-none"
       style:position="fixed"
-      style:top="{frame.top}px"
+      style:top="calc({frame.top}px + var(--navbar-offset, 0px))"
       style:left="{frame.left}px"
       style:width="{frame.width}px"
       style:opacity={progress}
@@ -158,7 +166,11 @@ The block at the top of a page: its heading, supporting facts and actions.
         </div>
       {/if}
       <div class="min-w-0 flex-1 space-y-1">
-        <svelte:element this={`h${headingLevel}`} bind:this={heading} class={titleClasses}>
+        <svelte:element
+          this={`h${headingLevel}`}
+          bind:this={heading}
+          class={[titleClasses, collapses && 'page-title-heading']}
+        >
           {#if typeof title === 'string'}
             {title}
           {:else}
@@ -189,3 +201,43 @@ The block at the top of a page: its heading, supporting facts and actions.
     <div>{@render children()}</div>
   {/if}
 </header>
+
+<style>
+  /* The fade runs on a view timeline: 0 as the heading's top reaches the line
+     under any stuck Navbar, 1 once its bottom has passed it. The inline
+     opacity and visibility, left at 0, are what the animation overrides. */
+  @supports (animation-timeline: view()) and (timeline-scope: --a) {
+    .page-title-scope {
+      timeline-scope: --page-title;
+    }
+
+    .page-title-heading {
+      view-timeline: --page-title block;
+      view-timeline-inset: var(--navbar-offset, 0px) 0px;
+    }
+
+    .page-title-bar {
+      animation: page-title-in linear both;
+      animation-timeline: --page-title;
+      animation-range: exit 0% exit 100%;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .page-title-bar {
+        animation-timing-function: steps(2, jump-none);
+      }
+    }
+  }
+
+  @keyframes page-title-in {
+    from {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    to {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+</style>
