@@ -14,7 +14,7 @@ For every spec field and mark type, this records which interpreters honour it an
 
 **Interpreter columns**
 
-- **TS core** — `@thomasfosterau/charts/core` (`computeContext`). Web interpreters that sit on the core — the ProseMirror NodeView (`/prosemirror`) and the Svelte component (`/svelte`) — inherit this column.
+- **TS core** — `@thomasfosterau/charts/core` (`computeContext`). Web interpreters that sit on the core — the effect-richtext NodeView (`/richtext`) and the Svelte component (`/svelte`) — inherit this column.
 - **Vega-Lite** — `@thomasfosterau/charts/vega` (`emitVegaLite`), the spec → Vega-Lite emitter (escape hatch / SSR fallback), validated against the real Vega-Lite compiler
 - **Swift Charts** — the planned Swift/SwiftUI interpreter, decoding the same spec JSON and rendering through Apple Swift Charts
 - **Compose** — the planned Kotlin/Android interpreter (charting approach not yet chosen; envelope may constrain further)
@@ -36,7 +36,7 @@ The v1 mark set is deliberately the intersection of the native charting vocabula
 
 | Feature | TS core | Vega-Lite | Swift Charts | Compose | Media | Degradation when unsupported |
 | --- | --- | --- | --- | --- | --- | --- |
-| Data table | ✅ `buildDataTable` (in `resolveChart`'s `table`); the Svelte and ProseMirror interpreters render it visually hidden beside every chart, and visible in place of a newer `1.N` mark they do not know | ⛔ (Vega-Lite has its own `description` / ARIA; an unknown mark is rendered by a TS interpreter) | 🔵 the same model through `accessibilityChildren`, and as the fallback view | 🔵 | 🔵 | **Normative** for an unknown mark: render the table, never an empty plot |
+| Data table | ✅ `buildDataTable` (in `resolveChart`'s `table`); the Svelte and rich-text interpreters render it visually hidden beside every chart, and visible in place of a newer `1.N` mark they do not know | ⛔ (Vega-Lite has its own `description` / ARIA; an unknown mark is rendered by a TS interpreter) | 🔵 the same model through `accessibilityChildren`, and as the fallback view | 🔵 | 🔵 | **Normative** for an unknown mark: render the table, never an empty plot |
 
 ### Encoding channels
 
@@ -93,7 +93,7 @@ The TS core never resolves references itself: `computeContext` takes already-res
 
 | Field | TS core | Vega-Lite | Swift Charts | Compose | Media | Degradation when unsupported |
 | --- | --- | --- | --- | --- | --- | --- |
-| `config.title` | 🟡 not in `ChartContext`; the Svelte and ProseMirror interpreters draw it (rendering is the interpreter's job) | ✅ `title` | 🔵 SwiftUI label | 🔵 | 🔵 | Ignored → untitled chart |
+| `config.title` | 🟡 not in `ChartContext`; the Svelte and rich-text interpreters draw it (rendering is the interpreter's job) | ✅ `title` | 🔵 SwiftUI label | 🔵 | 🔵 | Ignored → untitled chart |
 | `config.tooltip` | — (interaction is per-platform) | ✅ `tooltip` | 🟡 maps to selection/`chartOverlay` if the app implements it | 🟡 | ⛔ static output has no tooltips | Ignored entirely; never an error |
 
 ### Extensions

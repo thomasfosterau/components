@@ -2,9 +2,10 @@
   "$schema": "https://www.schemastore.org/package",
   "name": "@thomasfosterau/charts",
   "version": "0.2.1",
-  "description": "A portable, renderer-agnostic chart spec — its JSON Schema, a pure TypeScript geometry core, and Svelte, ProseMirror and Vega-Lite interpreters",
+  "description": "A portable, renderer-agnostic chart spec — its JSON Schema, a pure TypeScript geometry core, and Svelte, effect-richtext and Vega-Lite interpreters",
   "keywords": [
     "charts",
+    "effect-richtext",
     "grammar-of-graphics",
     "json-schema",
     "prosemirror",
@@ -37,9 +38,9 @@
       "types": "./dist/core.d.mts",
       "default": "./dist/core.mjs"
     },
-    "./prosemirror": {
-      "types": "./dist/prosemirror.d.mts",
-      "default": "./dist/prosemirror.mjs"
+    "./richtext": {
+      "types": "./dist/richtext.d.mts",
+      "default": "./dist/richtext.mjs"
     },
     "./svelte": {
       "types": "./dist/svelte/index.d.ts",
@@ -63,12 +64,11 @@
   "devDependencies": {
     "@sveltejs/package": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@thomasfosterau/effect-richtext": "catalog:",
     "@types/d3-scale": "catalog:",
     "@types/d3-shape": "catalog:",
     "@types/node": "catalog:",
     "happy-dom": "catalog:",
-    "prosemirror-model": "catalog:",
-    "prosemirror-view": "catalog:",
     "svelte": "catalog:",
     "svelte-check": "catalog:",
     "typescript": "catalog:",
@@ -76,15 +76,11 @@
     "vega-lite": "catalog:"
   },
   "peerDependencies": {
-    "prosemirror-model": "catalog:peers",
-    "prosemirror-view": "catalog:peers",
+    "@thomasfosterau/effect-richtext": "catalog:peers",
     "svelte": "catalog:peers"
   },
   "peerDependenciesMeta": {
-    "prosemirror-model": {
-      "optional": true
-    },
-    "prosemirror-view": {
+    "@thomasfosterau/effect-richtext": {
       "optional": true
     },
     "svelte": {

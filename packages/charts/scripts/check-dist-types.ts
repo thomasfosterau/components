@@ -5,7 +5,9 @@
  * isolation invariant in AGENTS.md): consumers see plain TypeScript types and
  * never need Effect's types to compile. A `.d.mts` that names it would make
  * every consumer's type-check depend on Effect's, so it is caught here,
- * against the emitted `dist/`, rather than trusted to review.
+ * against the emitted `dist/`, rather than trusted to review. The `/richtext`
+ * entry's types name `@thomasfosterau/effect-richtext`, its optional peer,
+ * which an editor that uses that entry already depends on.
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -16,7 +18,7 @@ const dist = resolve(dirname(fileURLToPath(import.meta.url)), '../dist');
 // `dist/svelte/`, whose declarations are `.d.ts`.
 const offenders = readdirSync(dist, { recursive: true, encoding: 'utf8' })
   .filter((file) => file.endsWith('.d.mts') || file.endsWith('.d.ts'))
-  .filter((file) => /\beffect\b/.test(readFileSync(join(dist, file), 'utf8')));
+  .filter((file) => /\beffect\b(?!-richtext)/.test(readFileSync(join(dist, file), 'utf8')));
 
 if (offenders.length > 0) {
   console.error(`Published type definitions reference effect: ${offenders.join(', ')}`);

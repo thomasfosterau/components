@@ -69,7 +69,7 @@ export default defineConfig({
     entry: {
       index: 'src/spec/index.ts',
       core: 'src/core/index.ts',
-      prosemirror: 'src/prosemirror/index.ts',
+      richtext: 'src/richtext/index.ts',
       vega: 'src/vega/index.ts',
     },
     format: ['esm'],

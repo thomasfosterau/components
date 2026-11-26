@@ -1,7 +1,7 @@
 /**
- * `@thomasfosterau/charts/prosemirror`
+ * `@thomasfosterau/charts/richtext`
  *
- * Layer 3 interpreter: edit-time chart rendering inside ProseMirror.
+ * Layer 3 interpreter: edit-time chart rendering inside an effect-richtext editor.
  *
  * - {@link createChartNodeSpec} — the atom node schema persisting the
  *   portable chart spec in node attrs (pure JSON, so document round-trips
@@ -17,6 +17,7 @@ export {
   CHART_SPEC_ATTRIBUTE,
   createChartNodeSpec,
   type ChartNodeAttrs,
+  type ChartNodeSpec,
   type ChartNodeSpecOptions,
 } from './node-spec.ts';
 

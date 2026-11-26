@@ -26,7 +26,7 @@ const DEFAULT_COLOR = CATEGORICAL_PALETTE[0]!;
 /**
  * Renders a computed ChartContext to an SVG string.
  *
- * Pure string building — no DOM required — so it works in the ProseMirror
+ * Pure string building — no DOM required — so it works in the rich-text
  * NodeView (via innerHTML), in server-side rendering, and in headless tests.
  * The SVG uses a viewBox so it scales to its container via CSS. The root is
  * `<svg role="img" viewBox="…">` with no `aria-label` (the title is drawn as

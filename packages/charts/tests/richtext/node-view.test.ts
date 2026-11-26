@@ -1,17 +1,18 @@
 // @vitest-environment happy-dom
 import type { DataRows } from '../../src/core/index.ts';
 import type { ChartSpec } from '../../src/spec/index.ts';
-import { Schema } from 'prosemirror-model';
-import type { EditorView } from 'prosemirror-view';
+import { DocSchema } from '@thomasfosterau/effect-richtext/Model';
+import { EditorState } from '@thomasfosterau/effect-richtext/State';
+import { EditorView } from '@thomasfosterau/effect-richtext/View';
 import { describe, expect, it, vi } from 'vite-plus/test';
 import {
   CHART_NODE_NAME,
   ChartNodeView,
   chartNodeViewFactory,
   createChartNodeSpec,
-} from '../../src/prosemirror/index.ts';
+} from '../../src/richtext/index.ts';
 
-const schema = new Schema({
+const schema = DocSchema.makeUnsafe({
   nodes: {
     doc: { content: 'block+' },
     paragraph: {
@@ -61,7 +62,7 @@ const refRows: DataRows = [
 const fakeView: EditorView = Object.create(null);
 
 function viewFor(spec: unknown, options?: ConstructorParameters<typeof ChartNodeView>[2]) {
-  return new ChartNodeView(chartType.create({ spec }), fakeView, options);
+  return new ChartNodeView(chartType.createUnsafe({ spec }), fakeView, options);
 }
 
 describe('ChartNodeView', () => {
@@ -137,14 +138,14 @@ describe('ChartNodeView', () => {
         ],
       },
     };
-    const updated = view.update(chartType.create({ spec: updatedSpec }));
+    const updated = view.update(chartType.createUnsafe({ spec: updatedSpec }));
     expect(updated).toBe(true);
     expect(view.dom.querySelectorAll('circle')).toHaveLength(3);
   });
 
   it('rejects updates for a different node type', () => {
     const view = viewFor(inlineSpec);
-    const paragraph = schema.nodes['paragraph'].create();
+    const paragraph = schema.nodes['paragraph'].createUnsafe();
     expect(view.update(paragraph)).toBe(false);
   });
 
@@ -162,9 +163,28 @@ describe('ChartNodeView', () => {
 describe('chartNodeViewFactory', () => {
   it('creates NodeViews compatible with the nodeViews editor prop', () => {
     const factory = chartNodeViewFactory();
-    const view = factory(chartType.create({ spec: inlineSpec }), fakeView, () => 0);
+    const view = factory(chartType.createUnsafe({ spec: inlineSpec }), fakeView, () => 0);
     expect(view).toBeInstanceOf(ChartNodeView);
     expect(view.dom.querySelector('svg')).toBeTruthy();
+  });
+
+  it('draws a chart node in a mounted editor view', () => {
+    const place = document.createElement('div');
+    const editor = EditorView.makeUnsafe(place, {
+      state: EditorState.createUnsafe({
+        schema,
+        doc: schema.nodeUnsafe('doc', null, [
+          schema.nodeUnsafe(CHART_NODE_NAME, { spec: inlineSpec }),
+        ]),
+      }),
+      nodeViews: { [CHART_NODE_NAME]: chartNodeViewFactory() },
+    });
+    try {
+      expect(place.querySelector('.chart-node-view svg')).toBeTruthy();
+      expect(place.querySelectorAll('circle')).toHaveLength(2);
+    } finally {
+      editor.destroy();
+    }
   });
 });
 

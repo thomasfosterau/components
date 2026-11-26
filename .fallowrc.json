@@ -62,7 +62,7 @@
       { "name": "charts-spec", "patterns": ["packages/charts/src/spec/**"] },
       { "name": "charts-core", "patterns": ["packages/charts/src/core/**"] },
       { "name": "charts-svelte", "patterns": ["packages/charts/src/svelte/**"] },
-      { "name": "charts-prosemirror", "patterns": ["packages/charts/src/prosemirror/**"] },
+      { "name": "charts-richtext", "patterns": ["packages/charts/src/richtext/**"] },
       { "name": "charts-vega", "patterns": ["packages/charts/src/vega/**"] },
       { "name": "import", "patterns": ["packages/import/src/*.ts"] },
       { "name": "import-svelte", "patterns": ["packages/import/src/svelte/**"] }
@@ -76,7 +76,7 @@
       // package name, which fallow resolves to source through the workspace
       // link; fallow-rules.json bans the relative form.
       { "from": "charts-svelte", "allow": ["charts-spec", "charts-core"] },
-      { "from": "charts-prosemirror", "allow": ["charts-spec", "charts-core"] },
+      { "from": "charts-richtext", "allow": ["charts-spec", "charts-core"] },
       { "from": "charts-vega", "allow": ["charts-spec", "charts-core"] },
       // No relative imports into other packages; fallow-rules.json bans the rest.
       { "from": "import", "allow": [] },

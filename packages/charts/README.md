@@ -1,6 +1,6 @@
 # @thomasfosterau/charts
 
-A portable, renderer-agnostic charting system built around a durable chart specification: the spec and its JSON Schema, a pure TypeScript geometry core, and interpreters for Svelte, ProseMirror and Vega-Lite.
+A portable, renderer-agnostic charting system built around a durable chart specification: the spec and its JSON Schema, a pure TypeScript geometry core, and interpreters for Svelte, effect-richtext and Vega-Lite.
 
 It is unrelated to `Chart` from [`@thomasfosterau/components/charts`](https://github.com/thomasfosterau/components/blob/trunk/packages/components/README.md), which takes its own series props rather than this spec.
 
@@ -10,7 +10,7 @@ It is unrelated to `Chart` from [`@thomasfosterau/components/charts`](https://gi
 pnpm add @thomasfosterau/charts
 ```
 
-The package is ESM-only. The spec, core and Vega-Lite entries need nothing else. The framework entries need their framework, declared as an optional peer: `svelte` (`^5.40.0`) for `/svelte`, and `prosemirror-model` and `prosemirror-view` (`^1.0.0`) for `/prosemirror`.
+The package is ESM-only. The spec, core and Vega-Lite entries need nothing else. The framework entries need their framework, declared as an optional peer: `svelte` (`^5.40.0`) for `/svelte`, and `@thomasfosterau/effect-richtext` (`^0.3.0`, with its `effect` peer) for `/richtext`.
 
 ## Example
 
@@ -46,7 +46,7 @@ In Svelte, `<Chart {spec} />` from `@thomasfosterau/charts/svelte` renders the s
 | `@thomasfosterau/charts` | The portable spec: types, `parseSpec` / `validateSpec` / `encodeSpec`, `ganttSpec` | none |
 | `@thomasfosterau/charts/core` | Pure geometry core: `computeContext`, `resolveChart`, scales, ticks, data tables | none |
 | `@thomasfosterau/charts/svelte` | Svelte 5 `Chart` component, SSR-compatible, shipped as `.svelte` source | `svelte` |
-| `@thomasfosterau/charts/prosemirror` | Chart node, edit-time NodeView and a DOM-free SVG string renderer | `prosemirror-model`, `prosemirror-view` |
+| `@thomasfosterau/charts/richtext` | Chart node, edit-time NodeView and a DOM-free SVG string renderer for effect-richtext | `@thomasfosterau/effect-richtext` |
 | `@thomasfosterau/charts/vega` | Spec to Vega-Lite emitter | none |
 | `@thomasfosterau/charts/schema.json` | The JSON Schema (draft 2020-12) | none |
 

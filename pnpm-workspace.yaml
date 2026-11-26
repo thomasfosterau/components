@@ -27,8 +27,7 @@ catalog:
   d3-scale: ^4.0.3
   d3-shape: ^3.2.1
   happy-dom: ^21.0.4
-  prosemirror-model: ^1.25.13
-  prosemirror-view: ^1.44.0
+  '@thomasfosterau/effect-richtext': ^0.3.0
   vega: ^6.2.0
   vega-lite: ^6.4.3
   '@storybook/addon-a11y': ^10.6.8
@@ -82,8 +81,7 @@ catalogs:
     '@thomasfosterau/effect-forms-svelte': ^0.4.2
     effect: ^4.0.0
     '@thomasfosterau/effect-document': ^0.3.0
-    prosemirror-model: ^1.0.0
-    prosemirror-view: ^1.0.0
+    '@thomasfosterau/effect-richtext': ^0.3.0
   published:
     effect: ^4.0.0
 

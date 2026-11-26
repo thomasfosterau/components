@@ -161,7 +161,7 @@ export interface Scales {
 
 /** Portable presentation hints honoured (or gracefully ignored) by every interpreter. */
 export interface Config {
-  /** The chart's title: its accessible name, and drawn above the plot by the Svelte and ProseMirror interpreters. */
+  /** The chart's title: its accessible name, and drawn above the plot by the Svelte and rich-text interpreters. */
   readonly title?: string;
   /** Whether tooltips are enabled. A trivial declarative hint — real interaction is per-platform. */
   readonly tooltip?: boolean;
