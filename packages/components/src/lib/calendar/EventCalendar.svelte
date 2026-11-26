@@ -1,14 +1,21 @@
 <!-- @component
-Dated events on a calendar: a month grid and an agenda list, with Today / Previous / Next and a view switch.
+Dated events on a calendar: a month grid, week and day time grids and an agenda list, with Today / Previous / Next and a view switch.
 -->
 <!--
   The agenda is a list of day headings and events, accessible by
   construction; the month is an APG grid with roving focus, Enter into a
-  day's events and Escape back out. Events are concrete: recurrences are
-  the caller's to expand. Week and day time grids are not built yet.
+  day's events and Escape back out. The week and day time grids position
+  events by time but keep them in time order in the DOM, so Tab follows
+  the clock. Events are concrete: recurrences are the caller's to expand.
 -->
 <script lang="ts">
-  import { getLocalTimeZone, parseDate, today, type CalendarDate } from '@internationalized/date';
+  import {
+    getLocalTimeZone,
+    now as nowIn,
+    parseDate,
+    today,
+    type CalendarDate,
+  } from '@internationalized/date';
   import { ChevronLeft, ChevronRight } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
@@ -17,11 +24,16 @@ Dated events on a calendar: a month grid and an agenda list, with Today / Previo
   import ToggleGroup from '../ui/ToggleGroup.svelte';
   import CalendarAgenda from './CalendarAgenda.svelte';
   import CalendarMonth from './CalendarMonth.svelte';
+  import CalendarTimeGrid from './CalendarTimeGrid.svelte';
   import {
+    defaultSlot,
     eventsOn,
+    gridDays,
+    gridHours,
     localeWeekStart,
     monthWeeks,
     placeEvent,
+    slotBetween,
     visibleRange,
     type CalendarEvent,
     type CalendarView,
@@ -43,7 +55,7 @@ Dated events on a calendar: a month grid and an agenda list, with Today / Previo
     date?: string | undefined;
     /**
      * The views the switch offers.
-     * @defaultValue `['month', 'agenda']`
+     * @defaultValue `['month', 'week', 'day', 'agenda']`
      */
     views?: readonly CalendarView[] | undefined;
     /** Fetch the events for the visible range (ISO dates, inclusive); the signal aborts on navigation. */
@@ -52,6 +64,22 @@ Dated events on a calendar: a month grid and an agenda list, with Today / Previo
       | undefined;
     /** An event without an `href` was chosen. */
     onEventSelect?: ((event: CalendarEvent) => void) | undefined;
+    /**
+     * A time slot was chosen in the week or day view, by dragging over the
+     * hours or a day's "New event" button: ISO 8601 instants with the
+     * offset. Without it, the grid offers neither.
+     */
+    onSlotSelect?: ((start: string, end: string) => void) | undefined;
+    /**
+     * The week and day views' first and last hours, 0–24.
+     * @defaultValue `[6, 22]`
+     */
+    hours?: readonly [from: number, to: number] | undefined;
+    /**
+     * The minutes a dragged slot snaps to.
+     * @defaultValue `30`
+     */
+    slotMinutes?: number | undefined;
     /**
      * The first day of the week, 0 Sunday … 6 Saturday.
      * @defaultValue the locale's
@@ -82,15 +110,30 @@ Dated events on a calendar: a month grid and an agenda list, with Today / Previo
      */
     nextLabel?: ((unit: string) => string) | undefined;
     /**
-     * The unit the buttons move by.
+     * The unit the buttons move by in the month and agenda views.
      * @defaultValue `'month'`
      */
     monthUnitLabel?: string | undefined;
     /**
-     * The view switch's items.
-     * @defaultValue `{ month: 'Month', agenda: 'Agenda' }`
+     * The unit the buttons move by in the week view.
+     * @defaultValue `'week'`
      */
-    viewLabels?: Readonly<Record<CalendarView, string>> | undefined;
+    weekUnitLabel?: string | undefined;
+    /**
+     * The unit the buttons move by in the day view.
+     * @defaultValue `'day'`
+     */
+    dayUnitLabel?: string | undefined;
+    /**
+     * The view switch's items; any left out keep their default.
+     * @defaultValue `{ month: 'Month', week: 'Week', day: 'Day', agenda: 'Agenda' }`
+     */
+    viewLabels?: Readonly<Partial<Record<CalendarView, string>>> | undefined;
+    /**
+     * A day's "New event" button in the week and day views, given the date.
+     * @defaultValue `` (day) => `New event, ${day}` ``
+     */
+    newEventLabel?: ((day: string) => string) | undefined;
     /**
      * Names the view switch.
      * @defaultValue `'View'`
@@ -116,9 +159,12 @@ Dated events on a calendar: a month grid and an agenda list, with Today / Previo
     events = [],
     view = $bindable(),
     date = $bindable(),
-    views = ['month', 'agenda'],
+    views = ['month', 'week', 'day', 'agenda'],
     loadRange,
     onEventSelect,
+    onSlotSelect,
+    hours: hoursProp,
+    slotMinutes = 30,
     weekStartsOn,
     timeZone: timeZoneProp,
     locales,
@@ -127,7 +173,10 @@ Dated events on a calendar: a month grid and an agenda list, with Today / Previo
     previousLabel = (unit) => `Previous ${unit}`,
     nextLabel = (unit) => `Next ${unit}`,
     monthUnitLabel = 'month',
-    viewLabels = { month: 'Month', agenda: 'Agenda' },
+    weekUnitLabel = 'week',
+    dayUnitLabel = 'day',
+    viewLabels,
+    newEventLabel = (day) => `New event, ${day}`,
     viewSwitchLabel = 'View',
     moreLabel = (count) => `${count} more`,
     eventCountLabel = (count) => (count === 1 ? '1 event' : `${count} events`),
@@ -217,8 +266,22 @@ Dated events on a calendar: a month grid and an agenda list, with Today / Previo
   );
 
   const asDate = (day: CalendarDate): Date => day.toDate('UTC');
-  const heading = $derived(
-    monthFormat.format(new Date(Date.UTC(focused.year, focused.month - 1, 15))),
+  const rangeFormat = $derived(
+    new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }),
+  );
+  const heading = $derived.by(() => {
+    if (current === 'week') return rangeFormat.formatRange(asDate(range.start), asDate(range.end));
+    if (current === 'day') return fullDayFormat.format(asDate(focused));
+    return monthFormat.format(new Date(Date.UTC(focused.year, focused.month - 1, 15)));
+  });
+
+  /** What Previous and Next move by in each view, and the unit their names give. */
+  const step = $derived(
+    current === 'week'
+      ? { duration: { weeks: 1 }, unit: weekUnitLabel }
+      : current === 'day'
+        ? { duration: { days: 1 }, unit: dayUnitLabel }
+        : { duration: { months: 1 }, unit: monthUnitLabel },
   );
 
   const timeOf = (each: PlacedEvent): string =>
@@ -255,7 +318,30 @@ Dated events on a calendar: a month grid and an agenda list, with Today / Previo
     return days;
   });
 
-  const viewItems = $derived(views.map((each) => ({ value: each, label: viewLabels[each] })));
+  const defaultViewLabels: Record<CalendarView, string> = {
+    month: 'Month',
+    week: 'Week',
+    day: 'Day',
+    agenda: 'Agenda',
+  };
+  const viewItems = $derived(
+    views.map((each) => ({ value: each, label: viewLabels?.[each] ?? defaultViewLabels[each] })),
+  );
+
+  const hours = $derived(gridHours(hoursProp));
+  const hourFormat = $derived(new Intl.DateTimeFormat(locale, { hour: 'numeric', timeZone: 'UTC' }));
+  const shortWeekdayFormat = $derived(
+    new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', timeZone: 'UTC' }),
+  );
+
+  const nameOf = (each: PlacedEvent): string =>
+    each.startsAt === undefined || each.endsAt === undefined
+      ? `${each.event.title}, ${allDayLabel}`
+      : `${each.event.title}, ${timeFormat.formatRange(each.startsAt.toDate(), each.endsAt.toDate())}`;
+
+  const selectSlot = (slot: { readonly start: string; readonly end: string }): void => {
+    onSlotSelect?.(slot.start, slot.end);
+  };
 </script>
 
 <section {...rest} aria-labelledby={headingId} class={['flex flex-col gap-3', className]}>
@@ -264,16 +350,16 @@ Dated events on a calendar: a month grid and an agenda list, with Today / Previo
     <button type="button" class="btn btn-sm" onclick={() => setDate(now)}>{todayLabel}</button>
     <div class="flex">
       <IconButtonCore
-        label={previousLabel(monthUnitLabel)}
+        label={previousLabel(step.unit)}
         size="sm"
-        onclick={() => setDate(focused.subtract({ months: 1 }))}
+        onclick={() => setDate(focused.subtract(step.duration))}
       >
         {#snippet icon()}<ChevronLeft class="size-4 rtl:rotate-180" />{/snippet}
       </IconButtonCore>
       <IconButtonCore
-        label={nextLabel(monthUnitLabel)}
+        label={nextLabel(step.unit)}
         size="sm"
-        onclick={() => setDate(focused.add({ months: 1 }))}
+        onclick={() => setDate(focused.add(step.duration))}
       >
         {#snippet icon()}<ChevronRight class="size-4 rtl:rotate-180" />{/snippet}
       </IconButtonCore>
@@ -308,6 +394,30 @@ Dated events on a calendar: a month grid and an agenda list, with Today / Previo
         {describe}
         onFocusDate={setDate}
         onSelect={onEventSelect}
+      />
+    {:else if current === 'week' || current === 'day'}
+      <CalendarTimeGrid
+        days={gridDays(current, focused, firstDay)}
+        today={now}
+        {placed}
+        {hours}
+        dayNames={(day) => ({
+          short: shortWeekdayFormat.format(asDate(day)),
+          long: fullDayFormat.format(asDate(day)),
+        })}
+        hourLabel={(hour) => hourFormat.format(new Date(Date.UTC(2000, 0, 1, hour)))}
+        {allDayLabel}
+        {newEventLabel}
+        {timeOf}
+        {nameOf}
+        {describe}
+        onSelect={onEventSelect}
+        onNew={onSlotSelect === undefined
+          ? undefined
+          : (day) => selectSlot(defaultSlot(day, hours, nowIn(timeZone), timeZone))}
+        onDrag={onSlotSelect === undefined
+          ? undefined
+          : (day, from, to) => selectSlot(slotBetween(day, from, to, hours, slotMinutes, timeZone))}
       />
     {:else}
       <CalendarAgenda days={agendaDays} {timeOf} {describe} {noEventsLabel} onSelect={onEventSelect} />

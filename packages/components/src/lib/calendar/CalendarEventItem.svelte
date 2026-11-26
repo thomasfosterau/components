@@ -17,19 +17,37 @@ One event as a link (with an `href` that `safeHref` accepts) or a button: named 
     tabindex?: 0 | -1 | undefined;
     /** Compact, for a month cell. */
     compact?: boolean | undefined;
+    /** A block filling its time-grid slot, named by title and time. */
+    block?: boolean | undefined;
+    /** The accessible name, when it says more than the title. */
+    label?: string | undefined;
     onSelect: ((event: PlacedEvent['event']) => void) | undefined;
   }
 
-  let { placed, time, description, tabindex = 0, compact = false, onSelect }: Props = $props();
+  let {
+    placed,
+    time,
+    description,
+    tabindex = 0,
+    compact = false,
+    block = false,
+    label,
+    onSelect,
+  }: Props = $props();
 
   const context = getComponentsContext();
   const uid = $props.id();
   const event = $derived(placed.event);
   const href = $derived(safeHref(event.href));
   const classes = $derived([
-    'hover:bg-base-200 focus-visible:outline-primary flex w-full min-w-0 items-center gap-1.5 rounded text-start focus-visible:outline-2',
-    compact ? 'px-1 text-xs' : 'px-2 py-1',
+    'focus-visible:outline-primary flex w-full min-w-0 gap-1.5 rounded text-start focus-visible:outline-2',
+    block
+      ? 'bg-base-200 border-base-300 hover:bg-base-300 flex-wrap content-start items-center gap-y-0 overflow-hidden border px-1 py-0.5 text-xs'
+      : 'hover:bg-base-200 items-center',
+    !block && (compact ? 'px-1 text-xs' : 'px-2 py-1'),
   ]);
+  // Inline, so a block fills its slot even where no stylesheet has loaded.
+  const style = $derived(block ? 'width:100%;height:100%;overflow:hidden;box-sizing:border-box' : undefined);
 </script>
 
 {#snippet body()}
@@ -38,16 +56,18 @@ One event as a link (with an `href` that `safeHref` accepts) or a button: named 
     class={['status shrink-0', statusTone[event.tone ?? 'neutral']]}
   ></span>
   {#if time !== ''}<span aria-hidden="true" class="shrink-0 tabular-nums opacity-70">{time}</span>{/if}
-  <span class="truncate">{event.title}</span>
+  <span class={block ? 'line-clamp-3 basis-full font-medium' : 'truncate'}>{event.title}</span>
 {/snippet}
 
 {#if href !== undefined}
   <a
     href={context.href(href)}
     {tabindex}
+    aria-label={label}
     aria-describedby={uid}
     data-event
     class={classes}
+    {style}
   >
     {@render body()}
   </a>
@@ -55,9 +75,11 @@ One event as a link (with an `href` that `safeHref` accepts) or a button: named 
   <button
     type="button"
     {tabindex}
+    aria-label={label}
     aria-describedby={uid}
     data-event
     class={classes}
+    {style}
     onclick={() => onSelect?.(event)}
   >
     {@render body()}
