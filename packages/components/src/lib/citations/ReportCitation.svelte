@@ -11,6 +11,7 @@ A report as "Authors, <cite>Title</cite> (2021) Canberra: Department of X pp 88"
   English default.
 -->
 <script lang="ts">
+  import { safeHref } from '../links/safe-href.ts';
   import Year from '../formatting/Year.svelte';
   import CreditList from './CreditList.svelte';
   import Publisher from './Publisher.svelte';
@@ -58,6 +59,8 @@ A report as "Authors, <cite>Title</cite> (2021) Canberra: Department of X pp 88"
     locales,
   }: Props = $props();
 
+  const url = $derived(safeHref(report.url));
+
   const authors = $derived(report.authors ?? []);
 </script>
 
@@ -79,7 +82,7 @@ A report as "Authors, <cite>Title</cite> (2021) Canberra: Department of X pp 88"
   {#if report.numberOfPages !== undefined}
     {pageCountLabel} <span itemprop="numberOfPages">{report.numberOfPages}</span>
   {/if}
-  {#if report.url !== undefined}
-    {availableOnlineLabel} <a itemprop="url" href={report.url}>{report.url}</a>
+  {#if url !== undefined}
+    {availableOnlineLabel} <a itemprop="url" href={url}>{url}</a>
   {/if}
 </span>

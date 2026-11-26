@@ -31,7 +31,7 @@ export interface CalendarEvent {
   readonly tone?: Tone | undefined;
   /** What the tone means ("Sowing"), read in the event's description. */
   readonly category?: string | undefined;
-  /** Open the event at this app path instead of calling `onEventSelect`. */
+  /** Open the event at this app path or `http(s):`, `mailto:` or `tel:` URL instead of calling `onEventSelect`; any other scheme is ignored. */
   readonly href?: string | undefined;
   readonly description?: string | undefined;
 }

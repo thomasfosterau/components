@@ -63,3 +63,23 @@ test('inside a FormField it is named by the label, described by the hint, and po
     expect(posted?.get('colour')).toBe('#1e3a5f');
   });
 });
+
+test('fills a swatch with its colour alone, and leaves a value that is not a colour unfilled', async () => {
+  const screen = await render(ColorSwatchGroup, {
+    swatches: [
+      { value: '#3a7d44', label: 'Moss green' },
+      { value: 'red; background-image: url(https://example.com/x)', label: 'Injected' },
+    ],
+    label: 'Label colour',
+  });
+
+  const moss = instanceOf(screen.getByRole('radio', { name: 'Moss green' }).element(), HTMLElement);
+  expect(moss.style.backgroundColor).toBe('rgb(58, 125, 68)');
+  const injected = instanceOf(
+    screen.getByRole('radio', { name: 'Injected' }).element(),
+    HTMLElement,
+  );
+  expect(injected.style.backgroundColor).toBe('');
+  expect(injected.style.backgroundImage).toBe('');
+  expect(injected.getAttribute('style') ?? '').not.toContain('example.com');
+});

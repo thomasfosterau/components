@@ -1,8 +1,9 @@
 <!-- @component
-One event as a link (with `href`) or a button: named by its title, described by its date, time and category. Internal.
+One event as a link (with an `href` that `safeHref` accepts) or a button: named by its title, described by its date, time and category. Internal.
 -->
 <script lang="ts">
   import { getComponentsContext } from '../context.svelte.ts';
+  import { safeHref } from '../links/safe-href.ts';
   import { statusTone } from '../ui/tones.ts';
   import type { PlacedEvent } from './events.ts';
 
@@ -24,6 +25,7 @@ One event as a link (with `href`) or a button: named by its title, described by 
   const context = getComponentsContext();
   const uid = $props.id();
   const event = $derived(placed.event);
+  const href = $derived(safeHref(event.href));
   const classes = $derived([
     'hover:bg-base-200 focus-visible:outline-primary flex w-full min-w-0 items-center gap-1.5 rounded text-start focus-visible:outline-2',
     compact ? 'px-1 text-xs' : 'px-2 py-1',
@@ -39,9 +41,9 @@ One event as a link (with `href`) or a button: named by its title, described by 
   <span class="truncate">{event.title}</span>
 {/snippet}
 
-{#if event.href !== undefined}
+{#if href !== undefined}
   <a
-    href={context.href(event.href)}
+    href={context.href(href)}
     {tabindex}
     aria-describedby={uid}
     data-event

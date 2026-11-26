@@ -15,6 +15,7 @@ The numbered bibliography a page’s `<Citation>` markers accumulated, in citati
   be a different style entirely, not a display toggle on this one.
 -->
 <script lang="ts">
+  import { safeHref } from '../links/safe-href.ts';
   import { getBibliographyContext } from './bibliography.svelte.ts';
   import { formatCitation } from './citation.ts';
 
@@ -59,12 +60,13 @@ The numbered bibliography a page’s `<Citation>` markers accumulated, in citati
 
     <ol class="space-y-2 text-sm">
       {#each entries as entry (entry.id)}
+        {@const href = safeHref(entry.url)}
         <li id="ref-{entry.id}" class="text-base-content/80 flex gap-2 leading-relaxed">
           <span class="text-base-content/60 shrink-0 font-medium">[{entry.order}]</span>
           <span>
             {entry.text}
-            {#if entry.url}
-              <a class="link link-hover" href={entry.url} rel="noreferrer nofollow" target="_blank">
+            {#if href !== undefined && href !== ''}
+              <a class="link link-hover" {href} rel="noreferrer nofollow" target="_blank">
                 {entry.url}
               </a>
             {/if}

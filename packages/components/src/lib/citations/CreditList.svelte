@@ -21,12 +21,13 @@ A locale-joined byline for one credited role (authors, editors, translators), ea
 -->
 <script lang="ts">
   import { getComponentsContext } from '../context.svelte.ts';
+  import { safeHref } from '../links/safe-href.ts';
   import { formatListParts } from './list-format.ts';
 
   /** One credited name. */
   export interface Credit {
     readonly name: string;
-    /** Link to the credited party's own page, if it has one. */
+    /** Link to the credited party's own page, if it has one; ignored unless relative or `http(s):`, `mailto:` or `tel:`. */
     readonly href?: string | undefined;
     /** Present exactly when the credit resolved to a real Agent. */
     readonly itemtype?: 'Person' | 'Organization' | undefined;
@@ -106,16 +107,17 @@ A locale-joined byline for one credited role (authors, editors, translators), ea
     {#each parts as part, index (index)}
       {#if part.kind === 'item'}
         {@const credit = part.value}
+        {@const href = safeHref(credit.href)}
         {#if credit.itemtype !== undefined}
           <span itemprop={creditItemprop} itemscope itemtype={`https://schema.org/${credit.itemtype}`}>
-            {#if credit.href !== undefined}
-              <a itemprop="name" href={ctx.href(credit.href)}>{credit.name}</a>
+            {#if href !== undefined}
+              <a itemprop="name" href={ctx.href(href)}>{credit.name}</a>
             {:else}
               <span itemprop="name">{credit.name}</span>
             {/if}
           </span>
-        {:else if credit.href !== undefined}
-          <a itemprop={creditItemprop} href={ctx.href(credit.href)}>{credit.name}</a>
+        {:else if href !== undefined}
+          <a itemprop={creditItemprop} href={ctx.href(href)}>{credit.name}</a>
         {:else}
           <span itemprop={creditItemprop}>{credit.name}</span>
         {/if}
