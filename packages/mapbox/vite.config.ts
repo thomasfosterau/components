@@ -7,7 +7,7 @@
  * cache fingerprint — with two differences that follow from this being the
  * SECOND package rather than the first:
  *
- * - `check` and `test:unit` take `{ task: 'build', from: 'dependencies' }`.
+ * - `check` and `test:unit` take `{ task: 'build', from: ['dependencies', 'devDependencies'] }`.
  *   This package imports `@thomasfosterau/components/canvas`, whose `exports`
  *   point at the sibling's BUILT `dist/`, so neither the type-check nor the
  *   browser suite can resolve it until that build has run. Same edge the
@@ -56,8 +56,8 @@ export default defineConfig({
       check: {
         command: 'svelte-check --tsconfig ./tsconfig.json',
         dependsOn: [
-          { task: 'check', from: 'dependencies' },
-          { task: 'build', from: 'dependencies' },
+          { task: 'check', from: ['dependencies', 'devDependencies'] },
+          { task: 'build', from: ['dependencies', 'devDependencies'] },
           'sync',
         ],
         cache: {
@@ -71,7 +71,7 @@ export default defineConfig({
         command: 'vp test run tests',
         dependsOn: [
           'sync',
-          { task: 'build', from: 'dependencies' },
+          { task: 'build', from: ['dependencies', 'devDependencies'] },
           '@thomasfosterau/monorepo#browser:install',
         ],
         cache: {

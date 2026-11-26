@@ -7,10 +7,10 @@ The `.` entry is the headless core: the target descriptor, the spec, the mapping
 ## Install
 
 ```sh
-pnpm add @thomasfosterau/components-import @thomasfosterau/effect-document effect
+pnpm add @thomasfosterau/components-import @thomasfosterau/components @thomasfosterau/effect-document effect
 ```
 
-The package is ESM-only. `effect` (`^4.0.0`) and `@thomasfosterau/effect-document` (`^0.2.0`) are required peers, and `svelte` (`^5.40.0`) is one for the `./svelte` entry. This package loads no reader of effect-document's, so its readers' optional peer `@thomasfosterau/effect-parse` is yours to add when you import one such as `/csv` (`pnpm add @thomasfosterau/effect-parse`). The UI's styles are `@thomasfosterau/components`' daisyUI classes; set that package up as its README says.
+The package is ESM-only. `effect` (`^4.0.0`), `@thomasfosterau/effect-document` (`^0.2.0`) and `@thomasfosterau/components` (the minor released alongside) are required peers, and `svelte` (`^5.40.0`) is one for the `./svelte` entry. This package loads no reader of effect-document's, so its readers' optional peer `@thomasfosterau/effect-parse` is yours to add when you import one such as `/csv` (`pnpm add @thomasfosterau/effect-parse`). The UI's styles are `@thomasfosterau/components`' daisyUI classes; set that package up as its README says.
 
 ## Example
 
