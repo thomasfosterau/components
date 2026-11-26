@@ -11,7 +11,7 @@
       docs: {
         description: {
           component:
-            'Shows as many items as fit and moves the rest, lowest priority first, into a "More" menu. Shown at three widths; `Tabs mode="links"` and `Breadcrumbs` take it through an `overflow` prop.',
+            'Shows as many items as fit and moves the rest, lowest priority first, into a "More" menu. Shown at three widths; `Tabs mode="links"`, `Breadcrumbs`, `Toolbar` and `ButtonGroup` take it through an `overflow` prop.',
         },
       },
     },
