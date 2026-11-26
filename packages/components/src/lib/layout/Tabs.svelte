@@ -20,6 +20,8 @@ A tab strip that is either a tab widget over panels (`mode="panels"`) or navigat
   `value` when the caller tracks it, and otherwise by the components context's
   own current-page check.
 
+  `scrollButtons` wraps the panels tablist in `TabsScroller`.
+
   ARIA contract: panels mode is bits-ui's, unmodified — `aria-selected` on the
   tabs, `aria-controls` to the panel, arrows and Home/End moving selection.
   Links mode is `<nav aria-label>` + `aria-current="page"`. A disabled item in
@@ -31,6 +33,7 @@ A tab strip that is either a tab widget over panels (`mode="panels"`) or navigat
   import { Tabs as BitsTabs } from 'bits-ui';
   import type { Snippet } from 'svelte';
   import { getComponentsContext } from '../context.svelte.ts';
+  import TabsScroller from './TabsScroller.svelte';
   import Overflow, { type OverflowItemAttributes } from '../ui/Overflow.svelte';
   import type { Size } from '../ui/tones.ts';
   import { tabsSize, tabsVariant, type TabItem, type TabsMode, type TabsVariant } from './types.ts';
@@ -68,7 +71,7 @@ A tab strip that is either a tab widget over panels (`mode="panels"`) or navigat
     /** One panel's content, in `panels` mode. Without it, no panels render. */
     panel?: Snippet<[TabItem]> | undefined;
     /**
-     * In `links` mode, move the tabs that don't fit into a "More" menu; the current tab always stays. `panels` mode ignores it: a menu item cannot be a `tab`.
+     * In `links` mode, move the tabs that don't fit into a "More" menu; the current tab always stays. `panels` mode ignores it, since a menu item cannot be a `tab`: use `scrollButtons` there.
      * @defaultValue `false`
      */
     overflow?: boolean | undefined;
@@ -77,6 +80,21 @@ A tab strip that is either a tab widget over panels (`mode="panels"`) or navigat
      * @defaultValue `'More'`
      */
     moreLabel?: string | undefined;
+    /**
+     * In `panels` mode, scroll a tab list that doesn't fit, with left and right scroll buttons that show only while it overflows. `links` mode ignores it.
+     * @defaultValue `false`
+     */
+    scrollButtons?: boolean | undefined;
+    /**
+     * Names the button that scrolls the tabs left, with `scrollButtons`.
+     * @defaultValue `'Scroll tabs left'`
+     */
+    scrollLeftLabel?: string | undefined;
+    /**
+     * Names the button that scrolls the tabs right, with `scrollButtons`.
+     * @defaultValue `'Scroll tabs right'`
+     */
+    scrollRightLabel?: string | undefined;
     /** Extra classes, merged last. */
     class?: string | undefined;
   }
@@ -91,6 +109,9 @@ A tab strip that is either a tab widget over panels (`mode="panels"`) or navigat
     panel,
     overflow = false,
     moreLabel = 'More',
+    scrollButtons = false,
+    scrollLeftLabel = 'Scroll tabs left',
+    scrollRightLabel = 'Scroll tabs right',
     class: className,
   }: Props = $props();
 
@@ -142,6 +163,19 @@ A tab strip that is either a tab widget over panels (`mode="panels"`) or navigat
   {@render linkTab(entry.item, attributes)}
 {/snippet}
 
+{#snippet triggers(style: string | undefined)}
+  {#each items as item (item.value)}
+    <BitsTabs.Trigger
+      value={item.value}
+      disabled={item.disabled === true}
+      class={['tab', selected === item.value && 'tab-active']}
+      {style}
+    >
+      {item.label}
+    </BitsTabs.Trigger>
+  {/each}
+{/snippet}
+
 {#if mode === 'links' && overflow}
   <nav aria-label={label}>
     <Overflow
@@ -162,17 +196,22 @@ A tab strip that is either a tab widget over panels (`mode="panels"`) or navigat
   <!-- A function binding rather than `bind:value`: the value this renders at
        is the DEFAULTED one, while what a write puts back is the caller's. -->
   <BitsTabs.Root bind:value={() => selected, (next) => (value = next)} class={className}>
-    <BitsTabs.List class={stripClasses} aria-label={label}>
-      {#each items as item (item.value)}
-        <BitsTabs.Trigger
-          value={item.value}
-          disabled={item.disabled === true}
-          class={['tab', selected === item.value && 'tab-active']}
-        >
-          {item.label}
-        </BitsTabs.Trigger>
-      {/each}
-    </BitsTabs.List>
+    {#if scrollButtons}
+      <TabsScroller
+        class={stripClasses}
+        {label}
+        {scrollLeftLabel}
+        {scrollRightLabel}
+        {selected}
+        {items}
+      >
+        {@render triggers('flex-shrink: 0;')}
+      </TabsScroller>
+    {:else}
+      <BitsTabs.List class={stripClasses} aria-label={label}>
+        {@render triggers(undefined)}
+      </BitsTabs.List>
+    {/if}
     {#if panel}
       {#each items as item (item.value)}
         <BitsTabs.Content value={item.value} class="py-4">{@render panel(item)}</BitsTabs.Content>

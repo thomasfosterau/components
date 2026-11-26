@@ -4,6 +4,7 @@ import { render } from 'vitest-browser-svelte';
 import Tabs from '../../src/lib/layout/Tabs.svelte';
 import TabsFixture from './fixtures/TabsFixture.svelte';
 import OverflowRowsFixture from './fixtures/OverflowRowsFixture.svelte';
+import TabsScrollFixture from './fixtures/TabsScrollFixture.svelte';
 import type { TabItem } from '../../src/lib/layout/types.ts';
 
 const items: readonly TabItem[] = [
@@ -196,4 +197,76 @@ test('panels mode ignores overflow and keeps the tablist', async () => {
 
   await expect.element(screen.getByRole('tablist', { name: 'Results views' })).toBeInTheDocument();
   expect(document.querySelector('[aria-haspopup="menu"]')).toBeNull();
+});
+
+const scroller = (): Element => page.getByRole('tablist', { name: 'Sections' }).element();
+
+test('scroll buttons: none while every tab fits', async () => {
+  const screen = await render(TabsScrollFixture, { width: 2000, count: 3 });
+
+  await expect.element(screen.getByRole('tablist', { name: 'Sections' })).toBeInTheDocument();
+  expect(screen.getByRole('button').elements()).toHaveLength(0);
+});
+
+test('scroll buttons: outside the tablist and out of the Tab order, disabled at either end', async () => {
+  const screen = await render(TabsScrollFixture, { width: 320 });
+
+  const left = screen.getByRole('button', { name: 'Scroll tabs left' });
+  const right = screen.getByRole('button', { name: 'Scroll tabs right' });
+  await expect.element(right).toBeEnabled();
+  await expect.element(left).toBeDisabled();
+  expect(left.element().getAttribute('tabindex')).toBe('-1');
+  expect(right.element().getAttribute('tabindex')).toBe('-1');
+  expect(scroller().contains(left.element())).toBe(false);
+  expect(scroller().contains(right.element())).toBe(false);
+  expect(screen.getByRole('tab').elements()).toHaveLength(8);
+  expect([...scroller().children].every((child) => child.getAttribute('role') === 'tab')).toBe(
+    true,
+  );
+
+  await right.click();
+  await expect.poll(() => scroller().scrollLeft).toBeGreaterThan(0);
+  await expect.element(left).toBeEnabled();
+
+  const list = scroller();
+  list.scrollLeft = list.scrollWidth;
+  await expect.element(right).toBeDisabled();
+
+  await left.click();
+  await expect.poll(() => scroller().scrollLeft).toBeLessThan(list.scrollWidth - list.clientWidth);
+});
+
+test('scroll buttons: arrowing to a far tab scrolls it into view', async () => {
+  const screen = await render(TabsScrollFixture, { width: 320 });
+
+  screen.getByRole('tab', { name: 'Section number 1' }).element().focus();
+  await userEvent.keyboard('{End}');
+
+  const last = screen.getByRole('tab', { name: 'Section number 8' });
+  await expect.element(last).toHaveFocus();
+  await expect.element(last).toHaveAttribute('aria-selected', 'true');
+  await expect
+    .poll(() => {
+      const bounds = scroller().getBoundingClientRect();
+      const box = last.element().getBoundingClientRect();
+      return box.left >= bounds.left - 1 && box.right <= bounds.right + 1;
+    })
+    .toBe(true);
+  await expect.element(screen.getByRole('button', { name: 'Scroll tabs right' })).toBeDisabled();
+});
+
+test('scroll buttons: under RTL the left button scrolls left, toward the later tabs', async () => {
+  const screen = await render(TabsScrollFixture, { width: 320, dir: 'rtl' });
+
+  const left = screen.getByRole('button', { name: 'Scroll tabs left' });
+  const right = screen.getByRole('button', { name: 'Scroll tabs right' });
+  await expect.element(right).toBeDisabled();
+  await expect.element(left).toBeEnabled();
+  expect(left.element().getBoundingClientRect().left).toBeLessThan(
+    scroller().getBoundingClientRect().left,
+  );
+
+  await left.click();
+  await expect.poll(() => scroller().scrollLeft).toBeLessThan(0);
+  await expect.element(right).toBeEnabled();
 });
