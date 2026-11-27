@@ -32,3 +32,16 @@ export function safeHref(value: string | undefined): string | undefined {
   const scheme = SCHEME.exec(cleaned)?.[1];
   return scheme === undefined || SAFE_SCHEMES.has(scheme.toLowerCase()) ? cleaned : undefined;
 }
+
+/**
+ * `href` checked with {@link safeHref}, then resolved through `resolve`
+ * unless it is `external`; `undefined` when the scheme is unsafe.
+ */
+export function resolveSafeHref(
+  href: string,
+  external: boolean,
+  resolve: (path: string) => string,
+): string | undefined {
+  const safe = safeHref(href);
+  return safe === undefined || external ? safe : resolve(safe);
+}

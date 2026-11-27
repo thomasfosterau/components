@@ -23,6 +23,7 @@ An `<a>` styled as a daisyUI `btn`, for navigation that reads as an action; it k
   import type { Snippet } from 'svelte';
   import type { HTMLAnchorAttributes } from 'svelte/elements';
   import { getComponentsContext } from '../context.svelte.ts';
+  import { resolveSafeHref } from '../links/safe-href.ts';
   import {
     buttonShape,
     buttonSize,
@@ -35,7 +36,11 @@ An `<a>` styled as a daisyUI `btn`, for navigation that reads as an action; it k
   } from './tones.ts';
 
   interface Props extends Omit<HTMLAnchorAttributes, 'href'> {
-    /** The target; an app path is resolved through the components context. */
+    /**
+     * The target; an app path is resolved through the components context.
+     * A scheme other than `http:`, `https:`, `mailto:` or `tel:` (such as
+     * `javascript:`) is dropped, and the button renders as `disabled`.
+     */
     href: string;
     /** Semantic colour. */
     tone?: Tone | undefined;
@@ -82,15 +87,16 @@ An `<a>` styled as a daisyUI `btn`, for navigation that reads as an action; it k
   }: Props = $props();
 
   const context = getComponentsContext();
-  const resolved = $derived(external ? href : context.href(href));
+  const resolved = $derived(resolveSafeHref(href, external, (path) => context.href(path)));
+  const inert = $derived(disabled || resolved === undefined);
 </script>
 
 <a
   {...rest}
-  href={disabled ? undefined : resolved}
-  role={disabled ? 'button' : undefined}
-  aria-disabled={disabled ? 'true' : undefined}
-  tabindex={disabled ? -1 : undefined}
+  href={inert ? undefined : resolved}
+  role={inert ? 'button' : undefined}
+  aria-disabled={inert ? 'true' : undefined}
+  tabindex={inert ? -1 : undefined}
   target={external ? '_blank' : undefined}
   rel={external ? 'noreferrer' : undefined}
   class={[
@@ -100,7 +106,7 @@ An `<a>` styled as a daisyUI `btn`, for navigation that reads as an action; it k
     buttonSize[size],
     buttonShape[shape],
     block && 'btn-block',
-    disabled && 'btn-disabled',
+    inert && 'btn-disabled',
     className,
   ]}
 >

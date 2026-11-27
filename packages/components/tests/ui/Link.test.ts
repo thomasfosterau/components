@@ -35,3 +35,13 @@ test('external adds target and rel together', async () => {
   await expect.element(link).toHaveAttribute('target', '_blank');
   await expect.element(link).toHaveAttribute('rel', 'noreferrer');
 });
+
+test('an unsafe scheme renders the text without a link', async () => {
+  const screen = await render(Link, {
+    href: ' JaVaScRiPt:alert(1)',
+    children: textSnippet('dog rose'),
+  });
+
+  await expect.element(screen.getByText('dog rose')).not.toHaveAttribute('href');
+  await expect.element(screen.getByRole('link')).not.toBeInTheDocument();
+});

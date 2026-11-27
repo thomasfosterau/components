@@ -23,11 +23,15 @@ A link off the site that opens in a new tab with the right `rel`, and says so to
   import { ExternalLink as ExternalLinkIcon } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
   import type { HTMLAnchorAttributes } from 'svelte/elements';
+  import { safeHref } from '../links/safe-href.ts';
   import { linkVariant, type LinkVariant } from './tones.ts';
   import VisuallyHidden from './VisuallyHidden.svelte';
 
   interface Props extends Omit<HTMLAnchorAttributes, 'href'> {
-    /** The absolute URL. */
+    /**
+     * The absolute URL. A scheme other than `http:`, `https:`, `mailto:` or
+     * `tel:` (such as `javascript:`) is dropped, leaving the text without a link.
+     */
     href: string;
     /**
      * The link weight.
@@ -64,11 +68,13 @@ A link off the site that opens in a new tab with the right `rel`, and says so to
     class: className,
     ...rest
   }: Props = $props();
+
+  const safe = $derived(safeHref(href));
 </script>
 
 <a
   {...rest}
-  {href}
+  href={safe}
   target="_blank"
   rel={untrusted ? 'noreferrer nofollow' : 'noreferrer'}
   class={['inline-flex items-center gap-1', linkVariant[variant], className]}
