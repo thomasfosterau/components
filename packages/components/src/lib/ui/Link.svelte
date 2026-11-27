@@ -20,10 +20,15 @@ An in-text anchor in one of three weights; the plain link of the library.
   import type { Snippet } from 'svelte';
   import type { HTMLAnchorAttributes } from 'svelte/elements';
   import { getComponentsContext } from '../context.svelte.ts';
+  import { resolveSafeHref } from '../links/safe-href.ts';
   import { linkVariant, type LinkVariant } from './tones.ts';
 
   interface Props extends Omit<HTMLAnchorAttributes, 'href'> {
-    /** The target; an app path is resolved through the components context. */
+    /**
+     * The target; an app path is resolved through the components context.
+     * A scheme other than `http:`, `https:`, `mailto:` or `tel:` (such as
+     * `javascript:`) is dropped, leaving the text without a link.
+     */
     href: string;
     /**
      * The link weight.
@@ -46,7 +51,7 @@ An in-text anchor in one of three weights; the plain link of the library.
   }: Props = $props();
 
   const context = getComponentsContext();
-  const resolved = $derived(external ? href : context.href(href));
+  const resolved = $derived(resolveSafeHref(href, external, (path) => context.href(path)));
 </script>
 
 <a

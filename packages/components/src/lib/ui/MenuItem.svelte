@@ -38,13 +38,17 @@ One entry of a `Menu` (a navigation link), or of a `DropdownMenu` or `ContextMen
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { getComponentsContext } from '../context.svelte.ts';
+  import { safeHref } from '../links/safe-href.ts';
   import HotkeyBadge from '../hotkeys/HotkeyBadge.svelte';
   import { ariaKeyShortcuts } from '../hotkeys/match.ts';
   import type { HotkeyTrigger } from '../hotkeys/types.ts';
   import { getMenuParts } from './menu-parts/menu-parts.ts';
 
   interface Props {
-    /** Where the item navigates. Omitted, the item is a button. */
+    /**
+     * Where the item navigates. Omitted, or with a scheme other than `http:`,
+     * `https:`, `mailto:` or `tel:` (such as `javascript:`), the item is a button.
+     */
     href?: string | undefined;
     /** Called when the item is chosen. */
     onSelect?: (() => void) | undefined;
@@ -79,7 +83,8 @@ One entry of a `Menu` (a navigation link), or of a `DropdownMenu` or `ContextMen
   const context = getComponentsContext();
   const parts = getMenuParts();
 
-  const resolved = $derived(href === undefined ? undefined : context.href(href));
+  const safe = $derived(safeHref(href));
+  const resolved = $derived(safe === undefined ? undefined : context.href(safe));
   // bits-ui's `onSelect` is not optional-friendly under
   // `exactOptionalPropertyTypes`; a stable wrapper is simpler than a spread.
   const select = (): void => onSelect?.();

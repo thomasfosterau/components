@@ -60,3 +60,10 @@ test('a disabled dropdown item is marked disabled for the menu', async () => {
     .element(screen.getByRole('menuitem', { name: 'Settings' }))
     .toHaveAttribute('aria-disabled', 'true');
 });
+
+test('a nav item with an unsafe scheme is a button, not a link', async () => {
+  const screen = await render(MenuNavFixture, { extraHref: 'javascript:alert(1)' });
+
+  await expect.element(screen.getByRole('button', { name: 'Extra' })).toBeInTheDocument();
+  await expect.element(screen.getByRole('link', { name: 'Extra' })).not.toBeInTheDocument();
+});

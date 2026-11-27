@@ -40,3 +40,14 @@ test('external links open in a new tab with the safe rel', async () => {
   // An absolute destination is not rewritten by the context.
   await expect.element(link).toHaveAttribute('href', 'https://example.org/handbook');
 });
+
+test('an unsafe scheme renders as disabled rather than linking', async () => {
+  const screen = await render(LinkButton, {
+    href: 'data:text/html,<script>alert(1)</script>',
+    children: textSnippet('Start a garden'),
+  });
+
+  const control = screen.getByRole('button', { name: 'Start a garden' });
+  await expect.element(control).toHaveAttribute('aria-disabled', 'true');
+  await expect.element(control).not.toHaveAttribute('href');
+});

@@ -15,9 +15,10 @@
     currentHref?: string | undefined;
     label?: string | undefined;
     href?: ((path: string) => string) | undefined;
+    extraHref?: string | undefined;
   }
 
-  let { currentHref = '/gardens', label = 'Primary', href }: Props = $props();
+  let { currentHref = '/gardens', label = 'Primary', href, extraHref }: Props = $props();
 
   // The context is set once, at mount, so the initial `href` is the one meant.
   setComponentsContext({
@@ -31,4 +32,5 @@
   <MenuItem href="/taxa">Taxa</MenuItem>
   <MenuSeparator />
   <MenuItem href="/admin" disabled>Moderation</MenuItem>
+  {#if extraHref !== undefined}<MenuItem href={extraHref}>Extra</MenuItem>{/if}
 </Menu>

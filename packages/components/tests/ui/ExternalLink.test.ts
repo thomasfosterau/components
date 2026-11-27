@@ -48,3 +48,12 @@ test('the new-tab announcement is a prop', async () => {
     .element(screen.getByRole('link'))
     .toHaveAccessibleName('example.com (s’ouvre dans un nouvel onglet)');
 });
+
+test('an unsafe scheme renders the text without a link', async () => {
+  const screen = await render(ExternalLink, {
+    href: 'vbscript:msgbox(1)',
+    children: textSnippet('example.com'),
+  });
+
+  await expect.element(screen.getByRole('link')).not.toBeInTheDocument();
+});
