@@ -180,8 +180,8 @@ catalogs:
       specifier: 0.73.4
       version: 0.73.4
     '@effect/vitest':
-      specifier: 4.1.5
-      version: 4.1.5
+      specifier: 4.1.6
+      version: 4.1.6
     '@enfect/oxlint':
       specifier: 0.10.0
       version: 0.10.0
@@ -303,7 +303,7 @@ catalogs:
 overrides:
   svelte: ^5.59.2
   '@sveltejs/kit': 3.4.1
-  effect: 4.1.5
+  effect: 4.1.6
   vite@*: npm:@voidzero-dev/vite-plus-core@8.3.8001
   vitest@*: 5.1.1
 
@@ -367,8 +367,8 @@ importers:
         specifier: 'catalog:'
         version: 3.2.1
       effect:
-        specifier: 4.1.5
-        version: 4.1.5
+        specifier: 4.1.6
+        version: 4.1.6
     devDependencies:
       '@sveltejs/package':
         specifier: 'catalog:'
@@ -451,7 +451,7 @@ importers:
         version: 8.0.0(@testing-library/dom@10.4.2)(vitest@5.1.1)
       '@thomasfosterau/effect-forms-svelte':
         specifier: 'catalog:'
-        version: 0.4.2(@sveltejs/kit@3.4.1(@sveltejs/vite-plugin-svelte@7.3.2(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.59.2))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.59.2))(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.5))(effect@4.1.5))(effect@4.1.5)(svelte@5.59.2)
+        version: 0.4.2(@sveltejs/kit@3.4.1(@sveltejs/vite-plugin-svelte@7.3.2(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.59.2))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.59.2))(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.6))(effect@4.1.6))(effect@4.1.6)(svelte@5.59.2)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.11
@@ -462,8 +462,8 @@ importers:
         specifier: 'catalog:'
         version: 5.8.2
       effect:
-        specifier: 4.1.5
-        version: 4.1.5
+        specifier: 4.1.6
+        version: 4.1.6
       playwright:
         specifier: 'catalog:'
         version: 1.65.1
@@ -490,7 +490,7 @@ importers:
     devDependencies:
       '@effect/vitest':
         specifier: 'catalog:'
-        version: 4.1.5(effect@4.1.5)(vitest@5.1.1)
+        version: 4.1.6(effect@4.1.6)(vitest@5.1.1)
       '@storybook/addon-svelte-csf':
         specifier: 'catalog:'
         version: 5.1.6(@storybook/svelte@10.6.9(storybook@10.6.9(@types/react@19.3.0)(react@19.3.1)(vite-plus@1.8.0(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(@vitest/browser-playwright@5.1.1)(@vitest/coverage-istanbul@5.1.1)(@vitest/ui@5.1.1)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(playwright@1.65.1)(svelte@5.59.2)(yaml@2.9.1)))(svelte@5.59.2))(@sveltejs/vite-plugin-svelte@7.3.2(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.59.2))(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(storybook@10.6.9(@types/react@19.3.0)(react@19.3.1)(vite-plus@1.8.0(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(@vitest/browser-playwright@5.1.1)(@vitest/coverage-istanbul@5.1.1)(@vitest/ui@5.1.1)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(playwright@1.65.1)(svelte@5.59.2)(yaml@2.9.1)))(svelte@5.59.2)
@@ -508,10 +508,10 @@ importers:
         version: link:../components
       '@thomasfosterau/effect-document':
         specifier: 'catalog:'
-        version: 0.3.0(@thomasfosterau/effect-parse@0.6.2(effect@4.1.5))(effect@4.1.5)
+        version: 0.3.0(@thomasfosterau/effect-parse@0.6.2(effect@4.1.6))(effect@4.1.6)
       '@thomasfosterau/effect-parse':
         specifier: 'catalog:'
-        version: 0.6.2(effect@4.1.5)
+        version: 0.6.2(effect@4.1.6)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.11
@@ -519,8 +519,8 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(playwright@1.65.1)(vitest@5.1.1)
       effect:
-        specifier: 4.1.5
-        version: 4.1.5
+        specifier: 4.1.6
+        version: 4.1.6
       playwright:
         specifier: 'catalog:'
         version: 1.65.1
@@ -729,10 +729,10 @@ packages:
     resolution: {integrity: sha512-geduC9fV5lEU14M7xo1av2wZx7zNbSslyAAxob3UMGUh3wUGJLme5emsjXULSILBbByt3HpMPaI0HaRFVPJBhg==}
     hasBin: true
 
-  '@effect/vitest@4.1.5':
-    resolution: {integrity: sha512-18u1013wkJtSelk1ZYLc/5aUnluTQyDfi2hAemkJW1GQ9qXw4mtPSiSf0AXZPhesmGCvG1Dk2C4JYD2sz+R72w==}
+  '@effect/vitest@4.1.6':
+    resolution: {integrity: sha512-Knb13gPhDbtOuNUnPXE/Sl+UvrKFHRATwU2vy+DGQCpjK1yI3oy1feQo1g2X8ZdOdc63sJB7HJXCMNsDy8xYvg==}
     peerDependencies:
-      effect: 4.1.5
+      effect: 4.1.6
       vitest: 5.1.1
 
   '@emnapi/core@1.11.0':
@@ -1856,7 +1856,7 @@ packages:
     engines: {node: '>=22'}
     peerDependencies:
       '@thomasfosterau/effect-parse': ^0.6.2
-      effect: 4.1.5
+      effect: 4.1.6
     peerDependenciesMeta:
       '@thomasfosterau/effect-parse':
         optional: true
@@ -1869,7 +1869,7 @@ packages:
       '@effect/platform-browser': ^4.0.0
       '@effect/platform-node': ^4.0.0
       '@thomasfosterau/effect-parse': ^0.4.1 || ^0.5.0 || ^0.6.0
-      effect: 4.1.5
+      effect: 4.1.6
     peerDependenciesMeta:
       '@effect/platform-browser':
         optional: true
@@ -1885,7 +1885,7 @@ packages:
       '@sveltejs/kit': 3.4.1
       '@thomasfosterau/effect-ext': ^0.1.0 || ^0.2.0 || ^0.3.0
       '@thomasfosterau/effect-jsonapi': '>=0.18.0'
-      effect: 4.1.5
+      effect: 4.1.6
       svelte: ^5.59.2
     peerDependenciesMeta:
       '@sveltejs/kit':
@@ -1898,13 +1898,13 @@ packages:
     engines: {node: '>=22.18.0'}
     peerDependencies:
       '@thomasfosterau/effect-ext': ^0.1.0 || ^0.2.0 || ^0.3.0
-      effect: 4.1.5
+      effect: 4.1.6
 
   '@thomasfosterau/effect-parse@0.6.2':
     resolution: {integrity: sha512-v/fMXkcN96G/2waTEOSlY4+CBhw/ndBKbjtSWKn3U6Q4vZJePTKFZFIgSIxKOmvgdmFDBokNqQIv84NigzYvqg==}
     engines: {node: '>=22'}
     peerDependencies:
-      effect: 4.1.5
+      effect: 4.1.6
 
   '@tsrs/darwin-arm64@7.1.0-beta.tsrs4':
     resolution: {integrity: sha512-Be1McQGyHipWIjnkvytZmh7Wi4YVATvTfiEuPX34kfk+W7QCtTdUUHnuLZ7bzwy8LgL9VDCmyvQtWiF3MENxBQ==}
@@ -2656,10 +2656,10 @@ packages:
   effect-oxlint@0.4.0:
     resolution: {integrity: sha512-IA3ihFKGK0JoZVSPPgPP58988jj4PZ5/asFOhaSYHwDyRRRbkBJn7FX8RiPi++MFpXQvb+3fQpKdPzOvUK9xPQ==}
     peerDependencies:
-      effect: 4.1.5
+      effect: 4.1.6
 
-  effect@4.1.5:
-    resolution: {integrity: sha512-xyR20KhQI0vg2gD8ILUSQRTTESEYJ0JKdP+QD8J37xbwPTqXRxFM/l0+vUVD9fuSvoYruoTqyt33C4FZv1s4TQ==}
+  effect@4.1.6:
+    resolution: {integrity: sha512-P3CxMsdcSCle/7/FnPILd9GJkNqGtduKam2LX9Xsb8LoOjmeQ9Kmsuh16JwtIthaxLyiTCOzUUt+PZsXIohl+A==}
 
   emoji-regex@10.6.0:
     resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
@@ -3697,9 +3697,9 @@ snapshots:
       '@effect/tsgo-win32-arm64': 0.73.4
       '@effect/tsgo-win32-x64': 0.73.4
 
-  '@effect/vitest@4.1.5(effect@4.1.5)(vitest@5.1.1)':
+  '@effect/vitest@4.1.6(effect@4.1.6)(vitest@5.1.1)':
     dependencies:
-      effect: 4.1.5
+      effect: 4.1.6
       vitest: 5.1.1(@types/node@26.6.11)(@vitest/browser-playwright@5.1.1)(@vitest/browser-preview@5.1.1)(@vitest/coverage-istanbul@5.1.1)(@vitest/ui@5.1.1)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(happy-dom@21.0.4)
 
   '@emnapi/core@1.11.0':
@@ -3753,8 +3753,8 @@ snapshots:
   '@enfect/oxlint@0.10.0':
     dependencies:
       '@oxlint/plugins': 1.89.0
-      effect: 4.1.5
-      effect-oxlint: 0.4.0(effect@4.1.5)
+      effect: 4.1.6
+      effect-oxlint: 0.4.0(effect@4.1.6)
 
   '@esbuild/aix-ppc64@0.28.2':
     optional: true
@@ -4466,40 +4466,40 @@ snapshots:
     dependencies:
       '@testing-library/dom': 10.4.2
 
-  '@thomasfosterau/effect-document@0.3.0(@thomasfosterau/effect-parse@0.6.2(effect@4.1.5))(effect@4.1.5)':
+  '@thomasfosterau/effect-document@0.3.0(@thomasfosterau/effect-parse@0.6.2(effect@4.1.6))(effect@4.1.6)':
     dependencies:
-      '@thomasfosterau/effect-ext': 0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.5))(effect@4.1.5)
-      effect: 4.1.5
+      '@thomasfosterau/effect-ext': 0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.6))(effect@4.1.6)
+      effect: 4.1.6
       fflate: 0.8.3
     optionalDependencies:
-      '@thomasfosterau/effect-parse': 0.6.2(effect@4.1.5)
+      '@thomasfosterau/effect-parse': 0.6.2(effect@4.1.6)
     transitivePeerDependencies:
       - '@effect/platform-browser'
       - '@effect/platform-node'
 
-  '@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.5))(effect@4.1.5)':
+  '@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.6))(effect@4.1.6)':
     dependencies:
-      effect: 4.1.5
+      effect: 4.1.6
     optionalDependencies:
-      '@thomasfosterau/effect-parse': 0.6.2(effect@4.1.5)
+      '@thomasfosterau/effect-parse': 0.6.2(effect@4.1.6)
 
-  '@thomasfosterau/effect-forms-svelte@0.4.2(@sveltejs/kit@3.4.1(@sveltejs/vite-plugin-svelte@7.3.2(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.59.2))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.59.2))(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.5))(effect@4.1.5))(effect@4.1.5)(svelte@5.59.2)':
+  '@thomasfosterau/effect-forms-svelte@0.4.2(@sveltejs/kit@3.4.1(@sveltejs/vite-plugin-svelte@7.3.2(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.59.2))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.59.2))(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.6))(effect@4.1.6))(effect@4.1.6)(svelte@5.59.2)':
     dependencies:
-      '@thomasfosterau/effect-ext': 0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.5))(effect@4.1.5)
-      '@thomasfosterau/effect-forms': 0.5.0(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.5))(effect@4.1.5))(effect@4.1.5)
-      effect: 4.1.5
+      '@thomasfosterau/effect-ext': 0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.6))(effect@4.1.6)
+      '@thomasfosterau/effect-forms': 0.5.0(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.6))(effect@4.1.6))(effect@4.1.6)
+      effect: 4.1.6
       svelte: 5.59.2
     optionalDependencies:
       '@sveltejs/kit': 3.4.1(@sveltejs/vite-plugin-svelte@7.3.2(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.59.2))(@typescript/typescript6@6.0.2)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.11)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(svelte@5.59.2)
 
-  '@thomasfosterau/effect-forms@0.5.0(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.5))(effect@4.1.5))(effect@4.1.5)':
+  '@thomasfosterau/effect-forms@0.5.0(@thomasfosterau/effect-ext@0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.6))(effect@4.1.6))(effect@4.1.6)':
     dependencies:
-      '@thomasfosterau/effect-ext': 0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.5))(effect@4.1.5)
-      effect: 4.1.5
+      '@thomasfosterau/effect-ext': 0.3.1(@thomasfosterau/effect-parse@0.6.2(effect@4.1.6))(effect@4.1.6)
+      effect: 4.1.6
 
-  '@thomasfosterau/effect-parse@0.6.2(effect@4.1.5)':
+  '@thomasfosterau/effect-parse@0.6.2(effect@4.1.6)':
     dependencies:
-      effect: 4.1.5
+      effect: 4.1.6
 
   '@tsrs/darwin-arm64@7.1.0-beta.tsrs4':
     optional: true
@@ -5060,12 +5060,12 @@ snapshots:
 
   dom-accessibility-api@0.6.3: {}
 
-  effect-oxlint@0.4.0(effect@4.1.5):
+  effect-oxlint@0.4.0(effect@4.1.6):
     dependencies:
       '@oxlint/plugins': 1.89.0
-      effect: 4.1.5
+      effect: 4.1.6
 
-  effect@4.1.5: {}
+  effect@4.1.6: {}
 
   emoji-regex@10.6.0: {}
 

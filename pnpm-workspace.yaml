@@ -13,9 +13,9 @@ catalog:
   '@changesets/cli': ^3.0.3
   # Optional peer of `/entity-form`; a devDependency for its suite and story.
   '@thomasfosterau/effect-forms-svelte': ^0.4.2
-  effect: 4.1.5
+  effect: 4.1.6
   # Peers `effect` at its own exact version: moves with `effect`.
-  '@effect/vitest': 4.1.5
+  '@effect/vitest': 4.1.6
   '@thomasfosterau/effect-document': ^0.3.0
   # effect-document's optional peer for its readers; packages/import's suite reads CSV with it.
   '@thomasfosterau/effect-parse': ^0.6.2
