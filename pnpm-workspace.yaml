@@ -40,7 +40,7 @@ catalog:
   '@sveltejs/vite-plugin-svelte': ^7.3.2
   '@tailwindcss/vite': ^4.3.5
   '@testing-library/jest-dom': ^8.0.0
-  '@types/node': ^26.6.10
+  '@types/node': ^26.6.11
   # Pins `vitest` exactly, so it follows the `vitest` entry below.
   '@vitest/browser-playwright': 5.1.1
   bits-ui: ^2.22.0
