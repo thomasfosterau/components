@@ -1,7 +1,7 @@
 import { resolveChart, type Box, type DataRows } from '../core/index.ts';
 import { isDataRef, validateSpec, type ChartSpec } from '../spec/index.ts';
-import type { Node as ProseMirrorNode } from 'prosemirror-model';
-import type { EditorView, NodeView } from 'prosemirror-view';
+import type { AnySchema, Node as RichTextNode } from '@thomasfosterau/effect-richtext/Model';
+import type { EditorView, NodeView } from '@thomasfosterau/effect-richtext/View';
 import { chartNodeAttrs } from './node-spec.ts';
 import { renderContextToSvg, renderDataTable, renderTreeOutline } from './render-svg.ts';
 
@@ -23,10 +23,13 @@ export interface ChartNodeViewOptions {
   readonly className?: string | undefined;
 }
 
+/** An editor view of any schema, as the `nodeViews` prop passes it. */
+type AnyEditorView = EditorView<AnySchema, unknown, unknown>;
+
 const DEFAULT_BOX: Box = { width: 640, height: 360 };
 
 /**
- * Edit-time chart rendering inside ProseMirror.
+ * Edit-time chart rendering inside an effect-richtext editor.
  *
  * A NodeView is imperative DOM — exactly why the pure Layer 2 core pays off:
  * this class owns a plain <div>, computes geometry via the `/core` entry, and sets
@@ -47,15 +50,15 @@ const DEFAULT_BOX: Box = { width: 640, height: 360 };
  * returns `true`, and `destroy` drops any pending async resolution.
  */
 export class ChartNodeView implements NodeView {
-  /** The wrapper element ProseMirror mounts; it holds the SVG or a placeholder message. */
+  /** The wrapper element the editor view mounts; it holds the SVG or a placeholder message. */
   readonly dom: HTMLElement;
 
-  private node: ProseMirrorNode;
+  private node: RichTextNode;
   private readonly options: ChartNodeViewOptions;
   /** Guards against stale async data resolutions racing a newer render. */
   private renderToken = 0;
 
-  constructor(node: ProseMirrorNode, _view: EditorView, options?: ChartNodeViewOptions) {
+  constructor(node: RichTextNode, _view: AnyEditorView, options?: ChartNodeViewOptions) {
     this.node = node;
     this.options = options ?? {};
     this.dom = document.createElement('div');
@@ -63,8 +66,8 @@ export class ChartNodeView implements NodeView {
     this.render();
   }
 
-  /** ProseMirror calls this when the node updates (e.g. the spec attr changes). */
-  update(node: ProseMirrorNode): boolean {
+  /** The editor view calls this when the node updates (e.g. the spec attr changes). */
+  update(node: RichTextNode): boolean {
     if (node.type !== this.node.type) return false;
     this.node = node;
     this.render();
@@ -192,10 +195,10 @@ export class ChartNodeView implements NodeView {
 }
 
 /**
- * Creates a NodeView factory for ProseMirror's `nodeViews` editor prop:
+ * Creates a NodeView factory for the `nodeViews` editor prop:
  *
  * ```ts
- * new EditorView(place, {
+ * EditorView.make(place, {
  *   state,
  *   nodeViews: { chart: chartNodeViewFactory({ resolveData }) },
  * });
@@ -203,7 +206,7 @@ export class ChartNodeView implements NodeView {
  */
 export function chartNodeViewFactory(
   options?: ChartNodeViewOptions,
-): (node: ProseMirrorNode, view: EditorView, getPos: () => number | undefined) => ChartNodeView {
+): (node: RichTextNode, view: AnyEditorView, getPos: () => number | undefined) => ChartNodeView {
   return (node, view) => new ChartNodeView(node, view, options);
 }
 

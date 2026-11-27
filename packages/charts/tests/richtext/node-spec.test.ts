@@ -1,15 +1,15 @@
 // @vitest-environment happy-dom
 import type { ChartSpec } from '../../src/spec/index.ts';
-import { DOMParser as PMDOMParser, DOMSerializer, Node, Schema } from 'prosemirror-model';
+import { DocSchema, DOMParser, DOMSerializer } from '@thomasfosterau/effect-richtext/Model';
 import { describe, expect, it } from 'vite-plus/test';
 import {
   CHART_NODE_NAME,
   CHART_SPEC_ATTRIBUTE,
   createChartNodeSpec,
-} from '../../src/prosemirror/index.ts';
+} from '../../src/richtext/index.ts';
 import { instanceOf } from '../dom.ts';
 
-const schema = new Schema({
+const schema = DocSchema.makeUnsafe({
   nodes: {
     doc: { content: 'block+' },
     paragraph: {
@@ -44,28 +44,28 @@ describe('createChartNodeSpec', () => {
     const nodeType = schema.nodes[CHART_NODE_NAME];
     expect(nodeType.isAtom).toBe(true);
     expect(nodeType.isBlock).toBe(true);
-    const node = nodeType.create();
-    expect(node.attrs['spec']).toBeNull();
+    const node = nodeType.createUnsafe();
+    expect(node.attrs.spec).toBeNull();
   });
 
   describe('document JSON persistence (the Layer 1 round-trip)', () => {
     it('preserves the spec through doc.toJSON() → Node.fromJSON()', () => {
-      const doc = schema.nodes['doc'].create(null, [
-        schema.nodes[CHART_NODE_NAME].create({ spec: chartSpec }),
+      const doc = schema.nodeUnsafe('doc', null, [
+        schema.nodeUnsafe(CHART_NODE_NAME, { spec: chartSpec }),
       ]);
 
       const json = doc.toJSON();
       // The document JSON is pure data: it must survive JSON serialisation.
-      const restored = Node.fromJSON(schema, JSON.parse(JSON.stringify(json)));
+      const restored = schema.nodeFromJSONUnsafe(JSON.parse(JSON.stringify(json)));
 
-      expect(restored.firstChild!.attrs['spec']).toEqual(chartSpec);
+      expect(restored.childUnsafe(0).attrs).toEqual({ spec: chartSpec });
       expect(restored.eq(doc)).toBe(true);
     });
   });
 
   describe('DOM serialisation (copy/paste and HTML round-trips)', () => {
     it('toDOM stores the encoded spec in the data attribute', () => {
-      const node = schema.nodes[CHART_NODE_NAME].create({ spec: chartSpec });
+      const node = schema.nodeUnsafe(CHART_NODE_NAME, { spec: chartSpec });
       const rendered = instanceOf(
         DOMSerializer.fromSchema(schema).serializeNode(node),
         HTMLElement,
@@ -78,33 +78,33 @@ describe('createChartNodeSpec', () => {
     });
 
     it('round-trips a chart node through DOM serialisation and parsing', () => {
-      const doc = schema.nodes['doc'].create(null, [
-        schema.nodes[CHART_NODE_NAME].create({ spec: chartSpec }),
+      const doc = schema.nodeUnsafe('doc', null, [
+        schema.nodeUnsafe(CHART_NODE_NAME, { spec: chartSpec }),
       ]);
 
       const container = document.createElement('div');
       container.appendChild(DOMSerializer.fromSchema(schema).serializeFragment(doc.content));
 
-      const parsed = PMDOMParser.fromSchema(schema).parse(container);
-      expect(parsed.firstChild!.type.name).toBe(CHART_NODE_NAME);
-      expect(parsed.firstChild!.attrs['spec']).toEqual(chartSpec);
+      const parsed = DOMParser.fromSchema(schema).parseUnsafe(container);
+      expect(parsed.childUnsafe(0).type.name).toBe(CHART_NODE_NAME);
+      expect(parsed.childUnsafe(0).attrs).toEqual({ spec: chartSpec });
     });
 
     it('parses a chart node with an empty spec attribute as a null spec', () => {
       const container = document.createElement('div');
       container.innerHTML = `<div ${CHART_SPEC_ATTRIBUTE}=""></div>`;
 
-      const parsed = PMDOMParser.fromSchema(schema).parse(container);
-      expect(parsed.firstChild!.type.name).toBe(CHART_NODE_NAME);
-      expect(parsed.firstChild!.attrs['spec']).toBeNull();
+      const parsed = DOMParser.fromSchema(schema).parseUnsafe(container);
+      expect(parsed.childUnsafe(0).type.name).toBe(CHART_NODE_NAME);
+      expect(parsed.childUnsafe(0).attrs).toEqual({ spec: null });
     });
 
     it('does not parse divs with invalid spec JSON as chart nodes', () => {
       const container = document.createElement('div');
       container.innerHTML = `<div ${CHART_SPEC_ATTRIBUTE}='{"not": "a spec"}'><p>fallback</p></div>`;
 
-      const parsed = PMDOMParser.fromSchema(schema).parse(container);
-      expect(parsed.firstChild!.type.name).not.toBe(CHART_NODE_NAME);
+      const parsed = DOMParser.fromSchema(schema).parseUnsafe(container);
+      expect(parsed.childUnsafe(0).type.name).not.toBe(CHART_NODE_NAME);
     });
 
     it('does not parse a newer 1.N spec, so pasting never rewrites it', () => {
@@ -112,12 +112,12 @@ describe('createChartNodeSpec', () => {
       const future = JSON.stringify({ ...chartSpec, specVersion: '1.2' });
       container.innerHTML = `<div ${CHART_SPEC_ATTRIBUTE}='${future}'><p>fallback</p></div>`;
 
-      const parsed = PMDOMParser.fromSchema(schema).parse(container);
-      expect(parsed.firstChild!.type.name).not.toBe(CHART_NODE_NAME);
+      const parsed = DOMParser.fromSchema(schema).parseUnsafe(container);
+      expect(parsed.childUnsafe(0).type.name).not.toBe(CHART_NODE_NAME);
     });
 
     it('uses a custom class name when provided', () => {
-      const customSchema = new Schema({
+      const customSchema = DocSchema.makeUnsafe({
         nodes: {
           doc: { content: 'block+' },
           paragraph: {
@@ -130,7 +130,7 @@ describe('createChartNodeSpec', () => {
           chart: createChartNodeSpec({ className: 'cms-chart' }),
         },
       });
-      const node = customSchema.nodes['chart'].create({ spec: chartSpec });
+      const node = customSchema.nodeUnsafe('chart', { spec: chartSpec });
       const rendered = instanceOf(
         DOMSerializer.fromSchema(customSchema).serializeNode(node),
         HTMLElement,

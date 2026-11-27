@@ -1,7 +1,7 @@
 import { computeContext } from '../../src/core/index.ts';
 import { parseSpec } from '../../src/spec/index.ts';
 import { describe, expect, it } from 'vite-plus/test';
-import { renderContextToSvg } from '../../src/prosemirror/index.ts';
+import { renderContextToSvg } from '../../src/richtext/index.ts';
 
 const box = { width: 640, height: 360 };
 
@@ -98,7 +98,7 @@ describe('renderContextToSvg', () => {
 describe('tree mark (spec 1.1)', () => {
   it('renders boxes and links, and renderTreeOutline the nested list', async () => {
     const { taxonomy, TAXONOMY_ORDER, listOrder } = await import('../fixtures/taxonomy.ts');
-    const { renderTreeOutline } = await import('../../src/prosemirror/index.ts');
+    const { renderTreeOutline } = await import('../../src/richtext/index.ts');
     const context = computeContext(taxonomy, { width: 640, height: 360 });
     const svg = renderContextToSvg(context, { title: 'Nightshades' });
     expect(svg.match(/<rect /g)).toHaveLength(6);
@@ -111,7 +111,7 @@ describe('tree mark (spec 1.1)', () => {
 describe('renderDataTable', () => {
   it('renders the table, escaped, visible or visually hidden', async () => {
     const { buildDataTable } = await import('../../src/core/index.ts');
-    const { renderDataTable } = await import('../../src/prosemirror/index.ts');
+    const { renderDataTable } = await import('../../src/richtext/index.ts');
     const spec = parseSpec({
       specVersion: '1',
       mark: 'bar',

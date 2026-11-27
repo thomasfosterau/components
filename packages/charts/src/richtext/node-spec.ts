@@ -1,7 +1,7 @@
 import { encodeSpec, validateSpec, type ChartSpec } from '../spec/index.ts';
-import type { Attrs, NodeSpec } from 'prosemirror-model';
+import type { Attrs, NodeSpec } from '@thomasfosterau/effect-richtext/Model';
 
-/** The canonical name for the chart node in a ProseMirror schema. */
+/** The canonical name for the chart node in an effect-richtext schema. */
 export const CHART_NODE_NAME = 'chart';
 
 /** The DOM attribute carrying the serialised spec. */
@@ -27,14 +27,24 @@ export interface ChartNodeAttrs {
   readonly spec: ChartSpec | null;
 }
 
-/** The chart attrs of a node's `attrs`, which ProseMirror types as `any` values. */
+/**
+ * The NodeSpec {@link createChartNodeSpec} returns. It declares its one
+ * attr, so a schema built from it knows a chart node has `attrs.spec`.
+ * That value is `unknown` until validated: it may come from a peer or a
+ * pasted document.
+ */
+export interface ChartNodeSpec extends NodeSpec {
+  readonly attrs: { readonly spec: { readonly default: null } };
+}
+
+/** The chart attrs of a node's `attrs`, which an untyped schema types as `any` values. */
 export function chartNodeAttrs(attrs: Attrs): ChartNodeAttrs {
   const spec: ChartSpec | null = attrs['spec'];
   return { spec };
 }
 
 /**
- * Creates the ProseMirror NodeSpec for a chart node.
+ * Creates the effect-richtext NodeSpec for a chart node.
  *
  * The chart is an atom (leaf) node whose only attr is the portable chart
  * spec — pure JSON, so document persistence (toJSON / fromJSON) carries the
@@ -48,7 +58,7 @@ export function chartNodeAttrs(attrs: Attrs): ChartNodeAttrs {
  * version does not know and storing that would rewrite the document. The node
  * is selectable and draggable.
  */
-export function createChartNodeSpec(options?: ChartNodeSpecOptions): NodeSpec {
+export function createChartNodeSpec(options?: ChartNodeSpecOptions): ChartNodeSpec {
   const className = options?.className ?? 'chart-node';
 
   return {

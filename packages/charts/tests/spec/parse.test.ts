@@ -137,7 +137,7 @@ describe('encodeSpec', () => {
     const spec = parseSpec(validSpec);
     const encoded = encodeSpec(spec);
     expect(encoded).toEqual(validSpec);
-    // must survive JSON serialization unchanged (ProseMirror attr requirement)
+    // must survive JSON serialization unchanged (rich-text node attr requirement)
     expect(JSON.parse(JSON.stringify(encoded))).toEqual(encoded);
   });
 

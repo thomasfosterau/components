@@ -282,7 +282,7 @@ export function validateSpec(input: unknown): ValidationResult {
 
 /**
  * Encodes a {@link ChartSpec} back to a plain JSON-safe value, suitable for
- * persisting (e.g. into ProseMirror node attrs).
+ * persisting (e.g. into rich-text node attrs).
  *
  * @throws when `spec` does not satisfy the schema.
  */
