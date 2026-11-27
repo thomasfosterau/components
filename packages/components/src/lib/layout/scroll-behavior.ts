@@ -74,20 +74,33 @@ export const collapseProgress = (
 
 /**
  * Where a collapsed title bar goes, in viewport px: across the top of
- * `container` (or the viewport), below a stuck `Navbar`'s `--navbar-offset`.
+ * `container` (or the viewport), and the stuck `Navbar`'s `--navbar-offset`
+ * it sits below.
  */
 export const barFrame = (
   container: HTMLElement | undefined,
-): { readonly top: number; readonly left: number; readonly width: number } => {
+): {
+  readonly top: number;
+  readonly left: number;
+  readonly width: number;
+  readonly offset: number;
+} => {
   const scroller = container ?? document.documentElement;
   const offset =
     Number.parseFloat(getComputedStyle(scroller).getPropertyValue('--navbar-offset')) || 0;
   if (container === undefined) {
-    return { top: offset, left: 0, width: document.documentElement.clientWidth };
+    return { top: 0, left: 0, width: document.documentElement.clientWidth, offset };
   }
   const box = container.getBoundingClientRect();
-  return { top: box.top + offset, left: box.left, width: box.width };
+  return { top: box.top, left: box.left, width: box.width, offset };
 };
+
+/**
+ * Whether the browser can drive a collapsing title with a CSS view timeline,
+ * so no scroll handler is needed.
+ */
+export const scrollTimelines = (): boolean =>
+  globalThis.CSS?.supports('(animation-timeline: view()) and (timeline-scope: --a)') ?? false;
 
 /** Whether the reader asked for reduced motion; read when needed, not cached. */
 export const reducedMotion = (): boolean =>
