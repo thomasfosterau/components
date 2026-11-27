@@ -19,7 +19,9 @@ A row that shows as many items as fit and moves the rest, lowest priority first,
   wraps it, so styles like `.tabs > .tab` still reach it: the `item` snippet
   spreads the attributes it is given onto its root element.
   The trigger is the last item in DOM and visual order for `end`; for
-  `start` and `middle` it sits where the hidden items were.
+  `start` and `middle` it sits where the hidden items were. A `trigger`
+  snippet replaces the trigger's element (a toolbar's must be a toolbar
+  control); it spreads the `props` it is given.
 -->
 <script lang="ts" module>
   /** One item of an `Overflow` row. */
@@ -48,7 +50,15 @@ A row that shows as many items as fit and moves the rest, lowest priority first,
   /** What a `div` row's `item` spreads onto its root element. */
   export interface OverflowItemAttributes {
     readonly 'data-overflow-id'?: string;
+    /** Present while the item is in the menu. */
+    readonly 'data-overflow-hidden'?: '';
     readonly style?: string;
+  }
+
+  /** What a `trigger` snippet is given: `props` to spread onto its button, and the text to show. */
+  export interface OverflowTrigger {
+    readonly props: Record<string, unknown>;
+    readonly text: string;
   }
 </script>
 
@@ -99,6 +109,10 @@ A row that shows as many items as fit and moves the rest, lowest priority first,
      * @defaultValue `'btn btn-ghost btn-sm'`
      */
     triggerClass?: string | undefined;
+    /** Render the "More" trigger yourself, spreading `props` onto a button. Omitted, a plain `<button>`. */
+    trigger?: Snippet<[OverflowTrigger]> | undefined;
+    /** Called with the hidden items whenever they change. */
+    onHiddenChange?: ((hidden: readonly T[]) => void) | undefined;
   }
 
   let {
@@ -112,6 +126,8 @@ A row that shows as many items as fit and moves the rest, lowest priority first,
     moreText,
     showCount = false,
     triggerClass = 'btn btn-ghost btn-sm',
+    trigger: customTrigger,
+    onHiddenChange,
     class: className,
     ...rest
   }: Props = $props();
@@ -119,10 +135,9 @@ A row that shows as many items as fit and moves the rest, lowest priority first,
   const itemTag = $derived(element === 'div' ? 'div' : 'li');
 
   function attributesFor(entry: T, index: number): OverflowItemAttributes {
-    return {
-      'data-overflow-id': entry.id,
-      style: hidden.has(index) ? 'flex-shrink: 0; display: none;' : 'flex-shrink: 0;',
-    };
+    return hidden.has(index)
+      ? { 'data-overflow-id': entry.id, 'data-overflow-hidden': '', style: 'flex-shrink: 0; display: none;' }
+      : { 'data-overflow-id': entry.id, style: 'flex-shrink: 0;' };
   }
 
   let row: HTMLElement | undefined = $state();
@@ -199,21 +214,28 @@ A row that shows as many items as fit and moves the rest, lowest priority first,
   $effect(() => {
     if (hidden.size > 0 && Menu === undefined) void loadMenu();
   });
+
+  $effect(() => {
+    onHiddenChange?.(hiddenEntries.map(({ entry }) => entry));
+  });
 </script>
 
 {#snippet menu(Dropdown: DropdownMenuComponent)}
   <Dropdown label={moreLabel}>
     {#snippet trigger({ props })}
-      <button
-        {...props}
-        type="button"
-        class={triggerClass}
-        style="flex-shrink: 0;"
-        data-overflow-more
-        aria-label={moreText === undefined ? undefined : moreLabel}
-      >
-        {triggerText}
-      </button>
+      {@const triggerProps = {
+        ...props,
+        type: 'button' as const,
+        class: triggerClass,
+        style: 'flex-shrink: 0;',
+        'data-overflow-more': '',
+        'aria-label': moreText === undefined ? undefined : moreLabel,
+      }}
+      {#if customTrigger}
+        {@render customTrigger({ props: triggerProps, text: triggerText })}
+      {:else}
+        <button {...triggerProps}>{triggerText}</button>
+      {/if}
     {/snippet}
     {#each hiddenEntries as { entry, index } (entry.id)}
       {#if menuItem}
@@ -260,6 +282,7 @@ A row that shows as many items as fit and moves the rest, lowest priority first,
   <svelte:element
     this={itemTag}
     bind:this={measurer}
+    data-overflow-measurer
     aria-hidden="true"
     inert
     style="position: absolute; visibility: hidden; pointer-events: none;"

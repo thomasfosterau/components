@@ -5,7 +5,7 @@
 - Branch off `trunk` and open a pull request into `trunk`; it is squash-merged. Never commit to `trunk` directly.
 - Open a draft PR as soon as you start, so others can see the work. Keep one PR per change, even a large one, and keep it free of conflicts (rebase onto `origin/trunk`; don't merge `trunk` in). Getting CI green is the author's job.
 - Found something out of scope? File an issue and move on. Keep issue bodies evergreen: context, problem and suggested fix in the body, not in a trail of comments.
-- Dependabot updates dependencies daily. Update one by hand only when your change needs it, or for the moves Dependabot can't make, which go in a PR from a new branch started from its PR's head (never push to a `dependabot/*` branch, which stops it rebasing; Dependabot closes its own PR once yours merges):
+- Dependabot updates dependencies ([Dependencies](#dependencies)). Update one by hand only when your change needs it, or for the moves Dependabot can't make, which go in a PR from a new branch started from its PR's head (never push to a `dependabot/*` branch, which stops it rebasing; Dependabot closes its own PR once yours merges):
   - When a `toolchain` update bumps `vite-plus`: set the `vite` alias (`npm:@voidzero-dev/vite-plus-core@<version>`) to the same version, and the `.devcontainer/devcontainer.json` image tag with it.
   - `typescript` (TS6) and `@typescript/native` (TS7) are npm aliases: move them with `@effect/tsgo`, to versions its `components` table (`node_modules/@effect/tsgo/dist/effect-tsgo.cjs`) supports, or `pnpm install`'s `prepare` fails.
 
@@ -66,6 +66,10 @@ Test logic and behaviour that can regress: keyboard handling, focus, ARIA, edge 
 ## Before pushing
 
 Run `vp run ci` (or the gates one by one: `vp check`, `vp run check`, `vp run -r test:unit`, `vp run -r build`, `vp run --filter ./packages/components storybook:build`, `pnpm audit --audit-level high`). Say in the PR body which gates you couldn't run and why.
+
+## Dependencies
+
+Dependabot ([dependabot.yml](../.github/dependabot.yml)) opens every update weekly, on Wednesday morning Melbourne time: the named runtime sets (`effect` and the like) each in one PR, and every other development dependency in the single `toolchain` group. Security updates skip the schedule and open as soon as an advisory lands, one PR each. Vite+ selects Node.js from `.node-version` and pnpm from `packageManager`; pnpm's own switching is off (`runtimeOnFail` / `pmOnFail`), so one version of each is installed and used.
 
 ## Changesets
 

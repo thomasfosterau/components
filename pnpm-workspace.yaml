@@ -13,13 +13,13 @@ catalog:
   '@changesets/cli': ^3.0.3
   # Optional peer of `/entity-form`; a devDependency for its suite and story.
   '@thomasfosterau/effect-forms-svelte': ^0.4.2
-  effect: 4.1.5
+  effect: 4.1.6
   # Peers `effect` at its own exact version: moves with `effect`.
-  '@effect/vitest': 4.1.5
+  '@effect/vitest': 4.1.6
   '@thomasfosterau/effect-document': ^0.3.0
   # effect-document's optional peer for its readers; packages/import's suite reads CSV with it.
   '@thomasfosterau/effect-parse': ^0.6.2
-  '@lucide/svelte': ^1.79.0
+  '@lucide/svelte': ^1.80.0
   # DEV/BROWSER conditions, resolved by the consumer's bundler; Svelte itself depends on it.
   esm-env: ^1.2.2
   '@types/d3-scale': ^4.0.9
@@ -30,16 +30,16 @@ catalog:
   '@thomasfosterau/effect-richtext': ^0.3.0
   vega: ^6.2.0
   vega-lite: ^6.4.3
-  '@storybook/addon-a11y': ^10.6.8
+  '@storybook/addon-a11y': ^10.6.9
   '@storybook/addon-svelte-csf': ^5.1.6
-  '@storybook/sveltekit': ^10.6.8
+  '@storybook/sveltekit': ^10.6.9
   # Build-time only: `svelte-kit sync` and `svelte-package`.
-  '@sveltejs/kit': 3.4.0
+  '@sveltejs/kit': 3.4.1
   '@sveltejs/package': 3.0.3
   '@sveltejs/vite-plugin-svelte': ^7.3.2
   '@tailwindcss/vite': ^4.3.5
   '@testing-library/jest-dom': ^8.0.0
-  '@types/node': ^26.6.6
+  '@types/node': ^26.6.11
   # Pins `vitest` exactly, so it follows the `vitest` entry below.
   '@vitest/browser-playwright': 5.1.1
   bits-ui: ^2.22.0
@@ -47,9 +47,9 @@ catalog:
   # Exact: each release expects one Chromium revision. 1.56.1–1.59.x hang
   # extracting the browser on Node >= 26.1.0.
   playwright: 1.65.1
-  storybook: ^10.6.8
+  storybook: ^10.6.9
   svelte-check: ^4.7.8
-  svelte: ^5.59.1
+  svelte: ^5.59.2
   tailwindcss: ^4.3.5
   # TS6 under the `typescript` name, for svelte-check (which needs the JS API).
   typescript: 'npm:@typescript/typescript6@6.0.2'
@@ -57,7 +57,7 @@ catalog:
   # the `vite` alias follow what it depends on (the alias no longer shares the
   # vite-plus version).
   vite-plus: 1.8.0
-  vite: npm:@voidzero-dev/vite-plus-core@8.3.8000
+  vite: npm:@voidzero-dev/vite-plus-core@8.3.8001
   vitest: 5.1.1
   '@vitest/coverage-istanbul': 5.1.1
   # `effect-tsgo patch` (the root `prepare`) supports only the TypeScript,
@@ -112,18 +112,16 @@ permissions:
 skills:
   dirs: [.claude/skills]
 
-# Storybook's peer ranges lag the toolchain; the overrides above force one copy.
+# storybook's `vite-plus` peer range (^0.1 || ^0.2) predates Vite+ 1.x.
 peerDependencyRules:
-  allowAny:
-    - vite-plus
-    - vitest
-    - '@sveltejs/kit'
   allowedVersions:
     vite-plus: '*'
-    vitest: '*'
-    '@sveltejs/kit': '*'
 
 # Minutes: hold new third-party releases for 24 hours.
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - '@thomasfosterau/*'
+# Vite+ selects Node.js (.node-version) and pnpm (packageManager); pnpm
+# must not download or switch to its own.
+runtimeOnFail: ignore
+pmOnFail: ignore

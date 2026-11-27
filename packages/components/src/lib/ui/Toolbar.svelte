@@ -16,11 +16,20 @@ A `role="toolbar"` on bits-ui `Toolbar`: one Tab stop, arrow keys between its co
   ARIA and keyboard contract: bits-ui's `role="toolbar"` and roving
   tabindex; ← / → (↑ / ↓ when vertical), Home / End, wrapping with `loop`.
   We add the name (`label` → `aria-label`) and `aria-orientation`.
+
+  `items` and `item` render the controls from data instead of `children`;
+  with `overflow` too, those that don't fit move into a trailing "More"
+  menu (`Overflow`), whose trigger is the last arrow-key stop. A hidden
+  control leaves the arrow-key order, and the Tab stop never sits on one.
+  An overflowing toolbar is horizontal.
 -->
-<script lang="ts">
+<script lang="ts" generics="T extends OverflowEntry">
   import { Toolbar } from 'bits-ui';
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
+  import type { OverflowEntry, OverflowItemAttributes } from './Overflow.svelte';
+  import ItemsOrChildren from './ItemsOrChildren.svelte';
+  import ToolbarOverflow from './ToolbarOverflow.svelte';
 
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
     /** Accessible name ("Formatting", "Bulk actions"). */
@@ -32,27 +41,55 @@ A `role="toolbar"` on bits-ui `Toolbar`: one Tab stop, arrow keys between its co
      * @defaultValue `true`
      */
     loop?: boolean | undefined;
-    /** The controls: `ToolbarButton`, `ToolbarLink`, `ToolbarToggleGroup`, `ToolbarSeparator`. */
-    children: Snippet<[]>;
+    /** The controls: `ToolbarButton`, `ToolbarLink`, `ToolbarToggleGroup`, `ToolbarSeparator`. Ignored when `items` and `item` are given. */
+    children?: Snippet<[]> | undefined;
+    /** The controls as data, rendered by `item`: what the "More" menu shows for each, with `overflow`. */
+    items?: readonly T[] | undefined;
+    /** Render one of `items` as a `ToolbarButton` or `ToolbarLink`, spreading the third argument onto it. */
+    item?: Snippet<[T, number, OverflowItemAttributes]> | undefined;
+    /**
+     * Move the `items` that don't fit into a trailing "More" menu. Horizontal only.
+     * @defaultValue `false`
+     */
+    overflow?: boolean | undefined;
+    /**
+     * Names the "More" menu button, with `overflow`.
+     * @defaultValue `'More'`
+     */
+    moreLabel?: string | undefined;
   }
 
-  let { label, orientation = 'horizontal', loop = true, children, class: className, ...rest }: Props = $props();
+  let {
+    label,
+    orientation = 'horizontal',
+    loop = true,
+    children,
+    items,
+    item,
+    overflow = false,
+    moreLabel = 'More',
+    class: className,
+    ...rest
+  }: Props = $props();
+
+  const rowOrientation = $derived(overflow ? 'horizontal' : orientation);
+  const rowClass = 'rounded-box bg-base-200 items-center gap-1 p-1';
 </script>
 
-<Toolbar.Root {orientation} {loop}>
+<Toolbar.Root orientation={rowOrientation} {loop}>
   {#snippet child({ props })}
-    <div
-      {...rest}
-      {...props}
-      aria-label={label}
-      aria-orientation={orientation}
-      class={[
-        'rounded-box bg-base-200 inline-flex items-center gap-1 p-1',
-        orientation === 'vertical' && 'flex-col',
-        className,
-      ]}
-    >
-      {@render children()}
-    </div>
+    {#if overflow && items !== undefined && item !== undefined}
+      <ToolbarOverflow root={{ ...rest, ...props }} {label} {items} {item} {moreLabel} class={[rowClass, className]} />
+    {:else}
+      <div
+        {...rest}
+        {...props}
+        aria-label={label}
+        aria-orientation={rowOrientation}
+        class={['inline-flex', rowClass, rowOrientation === 'vertical' && 'flex-col', className]}
+      >
+        <ItemsOrChildren {items} {item} {children} />
+      </div>
+    {/if}
   {/snippet}
 </Toolbar.Root>

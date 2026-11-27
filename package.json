@@ -35,12 +35,6 @@
     "vite-plus": "catalog:",
     "vitest": "catalog:"
   },
-  "devEngines": {
-    "runtime": {
-      "name": "node",
-      "version": "lts"
-    }
-  },
   "engines": {
     "pnpm": ">=12"
   },

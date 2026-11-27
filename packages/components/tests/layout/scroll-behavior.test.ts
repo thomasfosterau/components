@@ -2,21 +2,41 @@
  * The scroll behaviours of `Navbar` and `PageHeader`: a pinned bar's
  * elevation and scroll padding, a hide-on-scroll bar that comes back on
  * focus and stays put under reduced motion, and a collapsing title that
- * keeps one heading in the tree without shifting layout.
+ * keeps one heading in the tree without shifting layout, on a CSS view
+ * timeline where the browser has one and a scroll handler where it does not.
  */
 
 import { afterEach, expect, test, vi } from 'vite-plus/test';
+import { cdp } from 'vite-plus/test/browser';
+import type { CDPSession } from 'vite-plus/test/browser-playwright';
 import { render } from 'vitest-browser-svelte';
-import { barFrame, collapseProgress, nextHidden } from '../../src/lib/layout/scroll-behavior.ts';
+import {
+  barFrame,
+  collapseProgress,
+  nextHidden,
+  scrollTimelines,
+} from '../../src/lib/layout/scroll-behavior.ts';
 import ScrollChromeFixture from './fixtures/ScrollChromeFixture.svelte';
 
-afterEach(() => {
+/** `cdp()` is typed without the Playwright provider's `send`, which this suite runs on. */
+const playwrightSession = (session: object): session is CDPSession => 'send' in session;
+
+/** Emulate media features in CSS as well as script. */
+const emulateMedia = async (features: { name: string; value: string }[]): Promise<void> => {
+  const session = cdp();
+  if (!playwrightSession(session)) throw new Error('This suite needs the Playwright provider');
+  await session.send('Emulation.setEmulatedMedia', { features });
+};
+
+afterEach(async () => {
   vi.restoreAllMocks();
+  await emulateMedia([]);
   window.scrollTo({ top: 0, behavior: 'instant' });
 });
 
-/** Make `prefers-reduced-motion: reduce` match for this test. */
-const reduceMotion = (): void => {
+/** Make `prefers-reduced-motion: reduce` match for this test, in script and in CSS. */
+const reduceMotion = async (): Promise<void> => {
+  await emulateMedia([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
   const original = window.matchMedia.bind(window);
   vi.spyOn(window, 'matchMedia').mockImplementation((query) => {
     const list = original(query);
@@ -31,6 +51,32 @@ const scrollTo = async (top: number): Promise<void> => {
 };
 
 const compactBar = (): HTMLElement | null => document.querySelector('[data-collapsed-title]');
+
+/** The compact bar's opacity and visibility as drawn, whichever path set them. */
+const drawn = (): { opacity: number; visibility: string } => {
+  const bar = compactBar();
+  if (bar === null) return { opacity: Number.NaN, visibility: '' };
+  const style = getComputedStyle(bar);
+  return { opacity: Number(style.opacity), visibility: style.visibility };
+};
+
+/** The opacity the scroll handler wrote, under whatever an animation draws. */
+const inline = (): number => Number(compactBar()?.style.opacity);
+
+/** Run a test without scroll-driven animations, on the scroll handler. */
+const withoutTimelines = (): void => {
+  const supports = CSS.supports.bind(CSS);
+  vi.spyOn(CSS, 'supports').mockImplementation((condition: string, value?: string) => {
+    if (condition.includes('animation-timeline')) return false;
+    return value === undefined ? supports(condition) : supports(condition, value);
+  });
+};
+
+/** A scroll offset that puts `fraction` of the h1 past `line` px from the top. */
+const partWay = (fraction: number, line = 0): number => {
+  const box = document.querySelector('h1')?.getBoundingClientRect() ?? new DOMRect();
+  return box.top + window.scrollY - line + box.height * fraction;
+};
 
 test('nextHidden hides scrolling down, shows scrolling up and near the top', () => {
   expect(nextHidden(false, 500, 100, 64)).toBe(true);
@@ -53,12 +99,13 @@ test('barFrame spans a scroll container, below its navbar offset', () => {
     'position: absolute; top: 40px; left: 30px; width: 200px; height: 100px;';
   container.style.setProperty('--navbar-offset', '12px');
   document.body.append(container);
-  expect(barFrame(container)).toEqual({ top: 52, left: 30, width: 200 });
+  expect(barFrame(container)).toEqual({ top: 40, left: 30, width: 200, offset: 12 });
   container.remove();
   expect(barFrame(undefined)).toEqual({
     top: 0,
     left: 0,
     width: document.documentElement.clientWidth,
+    offset: 0,
   });
 });
 
@@ -126,7 +173,7 @@ test('a hide-on-scroll bar slides away scrolling down, returns scrolling up and 
 });
 
 test('under reduced motion a hide-on-scroll bar stays pinned', async () => {
-  reduceMotion();
+  await reduceMotion();
   const screen = await render(ScrollChromeFixture, { navbar: 'hide-on-scroll' });
   const bar = screen.getByRole('banner');
 
@@ -142,34 +189,66 @@ test('a collapsing header shows an aria-hidden compact title, keeping one h1', a
   const bar = compactBar();
   expect(bar?.getAttribute('aria-hidden')).toBe('true');
   expect(bar?.textContent.trim()).toBe('Black Krim');
-  await expect.poll(() => bar?.style.visibility).toBe('hidden');
+  await expect.poll(() => drawn().visibility).toBe('hidden');
 
   await scrollTo(300);
-  await expect.poll(() => bar?.style.opacity).toBe('1');
-  expect(bar?.style.visibility).toBe('visible');
+  await expect.poll(drawn).toEqual({ opacity: 1, visibility: 'visible' });
   await expect
     .element(screen.getByRole('heading', { level: 1, name: 'Tomato ‘Black Krim’' }))
     .toBeInTheDocument();
   expect(screen.getByRole('heading', { level: 1 }).elements()).toHaveLength(1);
 
   await scrollTo(0);
-  await expect.poll(() => bar?.style.visibility).toBe('hidden');
+  await expect.poll(() => drawn().visibility).toBe('hidden');
 });
 
-test('the compact title fades in part way, and snaps under reduced motion', async () => {
+test('the view timeline fades part way, and snaps at halfway under reduced motion', async () => {
+  expect(scrollTimelines()).toBe(true);
   await render(ScrollChromeFixture, { header: 'collapse' });
-  const title = document.querySelector('h1');
-  const box = title?.getBoundingClientRect() ?? new DOMRect();
-  const partWay = box.top + window.scrollY + box.height * 0.3;
 
-  await scrollTo(partWay);
-  await expect.poll(() => Number(compactBar()?.style.opacity)).toBeGreaterThan(0.1);
-  expect(Number(compactBar()?.style.opacity)).toBeLessThan(0.5);
+  await scrollTo(partWay(0.3));
+  await expect.poll(() => drawn().opacity).toBeGreaterThan(0.1);
+  expect(drawn().opacity).toBeLessThan(0.5);
+  expect(drawn().visibility).toBe('visible');
+  // The scroll handler never ran: the animation is drawing over the inline 0.
+  expect(compactBar()?.style.opacity).toBe('0');
+
+  await reduceMotion();
+  await scrollTo(partWay(0.4));
+  await expect.poll(drawn).toEqual({ opacity: 0, visibility: 'hidden' });
+  await scrollTo(partWay(0.6));
+  await expect.poll(drawn).toEqual({ opacity: 1, visibility: 'visible' });
+});
+
+test('the view timeline starts below a pinned bar', async () => {
+  const screen = await render(ScrollChromeFixture, { navbar: 'pinned', header: 'collapse' });
+  const line = screen.getByRole('banner').element().getBoundingClientRect().height;
+  await expect
+    .poll(() => document.documentElement.style.getPropertyValue('--navbar-offset'))
+    .toBe(`${line}px`);
+
+  await scrollTo(partWay(0.3, line));
+  await expect.poll(() => drawn().opacity).toBeGreaterThan(0.1);
+  expect(drawn().opacity).toBeLessThan(0.5);
+  expect(compactBar()?.getBoundingClientRect().top).toBeCloseTo(line, 0);
+});
+
+// The `@supports` rules still apply in this Chromium, so this reads the
+// inline opacity the scroll handler writes rather than the drawn one.
+test('without scroll timelines, the scroll handler fades part way and snaps under reduced motion', async () => {
+  withoutTimelines();
+  await render(ScrollChromeFixture, { header: 'collapse' });
+
+  await scrollTo(partWay(0.3));
+  await expect.poll(inline).toBeGreaterThan(0.1);
+  expect(inline()).toBeLessThan(0.5);
 
   await scrollTo(0);
-  reduceMotion();
-  await scrollTo(partWay);
-  await expect.poll(() => compactBar()?.style.opacity).toBe('0');
+  await reduceMotion();
+  await scrollTo(partWay(0.3));
+  await expect.poll(inline).toBe(0);
+  await scrollTo(partWay(0.6));
+  await expect.poll(inline).toBe(1);
 });
 
 test('scrolling a collapsing header under a pinned bar shifts no layout', async () => {
