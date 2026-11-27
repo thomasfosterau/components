@@ -1,5 +1,24 @@
 # @thomasfosterau/components
 
+## 0.7.0
+
+### Minor Changes
+
+- 56601cd: `EventCalendar` adds `week` and `day` views: time grids over `hours` (`[6, 22]` by default) with an all-day strip, events positioned by time but in time order in the DOM and named with their times, and overlapping events packed into side-by-side columns. `onSlotSelect(start, end)` reports a slot dragged over the hours or offered by each day's "New event" button, snapped to `slotMinutes`. Previous and Next move by the view's unit and name it (`weekUnitLabel`, `dayUnitLabel`), and the heading shows the visible range. The view switch now offers all four views by default, and `viewLabels` takes any subset of them. Dragging to move or resize an event is not part of this release.
+- 505b1a6: `Tabs` in `panels` mode takes `scrollButtons`: a tab list that doesn't fit scrolls horizontally, with "Scroll tabs left" and "Scroll tabs right" buttons (`scrollLeftLabel`, `scrollRightLabel`) that show only while it overflows and disable at either end. They sit outside the `tablist` and out of the Tab order; the focused or selected tab scrolls into view, so the arrow keys still reach every tab.
+- c426332: `Toolbar` and `ButtonGroup` take their controls as `items` and an `item` snippet, and with `overflow` move the ones that don't fit into a trailing "More" menu. In a `Toolbar`, "More" is the last arrow-key stop, hidden controls leave the arrow-key order and the toolbar stays one Tab stop. `Overflow` gains a `trigger` snippet for rendering the "More" button and an `onHiddenChange` callback, and marks a hidden item's attributes with `data-overflow-hidden`.
+
+### Patch Changes
+
+- c79891e: `Dialog` and `LeaveGuardDialog` show their box again. daisyUI 5 keeps a `modal-box` at `opacity: 0` unless it sits inside an open `.modal`, which bits-ui's portalled content never does, so the box was invisible behind its scrim. The box now opens itself on `data-state="open"`, fading and scaling in from `@starting-style` and back out on close.
+- e9a4df3: Security: `Link`, `LinkButton`, `ExternalLink` and `MenuItem` drop an `href` whose scheme isn't `http:`, `https:`, `mailto:` or `tel:` (relative URLs still pass), so a `javascript:`, `data:` or `vbscript:` URL can't reach the anchor. `Link` and `ExternalLink` then render their text without a link, `LinkButton` renders as disabled, and `MenuItem` becomes a button that calls `onSelect`.
+- 8e9d718: `PageHeader` `scrollBehavior="collapse"` fades its compact title on a CSS view timeline where the browser supports scroll-driven animations, so no scroll handler runs; elsewhere the scroll handler stays as the fallback. The compact bar also follows `--navbar-offset` as it changes, so it stays under a hide-on-scroll `Navbar`.
+- 2197c46: Security: components that render caller-supplied URLs or colours no longer pass unsafe values through.
+
+  - `EventCalendar` events, `Timeline` entries, `CreditList` credits, the `url` of `BookCitation`, `ReportCitation`, `ScholarlyArticleCitation`, `ThesisCitation` and `ReferenceList` entries, and `Infobox` / `InfoboxRow` links are linked only when the URL is relative or uses `http:`, `https:`, `mailto:` or `tel:`. Any other scheme, such as `javascript:` (including obfuscated forms like `\tJaVaScRiPt:`), renders without the link; an `EventCalendar` event falls back to its button and `onEventSelect`.
+  - `ColorSwatchGroup` fills a swatch only when its `value` is a CSS colour, so a value such as `red; background-image: url(…)` can no longer add declarations to the inline style.
+  - `Image`'s `lqip` placeholder percent-encodes quotes, backslashes and line breaks in `src`, so it can't end its CSS string.
+
 ## 0.6.0
 
 ### Minor Changes

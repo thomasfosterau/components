@@ -1,5 +1,29 @@
 # @thomasfosterau/components-import
 
+## 0.2.0
+
+### Minor Changes
+
+- ff8415c: `@thomasfosterau/components` is now a required peer (`^` the minor released alongside) instead of an exact-version dependency. Apps no longer get a second, nested copy of the library, so `getComponentsContext()` inside a map or the import mapper reads the context the app set. Add `@thomasfosterau/components` to your app's dependencies if it isn't there already.
+- 5a1dff7: `ImportMapper` gains a read options step between choosing the file and matching its columns: `ImportReadOptions`, a new step component, sets whether the table's first row is the header and how many rows above it to skip, with a live preview of the first rows and an announced count of the rows to import. It works for every source, a CSV's table and a workbook's sheet alike; an app that passes `Xlsx.format` from `@thomasfosterau/effect-document/ooxml` can import any sheet of an Excel workbook.
+
+  Breaking: the header checkbox moves from `ImportFieldMap` to `ImportReadOptions`, so `ImportFieldMap` no longer takes `headerRowLabel` and its `read` is no longer bindable. `ImportMapper` takes `readOptionsLabel` (the new step's name) and `readOptionsProps`.
+
+- 5f86a1e: `ImportFormat` takes an optional reader factory, `readerWith`, such as `{ ...Csv.format, readerWith: Csv.makeCsvReader }`. For a format with one, `ImportReadOptions` offers the text encoding (detected by default), the separator (the format's own, comma, semicolon or tab), the quote, ragged rows (on by default) and type inference, and previews each change on a bounded read of `previewRows` records (`ImportMapper`'s new `previewRows`, 200 by default). Going on reads the whole file with them, and `result.spec.source` records the `encoding` and `readerOptions`. A format without a factory reads as before. A failed read now shows the reader's reason rather than an empty one.
+
+  `ImportReadOptions` takes `source`, a bindable `reader` and copy for the new controls; `ImportMapper` takes `readFailedMessage` and `noTableMessage`; `ImportFile` gains `reader` and `encoding`. New exports from `./svelte`: `defaultReaderChoice` and the types `ImportReader`, `ImportReaderOptions`, `ImportDialect`, `ReaderChoice`, `SeparatorChoice` and `QuoteChoice`.
+
+### Patch Changes
+
+- Updated dependencies [56601cd]
+- Updated dependencies [c79891e]
+- Updated dependencies [e9a4df3]
+- Updated dependencies [8e9d718]
+- Updated dependencies [2197c46]
+- Updated dependencies [505b1a6]
+- Updated dependencies [c426332]
+  - @thomasfosterau/components@0.7.0
+
 ## 0.1.1
 
 ### Patch Changes

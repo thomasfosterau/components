@@ -1,5 +1,22 @@
 # @thomasfosterau/components-mapbox
 
+## 0.3.0
+
+### Minor Changes
+
+- ff8415c: `@thomasfosterau/components` is now a required peer (`^` the minor released alongside) instead of an exact-version dependency. Apps no longer get a second, nested copy of the library, so `getComponentsContext()` inside a map or the import mapper reads the context the app set. Add `@thomasfosterau/components` to your app's dependencies if it isn't there already.
+
+### Patch Changes
+
+- Updated dependencies [56601cd]
+- Updated dependencies [c79891e]
+- Updated dependencies [e9a4df3]
+- Updated dependencies [8e9d718]
+- Updated dependencies [2197c46]
+- Updated dependencies [505b1a6]
+- Updated dependencies [c426332]
+  - @thomasfosterau/components@0.7.0
+
 ## 0.2.4
 
 ### Patch Changes
