@@ -16,11 +16,22 @@
       docs: {
         description: {
           component:
-            'A `Toolbar` is one Tab stop with arrow keys across all its controls (APG toolbar). A `ButtonGroup` is a named cluster whose buttons each stay a Tab stop: use it for independent actions such as "Save | Save as… | Discard".',
+            'A `Toolbar` is one Tab stop with arrow keys across all its controls (APG toolbar). A `ButtonGroup` is a named cluster whose buttons each stay a Tab stop: use it for independent actions such as "Save | Save as… | Discard". Both take `items`, `item` and `overflow` to move the controls that don\'t fit into a "More" menu.',
         },
       },
     },
   });
+
+  const bedActions = [
+    { id: 'water', label: 'Water', priority: 2 },
+    { id: 'feed', label: 'Feed' },
+    { id: 'prune', label: 'Prune' },
+    { id: 'harvest', label: 'Harvest', priority: 1 },
+    { id: 'photo', label: 'Add photo' },
+    { id: 'history', label: 'History', href: '/beds/4/history' },
+  ];
+
+  const widths = [240, 420, 720] as const;
 </script>
 
 {#snippet undo()}<Undo2 class="size-4" aria-hidden="true" />{/snippet}
@@ -83,4 +94,36 @@
     <Button class="join-item">Save as…</Button>
     <Button class="join-item" variant="outline" tone="error">Discard</Button>
   </ButtonGroup>
+</Story>
+
+<Story name="Overflowing toolbar" asChild>
+  <div class="flex flex-col gap-6">
+    {#each widths as width (width)}
+      <div style="width: {width}px;">
+        <Toolbar label="Bed actions" items={bedActions} overflow>
+          {#snippet item(action, _index, attributes)}
+            {#if action.href === undefined}
+              <ToolbarButton {...attributes}>{action.label}</ToolbarButton>
+            {:else}
+              <ToolbarLink {...attributes} href={action.href}>{action.label}</ToolbarLink>
+            {/if}
+          {/snippet}
+        </Toolbar>
+      </div>
+    {/each}
+  </div>
+</Story>
+
+<Story name="Overflowing ButtonGroup" asChild>
+  <div class="flex flex-col gap-6">
+    {#each widths as width (width)}
+      <div style="width: {width}px;">
+        <ButtonGroup label="Bed actions" items={bedActions.filter((action) => action.href === undefined)} overflow>
+          {#snippet item(action, _index, attributes)}
+            <Button {...attributes} class="join-item">{action.label}</Button>
+          {/snippet}
+        </ButtonGroup>
+      </div>
+    {/each}
+  </div>
 </Story>

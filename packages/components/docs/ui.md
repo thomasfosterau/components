@@ -12,7 +12,7 @@ Buttons, badges and surfaces — the family every other family builds on: `Alert
 - **`colour-token.ts`** — `colourTokenStyle`, for binding a component's colour custom property to a theme token, and the two properties it binds: `BADGE_COLOUR_PROPERTY` (`'--badge-colour'`, `Badge`'s) and `CHIP_COLOUR_PROPERTY` (`'--chip-colour'`, `Chip`'s).
 - **`menu-context.ts`** — `MenuMode` (`'dropdown' | 'context' | 'nav'`) and `getMenuMode()`, which tells a menu item of your own which kind of menu it is in: `'dropdown'` inside a `DropdownMenu`, `'context'` inside a `ContextMenu`, otherwise `'nav'`.
 
-**A row that might not fit: `Overflow`.** It shows as many of its `items` as fit and moves the rest, lowest `priority` first, into a trailing "More" `DropdownMenu`, loaded with a dynamic `import()` the first time anything overflows. A `pinned` or `current` item never moves. `collapseFrom` picks the end that goes first (`'middle'` keeps the first and last, as `Breadcrumbs overflow` does), and each hidden item appears exactly once, in the menu, as a `MenuItem` that keeps its `href` and `aria-current`. In a `div` row, the `item` snippet spreads its third argument onto its root element; in a `ul` or `ol` the component wraps each item in an `<li>`. Until the first measure the row wraps, so a reader without script sees every item; `data-overflow-ready` marks the measured row. `Tabs mode="links"` and `Breadcrumbs` take an `overflow` prop built on it. Panel tabs don't: a menu item cannot be a `tab`.
+**A row that might not fit: `Overflow`.** It shows as many of its `items` as fit and moves the rest, lowest `priority` first, into a trailing "More" `DropdownMenu`, loaded with a dynamic `import()` the first time anything overflows. A `pinned` or `current` item never moves. `collapseFrom` picks the end that goes first (`'middle'` keeps the first and last, as `Breadcrumbs overflow` does), and each hidden item appears exactly once, in the menu, as a `MenuItem` that keeps its `href` and `aria-current`. In a `div` row, the `item` snippet spreads its third argument onto its root element; in a `ul` or `ol` the component wraps each item in an `<li>`. Until the first measure the row wraps, so a reader without script sees every item; `data-overflow-ready` marks the measured row. `Tabs mode="links"`, `Breadcrumbs`, `Toolbar` and `ButtonGroup` take an `overflow` prop built on it. Panel tabs don't: a menu item cannot be a `tab`. A `trigger` snippet renders the "More" button yourself, spreading the `props` it is given, and `onHiddenChange` reports the hidden items.
 
 ```svelte
 <Overflow items={actions} aria-label="Bed actions" class="gap-1">
@@ -20,6 +20,16 @@ Buttons, badges and surfaces — the family every other family builds on: `Alert
     <button {...attributes} class="btn btn-sm" onclick={action.onSelect}>{action.label}</button>
   {/snippet}
 </Overflow>
+```
+
+**A toolbar that might not fit.** `Toolbar` and `ButtonGroup` take their controls as `items` (`Overflow` entries) and an `item` snippet instead of `children`, and with `overflow` move what doesn't fit into a trailing "More" menu. In a `Toolbar` each item is a `ToolbarButton` or `ToolbarLink` spreading the snippet's third argument; "More" is the last arrow-key stop, a hidden control leaves the arrow-key order, and the toolbar stays one Tab stop, which passes to a visible control when its holder moves into the menu. An overflowing toolbar or group is horizontal.
+
+```svelte
+<Toolbar label="Bed actions" items={actions} overflow>
+  {#snippet item(action, _index, attributes)}
+    <ToolbarButton {...attributes} onclick={action.onSelect}>{action.label}</ToolbarButton>
+  {/snippet}
+</Toolbar>
 ```
 
 **A default action with alternatives is a `SplitButton`.** "Save ▾" runs Save on the main part and offers "Save as draft" behind the chevron: two Tab stops in a `join`, with the alternatives as the same `MenuItem`s a `DropdownMenu` takes. Name the chevron for what it holds (`menuLabel="More save options"`), not "More". Like `DropdownMenu`, it loads bits-ui's menu runtime, so keep it off components every page renders.
